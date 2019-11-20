@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.9.RELEASE</version>
+    </parent>
+    <groupId>com.jzy</groupId>
+    <artifactId>aows</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>aows</name>
+    <description>Demo project for Spring Boot</description>
+
+    <properties>
+        <!-- JDK version -->
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Spring Boot-->
+        <project.build.spring.boot.starter.parent.version>1.5.9.RELEASE</project.build.spring.boot.starter.parent.version>
+        <!-- MyBatis and Spring Boot -->
+        <project.build.mybatis.spring.boot.starter.version>1.3.2</project.build.mybatis.spring.boot.starter.version>
+        <!-- Database connection pool -->
+        <project.build.druid.spring.boot.starter.version>1.1.10</project.build.druid.spring.boot.starter.version>
+        <!-- PageHelper -->
+        <project.build.pagehelper.spring.boot.starter.version>1.2.3</project.build.pagehelper.spring.boot.starter.version>
+        <!-- Jackson -->
+        <project.build.alibaba.fastjson.version>1.2.56</project.build.alibaba.fastjson.version>
+        <project.build.fasterxml.jackson.version>2.10.0.pr1</project.build.fasterxml.jackson.version>
+        <project.build.codehaus.jackson.core.version>1.9.13</project.build.codehaus.jackson.core.version>
+        <!-- Shiro -->
+        <project.build.shiro.version>1.4.0</project.build.shiro.version>
+        <!-- Common util -->
+        <project.build.commons.lang3.version>3.3.2</project.build.commons.lang3.version>
+        <!-- Mail -->
+        <project.build.javax.mail.version>1.4.7</project.build.javax.mail.version>
+        <project.build.sun.mail.javax.version>1.6.2</project.build.sun.mail.javax.version>
+        <!--poi-->
+        <project.build.org.apache.poi.version>3.17</project.build.org.apache.poi.version>
+        <!--lombok-->
+        <project.build.lombok.version>1.18.8</project.build.lombok.version>
+        <!--kaptcha-->
+        <project.build.kaptcha.version>2.3.2</project.build.kaptcha.version>
+    </properties>
+
+
+    <dependencies>
+        <!--lombok-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${project.build.lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--添加热部署-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+            <scope>true</scope>
+        </dependency>
+
+        <!--对于web的依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Spring Boot log4j依赖 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j</artifactId>
+            <version>1.3.8.RELEASE</version>
+        </dependency>
+        <!--aop-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-freemarker</artifactId>
+        </dependency>
+
+        <!--jta管理多个数据源事务-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jta-atomikos</artifactId>
+        </dependency>
+
+        <!-- mysql驱动 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <!--redis-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <!-- mybatis依赖 -->
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>${project.build.mybatis.spring.boot.starter.version}</version>
+        </dependency>
+        <!--springboot pagehelper-->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>${project.build.pagehelper.spring.boot.starter.version}</version>
+        </dependency>
+
+        <!-- connection pool -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>${project.build.druid.spring.boot.starter.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+            <version>${project.build.shiro.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-spring</artifactId>
+            <version>${project.build.shiro.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-web</artifactId>
+            <version>${project.build.shiro.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-ehcache</artifactId>
+            <version>${project.build.shiro.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${project.build.commons.lang3.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>${project.build.javax.mail.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>${project.build.sun.mail.javax.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${project.build.alibaba.fastjson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${project.build.org.apache.poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${project.build.org.apache.poi.version}</version>
+        </dependency>
+
+        <!-- kaptcha验证码 -->
+        <dependency>
+            <groupId>com.github.penggle</groupId>
+            <artifactId>kaptcha</artifactId>
+            <version>${project.build.kaptcha.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>ROOT</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 工程主入口-->
+                    <mainClass>com.jzy.App</mainClass>
+                    <!--fork:如果没有该项配置,整个devtools不会起作用-->
+                    <fork>true</fork>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+        <!--解决maven项目编译后classes文件中没有.xml问题-->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>static/custom/img/favicon/**/*</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>static/plugins/layuiadmin/**/*</exclude>
+                    <exclude>static/custom/img/favicon/**/*</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <!--解决layui图标无法显示-->
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>static/plugins/layuiadmin/**/*</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+
+</project>

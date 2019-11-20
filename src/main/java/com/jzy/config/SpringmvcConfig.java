@@ -1,0 +1,56 @@
+package com.jzy.config;
+
+import com.jzy.web.interceptor.EmailVerifyCodeInterceptor;
+import com.jzy.web.interceptor.TokenInterceptor;
+import com.jzy.web.interceptor.UpdateSessionUserInfoInterceptor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+/**
+ * @author JinZhiyun
+ * @version 1.0
+ * @ClassName SpringmvcConfig
+ * @description 配置springmvc拦截器等
+ * @date 2019/9/30 10:37
+ **/
+@Configuration
+public class SpringmvcConfig extends WebMvcConfigurerAdapter {
+    @Bean
+    public UpdateSessionUserInfoInterceptor updateSessionUserInfoInterceptor(){
+        return new UpdateSessionUserInfoInterceptor();
+    }
+
+    @Bean
+    public TokenInterceptor tokenInterceptor(){
+        return new TokenInterceptor();
+    }
+
+    @Bean
+    public EmailVerifyCodeInterceptor emailVerifyCodeInterceptor(){
+        return new EmailVerifyCodeInterceptor();
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        //UpdateSessionUserInfoInterceptor
+        registry.addInterceptor(updateSessionUserInfoInterceptor())
+                .addPathPatterns("/index").addPathPatterns("/user/setInfo").addPathPatterns("/user/setEmail")
+                .addPathPatterns("/user/setPhone").addPathPatterns("/user/setPassword").addPathPatterns("/user/admin/page"); //拦截项目中的哪些请求
+
+        //TokenInterceptor
+        registry.addInterceptor(tokenInterceptor())
+                .addPathPatterns("/**"); //拦截项目中的哪些请求
+
+        //CsrfInterceptor
+//        registry.addInterceptor(new CsrfInterceptor())
+//                .addPathPatterns("/user/reset*").addPathPatterns("/*/update*")
+//                .addPathPatterns("/*/insert*").addPathPatterns("/*/delete*"); //拦截项目中的哪些请求
+
+        //EmailVerifyCodeInterceptor
+        registry.addInterceptor(emailVerifyCodeInterceptor())
+                .addPathPatterns("/resetPassword").addPathPatterns("/user/modifyCurrentEmail"); //拦截项目中的哪些请求
+
+    }
+}

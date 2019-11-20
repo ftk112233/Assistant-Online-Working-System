@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jzy.dao.UserMapper">
+    <!--resultMap和resultType不能同时使用-->
+    <resultMap id="BaseColumnResultMap" type="com.jzy.model.entity.BaseEntity">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap" type="com.jzy.model.entity.User" extends="BaseColumnResultMap">
+        <result column="user_work_id" property="userWorkId" jdbcType="VARCHAR"/>
+        <result column="user_id_card" property="userIdCard" jdbcType="VARCHAR"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="user_password" property="userPassword" jdbcType="VARCHAR"/>
+        <result column="user_salt" property="userSalt" jdbcType="VARCHAR"/>
+        <result column="user_real_name" property="userRealName" jdbcType="VARCHAR"/>
+        <result column="user_role" property="userRole" jdbcType="VARCHAR"/>
+        <result column="user_icon" property="userIcon" jdbcType="VARCHAR"/>
+        <result column="user_email" property="userEmail" jdbcType="VARCHAR"/>
+        <result column="user_phone" property="userPhone" jdbcType="VARCHAR"/>
+        <result column="user_remark" property="userRemark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <insert id="insertUser" parameterType="com.jzy.model.entity.User">
+        insert into user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userWorkId != null and userWorkId!=''">
+                user_work_id,
+            </if>
+            <if test="userIdCard != null and userIdCard!=''" >
+                user_id_card,
+            </if>
+            <if test="userName != null and userName!=''" >
+                user_name,
+            </if>
+            <if test="userPassword != null and userPassword!=''" >
+                user_password,
+            </if>
+            <if test="userSalt != null and userSalt!=''" >
+                user_salt,
+            </if>
+            <if test="userRealName != null and userRealName!=''" >
+                user_real_name,
+            </if>
+            <if test="userIcon != null and userIcon!=''" >
+                user_icon,
+            </if>
+            <if test="userEmail != null and userEmail!=''" >
+                user_email,
+            </if>
+            <if test="userPhone != null and userPhone!=''" >
+                user_phone,
+            </if>
+            user_remark
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userWorkId != null and userWorkId!=''">
+                #{userWorkId},
+            </if>
+            <if test="userIdCard != null and userIdCard!=''" >
+                #{userIdCard},
+            </if>
+            <if test="userName != null and userName!=''" >
+                #{userName},
+            </if>
+            <if test="userPassword != null and userPassword!=''" >
+                #{userPassword},
+            </if>
+            <if test="userSalt != null and userSalt!=''" >
+                #{userSalt},
+            </if>
+            <if test="userRealName != null and userRealName!=''" >
+                #{userRealName},
+            </if>
+            <if test="userIcon != null and userIcon!=''" >
+                #{userIcon},
+            </if>
+            <if test="userEmail != null and userEmail!=''" >
+                #{userEmail},
+            </if>
+            <if test="userPhone != null and userPhone!=''" >
+                #{userPhone},
+            </if>
+            #{userRemark}
+        </trim>
+    </insert>
+    <delete id="deleteOneUserById">
+        delete from user where id=#{id}
+    </delete>
+
+    <select id="getUserByName" resultMap="BaseResultMap">
+        select * from user where user_name=#{userName}
+    </select>
+    <select id="getUserByWorkId" resultMap="BaseResultMap">
+        select * from user where user_work_id=#{userWorkId}
+    </select>
+    <select id="getUserByEmail" resultMap="BaseResultMap">
+        select * from user where user_email=#{userEmail}
+    </select>
+    <select id="getUserByPhone" resultMap="BaseResultMap">
+        select * from user where user_phone=#{userPhone};
+    </select>
+    <select id="getUserByIdCard" resultMap="BaseResultMap">
+        select * from user where user_id_card=#{userIdCard};
+    </select>
+    <select id="getUserById" resultMap="BaseResultMap">
+        select * from user where id=#{id};
+    </select>
+    <select id="listUsers" resultMap="BaseResultMap"
+            parameterType="com.jzy.model.dto.UserSearchCondition">
+        select * from user u
+        <where>
+            <if test="userWorkId != null and userWorkId!=''">
+                <bind name="userWorkIdLike" value=" '%' + userWorkId + '%' "/>
+                and u.user_work_id like #{userWorkIdLike}
+            </if>
+            <if test="userIdCard != null and userIdCard!=''">
+                <bind name="userIdCardLike" value=" '%' + userIdCard + '%' "/>
+                and u.user_id_card like #{userIdCardLike}
+            </if>
+            <if test="userName != null and userName!=''">
+                <bind name="userNameLike" value=" '%' + userName + '%' "/>
+                and u.user_name like #{userNameLike}
+            </if>
+            <if test="userRealName != null and userRealName!=''">
+                <bind name="userRealNameLike" value=" '%' + userRealName + '%' "/>
+                and u.user_real_name like #{userRealNameLike}
+            </if>
+            <if test="userRole != null and userRole!=''">
+                and u.user_role=#{userRole}
+            </if>
+            <if test="userEmail != null and userEmail!=''">
+                <bind name="userEmailLike" value=" '%' + userEmail + '%' "/>
+                and u.user_email like #{userEmailLike}
+            </if>
+            <if test="userPhone != null and userPhone!=''">
+                <bind name="userPhoneLike" value=" '%' + userPhone + '%' "/>
+                and u.user_phone like #{userPhoneLike}
+            </if>
+        </where>
+            <if test="condition1 == 'userWorkId'">
+                order by u.user_work_id
+                <if test="condition2 == 'asc'">
+                    desc
+                </if>
+                <if test="condition2 == 'desc'">
+                    asc
+                </if>
+            </if>
+            <if test="condition1 == 'userIdCard'">
+                order by u.user_id_card
+                <if test="condition2 == 'asc'">
+                    desc
+                </if>
+                <if test="condition2 == 'desc'">
+                    asc
+                </if>
+            </if>
+            <if test="condition1 == 'userRealName'">
+                order by u.user_real_name
+                <if test="condition2 == 'asc'">
+                    desc
+                </if>
+                <if test="condition2 == 'desc'">
+                    asc
+                </if>
+            </if>
+            <if test="condition1 == 'userRole'">
+                order by u.user_role
+                <if test="condition2 == 'asc'">
+                    desc
+                </if>
+                <if test="condition2 == 'desc'">
+                    asc
+                </if>
+            </if>
+    </select>
+
+    <update id="updatePasswordByEmail" parameterType="com.jzy.model.entity.User">
+        UPDATE user
+        <set>
+            user_password=#{userPassword}
+        </set>
+        <where>
+            user_email=#{userEmail}
+        </where>
+    </update>
+    <update id="updateOwnInfo" parameterType="com.jzy.model.entity.User">
+        update user
+        <set>
+            user_id_card = #{userIdCard,jdbcType=VARCHAR},
+            <if test="userName != null  and userName!=''">
+                user_name = #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="userRealName != null and userRealName!=''">
+                user_real_name = #{userRealName,jdbcType=VARCHAR},
+            </if>
+            user_icon = #{userIcon,jdbcType=VARCHAR},
+        </set>
+        where id = #{id}
+    </update>
+    <update id="updateEmailById">
+        update user set user_email=#{userEmail} where id=#{id}
+    </update>
+    <update id="updatePhoneById">
+        update user set user_phone=#{userPhone} where id=#{id}
+    </update>
+    <update id="updatePasswordById">
+        update user set user_password=#{userPassword} where id=#{id}
+    </update>
+    <update id="updateUserInfo" parameterType="com.jzy.model.entity.User">
+        update user
+        <set>
+            user_work_id = #{userWorkId,jdbcType=VARCHAR},
+            user_id_card = #{userIdCard,jdbcType=VARCHAR},
+            <if test="userName != null  and userName!=''">
+                user_name = #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="userRealName != null and userRealName!=''">
+                user_real_name = #{userRealName,jdbcType=VARCHAR},
+            </if>
+            <if test="userRole != null and userRole!=''">
+                user_role = #{userRole,jdbcType=VARCHAR},
+            </if>
+            user_email = #{userEmail,jdbcType=VARCHAR},
+            user_phone = #{userPhone,jdbcType=VARCHAR},
+            user_remark = #{userRemark,jdbcType=VARCHAR},
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>
