@@ -15,6 +15,8 @@ import java.util.Properties;
  * @Version 1.0
  **/
 public class SendEmailUtils {
+    private SendEmailUtils(){}
+
     private static final String FROM = "929703621@qq.com"; // 谁发送
 
     // 发送者的用户名和密码(邮箱登录用)

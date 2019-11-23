@@ -184,7 +184,7 @@
                 type: 'post'
                 , data: {"userPassword": field.password}
                 , success: function (res) {
-                    if (res.data === "resetPasswordSuccess") {
+                    if (res.data === "success") {
                         layer.msg('密码已成功重置', {
                             offset: '15px'
                             , icon: 1

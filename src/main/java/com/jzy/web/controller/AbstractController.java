@@ -2,15 +2,9 @@ package com.jzy.web.controller;
 
 import com.jzy.config.FilePathProperties;
 import com.jzy.service.*;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * @author JinZhiyun
@@ -39,6 +33,12 @@ public abstract class AbstractController {
 
     @Autowired
     protected AssistantService assistantService;
+
+    @Autowired
+    protected RoleAndPermissionService roleAndPermissionService;
+
+    @Autowired
+    protected MissLessonStudentService missLessonStudentService;
 
     @Autowired
     protected RedisTemplate<String,Object> redisTemplate;

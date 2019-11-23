@@ -2,16 +2,20 @@ package com.jzy.web.shiro;
 
 import com.jzy.manager.constant.SessionConstants;
 import com.jzy.manager.util.ShiroUtils;
-import com.jzy.model.vo.UserLoginResult;
 import com.jzy.model.entity.User;
+import com.jzy.model.vo.UserLoginResult;
+import com.jzy.service.RoleAndPermissionService;
 import com.jzy.service.UserService;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;
+
+import java.util.List;
 
 /**
  * @author JinZhiyun
@@ -23,6 +27,9 @@ import org.springframework.data.redis.core.*;
 public class UserRealm extends AuthorizingRealm {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RoleAndPermissionService roleAndPermissionService;
 
     @Autowired
     protected RedisTemplate<String, Object> redisTemplate;
@@ -51,19 +58,18 @@ public class UserRealm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
 //        System.out.println("++++++++++++++");
-//        Session session = SecurityUtils.getSubject().getSession();
-//        User user = (User) session.getAttribute("userInfo");
-//        // 权限信息对象info,用来存放查出的用户的所有的角色（role）及权限（permission）
-//        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-//        // 用户的角色集合
+        User user =userService.getSessionUserInfo();
+        // 权限信息对象info,用来存放查出的用户的所有的角色（role）及权限（permission）
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+        // 用户的角色集合
 //        Set<String> roles = new HashSet<>();
 //        roles.add(user.getUserRole());
 //        info.setRoles(roles);
-        // 用户的角色对应的所有权限，如果只使用角色定义访问权限，下面可以不要
-        // 只有角色并没有颗粒度到每一个按钮 或 是操作选项  PERMISSIONS 是可选项
-//        info.addStringPermissions(permissions);
-//        info.addStringPermission("user:add");
-        return null;
+//         用户的角色对应的所有权限，如果只使用角色定义访问权限，下面可以不要
+//         只有角色并没有颗粒度到每一个按钮 或 是操作选项  PERMISSIONS 是可选项
+        List<String> permissions=roleAndPermissionService.listPermsByRole(user.getUserRole());
+        info.addStringPermissions(permissions);
+        return info;
     }
 
     /**

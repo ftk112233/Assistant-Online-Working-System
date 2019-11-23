@@ -10,6 +10,8 @@ import java.util.Random;
  * @date 2019/11/14 23:19
  **/
 public class CodeUtils {
+    private CodeUtils(){}
+
     /**
      * 判断用户输入的验证码与实际是否相同
      *

@@ -11,7 +11,6 @@
     <link rel="icon" href="${ctx}/custom/img/favicon/favicon.ico"/>
     <link rel="stylesheet" href="${ctx}/plugins/layuiadmin/layui/css/layui.css" media="all">
     <link rel="stylesheet" href="${ctx}/plugins/layuiadmin/style/admin.css" media="all">
-    <link rel="stylesheet" href="${ctx}/plugins/layuiadmin/style/login.css" media="all">
 </head>
 <body>
 <div class="layui-fluid">
@@ -97,9 +96,36 @@
             <div style="padding-bottom: 10px;">
                 <button class="layui-btn layuiadmin-btn-list" data-type="batchdel">删除</button>
                 <button class="layui-btn layuiadmin-btn-list" data-type="add">添加</button>
-            <#--<button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #FFB800"-->
-            <#--id="query-all-info">查询所有信息-->
-            <#--</button>-->
+                <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #FFB800"
+                        id="import-user"><i class="layui-icon">&#xe67c;</i>仅导入用户
+                </button>
+                <i class="layui-icon layui-icon-tips" lay-tips="上传excel要求说明：<br>
+                                                                1、第1行、第2行与导入无关。有效内容从第3行开始，第3行为列名属性：部门、校区、姓名、员工号......<br>
+                                                                2、重要！！列名属性中系统将读取以下名称的列导入数据库，先确保列名必须正确！<br>
+                                                                    ====部门、校区、姓名、员工号、身份证号、手机号、备注====<br>
+                                                                3、第四行开始是数据:<br>
+                                                                    1)员工号必须唯一且准确<br>
+                                                                    2)身份证号必须唯一且准确<br>
+                                                                    3)手机号必须唯一且准确<br>
+                                                                4、其他：<br>
+                                                                    1)导入用户后，密码默认初始化为身份证，用以初次登陆<br>
+                                                                                        "></i>
+                &nbsp;
+                <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #01AAED"
+                        id="import-user-and-assistant"><i class="layui-icon">&#xe67c;</i>导入用户和助教
+                </button>
+                <i class="layui-icon layui-icon-tips" lay-tips="上传excel要求说明：<br>
+                                                                1、第1行、第2行与导入无关。有效内容从第3行开始，第3行为列名属性：部门、校区、姓名、员工号......<br>
+                                                                2、重要！！列名属性中系统将读取以下名称的列导入数据库，先确保列名必须正确！<br>
+                                                                    ====部门、校区、姓名、员工号、身份证号、手机号、备注====<br>
+                                                                3、第四行开始是数据:<br>
+                                                                    1)员工号必须唯一且准确<br>
+                                                                    2)身份证号必须唯一且准确<br>
+                                                                    3)手机号必须唯一且准确<br>
+                                                                4、其他：<br>
+                                                                    1)姓名导入助教表中时，对于重名助教会在重名的名字后面加'1'以区别<br>
+                                                                    2)导入用户后，密码默认初始化为身份证，用以初次登陆<br>
+                                                                                        "></i>
             </div>
             <table id="userTable" lay-filter="LAY-app-content-comm"></table>
             <script type="text/html" id="table-content-list1">
@@ -110,7 +136,7 @@
             </script>
         </div>
         <script type="text/html" id="imgTpl">
-            <img src="${ctx}/user/showIcon?userIcon={{ d.userIcon }}" style="height:60px;">
+            <img src="${ctx}/user/showIcon?userIcon={{ d.userIcon }}" style="height:50px;">
         </script>
     </div>
 </div>
@@ -135,13 +161,91 @@
         base: '${ctx}/plugins/layuiadmin/' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use(['index', 'user'], function () {
+    }).use(['index', 'user', 'upload'], function () {
         var $ = layui.$
                 , admin = layui.admin
                 , form = layui.form
                 , table = layui.table
                 , laypage = layui.laypage
-                , laytpl = layui.laytpl;
+                , laytpl = layui.laytpl
+                , upload = layui.upload;
+
+
+        upload.render({
+            elem: '#import-user-and-assistant'
+            , url: '${ctx}/user/admin/import'
+            , data: {
+                //上传用户和助教
+                type: 2
+            }
+            , accept: 'file' //普通文件
+            , exts: 'xls|xlsx' //允许上传的文件后缀
+            , before: function (obj) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+                layer.load(1, {shade: [0.1, '#fff']}); //上传loading
+            }
+            , done: function (res) {//返回值接收
+                layer.closeAll('loading'); //关闭loading
+                if (res.msg === "success") {
+                    return layer.msg('导入成功', {
+                        icon: 1
+                        , time: 1000
+                    });
+                } else {
+                    return layer.msg('导入失败', {
+                        offset: '15px'
+                        , icon: 2
+                        , time: 2000
+                    });
+                }
+            }
+            , error: function () {
+                layer.closeAll('loading'); //关闭loading
+                return layer.msg('导入失败', {
+                    offset: '15px'
+                    , icon: 2
+                    , time: 2000
+                });
+            }
+        });
+
+
+        upload.render({
+            elem: '#import-user'
+            , url: '${ctx}/user/admin/import'
+            , data: {
+                //仅上传用户
+                type: 1
+            }
+            , accept: 'file' //普通文件
+            , exts: 'xls|xlsx' //允许上传的文件后缀
+            , before: function (obj) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+                layer.load(1, {shade: [0.1, '#fff']}); //上传loading
+            }
+            , done: function (res) {//返回值接收
+                layer.closeAll('loading'); //关闭loading
+                if (res.msg === "success") {
+                    return layer.msg('导入成功', {
+                        icon: 1
+                        , time: 1000
+                    });
+                } else {
+                    return layer.msg('导入失败', {
+                        offset: '15px'
+                        , icon: 2
+                        , time: 2000
+                    });
+                }
+            }
+            , error: function () {
+                layer.closeAll('loading'); //关闭loading
+                return layer.msg('导入失败', {
+                    offset: '15px'
+                    , icon: 2
+                    , time: 2000
+                });
+            }
+        });
+
 
         //填充角色列表
         var roles = eval('(' + '${roles}' + ')');
@@ -166,6 +270,8 @@
             , cols: [[
                 {type: 'checkbox', fixed: 'left', style: "height:70px;"}
                 , {field: 'id', title: 'id', sort: true, hide: true}
+                , {field: 'createTime', title: '创建时间', sort: true, hide: true}
+                , {field: 'updateTime', title: '更新时间', sort: true, hide: true}
                 , {field: 'userWorkId', title: '工号', sort: true}
                 , {field: 'userIdCard', title: '身份证', width: 180, sort: true}
                 , {field: 'userName', title: '用户名', sort: true}
@@ -175,7 +281,7 @@
                 , {field: 'userEmail', title: '邮箱'}
                 , {field: 'userPhone', title: '联系方式', width: 120}
                 , {field: 'userRemark', title: '备注', width: 150}
-                , {title: '操作', minWidth: 150, align: 'center', toolbar: '#table-content-list1'}
+                , {title: '操作', minWidth: 150, align: 'center', fixed: 'right', toolbar: '#table-content-list1'}
             ]]
             , page: true
             , limit: 10
@@ -249,8 +355,12 @@
                         type: 'post',
                         data: {users: JSON.stringify(checkData)},
                         url: "${ctx}/user/admin/deleteMany",
-                        success: function (data) {
-                            if (data.data === "deleteSuccess") {
+                        beforeSend: function (data) {
+                            layer.load(1, {shade: [0.1, '#fff']}); //上传loading
+                        }
+                        , success: function (data) {
+                            layer.closeAll('loading'); //关闭loading
+                            if (data.data === "success") {
                                 layer.msg('已删除');
                                 table.reload('userTable', {
                                     url: '${ctx}/user/admin/getUserInfo' //向后端默认传page和limit); //重载表格
@@ -274,7 +384,7 @@
                                     , icon: 2
                                     , time: 2000
                                 });
-                            }else {
+                            } else {
                                 layer.msg('未知错误');
                             }
                         }
@@ -314,8 +424,12 @@
                                 data: json,
                                 type: 'post',
                                 url: "${ctx}/user/admin/insert",
-                                success: function (data) {
-                                    if (data.data === "insertSuccess") {
+                                beforeSend: function (data) {
+                                    layer.load(1, {shade: [0.1, '#fff']}); //上传loading
+                                }
+                                , success: function (data) {
+                                    layer.closeAll('loading'); //关闭loading
+                                    if (data.data === "success") {
                                         layer.msg('添加成功', {
                                             icon: 1
                                             , time: 1000
@@ -363,8 +477,12 @@
                         data: data,
                         type: 'post',
                         url: "${ctx}/user/admin/deleteOne",
-                        success: function (data) {
-                            if (data.data === "deleteSuccess") {
+                        beforeSend: function (data) {
+                            layer.load(1, {shade: [0.1, '#fff']}); //上传loading
+                        }
+                        , success: function (data) {
+                            layer.closeAll('loading'); //关闭loading
+                            if (data.data === "success") {
                                 layer.msg('删除成功', {
                                     icon: 1
                                     , time: 1000
@@ -385,7 +503,7 @@
                                     , icon: 2
                                     , time: 2000
                                 });
-                            }else {
+                            } else {
                                 return layer.msg('未知错误');
                             }
                         }
@@ -426,8 +544,12 @@
                                 data: json,
                                 type: 'post',
                                 url: "${ctx}/user/admin/updateById",
-                                success: function (data) {
-                                    if (data.data === "updateSuccess") {
+                                beforeSend: function (data) {
+                                    layer.load(1, {shade: [0.1, '#fff']}); //上传loading
+                                }
+                                , success: function (data) {
+                                    layer.closeAll('loading'); //关闭loading
+                                    if (data.data === "success") {
                                         layer.msg('修改成功', {
                                             icon: 1
                                             , time: 1000

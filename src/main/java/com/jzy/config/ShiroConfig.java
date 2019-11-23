@@ -102,10 +102,11 @@ public class ShiroConfig {
          * 授权拦截
          */
         Map<String, String> permissions = new LinkedHashMap<>();
-//        permissions.put("/user/add", "perms[user:add]");
-//        permissions.put("/user/query", "perms[user:query]");
-//        permissions.put("/user/add", "roles[管理员]");
-//        permissions.put("/user/query", "roles[助教]");
+        permissions.put("/user/admin/**", "perms[user:admin]"); //用户管理，管理员和学管有
+        permissions.put("/user/showIcon", "perms[user:showIcon]"); //游客只有获取头像接口的权限
+        permissions.put("/user/**", "perms[user:basic]"); //基本用户信息的操作，除游客外都有权限
+        permissions.put("/permission/admin/**", "perms[permission:admin]"); //角色权限的权限，管理员才有
+        permissions.put("/assistant/admin/**", "perms[assistant:admin]"); //角色权限的权限，助教长以上级别才有
         filterChainDefinitionMap.putAll(permissions);
 
         /*=======================================================*/

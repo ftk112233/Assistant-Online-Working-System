@@ -29,6 +29,12 @@ public abstract class AbstractServiceImpl {
     protected AssistantService assistantService;
 
     @Autowired
+    protected RoleAndPermissionService roleAndPermissionService;
+
+    @Autowired
+    protected MissLessonStudentService missLessonStudentService;
+
+    @Autowired
     protected RedisTemplate<String,Object> redisTemplate;
 
     @Autowired

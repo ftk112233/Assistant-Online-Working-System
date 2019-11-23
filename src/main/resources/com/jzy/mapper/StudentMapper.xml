@@ -16,6 +16,73 @@
         <result column="student_school" property="studentSchool" jdbcType="VARCHAR"/>
         <result column="student_remark" property="studentRemark" jdbcType="VARCHAR"/>
     </resultMap>
+    <insert id="insertStudent" parameterType="com.jzy.model.entity.Student">
+        insert into student
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="studentId != null and studentId!=''">
+                student_id,
+            </if>
+            <if test="studentName != null and studentName!=''" >
+                student_name,
+            </if>
+            <if test="studentSex != null and studentSex!=''" >
+                student_sex,
+            </if>
+            <if test="studentPhone != null and studentPhone!=''" >
+                student_phone,
+            </if>
+            <if test="studentPhoneBackup != null and studentPhoneBackup!=''" >
+                student_phone_backup,
+            </if>
+            <if test="studentSchool != null and studentSchool!=''" >
+                student_school,
+            </if>
+            <if test="studentRemark != null and studentRemark!=''" >
+                student_remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="studentId != null and studentId!=''">
+                #{studentId},
+            </if>
+            <if test="studentName != null and studentName!=''" >
+                #{studentName},
+            </if>
+            <if test="studentSex != null and studentSex!=''" >
+                #{studentSex},
+            </if>
+            <if test="studentPhone != null and studentPhone!=''" >
+                #{studentPhone},
+            </if>
+            <if test="studentPhoneBackup != null and studentPhoneBackup!=''" >
+                #{studentPhoneBackup},
+            </if>
+            <if test="studentSchool != null and studentSchool!=''" >
+                #{studentSchool},
+            </if>
+            <if test="studentRemark != null and studentRemark!=''" >
+                #{studentRemark},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateStudentByStudentId" parameterType="com.jzy.model.entity.Student">
+        update student
+        <set>
+            student_name = #{studentName,jdbcType=VARCHAR},
+            student_sex = #{studentSex,jdbcType=VARCHAR},
+            student_phone = #{studentPhone,jdbcType=VARCHAR},
+            student_phone_backup = #{studentPhoneBackup,jdbcType=VARCHAR},
+            student_school = #{studentSchool,jdbcType=VARCHAR},
+            student_remark = #{studentRemark,jdbcType=VARCHAR},
+        </set>
+        where teacher_work_id = #{teacherWorkId}
+    </update>
+    <select id="getStudentById" resultMap="BaseResultMap">
+        select * from student where id=#{id}
+    </select>
+    <select id="getStudentByStudentId" resultMap="BaseResultMap">
+        select * from student where student_id=#{studentId}
+    </select>
 
 
 </mapper>

@@ -148,7 +148,7 @@
                                         icon: 5,
                                         anim: 6
                                     });
-                                } else if (res.data === "updateEmailSuccess") {
+                                } else if (res.data === "success") {
                                     layer.msg('修改已完成，请F5刷新页面', {
                                         icon: 1
                                         , time: 1000

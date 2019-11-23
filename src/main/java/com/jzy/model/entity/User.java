@@ -1,8 +1,13 @@
 package com.jzy.model.entity;
 
+import com.jzy.manager.util.ShiroUtils;
+import com.jzy.manager.util.UserUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.UUID;
 
 /**
  * @author JinZhiyun
@@ -18,7 +23,7 @@ public class User extends BaseEntity {
     private static final long serialVersionUID = 3383159835719833836L;
 
     /**
-     * 用户的工号，即助教的工号，唯一，长度小于32可以为空
+     * 用户的工号，即助教的工号，唯一，长度不超过32可以为空
      */
     private String userWorkId;
 
@@ -43,7 +48,7 @@ public class User extends BaseEntity {
     private String userSalt;
 
     /**
-     * 用户的真实姓名，非空，50个字符以内
+     * 用户的真实姓名，非空，不超过50个字符
      */
     private String userRealName;
 
@@ -53,12 +58,12 @@ public class User extends BaseEntity {
     private String userRole;
 
     /**
-     * 用户的头像存储的地址路径，空或者长度小于100
+     * 用户的头像存储的地址路径，空或者长度小于等于100
      */
     private String userIcon;
 
     /**
-     * 用户邮箱，唯一，空或者长度小于100
+     * 用户邮箱，唯一，空或者长度于等于100
      */
     private String userEmail;
 
@@ -68,7 +73,43 @@ public class User extends BaseEntity {
     private String userPhone;
 
     /**
-     * 用户备注，空或者长度小于500
+     * 用户备注，空或者长度小于等于500
      */
     private String userRemark;
+
+    /**
+     * 为新插入或修改过的user配置默认的密码和盐
+     */
+    public User setDefaultUserPasswordAndSalt(){
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        this.setUserSalt(uuid);
+        if (StringUtils.isEmpty(this.getUserPassword())) {
+            //若密码为空
+            if (!StringUtils.isEmpty(this.getUserIdCard())) {
+                //若身份证不为空,默认密码设为身份证
+                this.setUserPassword(ShiroUtils.encryptUserPassword(this.getUserIdCard(), uuid));
+            } else if (!StringUtils.isEmpty(this.getUserPhone())) {
+                //若手机号不为空,默认密码设为手机号
+                this.setUserPassword(ShiroUtils.encryptUserPassword(this.getUserPhone(), uuid));
+            } else {
+                //否则设置用户名为默认密码
+                this.setUserPassword(ShiroUtils.encryptUserPassword(this.getUserName(), uuid));
+            }
+        } else {
+            //若密码不为空
+            this.setUserPassword(ShiroUtils.encryptUserPassword(this.getUserPassword(), uuid));
+        }
+        return this;
+    }
+
+    /**
+     * 为新插入或修改过的user配置默认的头像
+     */
+    public User setDefaultUserIcon(){
+        if (StringUtils.isEmpty(this.getUserIcon())) {
+            //用户头像为空
+            this.setUserIcon(UserUtils.USER_ICON_DEFAULT);
+        }
+        return this;
+    }
 }

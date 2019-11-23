@@ -19,12 +19,12 @@ public class QuestionUtils {
     /**
      * 所有问题，键的顺序问题和答案相同
      */
-    public static final Map<Integer, String> QUESTIONS=new HashMap<>();
+    public static final Map<Integer, String> QUESTIONS=new HashMap<>(QUESTION_COUNT);
 
     /**
      * 所有答案，键的顺序问题和答案相同
      */
-    public static final Map<Integer, String> ANSWERS=new HashMap<>();
+    public static final Map<Integer, String> ANSWERS=new HashMap<>(QUESTION_COUNT);
 
     static {
         QUESTIONS.put(1, "金爷爷最喜欢的二次元角色是?");

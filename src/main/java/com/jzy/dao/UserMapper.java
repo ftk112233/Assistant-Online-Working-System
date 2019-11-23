@@ -129,4 +129,11 @@ public interface UserMapper {
      * @param id 用户id
      */
     void deleteOneUserById(@Param("id") Long id);
+
+    /**
+     * 根据工号更新用户信息
+     *
+     * @param user 新的用户信息
+     */
+    void updateUserByWorkId(User user);
 }

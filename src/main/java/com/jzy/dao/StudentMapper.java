@@ -1,5 +1,8 @@
 package com.jzy.dao;
 
+import com.jzy.model.entity.Student;
+import org.apache.ibatis.annotations.Param;
+
 /**
  * @author JinZhiyun
  * @version 1.0
@@ -8,4 +11,34 @@ package com.jzy.dao;
  * @date 2019/11/13 16:20
  **/
 public interface StudentMapper {
+    /**
+     * 根据主键id修改查询学生
+     *
+     * @param id 主键id
+     * @return
+     */
+    Student getStudentById(@Param("id") Long id);
+
+    /**
+     * 根据学员编号修改查询学生
+     *
+     * @param studentId 学员编号
+     * @return
+     */
+    Student getStudentByStudentId(@Param("studentId") String studentId);
+
+    /**
+     * 添加学生
+     *
+     * @param student 添加学生的信息
+     */
+    void insertStudent(Student student);
+
+    /**
+     * 修改学生信息学员编号修改
+     *
+     * @param student 修改后的学生信息
+     * @return
+     */
+    void updateStudentByStudentId(Student student);
 }

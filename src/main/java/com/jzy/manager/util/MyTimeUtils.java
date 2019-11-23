@@ -1,9 +1,11 @@
 package com.jzy.manager.util;
 
+import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * @author JinZhiyun
@@ -13,11 +15,16 @@ import java.util.Date;
  * @Version 1.0
  **/
 public class MyTimeUtils {
+    private static final String FORMAT_YMD = "yyyy-MM-dd";
+
+    private static final String FORMAT_YMDHMS = "yyyy-MM-dd HH:mm:ss";
+
     public static final long VALID_TIME_3_MIN = 180000;  //3分钟,180s
     public static final long VALID_TIME_5_MIN = 300000;  //5分钟,500s
     public static final long VALID_TIME_10_MIN = 600000;  //10分钟,600s
 
-    private MyTimeUtils(){}
+    private MyTimeUtils() {
+    }
 
     /**
      * @return long
@@ -90,8 +97,30 @@ public class MyTimeUtils {
      * @Date 17:26 2019/6/23
      * @Param [dateDate]
      **/
-    public static String dateToStr(Date dateDate) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    public static String dateToStrYMD(Date dateDate) {
+        return dateToStr(dateDate, FORMAT_YMD);
+    }
+
+    /**
+     * @return java.lang.String
+     * @author JinZhiyun
+     * @Description 将短时间格式时间转换为字符串 yyyy-MM-dd HH:mm:ss
+     * @Date 17:26 2019/6/23
+     * @Param [dateDate]
+     **/
+    public static String dateToStrYMDHMS(Date dateDate) {
+        return dateToStr(dateDate, FORMAT_YMDHMS);
+    }
+
+    /**
+     * 将短时间格式时间转换为字符串，手动指定格式
+     *
+     * @param dateDate
+     * @param formatStr
+     * @return
+     */
+    public static String dateToStr(Date dateDate, String formatStr) {
+        SimpleDateFormat formatter = new SimpleDateFormat(formatStr);
         String dateString = formatter.format(dateDate);
         return dateString;
     }
@@ -103,10 +132,40 @@ public class MyTimeUtils {
      * @Date 17:27 2019/6/23
      * @Param [strDate]
      **/
-    public static Date strToDate(String strDate) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    public static Date strToDateYMD(String strDate) {
+        return strToDate(strDate, FORMAT_YMD);
+    }
+
+    /**
+     * @return java.util.Date
+     * @author JinZhiyun
+     * @Description 将短时间格式字符串转换为时间 yyyy-MM-dd HH:mm:ss
+     * @Date 17:27 2019/6/23
+     * @Param [strDate]
+     **/
+    public static Date strToDateYMDHMS(String strDate) {
+        return strToDate(strDate, FORMAT_YMDHMS);
+    }
+
+    public static Date strToDate(String strDate, String formatStr) {
+        SimpleDateFormat formatter = new SimpleDateFormat(formatStr);
         ParsePosition pos = new ParsePosition(0);
         Date strtodate = formatter.parse(strDate, pos);
         return strtodate;
+    }
+
+    /**
+     * 将cst时间转为Date
+     *
+     * @param CST cst时间字符串
+     * @return
+     * @throws ParseException
+     */
+    public static Date cstToDate(String CST) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
+        return sdf.parse(CST);
+    }
+
+    public static void main(String[] args) throws ParseException {
     }
 }

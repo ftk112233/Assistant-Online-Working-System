@@ -18,7 +18,7 @@ public class HomeController extends AbstractController{
      * @return
      */
     @RequestMapping("/console")
-    public String setInfo() {
+    public String console() {
         return "home/console";
     }
 }

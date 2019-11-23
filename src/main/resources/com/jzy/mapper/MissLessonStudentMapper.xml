@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jzy.dao.MissLessonStudentMapper">
+    <resultMap id="BaseColumnResultMap" type="com.jzy.model.entity.BaseEntity">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap" type="com.jzy.model.entity.MissLessonStudent" extends="BaseColumnResultMap">
+        <result column="student_id" property="studentId" jdbcType="VARCHAR"/>
+        <result column="student_name" property="studentName" jdbcType="VARCHAR"/>
+        <result column="student_phone" property="studentPhone" jdbcType="VARCHAR"/>
+        <result column="original_class_id" property="originalClassId" jdbcType="BIGINT"/>
+        <result column="current_class_id" property="currentClassId" jdbcType="BIGINT"/>
+        <result column="date" property="date" jdbcType="DATE"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+</mapper>

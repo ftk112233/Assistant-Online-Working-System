@@ -1,5 +1,6 @@
 package com.jzy.web.controller;
 
+import com.jzy.manager.constant.Constants;
 import com.jzy.manager.util.*;
 import com.jzy.manager.constant.SessionConstants;
 import com.jzy.model.dto.*;
@@ -125,7 +126,7 @@ public class AuthenticationController extends AbstractController {
     @RequestMapping("/loginTest")
     @ResponseBody
     public Map<String, Object> loginTest(UserLoginInput input) {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>(1);
         UserLoginResult result = new UserLoginResult();
 
         Subject subject = SecurityUtils.getSubject();
@@ -138,7 +139,8 @@ public class AuthenticationController extends AbstractController {
             return map;
         }
 
-        String key = UserLoginResult.getUserLoginFailKey(input.getUserName()); //redis用户登录错误次数缓存的键
+        //redis用户登录错误次数缓存的键
+        String key = UserLoginResult.getUserLoginFailKey(input.getUserName());
 
         UsernamePasswordToken token = new UsernamePasswordToken(input.getUserName(), input.getUserPassword());
         token.setRememberMe(input.getRememberMe() != null);
@@ -210,14 +212,14 @@ public class AuthenticationController extends AbstractController {
     @ResponseBody
     public Map<String, Object> sendVerifyCodeToEmail(User user) {
         System.out.println("++++++++++++"+user);
-        Map<String, Object> map = new HashMap();
+        Map<String, Object> map = new HashMap(1);
         ShiroUtils.getSession().setAttribute(SessionConstants.USER_EMAIL_SESSION_KEY, new EmailVerifyCodeSession(user.getUserEmail(),false));
         try {
             userService.sendVerifyCodeToEmail(user.getUserEmail());
-            map.put("msg", "sendSuccess");
+            map.put("msg", Constants.SUCCESS);
         } catch (Exception e) {
             logger.error("邮箱验证码发送失败!");
-            map.put("msg", "sendFailed");
+            map.put("msg", Constants.FAILURE);
             e.printStackTrace();
         }
         return map;
@@ -233,7 +235,7 @@ public class AuthenticationController extends AbstractController {
     @RequestMapping("/emailVerifyCodeTest")
     @ResponseBody
     public Map<String, Object> emailVerifyCodeTest(@RequestParam(value = "emailVerifyCode",required = false) String emailVerifyCode, User user) {
-        Map<String, Object> map = new HashMap();
+        Map<String, Object> map = new HashMap(1);
         if (userService.getUserByEmail(user.getUserEmail()) == null) {
             map.put("data", "emailUnregistered");
         } else if (!userService.ifValidEmailVerifyCode(new EmailVerifyCode(user.getUserEmail(), emailVerifyCode))) {
@@ -256,14 +258,14 @@ public class AuthenticationController extends AbstractController {
     @Token(remove = true)
     @ResponseBody
     public Map<String, Object> resetPassword(User user) {
-        Map<String, Object> map = new HashMap();
+        Map<String, Object> map = new HashMap(1);
         if (!MyStringUtils.isPassword(user.getUserPassword())){
             logger.error("错误的用户密码入参!");
             throw new InvalidParameterException("错误的用户密码入参");
         }
         EmailVerifyCodeSession emailVerifyCodeSession= (EmailVerifyCodeSession) ShiroUtils.getSession().getAttribute(SessionConstants.USER_EMAIL_SESSION_KEY);
         userService.updatePasswordByEmail(emailVerifyCodeSession.getUserEmail(), user.getUserPassword());
-        map.put("data", "resetPasswordSuccess");
+        map.put("data", Constants.SUCCESS);
         return map;
     }
 
@@ -278,7 +280,7 @@ public class AuthenticationController extends AbstractController {
     @RequestMapping("/loginTestByEmailCode")
     @ResponseBody
     public Map<String, Object> loginTestByEmailCode(@RequestParam(value = "emailVerifyCode",required = false) String emailVerifyCode, User user) {
-        Map<String, Object> map = new HashMap();
+        Map<String, Object> map = new HashMap(1);
         User userGetByEmail=userService.getUserByEmail(user.getUserEmail());
         if (userGetByEmail == null) {
             map.put("data", "emailUnregistered");
@@ -300,7 +302,7 @@ public class AuthenticationController extends AbstractController {
                 map.put("data", "verifyCodeCorrect");
             } catch (AuthenticationException e) {
                 //其他异常
-                map.put("data", "unknownError");
+                map.put("data", Constants.UNKNOWN_ERROR);
             }
             //移除免密登录成功标志
             session.removeAttribute(SessionConstants.LOGIN_WITHOUT_PASSWORD_SESSION_KEY);
@@ -316,7 +318,7 @@ public class AuthenticationController extends AbstractController {
     @RequestMapping("/resetLoginQuestion")
     @ResponseBody
     public Map<String, Object> resetLoginQuestion() {
-        Map<String, Object> map = new HashMap();
+        Map<String, Object> map = new HashMap(1);
         Integer originQuestionId= (Integer) ShiroUtils.getSession().getAttribute(SessionConstants.LOGIN_QUESTION_ID_SESSION_KEY);
         Integer qId;
         do {
@@ -334,7 +336,7 @@ public class AuthenticationController extends AbstractController {
     @RequestMapping("/loginTestByQuestion")
     @ResponseBody
     public Map<String, Object> loginTestByQuestion(@RequestParam(value = "answer",required = false) String answer) {
-        Map<String, Object> map = new HashMap();
+        Map<String, Object> map = new HashMap(1);
 
         Integer qId= (Integer) ShiroUtils.getSession().getAttribute(SessionConstants.LOGIN_QUESTION_ID_SESSION_KEY);
 
@@ -361,7 +363,7 @@ public class AuthenticationController extends AbstractController {
                 map.put("data", "answerCorrect");
             } catch (AuthenticationException e) {
                 //其他异常
-                map.put("data", "unknownError");
+                map.put("data", Constants.UNKNOWN_ERROR);
             }
             //移除免密登录成功标志
             session.removeAttribute(SessionConstants.LOGIN_WITHOUT_PASSWORD_SESSION_KEY);

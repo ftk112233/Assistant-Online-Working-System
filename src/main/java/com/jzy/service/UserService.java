@@ -162,7 +162,7 @@ public interface UserService {
     void updatePasswordById(Long id, String salt, String userPasswordNotEncrypted);
 
     /**
-     * 返回符合条件的学生信息分页结果
+     * 返回符合条件的用户信息分页结果
      *
      * @param myPage 分页{页号，每页数量}
      * @param condition  查询条件入参
@@ -199,4 +199,43 @@ public interface UserService {
      * @param ids 用户id的list
      */
     void deleteManyUsersByIds(List<Long> ids);
+
+    /**
+     * 根据从excel中读取到的user信息，更新插入多个。根据工号判断：
+     *      if 当前工号不存在
+     *          执行插入
+     *      else
+     *          根据工号更新
+     * @param users
+     * @return
+     */
+    String insertAndUpdateUsersFromExcel(List<User> users) throws Exception;
+
+    /**
+     * 根据从excel中读取到的user信息，更新插入一个。根据工号判断：
+     *      if 当前工号不存在
+     *          执行插入
+     *      else
+     *          根据工号更新
+     * @param user
+     * @return
+     */
+    String insertAndUpdateOneUserFromExcel(User user) throws Exception;
+
+    /**
+     * 根据工号更新用户信息
+     *
+     * @param user 新的用户信息
+     * @return
+     */
+    String updateUserByWorkId(User user);
+
+    /**
+     * 根据工号更新用户信息
+     *
+     * @param originalUser 原来用户信息
+     * @param newUser 新的用户信息
+     * @return
+     */
+    String updateUserByWorkId(User originalUser, User newUser);
 }

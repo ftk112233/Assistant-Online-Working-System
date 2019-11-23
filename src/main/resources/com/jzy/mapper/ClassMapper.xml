@@ -10,8 +10,14 @@
     <resultMap id="BaseResultMap" type="com.jzy.model.entity.Class" extends="BaseColumnResultMap">
         <result column="class_id" property="classId" jdbcType="VARCHAR"/>
         <result column="class_name" property="className" jdbcType="VARCHAR"/>
+        <result column="class_campus" property="classCampus" jdbcType="VARCHAR"/>
+        <result column="class_grade" property="classGrade" jdbcType="VARCHAR"/>
+        <result column="class_subject" property="classSubject" jdbcType="VARCHAR"/>
+        <result column="class_type" property="classType" jdbcType="VARCHAR"/>
         <result column="class_year" property="classYear" jdbcType="DATE"/>
+        <result column="class_season" property="classSeason" jdbcType="VARCHAR"/>
         <result column="class_time" property="classTime" jdbcType="VARCHAR"/>
+        <result column="class_simplified_time" property="classSimplifiedTime" jdbcType="VARCHAR"/>
         <result column="class_times" property="classTimes" jdbcType="INTEGER"/>
         <result column="class_teacher_id" property="classTeacherId" jdbcType="BIGINT"/>
         <result column="class_assistant_id" property="classAssistantId" jdbcType="BIGINT"/>
@@ -19,6 +25,130 @@
         <result column="class_teacher_requirement" property="classTeacherRequirement" jdbcType="VARCHAR"/>
         <result column="class_remark" property="classRemark" jdbcType="VARCHAR"/>
     </resultMap>
+    <insert id="insertClass" parameterType="com.jzy.model.dto.ClassDetailedDto">
+        insert into class
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="classId != null and classId!=''">
+                class_id,
+            </if>
+            <if test="className != null and className!=''" >
+                class_name,
+            </if>
+            <if test="classCampus != null and classCampus!=''" >
+                class_campus,
+            </if>
+            <if test="classGrade != null and classGrade!=''" >
+                class_grade,
+            </if>
+            <if test="classSubject != null and classSubject!=''" >
+                class_subject,
+            </if>
+            <if test="classType != null and classType!=''">
+                class_type,
+            </if>
+            <if test="classYear != null and classYear!=''" >
+                class_year,
+            </if>
+            <if test="classSimplifiedTime != null and classSimplifiedTime!=''" >
+                class_time,
+            </if>
+            <if test="classGrade != null and classGrade!=''" >
+                class_simplified_time,
+            </if>
+            <if test="classTimes != null and classTimes!=''" >
+                class_times,
+            </if>
+            <if test="teacherName != null and teacherName!=''">
+                class_teacher_id,
+            </if>
+            <if test="assistantName != null and assistantName!=''" >
+                class_assistant_id,
+            </if>
+            <if test="classroom != null and classroom!=''" >
+                classroom,
+            </if>
+            <if test="classTeacherRequirement != null and classTeacherRequirement!=''" >
+                class_teacher_requirement,
+            </if>
+            <if test="classRemark != null and classRemark!=''" >
+                class_remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="classId != null and classId!=''">
+                #{classId},
+            </if>
+            <if test="className != null and className!=''" >
+                #{className},
+            </if>
+            <if test="classCampus != null and classCampus!=''" >
+                #{classCampus},
+            </if>
+            <if test="classGrade != null and classGrade!=''" >
+                #{classGrade},
+            </if>
+            <if test="classSubject != null and classSubject!=''" >
+                #{classSubject},
+            </if>
+            <if test="classType != null and classType!=''">
+                #{classType},
+            </if>
+            <if test="classYear != null and classYear!=''" >
+                #{classYear},
+            </if>
+            <if test="classSimplifiedTime != null and classSimplifiedTime!=''" >
+                #{classSimplifiedTime},
+            </if>
+            <if test="classGrade != null and classGrade!=''" >
+                #{classGrade},
+            </if>
+            <if test="classTimes != null and classTimes!=''" >
+                #{classTimes},
+            </if>
+            <if test="teacherName != null and teacherName!=''">
+                (select id from teacher where teacher_name=#{teacherName}),
+            </if>
+            <if test="assistantName != null and assistantName!=''" >
+                (select id from assistant where assistant_name=#{assistantName}),
+            </if>
+            <if test="classroom != null and classroom!=''" >
+                #{classroom},
+            </if>
+            <if test="classTeacherRequirement != null and classTeacherRequirement!=''" >
+                #{classTeacherRequirement},
+            </if>
+            <if test="classRemark != null and classRemark!=''" >
+                #{classRemark},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateClassByClassId" parameterType="com.jzy.model.dto.ClassDetailedDto">
+        update class
+        <set>
+            class_name = #{className,jdbcType=VARCHAR},
+            class_campus = #{classCampus,jdbcType=VARCHAR},
+            class_grade = #{classGrade,jdbcType=VARCHAR},
+            class_subject = #{classSubject,jdbcType=VARCHAR},
+            class_type = #{classType,jdbcType=VARCHAR},
+            class_year = #{classYear,jdbcType=VARCHAR},
+            class_season = #{classSeason,jdbcType=VARCHAR},
+            class_time = #{classTime,jdbcType=VARCHAR},
+            class_simplified_time = #{classSimplifiedTime,jdbcType=VARCHAR},
+            class_times = #{classTimes,jdbcType=VARCHAR},
+            class_teacher_id = (select id from teacher where teacher_name=#{teacherName}),
+            class_assistant_id = (select id from assistant where assistant_name=#{assistantName}),
+            classroom = #{classroom,jdbcType=VARCHAR},
+            class_teacher_requirement = #{classTeacherRequirement,jdbcType=VARCHAR},
+            class_remark = #{classRemark,jdbcType=VARCHAR},
+        </set>
+        where class_id = #{classId}
+    </update>
+    <select id="getClassById" resultMap="BaseResultMap">
+        select * from class where id=#{id};
+    </select>
+    <select id="getClassByClassId" resultMap="BaseResultMap">
+        select * from class where class_id=#{classId};
+    </select>
 
 
 </mapper>

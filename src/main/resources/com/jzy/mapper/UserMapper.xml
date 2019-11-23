@@ -43,6 +43,9 @@
             <if test="userRealName != null and userRealName!=''" >
                 user_real_name,
             </if>
+            <if test="userRole != null and userRole!=''" >
+                user_role,
+            </if>
             <if test="userIcon != null and userIcon!=''" >
                 user_icon,
             </if>
@@ -52,7 +55,9 @@
             <if test="userPhone != null and userPhone!=''" >
                 user_phone,
             </if>
-            user_remark
+            <if test="userRemark != null and userRemark!=''" >
+              user_remark,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="userWorkId != null and userWorkId!=''">
@@ -73,6 +78,9 @@
             <if test="userRealName != null and userRealName!=''" >
                 #{userRealName},
             </if>
+            <if test="userRole != null and userRole!=''" >
+                #{userRole},
+            </if>
             <if test="userIcon != null and userIcon!=''" >
                 #{userIcon},
             </if>
@@ -82,7 +90,9 @@
             <if test="userPhone != null and userPhone!=''" >
                 #{userPhone},
             </if>
-            #{userRemark}
+            <if test="userRemark != null and userRemark!=''" >
+                #{userRemark},
+            </if>
         </trim>
     </insert>
     <delete id="deleteOneUserById">
@@ -142,37 +152,37 @@
             <if test="condition1 == 'userWorkId'">
                 order by u.user_work_id
                 <if test="condition2 == 'asc'">
-                    desc
+                    asc
                 </if>
                 <if test="condition2 == 'desc'">
-                    asc
+                    desc
                 </if>
             </if>
             <if test="condition1 == 'userIdCard'">
                 order by u.user_id_card
                 <if test="condition2 == 'asc'">
-                    desc
+                    asc
                 </if>
                 <if test="condition2 == 'desc'">
-                    asc
+                    desc
                 </if>
             </if>
             <if test="condition1 == 'userRealName'">
                 order by u.user_real_name
                 <if test="condition2 == 'asc'">
-                    desc
+                    asc
                 </if>
                 <if test="condition2 == 'desc'">
-                    asc
+                    desc
                 </if>
             </if>
             <if test="condition1 == 'userRole'">
                 order by u.user_role
                 <if test="condition2 == 'asc'">
-                    desc
+                    asc
                 </if>
                 <if test="condition2 == 'desc'">
-                    asc
+                    desc
                 </if>
             </if>
     </select>
@@ -228,6 +238,25 @@
             user_remark = #{userRemark,jdbcType=VARCHAR},
         </set>
         where id = #{id}
+    </update>
+    <update id="updateUserByWorkId" parameterType="com.jzy.model.entity.User">
+        update user
+        <set>
+            user_id_card = #{userIdCard,jdbcType=VARCHAR},
+            <if test="userName != null  and userName!=''">
+                user_name = #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="userRealName != null and userRealName!=''">
+                user_real_name = #{userRealName,jdbcType=VARCHAR},
+            </if>
+            <if test="userRole != null and userRole!=''">
+                user_role = #{userRole,jdbcType=VARCHAR},
+            </if>
+            user_email = #{userEmail,jdbcType=VARCHAR},
+            user_phone = #{userPhone,jdbcType=VARCHAR},
+            user_remark = #{userRemark,jdbcType=VARCHAR},
+        </set>
+        where user_work_id = #{userWorkId}
     </update>
 
 </mapper>

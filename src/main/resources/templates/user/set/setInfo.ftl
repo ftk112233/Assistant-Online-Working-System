@@ -82,7 +82,7 @@
                             <label class="layui-form-label">我的角色</label>
                             <div class="layui-input-inline">
                                 <input type="text" name="role" value="${userInfo.userRole!""}"
-                                       class="layui-input" lay-verify="required" lay-verType="tips"readonly>
+                                       class="layui-input" lay-verify="required" lay-verType="tips" readonly>
                             </div>
                             <div class="layui-form-mid layui-word-aux">
                                 <i class="layui-icon layui-icon-tips" lay-tips="用户角色权限解释：<br>
@@ -92,14 +92,15 @@
                                                                                 3、助教长：百宝箱助教区的全部功能，除用户管理外的所有信息查询、编辑权限<br>
                                                                                 4、学管：百宝箱的全部功能，用户管理（不能编辑管理员信息）及所有信息查询、编辑权限<br>
                                                                                 5、管理员：系统的全部权限"></i>
-                                &nbsp;角色不可修改</div>
+                                &nbsp;角色不可修改
+                            </div>
                         </div>
                         <div class="layui-form-item">
                             <label class="layui-form-label">修改头像</label>
                             <div class="layui-input-inline uploadHeadImage">
                                 <div class="layui-upload-drag" id="headImg">
                                     <i class="layui-icon"></i>
-                                    <p>点击上传图片，或将图片拖拽到此处</p>
+                                    <p>点击上传图片，或将图片拖拽到此处。</p>
                                 </div>
                             </div>
                             <div class="layui-input-inline">
@@ -121,21 +122,26 @@
                                        class="layui-input" lay-verify="myemail" lay-verType="tips">
                             </div>
                             <div class="layui-form-mid layui-word-aux">
-                                <i class="layui-icon layui-icon-ok" style="font-size: 15px; color: #5FB878;" id="email-icon-ok" hidden="hidden"> 已绑定</i>
-                                <i class="layui-icon layui-icon-close-fill" style="font-size: 15px; color: #FF5722;" id="email-icon-close" hidden="hidden">  未绑定</i>
+                                <i class="layui-icon layui-icon-ok" style="font-size: 15px; color: #5FB878;"
+                                   id="email-icon-ok" hidden="hidden"> 已绑定</i>
+                                <i class="layui-icon layui-icon-close-fill" style="font-size: 15px; color: #FF5722;"
+                                   id="email-icon-close" hidden="hidden"> 未绑定</i>
                                 <a href="${ctx}/user/setEmail">&nbsp;前往绑定/修改邮箱?</a></div>
                         </div>
                         <div class="layui-form-item">
                             <label class="layui-form-label">手机</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="cellphone" value="${userInfo.userPhone!""}" lay-verify="myphone"
-                                       lay-verType="tips"   autocomplete="off" class="layui-input" readonly>
+                                <input type="text" name="cellphone" value="${userInfo.userPhone!""}"
+                                       lay-verify="myphone"
+                                       lay-verType="tips" autocomplete="off" class="layui-input" readonly>
                             </div>
                             <div class="layui-form-mid layui-word-aux">
-                                <i class="layui-icon layui-icon-ok" style="font-size: 15px; color: #5FB878;" id="phone-icon-ok" hidden="hidden"> 已绑定</i>
-                                <i class="layui-icon layui-icon-close-fill" style="font-size: 15px; color: #FF5722;" id="phone-icon-close" hidden="hidden">  未绑定</i>
+                                <i class="layui-icon layui-icon-ok" style="font-size: 15px; color: #5FB878;"
+                                   id="phone-icon-ok" hidden="hidden"> 已绑定</i>
+                                <i class="layui-icon layui-icon-close-fill" style="font-size: 15px; color: #FF5722;"
+                                   id="phone-icon-close" hidden="hidden"> 未绑定</i>
                                 <a href="${ctx}/user/setPhone"
-                            >&nbsp;前往绑定/修改手机?</a></div>
+                                >&nbsp;前往绑定/修改手机?</a></div>
                         </div>
                         <div class="layui-form-item">
                             <div class="layui-input-block">
@@ -204,7 +210,7 @@
         }
 
 
-        if ('${userInfo.userEmail!""}' === ''){
+        if ('${userInfo.userEmail!""}' === '') {
             $("#email-icon-ok").hide();
             $("#email-icon-close").show();
         } else {
@@ -212,7 +218,7 @@
             $("#email-icon-close").hide();
         }
 
-        if ('${userInfo.userPhone!""}' === ''){
+        if ('${userInfo.userPhone!""}' === '') {
             $("#phone-icon-ok").hide();
             $("#phone-icon-close").show();
         } else {
@@ -225,16 +231,18 @@
         var uploadInst = upload.render({
             elem: '#headImg'
             , url: '${ctx}/user/uploadUserIcon'
-            , size: 2048 //KB
+            , size: 1024 //KB
             , before: function (obj) {
                 //预读本地文件示例，不支持ie8
                 obj.preview(function (index, file, result) {
                     $('#demo1').attr('src', result); //图片链接（base64）
                 });
+                layer.load(1, {shade: [0.1, '#fff']}); //上传loading
+
             }
             , done: function (res) {
-                console.log(res.code);
-                //如果上传失败
+                layer.closeAll('loading'); //关闭loading
+                // 如果上传失败
                 if (res.code > 0) {
                     return layer.msg('上传失败');
                 }
@@ -245,9 +253,10 @@
                 $('#demoText').html('<span style="color: #8f8f8f;">上传成功!!!请点击确认修改即可完成最终更改!</span>');
             }
             , error: function () {
+                layer.closeAll('loading'); //关闭loading
                 //演示失败状态，并实现重传
                 var demoText = $('#demoText');
-                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+                demoText.html('<span style="color: #FF5722;">上传失败!</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
                 demoText.find('.demo-reload').on('click', function () {
                     uploadInst.upload();
                 });
@@ -274,7 +283,7 @@
                 },
                 url: '${ctx}/user/updateOwnInfo' //实际使用请改成服务端真实接口
                 , success: function (res2) {
-                    if (res2.data === "updateSuccess") {
+                    if (res2.data === "success") {
                         layer.msg('修改已完成，请F5刷新页面', {
                             icon: 1
                             , time: 1000

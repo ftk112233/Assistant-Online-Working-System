@@ -15,6 +15,8 @@ import java.util.UUID;
  * @date 2019/11/18 13:04
  **/
 public class CookieUtils {
+    private CookieUtils(){}
+
     /**
      * 设置CSRFToken到session和cookie
      *

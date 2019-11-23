@@ -14,6 +14,64 @@
         <result column="teacher_phone" property="teacherRemark" jdbcType="VARCHAR"/>
         <result column="teacher_remark" property="teacherRemark" jdbcType="VARCHAR"/>
     </resultMap>
+    <insert id="insertTeacher" parameterType="com.jzy.model.entity.Teacher">
+        insert into teacher
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="teacherWorkId != null and teacherWorkId!=''">
+                teacher_work_id,
+            </if>
+            <if test="teacherName != null and teacherName!=''" >
+                teacher_name,
+            </if>
+            <if test="teacherSex != null and teacherSex!=''" >
+                teacher_sex,
+            </if>
+            <if test="teacherPhone != null and teacherPhone!=''" >
+                teacher_phone,
+            </if>
+            <if test="teacherRemark != null and teacherRemark!=''" >
+                teacher_remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="teacherWorkId != null and teacherWorkId!=''">
+                #{teacherWorkId},
+            </if>
+            <if test="teacherName != null and teacherName!=''" >
+                #{teacherName},
+            </if>
+            <if test="teacherSex != null and teacherSex!=''" >
+                #{assistantSex},
+            </if>
+            <if test="teacherPhone != null and teacherPhone!=''" >
+                #{teacherPhone},
+            </if>
+            <if test="teacherRemark != null and teacherRemark!=''" >
+                #{teacherRemark},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateTeacherByWorkId" parameterType="com.jzy.model.entity.Teacher">
+        update teacher
+        <set>
+            <if test="teacherName != null  and teacherName!=''">
+                teacher_name = #{teacherName,jdbcType=VARCHAR},
+            </if>
+            teacher_sex = #{teacherSex,jdbcType=VARCHAR},
+            teacher_phone = #{teacherPhone,jdbcType=VARCHAR},
+            teacher_remark = #{teacherRemark,jdbcType=VARCHAR},
+        </set>
+        where teacher_work_id = #{teacherWorkId}
+    </update>
+    <select id="getTeacherByName" resultMap="BaseResultMap">
+        select * from teacher where teacher_name=#{teacherName}
+    </select>
+    <select id="getTeacherByWorkId" resultMap="BaseResultMap">
+        select * from teacher where teacher_work_id=#{teacherId}
+    </select>
+    <select id="getTeacherById" resultMap="BaseResultMap">
+        select * from teacher where id=#{id}
+  </select>
 
 
 </mapper>

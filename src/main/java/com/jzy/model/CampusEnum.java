@@ -205,8 +205,4 @@ public enum CampusEnum {
     public static List<String> getClassroomsByCampusName(String campusName){
         return CAMPUS_CLASSROOMS.get(campusName);
     }
-
-    public static void main(String[] args) {
-        System.out.println(CampusEnum.getCampusEnumByCode("000"));
-    }
 }

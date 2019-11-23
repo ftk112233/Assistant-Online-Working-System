@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jzy.dao.RoleAndPermissionMapper">
+    <resultMap id="BaseColumnResultMap" type="com.jzy.model.entity.BaseEntity">
+        <result column="id" property="id" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap" type="com.jzy.model.entity.RoleAndPermission" extends="BaseColumnResultMap">
+        <id column="role" property="role" jdbcType="VARCHAR"/>
+        <id column="perm" property="perm" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+    <insert id="insertRoleAndPermission" parameterType="com.jzy.model.entity.RoleAndPermission">
+        insert into role_permisson
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="role != null and role!=''">
+                role,
+            </if>
+            <if test="perm != null and perm!=''" >
+                perm,
+            </if>
+            <if test="remark != null and remark!=''" >
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="role != null and role!=''">
+                #{role},
+            </if>
+            <if test="perm != null and perm!=''" >
+                #{perm},
+            </if>
+            <if test="remark != null and remark!=''" >
+                #{remark},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateRoleAndPermissionInfo" parameterType="com.jzy.model.entity.RoleAndPermission">
+        update role_permisson
+        <set>
+            <if test="role != null  and role!=''">
+                role = #{role,jdbcType=VARCHAR},
+            </if>
+            <if test="perm != null  and perm!=''">
+                perm = #{perm,jdbcType=VARCHAR},
+            </if>
+            remark = #{remark,jdbcType=VARCHAR},
+        </set>
+        where id = #{id}
+    </update>
+    <delete id="deleteOneRoleAndPermissionById">
+        delete from role_permisson where id=#{id}
+    </delete>
+    <select id="listPermsByRole" resultType="String">
+        select perm from role_permisson where role=#{role}
+    </select>
+    <select id="listRoleAndPerms" resultMap="BaseResultMap"
+            parameterType="com.jzy.model.dto.RoleAndPermissionSearchCondition">
+        select * from role_permisson rp
+        <where>
+            <if test="role != null and role!=''">
+                and rp.role=#{role}
+            </if>
+            <if test="perm != null and perm!=''">
+                <bind name="permLike" value=" '%' + perm + '%' "/>
+                and rp.perm like #{permLike}
+            </if>
+            <if test="remark != null and remark!=''">
+                <bind name="remarkLike" value=" '%' + remark + '%' "/>
+                and rp.remark like #{remarkLike}
+            </if>
+        </where>
+        <if test="condition1 == 'role'">
+            order by rp.role
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'perm'">
+            order by rp.perm
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+    </select>
+    <select id="getByRoleAndPerm" resultMap="BaseResultMap">
+        select * from role_permisson where role=#{role} and perm=#{perm};
+    </select>
+    <select id="getRoleAndPermById" resultMap="BaseResultMap">
+        select * from role_permisson where id=#{id};
+    </select>
+
+
+</mapper>

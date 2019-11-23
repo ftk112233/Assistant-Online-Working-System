@@ -3,6 +3,7 @@ package com.jzy.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.UserMapper;
+import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.constant.SessionConstants;
 import com.jzy.manager.util.*;
@@ -21,11 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.security.InvalidParameterException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -165,15 +164,13 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         if (file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
-            throw new InvalidParameterException("msg");
+            throw new InvalidParameterException(msg);
         }
 
 
         String originalFilename = file.getOriginalFilename();
         String fileName = "user_icon_" + user.getId() + originalFilename.substring(originalFilename.lastIndexOf("."));
-        System.out.println("++++++++++++++++" + fileName);
         String filePath = filePathProperties.getUploadUserIconPath();
-        System.out.println("++++++++++++++++" + filePath);
         File dest = new File(filePath + fileName);
         try {
             file.transferTo(dest);
@@ -220,15 +217,16 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             }
             //将上传的新头像文件重名为含日期时间的newUserIconName，该新文件名用来保存到数据库
             String newUserIconName = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss").format(new Date()) + "_" + user.getUserIcon();
-            System.out.println("++++" + user.getUserIcon());
-            System.out.println("++++" + newUserIconName);
             FileUtils.renameByName(filePathProperties.getUploadUserIconPath(), user.getUserIcon(), newUserIconName);
             user.setUserIcon(newUserIconName);
+        } else {
+            //仍设置原头像
+            user.setUserIcon(originalUser.getUserIcon());
         }
 
         //执行更新
         userMapper.updateOwnInfo(user);
-        return "updateSuccess";
+        return Constants.SUCCESS;
     }
 
     @Override
@@ -249,7 +247,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
     @Override
     public PageInfo<User> listUsers(MyPage myPage, UserSearchCondition condition) {
-        PageHelper.startPage(myPage.getPageNum(), myPage.getPageSize());//第一个参数的意思为：当前页数，第二个参数的意思为：每页显示多少条记录
+        PageHelper.startPage(myPage.getPageNum(), myPage.getPageSize());
         List<User> users = userMapper.listUsers(condition);
         return new PageInfo<>(users);
     }
@@ -320,7 +318,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         }
 
         userMapper.updateUserInfo(user);
-        return "updateSuccess";
+        return Constants.SUCCESS;
     }
 
     @Override
@@ -351,32 +349,6 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             return "nameRepeat";
         }
 
-
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-        user.setUserSalt(uuid);
-        if (StringUtils.isEmpty(user.getUserPassword())) {
-            //若密码为空
-            if (!StringUtils.isEmpty(user.getUserIdCard())) {
-                //若身份证不为空,默认密码设为身份证
-                user.setUserPassword(ShiroUtils.encryptUserPassword(user.getUserIdCard(), uuid));
-            } else if (!StringUtils.isEmpty(user.getUserPhone())) {
-                //若手机号不为空,默认密码设为手机号
-                user.setUserPassword(ShiroUtils.encryptUserPassword(user.getUserPhone(), uuid));
-            } else {
-                //否则设置用户名为默认密码
-                user.setUserPassword(ShiroUtils.encryptUserPassword(user.getUserName(), uuid));
-            }
-        } else {
-            //若密码不为空
-            user.setUserPassword(ShiroUtils.encryptUserPassword(user.getUserPassword(), uuid));
-        }
-
-
-        if (StringUtils.isEmpty(user.getUserIcon())) {
-            //用户头像为空
-            user.setUserIcon(UserUtils.USER_ICON_DEFAULT);
-        }
-
         if (!StringUtils.isEmpty(user.getUserEmail())) {
             //新邮箱不为空
             if (getUserByEmail(user.getUserEmail()) != null) {
@@ -399,7 +371,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         //执行插入
         userMapper.insertUser(user);
-        return "insertSuccess";
+        return Constants.SUCCESS;
     }
 
     @Override
@@ -412,5 +384,101 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         for (Long id : ids) {
             deleteOneUserById(id);
         }
+    }
+
+    @Override
+    public String insertAndUpdateUsersFromExcel(List<User> users) throws Exception {
+        for (User user : users) {
+            if (UserUtils.isValidUserUpdateInfo(user)) {
+                insertAndUpdateOneUserFromExcel(user);
+            } else {
+                String msg = "表格输入用户user不合法!";
+                logger.error(msg);
+                throw new InvalidParameterException(msg);
+            }
+        }
+        return Constants.SUCCESS;
+    }
+
+    @Override
+    public String insertAndUpdateOneUserFromExcel(User user) throws Exception {
+        if (user == null) {
+            String msg = "insertAndUpdateOneUserFromExcel方法输入用户user为null!";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+
+        User originalUser = getUserByWorkId(user.getUserWorkId());
+        if (originalUser != null) {
+            //工号已存在，更新
+            if (!UserUtils.USER_ROLES.get(3).equals(originalUser.getUserRole())){
+                //如果当前助教用户角色不是助教，设为null，这样在mapper中不会更新
+                user.setUserRole(null);
+            }
+            updateUserByWorkId(originalUser, user);
+        } else {
+            //插入
+            insertUser(user);
+        }
+        return Constants.SUCCESS;
+    }
+
+    @Override
+    public String updateUserByWorkId(User user) {
+        User originalUser = getUserByWorkId(user.getUserWorkId());
+        return updateUserByWorkId(originalUser, user);
+    }
+
+    @Override
+    public String updateUserByWorkId(User originalUser, User newUser) {
+        if (!StringUtils.isEmpty(newUser.getUserIdCard())) {
+            //新身份证不为空
+            if (!newUser.getUserIdCard().equals(originalUser.getUserIdCard())) {
+                //身份证修改过了，判断是否与已存在的身份证冲突
+                if (getUserByIdCard(newUser.getUserIdCard()) != null) {
+                    //修改后的身份证已存在
+                    return "idCardRepeat";
+                }
+            }
+        } else {
+            newUser.setUserIdCard(null);
+        }
+
+        if (!newUser.getUserName().equals(originalUser.getUserName())) {
+            //用户名修改过了，判断是否与已存在的用户名冲突
+            if (getUserByName(newUser.getUserName()) != null) {
+                //修改后的用户名已存在
+                return "nameRepeat";
+            }
+        }
+
+        if (!StringUtils.isEmpty(newUser.getUserEmail())) {
+            //新邮箱不为空
+            if (!newUser.getUserEmail().equals(originalUser.getUserEmail())) {
+                //邮箱修改过了，判断是否与已存在的邮箱冲突
+                if (getUserByEmail(newUser.getUserEmail()) != null) {
+                    //修改后的邮箱已存在
+                    return "emailRepeat";
+                }
+            }
+        } else {
+            newUser.setUserEmail(null);
+        }
+
+        if (!StringUtils.isEmpty(newUser.getUserPhone())) {
+            //新手机不为空
+            if (!newUser.getUserPhone().equals(originalUser.getUserPhone())) {
+                //电话修改过了，判断是否与已存在的电话冲突
+                if (getUserByPhone(newUser.getUserPhone()) != null) {
+                    //修改后的电话已存在
+                    return "phoneRepeat";
+                }
+            }
+        } else {
+            newUser.setUserPhone(null);
+        }
+
+        userMapper.updateUserByWorkId(newUser);
+        return Constants.SUCCESS;
     }
 }

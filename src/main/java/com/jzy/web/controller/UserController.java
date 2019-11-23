@@ -1,13 +1,13 @@
 package com.jzy.web.controller;
 
-import com.alibaba.fastjson.JSON;
+import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.SessionConstants;
 import com.jzy.manager.util.FileUtils;
 import com.jzy.manager.util.ShiroUtils;
 import com.jzy.manager.util.UserUtils;
 import com.jzy.model.dto.EmailVerifyCode;
-import com.jzy.model.vo.EmailVerifyCodeSession;
 import com.jzy.model.entity.User;
+import com.jzy.model.vo.EmailVerifyCodeSession;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -22,9 +22,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -97,16 +95,16 @@ public class UserController extends AbstractController {
     @RequestMapping("/uploadUserIcon")
     @ResponseBody
     public Map<String, Object> uploadUserIcon(@RequestParam(value = "file", required = false) MultipartFile file) {
-        Map<String, Object> map2 = new HashMap<>();
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map2 = new HashMap<>(1);
+        Map<String, Object> map = new HashMap<>(3);
 
         String userIcon = userService.uploadUserIcon(file);
 
         //返回layui规定的文件上传模块JSON格式
         map.put("code", 0);
         map.put("msg", "");
-        map.put("data", map2);
         map2.put("src", userIcon);
+        map.put("data", map2);
         return map;
     }
 
@@ -120,7 +118,7 @@ public class UserController extends AbstractController {
     @RequestMapping("/updateOwnInfo")
     @ResponseBody
     public Map<String, Object> updateInfoByCurrentUser(User user) {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserUpdateOwnInfo(user)) {
             logger.error("updateInfoByUser方法错误入参");
@@ -142,7 +140,7 @@ public class UserController extends AbstractController {
     @RequestMapping("/updateOwnPassword")
     @ResponseBody
     public Map<String, Object> updatePasswordByCurrentUser(@RequestParam("oldPassword") String userOldPassword, @RequestParam("newPassword") String userNewPassword) {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserPassword(userNewPassword)) {
             logger.error("updatePasswordByCurrentUser方法错误入参");
@@ -157,7 +155,7 @@ public class UserController extends AbstractController {
             map.put("data", "oldPasswordWrong");
         } else {
             userService.updatePasswordById(userInfoSession.getId(),userInfoSession.getUserSalt(), userNewPassword);
-            map.put("data", "updatePasswordSuccess");
+            map.put("data", Constants.SUCCESS);
         }
 
         return map;
@@ -217,7 +215,7 @@ public class UserController extends AbstractController {
     @RequestMapping("/addNewEmail")
     @ResponseBody
     public Map<String, Object> addNewEmail(@RequestParam(value = "emailVerifyCode",required = false) String emailVerifyCode,@RequestParam("newEmail") String newEmail) {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserEmail(newEmail)) {
             logger.error("addNewEmail方法错误入参");
@@ -225,9 +223,14 @@ public class UserController extends AbstractController {
         }
         User userInfoSession = userService.getSessionUserInfo();
         //前端服务端双重校验确保安全
-        if (userInfoSession.getUserEmail() == null || userInfoSession.getUserEmail().equals(newEmail)) {
+        if (userInfoSession.getUserEmail() != null && userInfoSession.getUserEmail().equals(newEmail)) {
             logger.error("addNewEmail方法错误入参, 未对原有邮箱进行修改");
             throw new InvalidParameterException("addNewEmail方法错误入参, 未对原有邮箱进行修改");
+        } else {
+            if (StringUtils.isEmpty(newEmail)){
+                logger.error("addNewEmail方法错误入参, 未对原有邮箱进行修改");
+                throw new InvalidParameterException("addNewEmail方法错误入参, 未对原有邮箱进行修改");
+            }
         }
 
         //auth=true，即已经经过了服务端验证
@@ -239,7 +242,7 @@ public class UserController extends AbstractController {
                 map.put("data", "newEmailExist");
             } else {
                 userService.updateEmailById(userInfoSession.getId(), newEmail);
-                map.put("data", "updateEmailSuccess");
+                map.put("data", Constants.SUCCESS);
             }
         }
 
@@ -256,7 +259,7 @@ public class UserController extends AbstractController {
     @RequestMapping("/modifyCurrentEmail")
     @ResponseBody
     public Map<String, Object> modifyCurrentEmail(@RequestParam("oldEmail") String userOldEmail, @RequestParam("newEmail") String userNewEmail) {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserEmail(userNewEmail)) {
             logger.error("modifyCurrentEmail方法错误入参");
@@ -264,16 +267,22 @@ public class UserController extends AbstractController {
         }
         User userInfoSession = userService.getSessionUserInfo();
         //前端服务端双重校验确保安全
-        if (userInfoSession.getUserEmail() == null || userInfoSession.getUserEmail().equals(userNewEmail)) {
+        if (userInfoSession.getUserEmail() != null && userInfoSession.getUserEmail().equals(userNewEmail)) {
             logger.error("modifyCurrentEmail方法错误入参, 未对原有邮箱进行修改");
             throw new InvalidParameterException("modifyCurrentEmail方法错误入参, 未对原有邮箱进行修改");
+        }else {
+            if (StringUtils.isEmpty(userNewEmail)){
+                logger.error("modifyCurrentEmail方法错误入参, 未对原有邮箱进行修改");
+                throw new InvalidParameterException("modifyCurrentEmail方法错误入参, 未对原有邮箱进行修改");
+            }
         }
+
 
         if (userService.getUserByEmail(userNewEmail) != null) {
             map.put("data", "newEmailExist");
         } else {
             userService.updateEmailById(userInfoSession.getId(), userNewEmail);
-            map.put("data", "updateEmailSuccess");
+            map.put("data", Constants.SUCCESS);
         }
 
         return map;
@@ -288,7 +297,7 @@ public class UserController extends AbstractController {
     @RequestMapping("/modifyCurrentPhone")
     @ResponseBody
     public Map<String, Object> modifyCurrentPhone(@RequestParam("newPhone") String userNewPhone) {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserPhone(userNewPhone)) {
             logger.error("modifyCurrentPhone方法错误入参");
@@ -296,19 +305,19 @@ public class UserController extends AbstractController {
         }
         User userInfoSession = userService.getSessionUserInfo();
 
-        //前端服务端双重校验确保安全
-        if (userInfoSession.getUserPhone() == null || userInfoSession.getUserEmail().equals(userNewPhone)) {
-            logger.error("modifyCurrentPhone方法错误入参, 未对原有邮箱进行修改");
-            throw new InvalidParameterException("modifyCurrentPhone方法错误入参, 未对原有邮箱进行修改");
-        }
-
-        if (userService.getUserByPhone(userNewPhone) != null) {
-            map.put("data", "newPhoneExist");
+        //前端服务端双重校验确保安全 TODO 如有发送短信验证码接口需要另行处理
+        if (userInfoSession.getUserPhone() == null || userInfoSession.getUserPhone().equals(userNewPhone)) {
+            //未修改手机
+            logger.info("modifyCurrentPhone方法错误入参, 未对原有手机进行修改");
         } else {
-            userService.updatePhoneById(userInfoSession.getId(), userNewPhone);
-            map.put("data", "updatePhoneSuccess");
+            if (userService.getUserByPhone(userNewPhone) != null) {
+                map.put("data", "newPhoneExist");
+                return map;
+            }
         }
 
+        userService.updatePhoneById(userInfoSession.getId(), userNewPhone);
+        map.put("data", Constants.SUCCESS);
         return map;
     }
 

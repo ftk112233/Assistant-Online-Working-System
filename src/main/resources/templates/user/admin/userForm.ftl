@@ -4,14 +4,13 @@
 <head>
     <meta charset="utf-8">
     <title>用户管理-新东方优能中学助教工作平台</title>
-    <meta name="renderer" content="webkit">
+    <meta name="renderer" content="weabkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <link rel="icon" href="${ctx}/custom/img/favicon/favicon.ico"/>
     <link rel="stylesheet" href="${ctx}/plugins/layuiadmin/layui/css/layui.css" media="all">
     <link rel="stylesheet" href="${ctx}/plugins/layuiadmin/style/admin.css" media="all">
-    <link rel="stylesheet" href="${ctx}/plugins/layuiadmin/style/login.css" media="all">
 </head>
 <body>
 
@@ -28,7 +27,7 @@
     <div class="layui-form-item">
         <label class="layui-form-label">身份证</label>
         <div class="layui-input-inline">
-            <input type="text" name="idCard" value="" class="layui-input" placeholder="请输入">
+            <input type="text" name="idCard" value="" class="layui-input" lay-verify="idCard" lay-verType="tips" placeholder="请输入">
         </div>
     </div>
     <div class="layui-form-item">
@@ -67,13 +66,13 @@
     <div class="layui-form-item">
         <label class="layui-form-label">邮箱</label>
         <div class="layui-input-inline">
-            <input type="text" name="userEmail" value="" class="layui-input" placeholder="请输入">
+            <input type="text" name="userEmail" value="" class="layui-input" lay-verify="myemail" lay-verType="tips" placeholder="请输入">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">联系方式</label>
         <div class="layui-input-inline">
-            <input type="text" name="userPhone" value="" class="layui-input" placeholder="请输入">
+            <input type="text" name="userPhone" value="" class="layui-input" lay-verify="myphone" lay-verType="tips" placeholder="请输入">
         </div>
     </div>
     <div class="layui-form-item">

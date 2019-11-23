@@ -8,7 +8,7 @@ import lombok.ToString;
  * @author JinZhiyun
  * @version 1.0
  * @ClassName UserSearchCondition
- * @description 用户查询添加的封装
+ * @description 用户查询条件的封装
  * @date 2019/11/19 14:12
  **/
 @EqualsAndHashCode(callSuper = true)

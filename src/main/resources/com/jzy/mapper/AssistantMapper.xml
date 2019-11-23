@@ -8,7 +8,7 @@
     </resultMap>
 
     <resultMap id="BaseResultMap" type="com.jzy.model.entity.Assistant" extends="BaseColumnResultMap">
-        <result column="assistant_work_id" property="assistWorkId" jdbcType="VARCHAR"/>
+        <result column="assistant_work_id" property="assistantWorkId" jdbcType="VARCHAR"/>
         <result column="assistant_name" property="assistantName" jdbcType="VARCHAR"/>
         <result column="assistant_sex" property="assistantSex" jdbcType="VARCHAR"/>
         <result column="assistant_depart" property="assistantDepart" jdbcType="VARCHAR"/>
@@ -16,10 +16,149 @@
         <result column="assistant_phone" property="assistantPhone" jdbcType="VARCHAR"/>
         <result column="assistant_remark" property="assistantRemark" jdbcType="VARCHAR"/>
     </resultMap>
+    <insert id="insertAssistant" parameterType="com.jzy.model.entity.Assistant">
+        insert into assistant
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="assistantWorkId != null and assistantWorkId!=''">
+                assistant_work_id,
+            </if>
+            <if test="assistantName != null and assistantName!=''" >
+                assistant_name,
+            </if>
+            <if test="assistantSex != null and assistantSex!=''" >
+                assistant_sex,
+            </if>
+            <if test="assistantDepart != null and assistantDepart!=''" >
+                assistant_depart,
+            </if>
+            <if test="assistantCampus != null and assistantCampus!=''" >
+                assistant_campus,
+            </if>
+            <if test="assistantPhone != null and assistantPhone!=''" >
+                assistant_phone,
+            </if>
+            <if test="assistantRemark != null and assistantRemark!=''" >
+                assistant_remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="assistantWorkId != null and assistantWorkId!=''">
+                #{assistantWorkId},
+            </if>
+            <if test="assistantName != null and assistantName!=''" >
+                #{assistantName},
+            </if>
+            <if test="assistantSex != null and assistantSex!=''" >
+                #{assistantSex},
+            </if>
+            <if test="assistantDepart != null and assistantDepart!=''" >
+                #{assistantDepart},
+            </if>
+            <if test="assistantCampus != null and assistantCampus!=''" >
+                #{assistantCampus},
+            </if>
+            <if test="assistantPhone != null and assistantPhone!=''" >
+                #{assistantPhone},
+            </if>
+            <if test="assistantRemark != null and assistantRemark!=''" >
+                #{assistantRemark},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateAssistantInfo" parameterType="com.jzy.model.entity.Assistant">
+        update assistant
+        <set>
+            <if test="assistantWorkId != null  and assistantWorkId!=''">
+                assistant_work_id = #{assistantWorkId,jdbcType=VARCHAR},
+            </if>
+            <if test="assistantName != null  and assistantName!=''">
+                assistant_name = #{assistantName,jdbcType=VARCHAR},
+            </if>
+            assistant_sex = #{assistantSex,jdbcType=VARCHAR},
+            assistant_depart = #{assistantDepart,jdbcType=VARCHAR},
+            assistant_campus = #{assistantCampus,jdbcType=VARCHAR},
+            assistant_phone = #{assistantPhone,jdbcType=VARCHAR},
+            assistant_remark = #{assistantRemark,jdbcType=VARCHAR},
+        </set>
+        where id = #{id}
+    </update>
+    <update id="updateAssistantByWorkId" parameterType="com.jzy.model.entity.Assistant">
+        update assistant
+        <set>
+            <if test="assistantName != null  and assistantName!=''">
+                assistant_name = #{assistantName,jdbcType=VARCHAR},
+            </if>
+            assistant_sex = #{assistantSex,jdbcType=VARCHAR},
+            assistant_depart = #{assistantDepart,jdbcType=VARCHAR},
+            assistant_campus = #{assistantCampus,jdbcType=VARCHAR},
+            assistant_phone = #{assistantPhone,jdbcType=VARCHAR},
+            assistant_remark = #{assistantRemark,jdbcType=VARCHAR},
+        </set>
+        where assistant_work_id = #{assistantWorkId}
+    </update>
+    <delete id="deleteOneAssistantById">
+        delete from assistant where id=#{id}
+    </delete>
 
     <select id="getAssistantByWorkId" resultMap="BaseResultMap">
         select * from assistant where assistant_work_id=#{assistantWorkId}
     </select>
-
+    <select id="getAssistantByName" resultMap="BaseResultMap">
+        select * from assistant where assistant_name=#{assistantName}
+    </select>
+    <select id="getAssistantById" resultMap="BaseResultMap">
+        select * from assistant where id=#{id}
+    </select>
+    <select id="listAssistants" resultMap="BaseResultMap"
+            parameterType="com.jzy.model.dto.AssistantSearchCondition">
+        select * from assistant a
+        <where>
+            <if test="assistantWorkId != null and assistantWorkId!=''">
+                <bind name="assistantWorkIdLike" value=" '%' + assistantWorkId + '%' "/>
+                and a.assistant_work_id like #{assistantWorkIdLike}
+            </if>
+            <if test="assistantName != null and assistantName!=''">
+                <bind name="assistantNameLike" value=" '%' + assistantName + '%' "/>
+                and a.assistant_name like #{assistantNameLike}
+            </if>
+            <if test="assistantSex != null and assistantSex!=''">
+                and a.assistant_sex=#{assistantSex}
+            </if>
+            <if test="assistantCampus != null and assistantCampus!=''">
+                and a.assistant_campus=#{assistantCampus}
+            </if>
+            <if test="assistantPhone != null and assistantPhone!=''">
+                <bind name="assistantPhoneLike" value=" '%' + assistantPhone + '%' "/>
+                and a.assistant_phone like #{assistantPhoneLike}
+            </if>
+        </where>
+        <if test="condition1 == 'assistantWorkId'">
+            order by a.assistant_work_id
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'assistantName'">
+            order by a.assistant_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'assistantCampus'">
+            order by a.assistant_campus
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+    </select>
 
 </mapper>

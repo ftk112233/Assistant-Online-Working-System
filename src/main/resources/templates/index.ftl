@@ -121,10 +121,13 @@
                                 <a lay-href="app/message/index.html">转班操作</a>
                             </dd>
                             <dd>
-                                <a lay-href="app/message/index.html">助教信息</a>
+                                <a lay-href="${ctx}/assistant/admin/page">助教信息</a>
                             </dd>
-                            <dd data-name="workorder">
-                                <a lay-href="app/workorder/list.html">教师信息</a>
+                            <dd>
+                                <a lay-href="${ctx}/assistant/admin/page">教师信息</a>
+                            </dd>
+                            <dd>
+                                <a lay-href="${ctx}/user/admin/page">用户信息</a>
                             </dd>
                         </dl>
                     </li>
@@ -137,30 +140,18 @@
                             <dd data-name="grid">
                                 <a href="javascript:;">学管</a>
                                 <dl class="layui-nav-child">
-                                    <dd data-name="list"><a lay-href="${ctx}/user/admin/page">用户信息管理</a></dd>
-                                    <dd data-name="mobile"><a lay-href="component/grid/mobile.html">按移动端排列</a></dd>
-                                    <dd data-name="mobile-pc"><a lay-href="component/grid/mobile-pc.html">移动桌面端组合</a>
-                                    </dd>
-                                    <dd data-name="all"><a lay-href="component/grid/all.html">全端复杂组合</a></dd>
-                                    <dd data-name="stack"><a lay-href="component/grid/stack.html">低于桌面堆叠排列</a></dd>
-                                    <dd data-name="speed-dial"><a lay-href="component/grid/speed-dial.html">九宫格</a></dd>
+                                    <dd data-name="mobile"><a lay-href="${ctx}/toolbox/assistantAdministrator/infoImport">信息导入</a></dd>
+                                    <dd data-name="mobile"><a lay-href="component/grid/mobile.html">表格模板导入</a></dd>
                                 </dl>
                             </dd>
                             <dd data-name="laydate">
                                 <a href="javascript:;">助教</a>
                                 <dl class="layui-nav-child">
                                     <dd data-name="demo1">
-                                        <a lay-href="component/laydate/demo1.html" lay-text="layDate 功能演示一">功能演示一</a>
+                                        <a lay-href="${ctx}/toolbox/assistant/startClassExcel" lay-text="开班做表魔法">开班做表魔法</a>
                                     </dd>
                                     <dd data-name="demo2">
-                                        <a lay-href="component/laydate/demo2.html" lay-text="layDate 功能演示二">功能演示二</a>
-                                    </dd>
-                                    <dd data-name="theme">
-                                        <a lay-href="component/laydate/theme.html" lay-text="layDate 设定主题">设定主题</a>
-                                    </dd>
-                                    <dd data-name="special-demo">
-                                        <a lay-href="component/laydate/special-demo.html"
-                                           lay-text="layDate 特殊示例">特殊示例</a>
+                                        <a lay-href="${ctx}/toolbox/assistant/missLessonStudentExcel" lay-text="开补课单魔法">开补课单魔法</a>
                                     </dd>
                                 </dl>
                             </dd>
@@ -179,6 +170,12 @@
                                     <dd><a lay-href="${ctx}/user/setPassword">修改密码</a></dd>
                                     <dd><a lay-href="${ctx}/user/setEmail">修改绑定邮箱</a></dd>
                                     <dd><a lay-href="${ctx}/user/setPhone">修改绑定手机</a></dd>
+                                </dl>
+                            </dd>
+                            <dd class="layui-nav-itemed">
+                                <a href="javascript:;">系统设置</a>
+                                <dl class="layui-nav-child">
+                                    <dd><a lay-href="${ctx}/permission/admin/page">权限管理</a></dd>
                                 </dl>
                             </dd>
                         </dl>
