@@ -32,6 +32,9 @@ public abstract class AbstractController {
     protected ClassService classService;
 
     @Autowired
+    protected StudentAndClassService studentAndClassService;
+
+    @Autowired
     protected AssistantService assistantService;
 
     @Autowired

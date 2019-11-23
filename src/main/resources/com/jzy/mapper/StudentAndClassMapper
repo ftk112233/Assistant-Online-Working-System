@@ -52,13 +52,12 @@
             remark=#{remark},
         </set>
         where student_id=(select id from student where student_id=#{studentId})
-          and class_id=(select id from class where class_id=#{classId})
+        and class_id=(select id from class where class_id=#{classId})
     </update>
 
     <select id="countStudentAndClassByStudentIdAndClassId" resultType="Integer">
         select count(*) from student s inner join student_class s_c on s.id = s_c.student_id and  s.student_id=#{studentId}
           inner join class c on s_c.class_id = c.id and c.class_id=#{classId}
     </select>
-
 
 </mapper>
