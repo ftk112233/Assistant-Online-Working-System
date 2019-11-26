@@ -8,6 +8,8 @@ package com.jzy.manager.constant;
  * @Version 1.0
  **/
 public class ExcelConstants {
+    private ExcelConstants(){}
+
     /*==================助教信息表列属性名====================*/
     public static final String DEPART_COLUMN ="部门";
 
@@ -44,7 +46,7 @@ public class ExcelConstants {
 
     public static final String STUDENT_PHONE_COLUMN ="手机";
 
-    public static final String STUDENT_PHONE_BACKUP_COLUMN ="备用手机";
+    public static final String STUDENT_PHONE_BACKUP_COLUMN ="备用手机1";
 
     public static final String TEACHER_NAME_COLUMN_2 ="上课教师";
 

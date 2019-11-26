@@ -45,7 +45,29 @@ public interface StudentService {
 
 
     /**
-     * 根据从excel中读取到的students信息，更新插入多个。根据学员编号判断：
+     * 根据从excel中读取到的students信息（包括手机等字段），更新插入多个。根据学员编号判断：
+     *      if 当前学员编号不存在
+     *          执行插入
+     *      else
+     *          根据学员编号更新
+     * @param students
+     * @return
+     */
+    String insertAndUpdateStudentsDetailedFromExcel(List<Student> students) throws Exception;
+
+    /**
+     * 根据从excel中读取到的students信息（包括手机等字段），更新插入一个。根据学员编号判断：
+     *      if 当前学员编号不存在
+     *          执行插入
+     *      else
+     *          根据学员编号更新
+     * @param student
+     * @return
+     */
+    String insertAndUpdateOneStudentDetailedFromExcel(Student student) throws Exception;
+
+    /**
+     * 根据从excel中读取到的students信息（一般就学号姓名，不包括手机等字段），更新插入多个。根据学员编号判断：
      *      if 当前学员编号不存在
      *          执行插入
      *      else
@@ -56,7 +78,7 @@ public interface StudentService {
     String insertAndUpdateStudentsFromExcel(List<Student> students) throws Exception;
 
     /**
-     * 根据从excel中读取到的students信息，更新插入一个。根据学员编号判断：
+     * 根据从excel中读取到的students信息（一般就学号姓名，不包括手机等字段），更新插入一个。根据学员编号判断：
      *      if 当前学员编号不存在
      *          执行插入
      *      else

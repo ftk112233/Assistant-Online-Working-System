@@ -18,7 +18,7 @@ public class Teacher extends BaseEntity {
     private static final long serialVersionUID = -1081478262543186598L;
 
     /**
-     * 教师工号
+     * 教师工号，唯一，长度小于等于32可以为空
      */
     private String teacherWorkId;
 

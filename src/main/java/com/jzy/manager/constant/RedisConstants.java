@@ -8,6 +8,8 @@ package com.jzy.manager.constant;
  * @date 2019/11/15 21:55
  **/
 public class RedisConstants {
+    private RedisConstants(){}
+
     /**
      * 根键
      */

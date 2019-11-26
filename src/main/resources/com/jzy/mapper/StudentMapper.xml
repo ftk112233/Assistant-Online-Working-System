@@ -12,7 +12,7 @@
         <result column="student_name" property="studentName" jdbcType="VARCHAR"/>
         <result column="student_sex" property="studentSex" jdbcType="VARCHAR"/>
         <result column="student_phone" property="studentPhone" jdbcType="VARCHAR"/>
-        <result column="student_phone_backup" property="studentPhoneBackup" jdbcType="BOOLEAN"/>
+        <result column="student_phone_backup" property="studentPhoneBackup" jdbcType="VARCHAR"/>
         <result column="student_school" property="studentSchool" jdbcType="VARCHAR"/>
         <result column="student_remark" property="studentRemark" jdbcType="VARCHAR"/>
     </resultMap>
@@ -68,14 +68,25 @@
     <update id="updateStudentByStudentId" parameterType="com.jzy.model.entity.Student">
         update student
         <set>
-            student_name = #{studentName,jdbcType=VARCHAR},
+            <if test="studentName != null and studentName!=''" >
+              student_name = #{studentName,jdbcType=VARCHAR},
+            </if>
             student_sex = #{studentSex,jdbcType=VARCHAR},
             student_phone = #{studentPhone,jdbcType=VARCHAR},
             student_phone_backup = #{studentPhoneBackup,jdbcType=VARCHAR},
             student_school = #{studentSchool,jdbcType=VARCHAR},
             student_remark = #{studentRemark,jdbcType=VARCHAR},
         </set>
-        where teacher_work_id = #{teacherWorkId}
+        where student_id = #{studentId}
+    </update>
+    <update id="updateStudentNameByStudentId" parameterType="com.jzy.model.entity.Student">
+        update student
+        <set>
+            <if test="studentName != null and studentName!=''" >
+                student_name = #{studentName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where student_id = #{studentId}
     </update>
     <select id="getStudentById" resultMap="BaseResultMap">
         select * from student where id=#{id}

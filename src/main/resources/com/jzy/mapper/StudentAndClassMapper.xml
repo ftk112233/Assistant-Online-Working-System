@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jzy.dao.StudentAndClassMapper">
+    <resultMap id="BaseColumnResultMap" type="com.jzy.model.entity.BaseEntity">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap" type="com.jzy.model.entity.StudentAndClass" extends="BaseColumnResultMap">
+        <result column="student_id" property="studentId" jdbcType="BIGINT"/>
+        <result column="class_id" property="classId" jdbcType="BIGINT"/>
+        <result column="register_time" property="registerTime" jdbcType="TIMESTAMP"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="StudentAndClassDetailedResultMap" type="com.jzy.model.dto.StudentAndClassDetailedDto" extends="BaseColumnResultMap">
+        <result column="student_id" property="studentId" jdbcType="BIGINT"/>
+        <result column="student_name" property="studentName" jdbcType="VARCHAR"/>
+        <result column="student_sex" property="studentSex" jdbcType="VARCHAR"/>
+        <result column="student_phone" property="studentPhone" jdbcType="VARCHAR"/>
+        <result column="student_phone_backup" property="studentPhoneBackup" jdbcType="VARCHAR"/>
+        <result column="class_id" property="classId" jdbcType="BIGINT"/>
+        <result column="class_name" property="className" jdbcType="VARCHAR"/>
+        <result column="class_campus" property="classCampus" jdbcType="VARCHAR"/>
+        <result column="class_grade" property="classGrade" jdbcType="VARCHAR"/>
+        <result column="class_subject" property="classSubject" jdbcType="VARCHAR"/>
+        <result column="class_type" property="classType" jdbcType="VARCHAR"/>
+        <result column="class_year" property="classYear" jdbcType="VARCHAR"/>
+        <result column="class_season" property="classSeason" jdbcType="VARCHAR"/>
+        <result column="class_time" property="classTime" jdbcType="VARCHAR"/>
+        <result column="class_simplified_time" property="classSimplifiedTime" jdbcType="VARCHAR"/>
+        <result column="class_times" property="classTimes" jdbcType="INTEGER"/>
+        <result column="assistant_name" property="assistantName" jdbcType="VARCHAR"/>
+        <result column="teacher_name" property="teacherName" jdbcType="VARCHAR"/>
+        <result column="classroom" property="classroom" jdbcType="VARCHAR"/>
+        <result column="register_time" property="registerTime" jdbcType="TIMESTAMP"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <insert id="insertStudentAndClass" parameterType="com.jzy.model.dto.StudentAndClassDetailedDto">
+        insert into student_class
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="studentId != null and studentId!=''">
+                student_id,
+            </if>
+            <if test="classId != null and classId!=''" >
+                class_id,
+            </if>
+            <if test="registerTime != null" >
+                register_time,
+            </if>
+            <if test="remark != null and remark!=''" >
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="studentId != null and studentId!=''">
+                (select id from student where student_id=#{studentId}),
+            </if>
+            <if test="classId != null and classId!=''" >
+                (select id from class where class_id=#{classId}),
+            </if>
+            <if test="registerTime != null" >
+                #{registerTime},
+            </if>
+            <if test="remark != null and remark!=''" >
+                #{remark},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateStudentAndClassByStudentIdAndClassId"
+            parameterType="com.jzy.model.dto.StudentAndClassDetailedDto">
+        update student_class
+        <set>
+            register_time=#{registerTime},
+            remark=#{remark},
+        </set>
+        where student_id=(select id from student where student_id=#{studentId})
+        and class_id=(select id from class where class_id=#{classId})
+    </update>
+
+    <select id="countStudentAndClassByStudentIdAndClassId" resultType="Long">
+        select count(*) from student s inner join student_class s_c on s.id = s_c.student_id and  s.student_id=#{studentId}
+          inner join class c on s_c.class_id = c.id and c.class_id=#{classId}
+    </select>
+    <select id="listStudentAndClasses" resultMap="StudentAndClassDetailedResultMap"
+            parameterType="com.jzy.model.dto.StudentAndClassSearchCondition">
+        select sc.id, sc.create_time, sc.update_time,sc.register_time,sc.remark,
+          s.student_id,s.student_name,s.student_sex,s.student_phone,s.student_phone_backup,
+          class_tmp.class_id,class_tmp.class_name,class_tmp.class_campus,class_tmp.class_grade,class_tmp.class_subject,
+        class_tmp.class_type,class_tmp.class_year,class_tmp.class_season,class_tmp.class_time,class_tmp.class_simplified_time,
+        class_tmp.class_times,class_tmp.assistant_name,class_tmp.teacher_name,class_tmp.classroom
+        from (select c.*, a.assistant_name as assistant_name, t.teacher_name as teacher_name
+        from class c left join assistant a on c.class_assistant_id = a.id left join teacher t on c.class_teacher_id = t.id
+        <where>
+            <if test="classYear != null and classYear!=''">
+                and c.class_year=#{classYear}
+            </if>
+            <if test="classSeason != null and classSeason!=''">
+                and c.class_season=#{classSeason}
+            </if>
+            <if test="classCampus != null and classCampus!=''">
+                and c.class_campus=#{classCampus}
+            </if>
+            <if test="classId != null and classId!=''">
+                <bind name="classIdLike" value=" '%' + classId + '%' "/>
+                and c.class_id like #{classIdLike}
+            </if>
+            <if test="className != null and className!=''">
+                <bind name="classNameLike" value=" '%' + className + '%' "/>
+                and c.class_name like #{classNameLike}
+            </if>
+            <if test="assistantWorkId != null and assistantWorkId!=''">
+                <bind name="assistantWorkIdLike" value=" '%' + assistantWorkId + '%' "/>
+                and a.assistant_work_id like #{assistantWorkIdLike}
+            </if>
+            <if test="assistantName != null and assistantName!=''">
+                <bind name="assistantNameLike" value=" '%' + assistantName + '%' "/>
+                and a.assistant_name like #{assistantNameLike}
+            </if>
+            <if test="teacherWorkId != null and teacherWorkId!=''">
+                <bind name="teacherWorkIdLike" value=" '%' + teacherWorkId + '%' "/>
+                and t.teacher_work_id like #{teacherWorkIdLike}
+            </if>
+            <if test="teacherName != null and teacherName!=''">
+                <bind name="teacherNameLike" value=" '%' + teacherName + '%' "/>
+                and t.teacher_name like #{teacherNameLike}
+            </if>
+            <if test="classTime != null and classTime!=''">
+                <bind name="classTimeLike" value=" '%' + classTime + '%' "/>
+                and c.class_time like #{classTimeLike}
+            </if>
+            <if test="classGrade != null and classGrade!=''">
+                and c.class_grade=#{classGrade}
+            </if>
+            <if test="classSubject != null and classSubject!=''">
+                and c.class_subject=#{classSubject}
+            </if>
+            <if test="classType != null and classType!=''">
+                and c.class_type=#{classType}
+            </if>
+            <if test="classroom != null and classroom!=''">
+                <bind name="classroomLike" value=" '%' + classroom + '%' "/>
+                and c.classroom like #{classroomLike}
+            </if>
+        </where>
+        ) as class_tmp, student_class sc, student s
+        <where>
+            sc.class_id=class_tmp.id and sc.student_id=s.id
+            <if test="studentId != null and studentId!=''">
+                <bind name="studentIdLike" value=" '%' + studentId + '%' "/>
+                and s.student_id like #{studentIdLike}
+            </if>
+            <if test="studentName != null and studentName!=''">
+                <bind name="studentNameLike" value=" '%' + studentName + '%' "/>
+                and s.student_name like #{studentNameLike}
+            </if>
+        </where>
+        <if test="condition1 == 'studentId'">
+            order by s.student_id
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'studentName'">
+            order by s.student_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'classId'">
+            order by class_tmp.class_id
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'className'">
+            order by class_tmp.class_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'assistantName'">
+            order by class_tmp.assistant_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'teacherName'">
+            order by class_tmp.teacher_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'registerTime'">
+            order by sc.register_time
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+    </select>
+
+</mapper>

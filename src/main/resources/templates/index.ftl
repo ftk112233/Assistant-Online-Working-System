@@ -110,21 +110,19 @@
                             <dd data-name="content">
                                 <a href="javascript:;">学员信息</a>
                                 <dl class="layui-nav-child">
-                                    <dd data-name="list"><a lay-href="app/content/list.html">上课信息</a></dd>
-                                    <dd data-name="tags"><a lay-href="app/content/tags.html">补课信息</a></dd>
+                                    <dd data-name="list"><a lay-href="${ctx}/studentAndClass/admin/page">上课信息</a></dd>
+                                    <dd data-name="tags"><a lay-href="${ctx}/missLessonStudent/admin/page">补课信息</a></dd>
+                                    <dd data-name="tags"><a lay-href="${ctx}/student/admin/page">个人信息</a></dd>
                                 </dl>
                             </dd>
                             <dd>
-                                <a lay-href="app/message/index.html">班级信息</a>
-                            </dd>
-                            <dd>
-                                <a lay-href="app/message/index.html">转班操作</a>
+                                <a lay-href="${ctx}/class/admin/page">班级信息</a>
                             </dd>
                             <dd>
                                 <a lay-href="${ctx}/assistant/admin/page">助教信息</a>
                             </dd>
                             <dd>
-                                <a lay-href="${ctx}/assistant/admin/page">教师信息</a>
+                                <a lay-href="${ctx}/teacher/admin/page">教师信息</a>
                             </dd>
                             <dd>
                                 <a lay-href="${ctx}/user/admin/page">用户信息</a>

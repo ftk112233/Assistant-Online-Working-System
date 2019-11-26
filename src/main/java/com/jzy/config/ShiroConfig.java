@@ -106,7 +106,12 @@ public class ShiroConfig {
         permissions.put("/user/showIcon", "perms[user:showIcon]"); //游客只有获取头像接口的权限
         permissions.put("/user/**", "perms[user:basic]"); //基本用户信息的操作，除游客外都有权限
         permissions.put("/permission/admin/**", "perms[permission:admin]"); //角色权限的权限，管理员才有
-        permissions.put("/assistant/admin/**", "perms[assistant:admin]"); //角色权限的权限，助教长以上级别才有
+        permissions.put("/assistant/admin/**", "perms[assistant:admin]"); //管理助教的权限，助教长以上级别才有
+        permissions.put("/teacher/admin/**", "perms[teacher:admin]"); //管理教师的权限，助教长以上级别才有
+
+        permissions.put("/toolbox/assistant/**", "perms[toolbox:assistant]"); //百宝箱助教区的权限，助教以上级别才有
+        permissions.put("/toolbox/assistantAdministrator/**", "perms[toolbox:assistantAdministrator]"); //百宝箱学管区的权限，助教长以上级别才有
+
         filterChainDefinitionMap.putAll(permissions);
 
         /*=======================================================*/

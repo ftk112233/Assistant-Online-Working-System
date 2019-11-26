@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
 import com.jzy.manager.exception.InvalidParamterException;
+import com.jzy.manager.util.ClassUtils;
 import com.jzy.manager.util.FileUtils;
 import com.jzy.model.CampusEnum;
 import org.apache.log4j.Logger;
@@ -60,6 +61,7 @@ public class ToolboxController extends AbstractController {
     @RequestMapping("/assistantAdministrator/infoImport")
     public String infoImport(Model model) {
         model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
+        model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(ClassUtils.SEASONS));
         return "toolbox/assistantAdministrator/infoImport";
     }
 

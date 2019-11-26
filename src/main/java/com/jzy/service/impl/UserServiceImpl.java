@@ -409,14 +409,16 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         }
 
         User originalUser = getUserByWorkId(user.getUserWorkId());
-        if (originalUser != null) {
-            //工号已存在，更新
-            if (!UserUtils.USER_ROLES.get(3).equals(originalUser.getUserRole())){
-                //如果当前助教用户角色不是助教，设为null，这样在mapper中不会更新
-                user.setUserRole(null);
-            }
-            updateUserByWorkId(originalUser, user);
-        } else {
+//        if (originalUser != null) {
+//            //工号已存在，更新
+//            if (!UserUtils.USER_ROLES.get(3).equals(originalUser.getUserRole())){
+//                //如果当前助教用户角色不是助教，设为null，这样在mapper中不会更新
+//                user.setUserRole(null);
+//            }
+//            updateUserByWorkId(originalUser, user);
+//        }
+
+        if (originalUser == null) {
             //插入
             insertUser(user);
         }

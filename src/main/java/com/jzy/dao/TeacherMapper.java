@@ -1,7 +1,10 @@
 package com.jzy.dao;
 
+import com.jzy.model.dto.TeacherSearchCondition;
 import com.jzy.model.entity.Teacher;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @author JinZhiyun
@@ -50,4 +53,27 @@ public interface TeacherMapper {
      * @return
      */
     void updateTeacherByWorkId(Teacher teacher);
+
+    /**
+     * 返回符合条件的教师信息分页结果
+     *
+     * @param condition  查询条件入参
+     * @return
+     */
+    List<Teacher> listTeachers(TeacherSearchCondition condition);
+
+    /**
+     * 修改教师信息由id修改
+     *
+     * @param teacher 修改后的教师信息
+     * @return
+     */
+    void updateTeacherInfo(Teacher teacher);
+
+    /**
+     * 根据id删除一个教师
+     *
+     * @param id 教师id
+     */
+    void deleteOneTeacherById(Long id);
 }

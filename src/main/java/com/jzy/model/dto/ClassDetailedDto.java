@@ -23,8 +23,14 @@ public class ClassDetailedDto extends Class {
      */
     private String teacherName;
 
+
     /**
-     * 助教姓名，唯一，非空，不超过50个字符
+     * 助教姓名
      */
     private String assistantName;
+
+    /**
+     * 班上学生数量
+     */
+    private Long classStudentsCount;
 }

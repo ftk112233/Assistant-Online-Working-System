@@ -540,13 +540,14 @@ public class MyStringUtils {
      */
     public static String getParsedTime(String string){
         String result = "";
-        int separatorIdx=string.indexOf('-');
-        if (separatorIdx<4){
-            return result;
-        }
         //冒号的第一次出现位置
         int firstIdx=string.indexOf(':');
-        if (separatorIdx-firstIdx!=3){
+        if (firstIdx<1){
+            return result;
+        }
+
+        int separatorIdx=firstIdx+3;
+        if (string.charAt(separatorIdx) != '-'){
             return result;
         }
         //冒号的最后一次出现位置
@@ -571,6 +572,6 @@ public class MyStringUtils {
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println(getParsedTime(""));
+        System.out.println(getParsedTime("周五不上课, 周六0:15-1:15(11.2,11.9休息,11.3,11.4上课) "));
     }
 }

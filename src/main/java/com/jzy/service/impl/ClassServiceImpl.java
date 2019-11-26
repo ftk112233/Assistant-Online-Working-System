@@ -1,8 +1,13 @@
 package com.jzy.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jzy.dao.ClassMapper;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.util.ClassUtils;
 import com.jzy.model.dto.ClassDetailedDto;
+import com.jzy.model.dto.ClassSearchCondition;
+import com.jzy.model.dto.MyPage;
 import com.jzy.model.entity.Class;
 import com.jzy.service.ClassService;
 import org.apache.commons.lang3.StringUtils;
@@ -58,7 +63,13 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     @Override
     public String insertAndUpdateClassesFromExcel(List<ClassDetailedDto> classDetailedDtos) throws Exception {
         for (ClassDetailedDto classDetailedDto : classDetailedDtos) {
-            insertAndUpdateOneClassFromExcel(classDetailedDto);
+            if (ClassUtils.isValidClassInfo(classDetailedDto)){
+                insertAndUpdateOneClassFromExcel(classDetailedDto);
+            } else {
+                String msg = "输入助教排班表中读取到的classDetailedDtos不合法！";
+                logger.error(msg);
+                throw new InvalidParameterException(msg);
+            }
         }
         return Constants.SUCCESS;
     }
@@ -81,5 +92,26 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
         }
 
         return Constants.SUCCESS;
+    }
+
+    @Override
+    public PageInfo<ClassDetailedDto> listClasses(MyPage myPage, ClassSearchCondition condition) {
+        PageHelper.startPage(myPage.getPageNum(), myPage.getPageSize());
+        List<ClassDetailedDto> classDetailedDtos = classMapper.listClasses(condition);
+        for (int i=0;i<classDetailedDtos.size();i++){
+            ClassDetailedDto classDetailedDto=classDetailedDtos.get(i);
+            if (!StringUtils.isEmpty(classDetailedDto.getClassYear())){
+                String year=classDetailedDto.getClassYear();
+                String parsedYear=year.substring(0, year.indexOf('-'));
+                classDetailedDto.setClassYear(parsedYear);
+                classDetailedDtos.set(i,classDetailedDto);
+            }
+        }
+        return new PageInfo<>(classDetailedDtos);
+    }
+
+    @Override
+    public List<String> listAllClassIds() {
+        return classMapper.listAllClassIds();
     }
 }

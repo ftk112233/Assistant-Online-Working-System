@@ -1,5 +1,8 @@
 package com.jzy.service;
 
+import com.github.pagehelper.PageInfo;
+import com.jzy.model.dto.MyPage;
+import com.jzy.model.dto.TeacherSearchCondition;
 import com.jzy.model.entity.Teacher;
 
 import java.util.List;
@@ -82,4 +85,35 @@ public interface TeacherService {
      * @return
      */
     String insertAndUpdateOneTeacherFromExcel(Teacher teacher) throws Exception;
+
+    /**
+     * 返回符合条件的教师信息分页结果
+     *
+     * @param myPage 分页{页号，每页数量}
+     * @param condition  查询条件入参
+     * @return
+     */
+    PageInfo<Teacher> listTeachers(MyPage myPage, TeacherSearchCondition condition);
+
+    /**
+     * 修改教师信息由id修改
+     *
+     * @param teacher 修改后的教师信息
+     * @return
+     */
+    String updateTeacherInfo(Teacher teacher);
+
+    /**
+     * 根据id删除一个教师
+     *
+     * @param id 教师id
+     */
+    void deleteOneTeacherById(Long id);
+
+    /**
+     * 根据id删除多个个教师
+     *
+     * @param ids 教师id的列表
+     */
+    void deleteManyTeachersByIds(List<Long> ids);
 }

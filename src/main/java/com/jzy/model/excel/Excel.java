@@ -556,6 +556,9 @@ public class Excel implements Serializable, Resettable {
      * @return
      */
     public String getValueAt(int sheetIx, int rowIndex, int colIndex) {
+        if (rowIndex<0 || colIndex<0){
+            return null;
+        }
         Sheet sheet = workbook.getSheetAt(sheetIx);
         return getCellValueToString(sheet.getRow(rowIndex).getCell(colIndex));
     }

@@ -2,6 +2,7 @@ package com.jzy.service.impl;
 
 import com.jzy.dao.StudentMapper;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.util.StudentUtils;
 import com.jzy.model.entity.Student;
 import com.jzy.service.StudentService;
 import org.apache.commons.lang3.StringUtils;
@@ -57,9 +58,48 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
     }
 
     @Override
+    public String insertAndUpdateStudentsDetailedFromExcel(List<Student> students) throws Exception {
+        for (Student student:students){
+            if (StudentUtils.isValidStudentInfo(student)){
+                insertAndUpdateOneStudentDetailedFromExcel(student);
+            } else {
+                String msg = "学生花名册读取到的student不合法!";
+                logger.error(msg);
+                throw new InvalidParameterException(msg);
+            }
+        }
+        return Constants.SUCCESS;
+    }
+
+    @Override
+    public String insertAndUpdateOneStudentDetailedFromExcel(Student student) throws Exception {
+        if (student == null) {
+            String msg = "insertAndUpdateOneStudentFromExcel方法输入学生student为null!";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+
+
+        Student originalStudent=getStudentByStudentId(student.getStudentId());
+        if (originalStudent != null) {
+            //学员编号已存在，更新
+            updateStudentByStudentId(student);
+        } else {
+            insertStudent(student);
+        }
+        return Constants.SUCCESS;
+    }
+
+    @Override
     public String insertAndUpdateStudentsFromExcel(List<Student> students) throws Exception {
         for (Student student:students){
-            insertAndUpdateOneStudentFromExcel(student);
+            if (StudentUtils.isValidStudentInfo(student)){
+                insertAndUpdateOneStudentFromExcel(student);
+            } else {
+                String msg = "学生花名册读取到的student不合法!";
+                logger.error(msg);
+                throw new InvalidParameterException(msg);
+            }
         }
         return Constants.SUCCESS;
     }
@@ -72,11 +112,10 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
             throw new InvalidParameterException(msg);
         }
 
-
         Student originalStudent=getStudentByStudentId(student.getStudentId());
         if (originalStudent != null) {
             //学员编号已存在，更新
-            updateStudentByStudentId(student);
+            studentMapper.updateStudentNameByStudentId(student);
         } else {
             insertStudent(student);
         }

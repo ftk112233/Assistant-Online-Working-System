@@ -63,6 +63,22 @@
         </set>
         where teacher_work_id = #{teacherWorkId}
     </update>
+    <update id="updateTeacherInfo" parameterType="com.jzy.model.entity.Teacher">
+        update teacher
+        <set>
+            teacher_work_id = #{teacherWorkId,jdbcType=VARCHAR},
+            <if test="teacherName != null  and teacherName!=''">
+                teacher_name = #{teacherName,jdbcType=VARCHAR},
+            </if>
+            teacher_sex = #{teacherSex,jdbcType=VARCHAR},
+            teacher_phone = #{teacherPhone,jdbcType=VARCHAR},
+            teacher_remark = #{teacherRemark,jdbcType=VARCHAR},
+        </set>
+        where id = #{id}
+    </update>
+    <delete id="deleteOneTeacherById">
+        delete from teacher where id=#{id}
+    </delete>
     <select id="getTeacherByName" resultMap="BaseResultMap">
         select * from teacher where teacher_name=#{teacherName}
     </select>
@@ -72,6 +88,45 @@
     <select id="getTeacherById" resultMap="BaseResultMap">
         select * from teacher where id=#{id}
   </select>
+    <select id="listTeachers" resultMap="BaseResultMap"
+            parameterType="com.jzy.model.dto.TeacherSearchCondition">
+        select * from teacher t
+        <where>
+            <if test="teacherWorkId != null and teacherWorkId!=''">
+                <bind name="teacherWorkIdLike" value=" '%' + teacherWorkId + '%' "/>
+                and t.teacher_work_id like #{teacherWorkIdLike}
+            </if>
+            <if test="teacherName != null and teacherName!=''">
+                <bind name="teacherNameLike" value=" '%' + teacherName + '%' "/>
+                and t.teacher_name like #{teacherNameLike}
+            </if>
+            <if test="teacherSex != null and teacherSex!=''">
+                and t.teacher_sex=#{teacherSex}
+            </if>
+            <if test="teacherPhone != null and teacherPhone!=''">
+                <bind name="teacherPhoneLike" value=" '%' + teacherPhone + '%' "/>
+                and t.teacher_phone like #{teacherPhoneLike}
+            </if>
+        </where>
+        <if test="condition1 == 'teacherWorkId'">
+            order by t.teacher_work_id
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'teacherName'">
+            order by t.teacher_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+    </select>
 
 
 </mapper>

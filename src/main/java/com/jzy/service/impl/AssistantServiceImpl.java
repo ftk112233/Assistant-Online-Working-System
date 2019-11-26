@@ -70,13 +70,17 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     public String updateAssistantInfo(Assistant assistant) {
         Assistant originalAssistant = getAssistantById(assistant.getId());
 
-        //新工号不为空
-        if (!assistant.getAssistantWorkId().equals(originalAssistant.getAssistantWorkId())) {
-            //工号修改过了，判断是否与已存在的工号冲突
-            if (getAssistantByWorkId(assistant.getAssistantWorkId()) != null) {
-                //修改后的工号已存在
-                return "workIdRepeat";
+        if (!StringUtils.isEmpty(assistant.getAssistantWorkId())) {
+            //新工号不为空
+            if (!assistant.getAssistantWorkId().equals(originalAssistant.getAssistantWorkId())) {
+                //工号修改过了，判断是否与已存在的工号冲突
+                if (getAssistantByWorkId(assistant.getAssistantWorkId()) != null) {
+                    //修改后的工号已存在
+                    return "workIdRepeat";
+                }
             }
+        } else {
+            assistant.setAssistantWorkId(null);
         }
 
         if (!assistant.getAssistantName().equals(originalAssistant.getAssistantName())) {

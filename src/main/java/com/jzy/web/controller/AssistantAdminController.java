@@ -45,13 +45,13 @@ public class AssistantAdminController extends AbstractController {
      * @return
      */
     @RequestMapping("/page")
-    public String console(Model model) {
+    public String page(Model model) {
         model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
         return "assistant/admin/page";
     }
 
     /**
-     * 查询角色权限信息的ajax交互
+     * 查询助教信息的ajax交互
      *
      * @param myPage    分页{页号，每页数量}
      * @param condition 查询条件入参
@@ -140,7 +140,7 @@ public class AssistantAdminController extends AbstractController {
     /**
      * 删除多个助教ajax交互
      *
-     * @param assistants 多个角色权限的json串，用fastjson转换为list
+     * @param assistants 多个助教的json串，用fastjson转换为list
      * @return
      */
     @RequestMapping("/deleteMany")

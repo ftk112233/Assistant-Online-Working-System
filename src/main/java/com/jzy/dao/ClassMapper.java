@@ -1,8 +1,11 @@
 package com.jzy.dao;
 
 import com.jzy.model.dto.ClassDetailedDto;
+import com.jzy.model.dto.ClassSearchCondition;
 import com.jzy.model.entity.Class;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @author JinZhiyun
@@ -43,4 +46,20 @@ public interface ClassMapper {
      * @return
      */
     void insertClass(ClassDetailedDto classDetailedDto);
+
+    /**
+     * 返回符合条件的班级信息分页结果
+     *
+     * @param condition  查询条件入参
+     * @return
+     */
+    List<ClassDetailedDto> listClasses(ClassSearchCondition condition);
+
+    /**
+     * 返回所有的班级编码
+     *
+     * @param
+     * @return
+     */
+    List<String> listAllClassIds();
 }

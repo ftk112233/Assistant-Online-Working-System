@@ -14,7 +14,7 @@
         <result column="class_grade" property="classGrade" jdbcType="VARCHAR"/>
         <result column="class_subject" property="classSubject" jdbcType="VARCHAR"/>
         <result column="class_type" property="classType" jdbcType="VARCHAR"/>
-        <result column="class_year" property="classYear" jdbcType="DATE"/>
+        <result column="class_year" property="classYear" jdbcType="VARCHAR"/>
         <result column="class_season" property="classSeason" jdbcType="VARCHAR"/>
         <result column="class_time" property="classTime" jdbcType="VARCHAR"/>
         <result column="class_simplified_time" property="classSimplifiedTime" jdbcType="VARCHAR"/>
@@ -25,52 +25,61 @@
         <result column="class_teacher_requirement" property="classTeacherRequirement" jdbcType="VARCHAR"/>
         <result column="class_remark" property="classRemark" jdbcType="VARCHAR"/>
     </resultMap>
+
+    <resultMap id="ClassDetailedResultMap" type="com.jzy.model.dto.ClassDetailedDto" extends="BaseResultMap">
+        <result column="assistant_name" property="assistantName" jdbcType="VARCHAR"/>
+        <result column="teacher_name" property="teacherName" jdbcType="VARCHAR"/>
+        <result column="class_student_count" property="classStudentsCount" jdbcType="BIGINT"/>
+    </resultMap>
     <insert id="insertClass" parameterType="com.jzy.model.dto.ClassDetailedDto">
         insert into class
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="classId != null and classId!=''">
                 class_id,
             </if>
-            <if test="className != null and className!=''" >
+            <if test="className != null and className!=''">
                 class_name,
             </if>
-            <if test="classCampus != null and classCampus!=''" >
+            <if test="classCampus != null and classCampus!=''">
                 class_campus,
             </if>
-            <if test="classGrade != null and classGrade!=''" >
+            <if test="classGrade != null and classGrade!=''">
                 class_grade,
             </if>
-            <if test="classSubject != null and classSubject!=''" >
+            <if test="classSubject != null and classSubject!=''">
                 class_subject,
             </if>
             <if test="classType != null and classType!=''">
                 class_type,
             </if>
-            <if test="classYear != null and classYear!=''" >
+            <if test="classYear != null">
                 class_year,
             </if>
-            <if test="classSimplifiedTime != null and classSimplifiedTime!=''" >
+            <if test="classSeason != null and classSeason != ''">
+                class_season,
+            </if>
+            <if test="classSimplifiedTime != null and classSimplifiedTime!=''">
                 class_time,
             </if>
-            <if test="classGrade != null and classGrade!=''" >
+            <if test="classGrade != null and classGrade!=''">
                 class_simplified_time,
             </if>
-            <if test="classTimes != null and classTimes!=''" >
+            <if test="classTimes != null">
                 class_times,
             </if>
             <if test="teacherName != null and teacherName!=''">
                 class_teacher_id,
             </if>
-            <if test="assistantName != null and assistantName!=''" >
+            <if test="assistantName != null and assistantName!=''">
                 class_assistant_id,
             </if>
-            <if test="classroom != null and classroom!=''" >
+            <if test="classroom != null and classroom!=''">
                 classroom,
             </if>
-            <if test="classTeacherRequirement != null and classTeacherRequirement!=''" >
+            <if test="classTeacherRequirement != null and classTeacherRequirement!=''">
                 class_teacher_requirement,
             </if>
-            <if test="classRemark != null and classRemark!=''" >
+            <if test="classRemark != null and classRemark!=''">
                 class_remark,
             </if>
         </trim>
@@ -78,46 +87,49 @@
             <if test="classId != null and classId!=''">
                 #{classId},
             </if>
-            <if test="className != null and className!=''" >
+            <if test="className != null and className!=''">
                 #{className},
             </if>
-            <if test="classCampus != null and classCampus!=''" >
+            <if test="classCampus != null and classCampus!=''">
                 #{classCampus},
             </if>
-            <if test="classGrade != null and classGrade!=''" >
+            <if test="classGrade != null and classGrade!=''">
                 #{classGrade},
             </if>
-            <if test="classSubject != null and classSubject!=''" >
+            <if test="classSubject != null and classSubject!=''">
                 #{classSubject},
             </if>
             <if test="classType != null and classType!=''">
                 #{classType},
             </if>
-            <if test="classYear != null and classYear!=''" >
+            <if test="classYear != null and classYear!=''">
                 #{classYear},
             </if>
-            <if test="classSimplifiedTime != null and classSimplifiedTime!=''" >
+            <if test="classSeason != null and classSeason != ''">
+                #{classSeason},
+            </if>
+            <if test="classSimplifiedTime != null and classSimplifiedTime!=''">
                 #{classSimplifiedTime},
             </if>
-            <if test="classGrade != null and classGrade!=''" >
+            <if test="classGrade != null and classGrade!=''">
                 #{classGrade},
             </if>
-            <if test="classTimes != null and classTimes!=''" >
+            <if test="classTimes != null">
                 #{classTimes},
             </if>
             <if test="teacherName != null and teacherName!=''">
                 (select id from teacher where teacher_name=#{teacherName}),
             </if>
-            <if test="assistantName != null and assistantName!=''" >
+            <if test="assistantName != null and assistantName!=''">
                 (select id from assistant where assistant_name=#{assistantName}),
             </if>
-            <if test="classroom != null and classroom!=''" >
+            <if test="classroom != null and classroom!=''">
                 #{classroom},
             </if>
-            <if test="classTeacherRequirement != null and classTeacherRequirement!=''" >
+            <if test="classTeacherRequirement != null and classTeacherRequirement!=''">
                 #{classTeacherRequirement},
             </if>
-            <if test="classRemark != null and classRemark!=''" >
+            <if test="classRemark != null and classRemark!=''">
                 #{classRemark},
             </if>
         </trim>
@@ -134,7 +146,7 @@
             class_season = #{classSeason,jdbcType=VARCHAR},
             class_time = #{classTime,jdbcType=VARCHAR},
             class_simplified_time = #{classSimplifiedTime,jdbcType=VARCHAR},
-            class_times = #{classTimes,jdbcType=VARCHAR},
+            class_times = #{classTimes,jdbcType=INTEGER},
             class_teacher_id = (select id from teacher where teacher_name=#{teacherName}),
             class_assistant_id = (select id from assistant where assistant_name=#{assistantName}),
             classroom = #{classroom,jdbcType=VARCHAR},
@@ -148,6 +160,105 @@
     </select>
     <select id="getClassByClassId" resultMap="BaseResultMap">
         select * from class where class_id=#{classId};
+    </select>
+    <select id="listClasses" resultMap="ClassDetailedResultMap"
+            parameterType="com.jzy.model.dto.ClassSearchCondition">
+      select class_tmp.*, count(*) as class_student_count
+        from (select c.*, a.assistant_name as assistant_name, t.teacher_name as teacher_name
+        from class c left join assistant a on c.class_assistant_id = a.id left join teacher t on c.class_teacher_id = t.id
+        <where>
+            <if test="classYear != null and classYear!=''">
+                and c.class_year=#{classYear}
+            </if>
+            <if test="classSeason != null and classSeason!=''">
+                and c.class_season=#{classSeason}
+            </if>
+            <if test="classCampus != null and classCampus!=''">
+                and c.class_campus=#{classCampus}
+            </if>
+            <if test="classId != null and classId!=''">
+                <bind name="classIdLike" value=" '%' + classId + '%' "/>
+                and c.class_id like #{classIdLike}
+            </if>
+            <if test="className != null and className!=''">
+                <bind name="classNameLike" value=" '%' + className + '%' "/>
+                and c.class_name like #{classNameLike}
+            </if>
+            <if test="assistantWorkId != null and assistantWorkId!=''">
+                <bind name="assistantWorkIdLike" value=" '%' + assistantWorkId + '%' "/>
+                and a.assistant_work_id like #{assistantWorkIdLike}
+            </if>
+            <if test="assistantName != null and assistantName!=''">
+                <bind name="assistantNameLike" value=" '%' + assistantName + '%' "/>
+                and a.assistant_name like #{assistantNameLike}
+            </if>
+            <if test="teacherWorkId != null and teacherWorkId!=''">
+                <bind name="teacherWorkIdLike" value=" '%' + teacherWorkId + '%' "/>
+                and t.teacher_work_id like #{teacherWorkIdLike}
+            </if>
+            <if test="teacherName != null and teacherName!=''">
+                <bind name="teacherNameLike" value=" '%' + teacherName + '%' "/>
+                and t.teacher_name like #{teacherNameLike}
+            </if>
+            <if test="classTime != null and classTime!=''">
+                <bind name="classTimeLike" value=" '%' + classTime + '%' "/>
+                and c.class_time like #{classTimeLike}
+            </if>
+            <if test="classGrade != null and classGrade!=''">
+                and c.class_grade=#{classGrade}
+            </if>
+            <if test="classSubject != null and classSubject!=''">
+                and c.class_subject=#{classSubject}
+            </if>
+            <if test="classType != null and classType!=''">
+                and c.class_type=#{classType}
+            </if>
+            <if test="classroom != null and classroom!=''">
+                <bind name="classroomLike" value=" '%' + classroom + '%' "/>
+                and c.classroom like #{classroomLike}
+            </if>
+        </where>
+         ) as class_tmp, student_class sc, student s where sc.class_id=class_tmp.id and sc.student_id=s.id
+        group by class_tmp.id
+        <if test="condition1 == 'classId'">
+            order by class_tmp.class_id
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'className'">
+            order by class_tmp.class_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'assistantName'">
+            order by class_tmp.assistant_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'teacherName'">
+            order by class_tmp.teacher_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+    </select>
+    <select id="listAllClassIds" resultType="string">
+        select class_id from class;
     </select>
 
 

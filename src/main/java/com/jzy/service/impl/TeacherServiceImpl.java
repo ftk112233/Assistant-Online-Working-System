@@ -1,7 +1,12 @@
 package com.jzy.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jzy.dao.TeacherMapper;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.util.TeacherUtils;
+import com.jzy.model.dto.MyPage;
+import com.jzy.model.dto.TeacherSearchCondition;
 import com.jzy.model.entity.Teacher;
 import com.jzy.service.TeacherService;
 import org.apache.commons.lang3.StringUtils;
@@ -84,7 +89,13 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
     @Override
     public String insertAndUpdateTeachersFromExcel(List<Teacher> teachers) throws Exception {
         for (Teacher teacher : teachers) {
-            insertAndUpdateOneTeacherFromExcel(teacher);
+            if (TeacherUtils.isValidTeacherInfo(teacher)){
+                insertAndUpdateOneTeacherFromExcel(teacher);
+            } else {
+                String msg = "输入排班表中读取到的teacher不合法!";
+                logger.error(msg);
+                throw new InvalidParameterException(msg);
+            }
         }
         return Constants.SUCCESS;
     }
@@ -105,5 +116,57 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
         }
 
         return Constants.SUCCESS;
+    }
+
+    @Override
+    public PageInfo<Teacher> listTeachers(MyPage myPage, TeacherSearchCondition condition) {
+        PageHelper.startPage(myPage.getPageNum(), myPage.getPageSize());
+        List<Teacher> teachers = teacherMapper.listTeachers(condition);
+        return new PageInfo<>(teachers);
+    }
+
+    @Override
+    public String updateTeacherInfo(Teacher teacher) {
+        Teacher originalTeacher = getTeacherById(teacher.getId());
+
+        if (!StringUtils.isEmpty(teacher.getTeacherWorkId())) {
+            //新工号不为空
+            if (!teacher.getTeacherWorkId().equals(originalTeacher.getTeacherWorkId())) {
+                //工号修改过了，判断是否与已存在的工号冲突
+                if (getTeacherByWorkId(teacher.getTeacherWorkId()) != null) {
+                    //修改后的工号已存在
+                    return "workIdRepeat";
+                }
+            }
+        } else {
+            teacher.setTeacherWorkId(null);
+        }
+
+        if (!teacher.getTeacherName().equals(originalTeacher.getTeacherName())) {
+            //姓名修改过了，判断是否与已存在的姓名冲突
+            if (getTeacherByName(teacher.getTeacherName()) != null) {
+                //修改后的姓名已存在
+                return "nameRepeat";
+            }
+        }
+
+        if (StringUtils.isEmpty(teacher.getTeacherSex())) {
+            teacher.setTeacherSex(null);
+        }
+
+        teacherMapper.updateTeacherInfo(teacher);
+        return Constants.SUCCESS;
+    }
+
+    @Override
+    public void deleteOneTeacherById(Long id) {
+        teacherMapper.deleteOneTeacherById(id);
+    }
+
+    @Override
+    public void deleteManyTeachersByIds(List<Long> ids) {
+        for (Long id:ids){
+            deleteOneTeacherById(id);
+        }
     }
 }

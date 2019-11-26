@@ -13,5 +13,6 @@ public class StudentAndClassServiceTest extends BaseTest {
         StudentListExcel excel = new StudentListExcel("D:\\aows_resources\\toolbox\\example\\秋下花名册.xls");
         excel.readStudentAndClassInfoFromExcel();
         studentAndClassService.insertAndUpdateStudentAndClassesFromExcel(excel.getStudentAndClassDetailedDtos());
+
     }
 }

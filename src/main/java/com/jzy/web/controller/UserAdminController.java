@@ -282,9 +282,9 @@ public class UserAdminController extends AbstractController {
                     return map;
                 }
             }
+            map.put("msg", Constants.SUCCESS);
         }
 
-        map.put("msg", Constants.SUCCESS);
         return map;
     }
 }

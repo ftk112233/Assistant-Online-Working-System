@@ -42,7 +42,7 @@ public class PermissionAdminController extends AbstractController {
      * @return
      */
     @RequestMapping("/page")
-    public String console(Model model) {
+    public String page(Model model) {
         model.addAttribute(ModelConstants.ROLES_MODEL_KEY, JSON.toJSONString(UserUtils.USER_ROLES));
         return "permission/admin/page";
     }

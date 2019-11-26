@@ -1,6 +1,9 @@
 package com.jzy.service;
 
+import com.github.pagehelper.PageInfo;
 import com.jzy.model.dto.ClassDetailedDto;
+import com.jzy.model.dto.ClassSearchCondition;
+import com.jzy.model.dto.MyPage;
 import com.jzy.model.entity.Class;
 
 import java.util.List;
@@ -66,4 +69,21 @@ public interface ClassService {
      * @return
      */
     String insertAndUpdateOneClassFromExcel(ClassDetailedDto classDetailedDto) throws Exception;
+
+    /**
+     * 查询班级信息的ajax交互
+     *
+     * @param myPage    分页{页号，每页数量}
+     * @param condition 查询条件入参
+     * @return
+     */
+    PageInfo<ClassDetailedDto> listClasses(MyPage myPage, ClassSearchCondition condition);
+
+    /**
+     * 返回所有的班级编码
+     *
+     * @param
+     * @return
+     */
+    List<String> listAllClassIds();
 }

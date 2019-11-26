@@ -24,22 +24,22 @@ public class StudentAndClass extends BaseEntity {
     /**
      * 上课学生的主键id
      */
-    private String studentId;
+    private Long studentId;
 
     /**
      * 上课班级的主键id
      */
-    private String classId;
+    private Long classId;
 
     /**
-     * 学生报名进班时间
+     * 学生报名进班时间，可以为空
      */
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date registerTime;
 
     /**
-     * 备注
+     * 备注，可以为空，但长度不超过500
      */
     private String remark;
 }

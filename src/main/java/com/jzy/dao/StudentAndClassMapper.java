@@ -1,9 +1,13 @@
 package com.jzy.dao;
 
 import com.jzy.model.dto.StudentAndClassDetailedDto;
+import com.jzy.model.dto.StudentAndClassSearchCondition;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
- * @InterfaceName StudentAndClassMapper
+ * @InterfaceName StudentAndClassMapper.xml
  * @Author JinZhiyun
  * @Description 学生和上课班级dao接口
  * @Date 2019/11/23 18:31
@@ -17,7 +21,7 @@ public interface StudentAndClassMapper {
      * @param classId 班号
      * @return
      */
-    int countStudentAndClassByStudentIdAndClassId(String studentId, String classId);
+    Long countStudentAndClassByStudentIdAndClassId(@Param("studentId") String studentId, @Param("classId") String classId);
 
     /**
      * 插入一个学生报班记录
@@ -34,4 +38,12 @@ public interface StudentAndClassMapper {
      * @return
      */
     void updateStudentAndClassByStudentIdAndClassId(StudentAndClassDetailedDto studentAndClassDetailedDto);
+
+    /**
+     * 返回符合条件的学生上课信息分页结果
+     *
+     * @param condition  查询条件入参
+     * @return
+     */
+    List<StudentAndClassDetailedDto> listStudentAndClasses(StudentAndClassSearchCondition condition);
 }

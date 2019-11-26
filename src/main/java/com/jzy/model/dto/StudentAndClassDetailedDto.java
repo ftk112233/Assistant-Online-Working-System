@@ -1,7 +1,10 @@
 package com.jzy.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.jzy.model.entity.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -13,12 +16,11 @@ import java.util.Date;
  * @Date 2019/11/22 21:57
  * @Version 1.0
  **/
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Data
-public class StudentAndClassDetailedDto {
-    /**
-     * 学生班级中间表的自增主键
-     */
-    private Long id;
+public class StudentAndClassDetailedDto extends BaseEntity {
+    private static final long serialVersionUID = 730389930087152500L;
 
     /**
      * 学员号
@@ -80,9 +82,7 @@ public class StudentAndClassDetailedDto {
     /**
      * 班级开设的年份，2019版的班级编码中没有能标识年份的字段
      */
-    @DateTimeFormat(pattern = "yyyy")
-    @JsonFormat(pattern = "yyyy", timezone = "GMT+8")
-    private Date classYear;
+    private String classYear;
 
     /**
      * 班级开设的季度，如春季，暑假等

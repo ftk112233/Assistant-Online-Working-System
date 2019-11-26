@@ -3,6 +3,7 @@ package com.jzy.model.excel.input;
 import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.ExcelColumnNotFoundException;
 import com.jzy.manager.exception.InputFileTypeException;
+import com.jzy.manager.util.FileUtils;
 import com.jzy.manager.util.MyTimeUtils;
 import com.jzy.model.dto.StudentAndClassDetailedDto;
 import com.jzy.model.entity.Student;
@@ -176,6 +177,64 @@ public class StudentListExcel extends Excel implements Serializable {
         }
     }
 
+    /**
+     * 从刚开班的时候带学生电话的学生花名册表中读取信息
+     *       学生Student对象直接读出
+     */
+    public void readStudentDetailInfoFromExcel() throws ExcelColumnNotFoundException{
+        resetParam();
+        int sheetIx = 0;
+
+        // 先扫描第startRow行找到"学员号"、"姓名"、"手机"等信息所在列的位置
+        int columnIndexOfStudentId = -1, columnIndexOfStudentName = -2, columnIndexOfStudentPhone = -3
+                , columnIndexOfStudentPhoneBackup = -4;
+        int row0ColumnCount = this.getColumnCount(sheetIx, startRow); // 第startRow行的列数
+        for (int i = 0; i < row0ColumnCount; i++) {
+            String value = this.getValueAt(sheetIx, startRow, i);
+            switch (value) {
+                case STUDENT_ID_COLUMN:
+                    columnIndexOfStudentId = i;
+                    break;
+                case STUDENT_NAME_COLUMN:
+                    columnIndexOfStudentName = i;
+                    break;
+                case STUDENT_PHONE_COLUMN:
+                    columnIndexOfStudentPhone = i;
+                    break;
+                case STUDENT_PHONE_BACKUP_COLUMN:
+                    columnIndexOfStudentPhoneBackup = i;
+                    break;
+                default:
+            }
+        }
+
+        if (columnIndexOfStudentId < 0 || columnIndexOfStudentPhone < 0) {
+            //列属性中有未匹配的属性名
+            throw new ExcelColumnNotFoundException("刚开班的时候带学生电话的学生花名册列属性中有未匹配的属性名");
+        }
+
+
+        int rowCount = this.getRowCount(sheetIx); // 表的总行数
+        for (int i = startRow + 1; i < rowCount; i++) {
+            if (StringUtils.isEmpty(this.getValueAt(sheetIx, i, columnIndexOfStudentId))){
+                //当前行学员号为空，跳过
+                continue;
+            }
+            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId);
+            String studentName = this.getValueAt(sheetIx, i, columnIndexOfStudentName);
+            String studentPhone = this.getValueAt(sheetIx, i, columnIndexOfStudentPhone);
+            String studentPhoneBackup = this.getValueAt(sheetIx, i, columnIndexOfStudentPhoneBackup);
+
+            //封装student
+            Student student=new Student();
+            student.setStudentId(studentId);
+            student.setStudentName(studentName);
+            student.setStudentPhone(studentPhone);
+            student.setStudentPhoneBackup(studentPhoneBackup);
+            students.add(student);
+        }
+    }
+
     @Override
     public void resetParam() {
         students = new HashSet<>();
@@ -183,11 +242,12 @@ public class StudentListExcel extends Excel implements Serializable {
     }
 
     public static void main(String[] args) throws IOException {
-        StudentListExcel excel = new StudentListExcel("D:\\aows_resources\\toolbox\\example\\秋下花名册.xls");
-        excel.readStudentAndClassInfoFromExcel();
+        StudentListExcel excel = new StudentListExcel("D:\\aows_resources\\toolbox\\example\\"+FileUtils.FILE_NAMES.get(4));
+        excel.readStudentDetailInfoFromExcel();
         for (Student student:excel.getStudents()){
             System.out.println(student);
         }
-        System.out.println(excel.getStudentAndClassDetailedDtos().size());
+        System.out.println(excel.getStudents().size());
+        System.out.println(excel.getValueAt(0,0,-1));
     }
 }

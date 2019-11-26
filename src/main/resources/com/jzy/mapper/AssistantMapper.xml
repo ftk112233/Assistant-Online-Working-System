@@ -68,9 +68,7 @@
     <update id="updateAssistantInfo" parameterType="com.jzy.model.entity.Assistant">
         update assistant
         <set>
-            <if test="assistantWorkId != null  and assistantWorkId!=''">
-                assistant_work_id = #{assistantWorkId,jdbcType=VARCHAR},
-            </if>
+            assistant_work_id = #{assistantWorkId,jdbcType=VARCHAR},
             <if test="assistantName != null  and assistantName!=''">
                 assistant_name = #{assistantName,jdbcType=VARCHAR},
             </if>

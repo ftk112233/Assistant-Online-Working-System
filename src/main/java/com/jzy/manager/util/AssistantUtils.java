@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @ClassName AssistantUtils
  * @Author JinZhiyun
- * @Description 用户的工具类 {@link com.jzy.model.entity.Assistant}
+ * @Description 助教的工具类 {@link com.jzy.model.entity.Assistant}
  *   对助教的增删改入参对象字段的校验，服务端的校验应该与前端js保持一致，且必须严格于数据库列属性要求的标准
  * @Date 2019/11/20 19:54
  * @Version 1.0

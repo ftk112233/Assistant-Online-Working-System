@@ -1,8 +1,13 @@
 package com.jzy.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jzy.dao.StudentAndClassMapper;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.util.StudentAndClassUtils;
+import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.StudentAndClassDetailedDto;
+import com.jzy.model.dto.StudentAndClassSearchCondition;
 import com.jzy.service.StudentAndClassService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -27,7 +32,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
     private StudentAndClassMapper studentAndClassMapper;
 
     @Override
-    public int countStudentAndClassByStudentIdAndClassId(String studentId, String classId) {
+    public Long countStudentAndClassByStudentIdAndClassId(String studentId, String classId) {
         return (StringUtils.isEmpty(studentId) || StringUtils.isEmpty(classId)) ? 0 : studentAndClassMapper.countStudentAndClassByStudentIdAndClassId(studentId, classId);
     }
 
@@ -51,7 +56,13 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
     @Override
     public String insertAndUpdateStudentAndClassesFromExcel(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos) throws Exception {
         for (StudentAndClassDetailedDto studentAndClassDetailedDto:studentAndClassDetailedDtos){
-            insertAndUpdateOneStudentAndClassFromExcel(studentAndClassDetailedDto);
+            if (StudentAndClassUtils.isValidStudentAndClassDetailedDtoInfo(studentAndClassDetailedDto)){
+                insertAndUpdateOneStudentAndClassFromExcel(studentAndClassDetailedDto);
+            } else {
+                String msg = "输入学生花名册表中读取到的studentAndClassDetailedDtos不合法!";
+                logger.error(msg);
+                throw new InvalidParameterException(msg);
+            }
         }
         return Constants.SUCCESS;
     }
@@ -64,7 +75,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
             throw new InvalidParameterException(msg);
         }
 
-        int count=countStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto.getStudentId(),studentAndClassDetailedDto.getClassId());
+        Long count=countStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto.getStudentId(),studentAndClassDetailedDto.getClassId());
         if (count>0) {
             //记录已存在，更新
             updateStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto);
@@ -73,6 +84,22 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
             insertStudentAndClass(studentAndClassDetailedDto);
         }
         return Constants.SUCCESS;
+    }
+
+    @Override
+    public PageInfo<StudentAndClassDetailedDto> listStudentAndClasses(MyPage myPage, StudentAndClassSearchCondition condition) {
+        PageHelper.startPage(myPage.getPageNum(), myPage.getPageSize());
+        List<StudentAndClassDetailedDto> studentAndClassDetailedDtos = studentAndClassMapper.listStudentAndClasses(condition);
+        for (int i=0;i<studentAndClassDetailedDtos.size();i++){
+            StudentAndClassDetailedDto studentAndClassDetailedDto=studentAndClassDetailedDtos.get(i);
+            if (!StringUtils.isEmpty(studentAndClassDetailedDto.getClassYear())){
+                String year=studentAndClassDetailedDto.getClassYear();
+                String parsedYear=year.substring(0, year.indexOf('-'));
+                studentAndClassDetailedDto.setClassYear(parsedYear);
+                studentAndClassDetailedDtos.set(i,studentAndClassDetailedDto);
+            }
+        }
+        return new PageInfo<>(studentAndClassDetailedDtos);
     }
 
 }

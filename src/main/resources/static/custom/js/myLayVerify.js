@@ -10,8 +10,8 @@ layui.define(['table', 'form'], function (exports) {
             }
         }
         , assistantWorkId: function (value) {
-            if (value === '' || value.length > 32) {
-                return '工号不能为空且，不能超过32个字符';
+            if (value.length > 32) {
+                return '工号不能超过32个字符';
             }
         }
         , mypass: function (value) {
@@ -29,7 +29,7 @@ layui.define(['table', 'form'], function (exports) {
             }
         }
         , realName: function (value) {
-            if (value === '' || value.length > 50) {
+            if (!(value !== '' && value.length <= 50)) {
                 return '姓名不能为空，且不能超过50个字符！';
             }
         }
@@ -72,8 +72,13 @@ layui.define(['table', 'form'], function (exports) {
             }
         }
         , classId: function (value) {
-            if (value === '' || value.length > 32) {
+            if (!(value !== '' && value.length <= 32)) {
                 return '班级编码不能为空，且不能超过32个字符！';
+            }
+        }
+        , className: function (value) {
+            if (value.length > 50) {
+                return '班级名称不能不能超过50个字符！';
             }
         }
         , classTime: function (value) {

@@ -41,4 +41,12 @@ public interface StudentMapper {
      * @return
      */
     void updateStudentByStudentId(Student student);
+
+    /**
+     * 修改学生姓名学员编号修改
+     *
+     * @param student 修改后的学生信息
+     * @return
+     */
+    void updateStudentNameByStudentId(Student student);
 }

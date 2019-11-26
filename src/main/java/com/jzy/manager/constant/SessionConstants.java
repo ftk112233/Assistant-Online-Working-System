@@ -10,6 +10,8 @@ import com.google.code.kaptcha.Constants;
  * @date 2019/11/14 23:20
  **/
 public class SessionConstants {
+    private SessionConstants(){}
+
     /**
      * KAPTCHA图形验证码session的键
      */

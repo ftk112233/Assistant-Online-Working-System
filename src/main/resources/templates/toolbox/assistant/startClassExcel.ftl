@@ -40,8 +40,8 @@
                             <div class="layui-form-mid " style="color:red">*必填项</div>
                         </div>
                         <div class="layui-form-item">
-                            <label class="layui-form-label">自动解析&nbsp; <i class="layui-icon layui-icon-tips"
-                                                                          lay-tips="开启'自动解析'将自动从数据库中通过查询上面班号来解析班级的教师、助教、上课教室、上课时间等信息，且查询的学员按进班时间排序。如果系统上名单信息与最新名单有出入，请关闭此选项。"></i></label>
+                            <label class="layui-form-label">在线解析&nbsp; <i class="layui-icon layui-icon-tips"
+                                                                          lay-tips="开启'在线解析'将自动从数据库中通过查询上面班号来解析班级的教师、助教、上课教室、上课时间等信息，且查询的学员按进班时间排序。如果系统上名单信息与最新名单有出入，请关闭此选项。"></i></label>
                             <div class="layui-input-inline">
                                 <input type="checkbox" name="parseClassId" lay-skin="switch" lay-text="ON|OFF"
                                        lay-filter="parseClassId" checked>
@@ -190,24 +190,6 @@
         }
         form.render('select');
 
-        //联动监听select
-        form.on('select(campus)', function (data) {
-            $("#classroom").empty();
-            $("#classroom").append('<option value="">请选择教室</option>');
-            var campus_name = $(this).attr("lay-value");
-            $.ajax({
-                type: "get",
-                data: {campusName: campus_name},
-                url: "${ctx}/class/getClassroomsByCampus",
-                success: function (data) {
-                    for (var i = 0; i < data.length; i++) {
-                        var json = data[i];
-                        $("#classroom").append('<option value="' + json + '">' + json + '</option>');
-                    }
-                    form.render('select');
-                }
-            });
-        });
 
         //监听自动解析开关
         form.on('switch(parseClassId)', function (data) {

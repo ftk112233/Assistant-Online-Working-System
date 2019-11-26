@@ -1,6 +1,9 @@
 package com.jzy.service;
 
+import com.github.pagehelper.PageInfo;
+import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.StudentAndClassDetailedDto;
+import com.jzy.model.dto.StudentAndClassSearchCondition;
 
 import java.util.List;
 
@@ -19,7 +22,7 @@ public interface StudentAndClassService {
      * @param classId 班号
      * @return
      */
-    int countStudentAndClassByStudentIdAndClassId(String studentId, String classId);
+    Long countStudentAndClassByStudentIdAndClassId(String studentId, String classId);
 
     /**
      * 插入一个学生报班记录
@@ -58,4 +61,13 @@ public interface StudentAndClassService {
      * @return
      */
     String insertAndUpdateOneStudentAndClassFromExcel(StudentAndClassDetailedDto studentAndClassDetailedDto) throws Exception;
+
+    /**
+     * 查询学员上课信息的ajax交互
+     *
+     * @param myPage    分页{页号，每页数量}
+     * @param condition 查询条件入参
+     * @return
+     */
+    PageInfo<StudentAndClassDetailedDto> listStudentAndClasses(MyPage myPage, StudentAndClassSearchCondition condition);
 }
