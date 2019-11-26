@@ -79,6 +79,30 @@
         where student_id=(select id from student where student_id=#{studentId})
         and class_id=(select id from class where class_id=#{classId})
     </update>
+    <update id="updateStudentAndClassInfo" parameterType="com.jzy.model.dto.StudentAndClassDetailedDto">
+        update student_class
+        <set>
+            <if test="studentId != null and studentId!=''">
+                student_id=(select id from student where student_id=#{studentId}),
+            </if>
+            <if test="classId != null and classId!=''">
+                class_id=(select id from class where class_id=#{classId}),
+            </if>
+            register_time=#{registerTime},
+            remark=#{remark},
+        </set>
+        where id=#{id}
+
+    </update>
+    <delete id="deleteOneStudentAndClassById">
+        delete from student_class where id=#{id}
+    </delete>
+    <delete id="deleteManyStudentAndClassesByIds">
+        delete from student_class where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 
     <select id="countStudentAndClassByStudentIdAndClassId" resultType="Long">
         select count(*) from student s inner join student_class s_c on s.id = s_c.student_id and  s.student_id=#{studentId}
@@ -220,6 +244,9 @@
                 desc
             </if>
         </if>
+    </select>
+    <select id="getStudentAndClassById" resultMap="BaseResultMap">
+        select * from student_class where id=#{id}
     </select>
 
 </mapper>

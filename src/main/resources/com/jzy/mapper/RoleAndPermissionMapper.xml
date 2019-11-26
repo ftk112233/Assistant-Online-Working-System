@@ -53,6 +53,12 @@
     <delete id="deleteOneRoleAndPermissionById">
         delete from role_permisson where id=#{id}
     </delete>
+    <delete id="deleteManyRoleAndPermissionsByIds">
+        delete from role_permisson where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
     <select id="listPermsByRole" resultType="String">
         select perm from role_permisson where role=#{role}
     </select>

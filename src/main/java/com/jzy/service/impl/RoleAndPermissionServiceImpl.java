@@ -84,8 +84,6 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
 
     @Override
     public void deleteManyRoleAndPermissionsByIds(List<Long> ids) {
-        for (Long id:ids){
-            deleteOneRoleAndPermissionById(id);
-        }
+        roleAndPermissionMapper.deleteManyRoleAndPermissionsByIds(ids);
     }
 }

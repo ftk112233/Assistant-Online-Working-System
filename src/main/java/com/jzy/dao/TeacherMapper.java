@@ -76,4 +76,11 @@ public interface TeacherMapper {
      * @param id 教师id
      */
     void deleteOneTeacherById(Long id);
+
+    /**
+     * 根据id删除多个个教师
+     *
+     * @param ids 教师id的列表
+     */
+    void deleteManyTeachersByIds(List<Long> ids);
 }

@@ -67,4 +67,11 @@ public interface RoleAndPermissionMapper {
      * @param id 角色权限id
      */
     void deleteOneRoleAndPermissionById(@Param("id") Long id);
+
+    /**
+     * 根据id删除多个角色权限
+     *
+     * @param ids 角色权限id的列表
+     */
+    void deleteManyRoleAndPermissionsByIds(List<Long> ids);
 }

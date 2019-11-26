@@ -2,6 +2,7 @@ package com.jzy.dao;
 
 import com.jzy.model.dto.StudentAndClassDetailedDto;
 import com.jzy.model.dto.StudentAndClassSearchCondition;
+import com.jzy.model.entity.StudentAndClass;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -46,4 +47,35 @@ public interface StudentAndClassMapper {
      * @return
      */
     List<StudentAndClassDetailedDto> listStudentAndClasses(StudentAndClassSearchCondition condition);
+
+    /**
+     * 根据id查询StudentAndClass
+     *
+     * @param id 学员上课对象的自增主键id
+     * @return
+     */
+    StudentAndClass getStudentAndClassById(Long id);
+
+    /**
+     * 编辑学员上课信息，由id修改
+     *
+     * @param studentAndClassDetailedDto 修改后的学员上课信息
+     * @return
+     */
+    void updateStudentAndClassInfo(StudentAndClassDetailedDto studentAndClassDetailedDto);
+
+    /**
+     * 删除一个学员上课记录
+     *
+     * @param id 被删除学员上课的id
+     * @return
+     */
+    void deleteOneStudentAndClassById(Long id);
+
+    /**
+     * 根据id删除多个学员上课记录
+     *
+     * @param ids 学员上课记录id的列表
+     */
+    void deleteManyStudentAndClassesByIds(List<Long> ids);
 }

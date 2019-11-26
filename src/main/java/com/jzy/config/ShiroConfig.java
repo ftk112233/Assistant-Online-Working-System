@@ -108,6 +108,14 @@ public class ShiroConfig {
         permissions.put("/permission/admin/**", "perms[permission:admin]"); //角色权限的权限，管理员才有
         permissions.put("/assistant/admin/**", "perms[assistant:admin]"); //管理助教的权限，助教长以上级别才有
         permissions.put("/teacher/admin/**", "perms[teacher:admin]"); //管理教师的权限，助教长以上级别才有
+        permissions.put("/class/admin/update*", "perms[class:admin:update]"); //编辑班级的权限，助教长以上级别才有
+        permissions.put("/class/admin/insert*", "perms[class:admin:insert]"); //添加班级的权限，助教长以上级别才有
+        permissions.put("/class/admin/delete*", "perms[class:admin:delete]"); //删除班级的权限，助教长以上级别才有
+        permissions.put("/class/admin/import*", "perms[class:admin:import]"); //excel导入班级的权限，助教长以上级别才有
+        permissions.put("/studentAndClass/admin/update*", "perms[studentAndClass:admin:update]"); //编辑学员上课信息的权限，助教长以上级别才有
+        permissions.put("/studentAndClass/admin/insert*", "perms[studentAndClass:admin:insert]"); //添加学员上课信息的权限，助教长以上级别才有
+        permissions.put("/studentAndClass/admin/delete*", "perms[studentAndClass:admin:delete]"); //删除学员上课信息的权限，助教长以上级别才有
+        permissions.put("/studentAndClass/admin/import*", "perms[studentAndClass:admin:import]"); //excel导入学员上课信息的权限，助教长以上级别才有
 
         permissions.put("/toolbox/assistant/**", "perms[toolbox:assistant]"); //百宝箱助教区的权限，助教以上级别才有
         permissions.put("/toolbox/assistantAdministrator/**", "perms[toolbox:assistantAdministrator]"); //百宝箱学管区的权限，助教长以上级别才有

@@ -98,6 +98,12 @@
     <delete id="deleteOneUserById">
         delete from user where id=#{id}
     </delete>
+    <delete id="deleteManyUsersByIds">
+        delete from user where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 
     <select id="getUserByName" resultMap="BaseResultMap">
         select * from user where user_name=#{userName}

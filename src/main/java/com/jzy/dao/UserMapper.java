@@ -136,4 +136,11 @@ public interface UserMapper {
      * @param user 新的用户信息
      */
     void updateUserByWorkId(User user);
+
+    /**
+     * 根据id删除多个用户
+     *
+     * @param ids 用户id的list
+     */
+    void deleteManyUsersByIds(List<Long> ids);
 }

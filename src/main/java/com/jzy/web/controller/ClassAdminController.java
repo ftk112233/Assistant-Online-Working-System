@@ -170,7 +170,7 @@ public class ClassAdminController extends AbstractController{
     }
 
     /**
-     * 重定向到编辑班级权限iframe子页面并返回相应model
+     * 重定向到编辑班级iframe子页面并返回相应model
      *
      * @param model
      * @param clazz 当前要被编辑的班级信息
@@ -183,9 +183,110 @@ public class ClassAdminController extends AbstractController{
         model.addAttribute(ModelConstants.GRADES_MODEL_KEY, JSON.toJSONString(ClassUtils.GRADES));
         model.addAttribute(ModelConstants.SUBJECTS_MODEL_KEY, JSON.toJSONString(ClassUtils.SUBJECTS));
         model.addAttribute(ModelConstants.TYPES_MODEL_KEY, JSON.toJSONString(ClassUtils.TYPES));
-        model.addAttribute(ModelConstants.TYPES_MODEL_KEY, JSON.toJSONString(ClassUtils.TYPES));
 
         model.addAttribute(ModelConstants.CLASS_EDIT_MODEL_KEY, clazz);
         return "class/admin/classForm";
+    }
+
+    /**
+     * 班级管理中的编辑班级请求，由id修改
+     *
+     * @param classDetailedDto 修改后的班级信息
+     * @return
+     */
+    @RequestMapping("/updateById")
+    @ResponseBody
+    public Map<String, Object> updateById(ClassDetailedDto classDetailedDto) {
+        Map<String, Object> map = new HashMap<>(1);
+
+        if (!ClassUtils.isValidClassDetailedDtoInfo(classDetailedDto)) {
+            String msg = "updateById方法错误入参";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+
+        map.put("data", classService.updateClassInfo(classDetailedDto));
+
+        return map;
+    }
+
+    /**
+     * 班级管理中的添加班级请求
+     *
+     * @param classDetailedDto 新添加班级的信息
+     * @return
+     */
+    @RequestMapping("/insert")
+    @ResponseBody
+    public Map<String, Object> insert(ClassDetailedDto classDetailedDto) {
+        Map<String, Object> map = new HashMap<>(1);
+
+        if (!ClassUtils.isValidClassUpdateInfo(classDetailedDto)) {
+            String msg = "insert方法错误入参";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+        map.put("data", classService.insertClass(classDetailedDto));
+
+        return map;
+    }
+
+    /**
+     * 删除一个班级ajax交互
+     *
+     * @param id 被删除班级的id
+     * @return
+     */
+    @RequestMapping("/deleteOne")
+    @ResponseBody
+    public Map<String, Object> deleteOne(@RequestParam("id") Long id) {
+        Map<String, Object> map = new HashMap(1);
+
+        classService.deleteOneClassById(id);
+        map.put("data", Constants.SUCCESS);
+        return map;
+    }
+
+    /**
+     * 删除多个班级ajax交互
+     *
+     * @param classes 多个班级的json串，用fastjson转换为list
+     * @return
+     */
+    @RequestMapping("/deleteMany")
+    @ResponseBody
+    public Map<String, Object> deleteMany(@RequestParam("classes") String classes) {
+        Map<String, Object> map = new HashMap(1);
+
+        List<ClassDetailedDto> classesParsed = JSON.parseArray(classes, ClassDetailedDto.class);
+        List<Long> ids = new ArrayList<>();
+        for (ClassDetailedDto classDetailedDto : classesParsed) {
+            ids.add(classDetailedDto.getId());
+        }
+        classService.deleteManyClassesByIds(ids);
+        map.put("data", Constants.SUCCESS);
+        return map;
+    }
+
+
+    /**
+     * 重定向到预览班级信息iframe子页面并返回相应model
+     *
+     * @param model
+     * @param clazz 当前输入的含班号的班级信息
+     * @return
+     */
+    @RequestMapping("/getPreviewClassInfo")
+    public String getPreviewClassInfo(Model model, Class clazz) {
+        ClassDetailedDto classDetailedDto=classService.getClassDetailByClassId(clazz.getClassId());
+//
+//        model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
+//        model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(ClassUtils.SEASONS));
+//        model.addAttribute(ModelConstants.GRADES_MODEL_KEY, JSON.toJSONString(ClassUtils.GRADES));
+//        model.addAttribute(ModelConstants.SUBJECTS_MODEL_KEY, JSON.toJSONString(ClassUtils.SUBJECTS));
+//        model.addAttribute(ModelConstants.TYPES_MODEL_KEY, JSON.toJSONString(ClassUtils.TYPES));
+
+        model.addAttribute(ModelConstants.CLASS_PREVIEW_MODEL_KEY, classDetailedDto);
+        return "class/admin/classPreviewForm";
     }
 }

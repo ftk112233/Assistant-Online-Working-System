@@ -231,7 +231,7 @@
                 var index = layer.open({
                     type: 2
                     , title: '添加角色权限'
-                    , content: '${ctx}/permission/admin/addForm'
+                    , content: '${ctx}/permission/admin/insertForm'
                     , maxmin: true
                     , btn: ['确定', '取消']
                     , yes: function (index, layero) {

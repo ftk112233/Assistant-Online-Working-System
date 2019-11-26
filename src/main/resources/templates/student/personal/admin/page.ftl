@@ -18,99 +18,37 @@
         <div class="layui-form layui-card-header layuiadmin-card-header-auto">
             <div class="layui-form-item" id="form">
                 <div class="layui-inline">
-                    <label class="layui-form-label">年份-季度</label>
-                    <div class="layui-input-inline">
-                        <input type="text" class="layui-input" placeholder="yyyy" id="year" name="year">
-                    </div>
-                    <div class="layui-input-inline">
-                        <select name="season" id="season">
-                            <option value="">请选择季度</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="layui-inline">
-                    <label class="layui-form-label">校区</label>
-                    <div class="layui-input-inline">
-                        <select name="campus" id="campus" lay-filter="campus" lay-search>
-                            <option value="">请选择校区</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="layui-inline">
                     <label class="layui-form-label">学员号</label>
                     <div class="layui-input-inline">
-                        <input type="text" name="studentId" placeholder="请输入" autocomplete="off" class="layui-input">
+                        <input type="text" class="layui-input" placeholder="请输入" name="studentId">
                     </div>
                 </div>
                 <div class="layui-inline">
                     <label class="layui-form-label">学员姓名</label>
                     <div class="layui-input-inline">
-                        <input type="text" name="studentName" placeholder="请输入" autocomplete="off" class="layui-input">
+                        <input type="text" class="layui-input" placeholder="请输入" name="studentName">
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <label class="layui-form-label">班级编码</label>
+                    <label class="layui-form-label">性别</label>
                     <div class="layui-input-inline">
-                        <select name="classId" id="classId" lay-search>
-                            <option value="">请输入或选择班级编码</option>
+                        <select name="sex" id="sex">
+                            <option value="">请选择性别</option>
+                            <option value="男">男</option>
+                            <option value="女">女</option>
                         </select>
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <label class="layui-form-label">班级名称</label>
+                    <label class="layui-form-label">联系方式</label>
                     <div class="layui-input-inline">
-                        <input type="text" name="className" placeholder="请输入" autocomplete="off" class="layui-input">
+                        <input type="text" name="studentPhone" placeholder="请输入" autocomplete="off" class="layui-input">
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <label class="layui-form-label">助教</label>
+                    <label class="layui-form-label">学校</label>
                     <div class="layui-input-inline">
-                        <input type="text" name="assistantName" placeholder="请输入" autocomplete="off" class="layui-input">
-                    </div>
-                </div>
-                <div class="layui-inline">
-                    <label class="layui-form-label">上课教师</label>
-                    <div class="layui-input-inline">
-                        <input type="text" name="teacherName" placeholder="请输入" autocomplete="off" class="layui-input">
-                    </div>
-                </div>
-                <div class="layui-inline">
-                    <label class="layui-form-label">上课时间</label>
-                    <div class="layui-input-inline">
-                        <input type="text" name="classTime" placeholder="8:00-10:00" autocomplete="off" class="layui-input">
-                    </div>
-                </div>
-                <div class="layui-inline">
-                    <label class="layui-form-label">上课教室</label>
-                    <div class="layui-input-inline">
-                        <select name="classroom" id="classroom"
-                                lay-search>
-                            <option value="">请选择教室</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="layui-inline">
-                    <label class="layui-form-label">年级</label>
-                    <div class="layui-input-inline">
-                        <select name="grade" id="grade">
-                            <option value="">请选择年级</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="layui-inline">
-                    <label class="layui-form-label">学科</label>
-                    <div class="layui-input-inline">
-                        <select name="subject" id="subject">
-                            <option value="">请选择学科</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="layui-inline">
-                    <label class="layui-form-label">班型</label>
-                    <div class="layui-input-inline">
-                        <select name="type" id="type">
-                            <option value="">请选择班型</option>
-                        </select>
+                        <input type="text" name="school" placeholder="请输入" autocomplete="off" class="layui-input">
                     </div>
                 </div>
                 <div class="layui-inline">
@@ -120,11 +58,7 @@
                             <option value="">请选择要排序的类别</option>
                             <option value="studentId">按学员号排序</option>
                             <option value="studentName">按学员姓名排序</option>
-                            <option value="classId">按班号排序</option>
-                            <option value="className">按班级名称排序</option>
-                            <option value="assistantName">按助教排序</option>
-                            <option value="teacherName">按教师排序</option>
-                            <option value="registerTime">按进班时间排序</option>
+                            <option value="studentSchool">按学校排序</option>
                         </select>
                     </div>
                     <div class="layui-input-inline">
@@ -153,15 +87,15 @@
         </div>
         <div class="layui-card-body">
             <div style="padding-bottom: 10px;">
-                <button class="layui-btn layuiadmin-btn-list" data-type="batchdel">退班</button>
-                <button class="layui-btn layuiadmin-btn-list" data-type="add">报班</button>
+                <button class="layui-btn layuiadmin-btn-list" data-type="batchdel">删除</button>
+                <button class="layui-btn layuiadmin-btn-list" data-type="add">添加</button>
             </div>
-            <table id="scTables" lay-filter="LAY-app-content-comm"></table>
+            <table id="studentTable" lay-filter="LAY-app-content-comm"></table>
             <script type="text/html" id="table-content-list1">
                 <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i
-                        class="layui-icon layui-icon-edit"></i>转班</a>
+                        class="layui-icon layui-icon-edit"></i>编辑</a>
                 <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i
-                        class="layui-icon layui-icon-delete"></i>退班</a>
+                        class="layui-icon layui-icon-delete"></i>删除</a>
             </script>
         </div>
     </div>
@@ -187,92 +121,11 @@
                 , upload = layui.upload
                 , laydate = layui.laydate;
 
-        laydate.render({
-            elem: '#year'
-            ,type: 'year'
-            ,value: '${currentYear!""}'
-        });
-
-
-        var campusNames = eval('(' + '${campusNames}' + ')');
-        for (var i = 0; i < campusNames.length; i++) {
-            var json = campusNames[i];
-            var str = "";
-            str += '<option value="' + json + '">' + json + '</option>';
-            $("#campus").append(str);
-        }
-
-        var seasons = eval('(' + '${seasons}' + ')');
-        for (var i = 0; i < seasons.length; i++) {
-            var json = seasons[i];
-            var str = "";
-            str += '<option value="' + json + '">' + json + '</option>';
-            $("#season").append(str);
-        }
-
-        var classIds = eval('(' + '${classIds}' + ')');
-        for (var i = 0; i < classIds.length; i++) {
-            var json = classIds[i];
-            var str = "";
-            str += '<option value="' + json + '">' + json + '</option>';
-            $("#classId").append(str);
-        }
-
-        var grades = eval('(' + '${grades}' + ')');
-        for (var i = 0; i < grades.length; i++) {
-            var json = grades[i];
-            var str = "";
-            str += '<option value="' + json + '">' + json + '</option>';
-            $("#grade").append(str);
-        }
-
-        var subjects = eval('(' + '${subjects}' + ')');
-        for (var i = 0; i < subjects.length; i++) {
-            var json = subjects[i];
-            var str = "";
-            str += '<option value="' + json + '">' + json + '</option>';
-            $("#subject").append(str);
-        }
-
-        var types = eval('(' + '${types}' + ')');
-        for (var i = 0; i < types.length; i++) {
-            var json = types[i];
-            var str = "";
-            str += '<option value="' + json + '">' + json + '</option>';
-            $("#type").append(str);
-        }
-
-        $("#season").val('${currentSeason!""}');
-
-        $("#condition1").val('registerTime');
-        $("#condition2").val('asc');
-
-        form.render();
-
-        //联动监听select
-        form.on('select(campus)', function (data) {
-            $("#classroom").empty();
-            $("#classroom").append('<option value="">请选择教室</option>');
-            var campus_name = $(this).attr("lay-value");
-            $.ajax({
-                type: "get",
-                data: {campusName: campus_name},
-                url: "${ctx}/class/getClassroomsByCampus",
-                success: function (data) {
-                    for (var i = 0; i < data.length; i++) {
-                        var json = data[i];
-                        $("#classroom").append('<option value="' + json + '">' + json + '</option>');
-                    }
-                    form.render('select');
-                }
-            });
-        });
-
 
         //方法级渲染
         table.render({
-            elem: '#scTables'
-            , url: '${ctx}/studentAndClass/admin/getStudentAndClassInfo' //向后端默认传page和limit
+            elem: '#studentTable'
+            , url: '${ctx}/student/admin/getStudentInfo' //向后端默认传page和limit
             , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
             , defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
                 title: '提示'
@@ -284,32 +137,14 @@
                 , {field: 'id', title: 'id', sort: true, hide: true}
                 , {field: 'createTime', title: '创建时间', sort: true, hide: true}
                 , {field: 'updateTime', title: '更新时间', sort: true, hide: true}
-                , {field: 'studentId', title: '学员号', width: 150, sort: true}
-                , {field: 'studentName', title: '学员姓名', width: 120, sort: true}
-                , {field: 'classId', title: '班级编码', width: 150, hide: true, sort: true}
-                , {field: 'className', title: '班级名称', sort: true}
-                , {field: 'classCampus', title: '校区', width: 80, sort: true}
-                , {field: 'classGrade', title: '年级', width: 110, sort: true, hide: true}
-                , {field: 'classSubject', title: '学科', width: 80, sort: true, hide: true}
-                , {field: 'classType', title: '班型', width: 80, sort: true, hide: true}
-                , {field: 'classYear', title: '年份', width: 80, sort: true}
-                , {field: 'classSeason', title: '季度', width: 80, sort: true}
-                , {field: 'classTime', title: '详细上课时间', hide: true}
-                , {field: 'classSimplifiedTime', title: '上课时间', width: 120}
-                , {field: 'classTimes', title: '上课次数', width: 110, hide: true}
-                , {field: 'assistantName', title: '助教', width: 110, sort: true}
-                , {field: 'teacherName', title: '任课教师', width: 110, sort: true}
-                , {field: 'classroom', title: '上课教室', width: 110}
-                , {field: 'registerTime', title: '进班时间', sort: true}
-                , {field: 'remark', title: '报班备注', hide: true}
+                , {field: 'studentId', title: '学员号', width: 180, sort: true}
+                , {field: 'studentName', title: '学员姓名', width: 180, sort: true}
+                , {field: 'studentPhone', title: '手机', width: 120}
+                , {field: 'studentPhone', title: '备用手机', width: 120}
+                , {field: 'studentRemark', title: '备注'}
                 , {title: '操作', minWidth: 150, align: 'center', fixed: 'right', toolbar: '#table-content-list1'}
             ]]
             , where: {
-                classYear: '${currentYear!""}'
-                , classSeason: '${currentSeason!""}'
-                ,classId: '${classId!""}'
-                , condition1: 'registerTime'
-                , condition2: 'asc'
             }
             , page: true
             , limit: 10
@@ -342,23 +177,10 @@
         form.on('submit(LAY-app-contcomm-search)', function (data) {
             var field = data.field;
             //执行重载
-            table.reload('scTables', {
-                url: '${ctx}/studentAndClass/admin/getStudentAndClassInfo' //向后端默认传page和limit
+            table.reload('studentTable', {
+                url: '${ctx}/student/admin/getStudentInfo' //向后端默认传page和limit
                 , where: { //设定异步数据接口的额外参数，任意设
-                    classYear: field.year
-                    , classSeason: field.season
-                    , classCampus: field.campus
-                    , studentId : field.studentId
-                    , studentName : field.studentName
-                    , classId: field.classId
-                    , className: field.className
-                    , assistantName: field.assistantName
-                    , teacherName: field.teacherName
-                    , classTime: field.classTime
-                    , classGrade: field.grade
-                    , classSubject: field.subject
-                    , classType: field.type
-                    , classroom: field.classroom
+                    studentId : field.studentId
                     , condition1: field.condition1
                     , condition2: field.condition2
                 }
@@ -375,7 +197,7 @@
 
         var $ = layui.$, active = {
             batchdel: function () {
-                var checkStatus = table.checkStatus('scTables')
+                var checkStatus = table.checkStatus('studentTable')
                         , checkData = checkStatus.data; //得到选中的数据
 
                 if (checkData.length === 0) {
@@ -398,7 +220,7 @@
                             layer.closeAll('loading'); //关闭loading
                             if (data.data === "success") {
                                 layer.msg('已删除');
-                                table.reload('scTables', {
+                                table.reload('studentTable', {
                                     url: '${ctx}/studentAndClass/admin/getStudentAndClassInfo' //向后端默认传page和limit); //重载表格
                                     , request: {
                                         pageName: 'pageNum',

@@ -58,7 +58,6 @@ layui.define(['table', 'form'], function (exports) {
             if (value.length > 20) {
                 return '校区长度不能超过20个字符';
             }
-
         }
         , studentPhone: function (value) {
             //学员联系方式不做手机正则校验
@@ -84,6 +83,30 @@ layui.define(['table', 'form'], function (exports) {
         , classTime: function (value) {
             if (value.length > 50) {
                 return '上课时间不能超过50个字符！';
+            }
+        }
+        , classTeacherRequirement: function (value) {
+            if (value.length >100) {
+                return '任课教师要求长度不能超过200个字符';
+            }
+        }
+        ,classTime: function (value) {
+            if (value.length > 50) {
+                return '上课时间不能超过50个字符';
+            }
+        },classTimes: function (value) {
+            if (!(value === '' || isDigit(value) && value <=100)) {
+                return '班级上课次数不合法';
+            }
+        }
+        , studentId: function (value) {
+            if (!(value !== '' && value.length <= 32)) {
+                return '学员号不能为空，且不能超过32个字符！';
+            }
+        }
+        , studentName: function (value) {
+            if (value.length > 50) {
+                return '学员姓名不能不能超过50个字符！';
             }
         }
     });

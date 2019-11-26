@@ -25,12 +25,20 @@ public interface ClassService {
     Class getClassById(Long id);
 
     /**
-     * 根据班级编码查询班级,，注意这里classId不是主键id
+     * 根据班级编码查询班级,注意这里classId不是主键id
      *
      * @param classId 班级编码
      * @return
      */
     Class getClassByClassId(String classId);
+
+    /**
+     * 根据班级编码查询班级详细信息，注意这里classId不是主键id
+     *
+     * @param classId 班级编码
+     * @return
+     */
+    ClassDetailedDto getClassDetailByClassId(String classId);
 
     /**
      * 修改班级信息由班级编码修改，注意这里classId不是主键id
@@ -86,4 +94,26 @@ public interface ClassService {
      * @return
      */
     List<String> listAllClassIds();
+
+    /**
+     * 修改班级信息请求，由id修改
+     *
+     * @param classDetailedDto 修改后的班级信息
+     * @return
+     */
+    String updateClassInfo(ClassDetailedDto classDetailedDto);
+
+    /**
+     * 删除一个班级
+     *
+     * @param id 被删除班级的id
+     */
+    void deleteOneClassById(Long id);
+
+    /**
+     * 根据id删除多个班级
+     *
+     * @param ids 班级id的列表
+     */
+    void deleteManyClassesByIds(List<Long> ids);
 }

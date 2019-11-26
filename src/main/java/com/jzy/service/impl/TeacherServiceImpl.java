@@ -165,8 +165,6 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
 
     @Override
     public void deleteManyTeachersByIds(List<Long> ids) {
-        for (Long id:ids){
-            deleteOneTeacherById(id);
-        }
+        teacherMapper.deleteManyTeachersByIds(ids);
     }
 }

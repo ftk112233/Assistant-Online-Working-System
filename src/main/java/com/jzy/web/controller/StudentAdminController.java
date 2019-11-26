@@ -1,11 +1,23 @@
 package com.jzy.web.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageInfo;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.constant.ModelConstants;
+import com.jzy.manager.util.ClassUtils;
+import com.jzy.model.CampusEnum;
+import com.jzy.model.dto.MyPage;
+import com.jzy.model.dto.StudentAndClassDetailedDto;
+import com.jzy.model.dto.StudentAndClassSearchCondition;
+import com.jzy.model.dto.StudentSearchCondition;
+import com.jzy.model.entity.Student;
 import com.jzy.model.excel.Excel;
 import com.jzy.model.excel.ExcelVersionEnum;
 import com.jzy.model.excel.input.StudentListExcel;
+import com.jzy.model.vo.ResultMap;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -15,6 +27,7 @@ import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -109,4 +122,30 @@ public class StudentAdminController extends AbstractController {
 
         return map;
     }
+
+    /**
+     * 跳转学员个人信息管理页面
+     *
+     * @return
+     */
+    @RequestMapping("/page")
+    public String page() {
+        return "student/personal/admin/page";
+    }
+
+
+    /**
+     * 查询学员个人信息的ajax交互
+     *
+     * @param myPage    分页{页号，每页数量}
+     * @param condition 查询条件入参
+     * @return
+     */
+    @RequestMapping("/getStudentInfo")
+    @ResponseBody
+    public ResultMap<List<Student>> getStudentInfo(MyPage myPage, StudentSearchCondition condition) {
+        PageInfo<Student> pageInfo = studentService.listStudents(myPage, condition);
+        return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
+    }
+
 }

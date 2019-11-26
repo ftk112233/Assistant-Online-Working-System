@@ -97,6 +97,12 @@
     <delete id="deleteOneAssistantById">
         delete from assistant where id=#{id}
     </delete>
+    <delete id="deleteManyAssistantsByIds">
+        delete from assistant where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 
     <select id="getAssistantByWorkId" resultMap="BaseResultMap">
         select * from assistant where assistant_work_id=#{assistantWorkId}

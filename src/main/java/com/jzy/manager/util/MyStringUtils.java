@@ -505,25 +505,26 @@ public class MyStringUtils {
      * @param string
      * @return
      */
-    public static String getMaxLengthNumberSubstring(String string){
+    public static String getMaxLengthNumberSubstring(String string) {
         String result = "";
         int count = 0;
-        char [] arr = string.toCharArray();
-        for (int i= 0 ;i<arr.length;i++){
-            if('0'<=arr[i] && '9'>= arr[i]){//当前的是数字
+        char[] arr = string.toCharArray();
+        for (int i = 0; i < arr.length; i++) {
+            if ('0' <= arr[i] && '9' >= arr[i]) {//当前的是数字
                 count = 1;//初始化计算器
                 int index = i;//在后面的循环存储截至索引
-                for(int j=i+1;j<arr.length;j++){
-                    if('0'<=arr[j] && '9'>= arr[j]){
+                for (int j = i + 1; j < arr.length; j++) {
+                    if ('0' <= arr[j] && '9' >= arr[j]) {
                         count++;
-                        index =j;
-                    }else {
+                        index = j;
+                    } else {
                         break;
                     }
-                }if(count>result.length()){
-                    result = string.substring(i,index+1);
                 }
-            }else {
+                if (count > result.length()) {
+                    result = string.substring(i, index + 1);
+                }
+            } else {
                 continue;
             }
 
@@ -533,39 +534,42 @@ public class MyStringUtils {
 
     /**
      * 获得输入字串中有效的时间区间串，如输入："(具体以课表为准)周六8:15-10:45(11.2,11.9休息,11.3,11.4上课)"
-     *                          输出: 8:15-10:45
+     * 输出: 8:15-10:45
      *
      * @param string
      * @return
      */
-    public static String getParsedTime(String string){
+    public static String getParsedTime(String string) {
         String result = "";
         //冒号的第一次出现位置
-        int firstIdx=string.indexOf(':');
-        if (firstIdx<1){
+        int firstIdx = string.indexOf(':');
+        if (firstIdx < 1) {
             return result;
         }
 
-        int separatorIdx=firstIdx+3;
-        if (string.charAt(separatorIdx) != '-'){
+        int separatorIdx = firstIdx + 3;
+        if (string.charAt(separatorIdx) != '-') {
             return result;
         }
         //冒号的最后一次出现位置
-        int lastIdx=string.lastIndexOf(':');
-        if (lastIdx-separatorIdx!=2 && lastIdx-separatorIdx!=3){
+        int lastIdx = string.lastIndexOf(':');
+        if (lastIdx - separatorIdx != 2 && lastIdx - separatorIdx != 3) {
             return result;
         }
 
-        int start=0, end=lastIdx+3;
-        if (string.charAt(firstIdx-1)-'0'>=0 &&  string.charAt(firstIdx-1)-'0'<=9){
+        int start = 0, end = lastIdx + 3;
+        if (string.charAt(firstIdx - 1) - '0' >= 0 && string.charAt(firstIdx - 1) - '0' <= 9) {
             //第一个冒号的前一位是数字
-            if (string.charAt(firstIdx-2)-'0'>=0 &&  string.charAt(firstIdx-2)-'0'<=9){
+            if (firstIdx - 1 == 0) {
+                //如果第一个冒号前只有一位
+                start = firstIdx - 1;
+            } else if (string.charAt(firstIdx - 2) - '0' >= 0 && string.charAt(firstIdx - 2) - '0' <= 9) {
                 //第一个冒号的前第二位是数字
-                start=firstIdx-2;
+                start = firstIdx - 2;
             } else {
-                start=firstIdx-1;
+                start = firstIdx - 1;
             }
-            result=string.substring(start,end);
+            result = string.substring(start, end);
         }
 
         return result;

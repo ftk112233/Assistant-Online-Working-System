@@ -2,18 +2,22 @@ package com.jzy.web.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
+import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
 import com.jzy.manager.util.ClassUtils;
+import com.jzy.manager.util.StudentAndClassUtils;
 import com.jzy.model.CampusEnum;
 import com.jzy.model.dto.*;
 import com.jzy.model.vo.ResultMap;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
+import java.security.InvalidParameterException;
+import java.util.*;
 
 /**
  * @ClassName StudentAndClassAdminController
@@ -25,8 +29,10 @@ import java.util.List;
 @Controller
 @RequestMapping("/studentAndClass/admin")
 public class StudentAndClassAdminController extends AbstractController {
+    private final static Logger logger = Logger.getLogger(StudentAndClassAdminController.class);
+
     /**
-     * 跳转班级管理页面
+     * 跳转学员上课信息管理页面
      *
      * @return
      */
@@ -55,8 +61,125 @@ public class StudentAndClassAdminController extends AbstractController {
      */
     @RequestMapping("/getStudentAndClassInfo")
     @ResponseBody
-    public ResultMap<List<StudentAndClassDetailedDto>> getTeacherInfo(MyPage myPage, StudentAndClassSearchCondition condition) {
+    public ResultMap<List<StudentAndClassDetailedDto>> getStudentAndClassInfo(MyPage myPage, StudentAndClassSearchCondition condition) {
         PageInfo<StudentAndClassDetailedDto> pageInfo = studentAndClassService.listStudentAndClasses(myPage, condition);
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
+    }
+
+
+    /**
+     * 重定向到转班iframe子页面并返回相应model
+     *
+     * @param model
+     * @param studentAndClassDetailedDto 当前要被编辑的学员上课信息
+     * @return
+     */
+    @RequestMapping("/updateForm")
+    public String updateForm(Model model, StudentAndClassDetailedDto studentAndClassDetailedDto) {
+        model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
+
+        model.addAttribute(ModelConstants.STUDENT_AND_CLASS_EDIT_MODEL_KEY, studentAndClassDetailedDto);
+        return "student/sc/admin/studentAndClassFormEdit";
+    }
+
+    /**
+     * 学员上课信息管理中的编辑学员上课信息请求，由id修改
+     *
+     * @param studentAndClassDetailedDto 修改后的学员上课信息
+     * @return
+     */
+    @RequestMapping("/updateById")
+    @ResponseBody
+    public Map<String, Object> updateById(@RequestParam(value = "currentTime",required = false) String currentTimeSwitch, StudentAndClassDetailedDto studentAndClassDetailedDto) {
+        Map<String, Object> map = new HashMap<>(1);
+
+
+        if (!StudentAndClassUtils.isValidStudentAndClassUpdateDtoInfo(studentAndClassDetailedDto)) {
+            String msg = "updateById方法错误入参";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+
+        if (Constants.ON.equals(currentTimeSwitch)){
+            //如果开启了使用当前时间作为进班时间
+            studentAndClassDetailedDto.setRegisterTime(new Date());
+        }
+
+        map.put("data", studentAndClassService.updateStudentAndClassInfo(studentAndClassDetailedDto));
+        return map;
+    }
+
+    /**
+     * 重定向到报班iframe子页面并返回相应model
+     *
+     * @param model
+     * @return
+     */
+    @RequestMapping("/insertForm")
+    public String addForm(Model model) {
+        model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
+        return "student/sc/admin/studentAndClassFormAdd";
+    }
+
+
+
+    /**
+     * 学员上课信息管理中的报班请求
+     *
+     * @param studentAndClassDetailedDto 新添加de 报班信息
+     * @return
+     */
+    @RequestMapping("/insert")
+    @ResponseBody
+    public Map<String, Object> insert(StudentAndClassDetailedDto studentAndClassDetailedDto) {
+        Map<String, Object> map = new HashMap<>(1);
+
+        if (!StudentAndClassUtils.isValidStudentAndClassUpdateDtoInfo(studentAndClassDetailedDto)) {
+            String msg = "insert方法错误入参";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+
+        map.put("data", studentAndClassService.insertStudentAndClass(studentAndClassDetailedDto));
+
+        return map;
+    }
+
+
+    /**
+     * 删除一个学员上课记录ajax交互
+     *
+     * @param id 被删除学员上课的id
+     * @return
+     */
+    @RequestMapping("/deleteOne")
+    @ResponseBody
+    public Map<String, Object> deleteOne(@RequestParam("id") Long id) {
+        Map<String, Object> map = new HashMap(1);
+
+        studentAndClassService.deleteOneStudentAndClassById(id);
+        map.put("data", Constants.SUCCESS);
+        return map;
+    }
+
+    /**
+     * 删除多个学员上课记录ajax交互
+     *
+     * @param studentAndClasses 多个学员上课记录的json串，用fastjson转换为list
+     * @return
+     */
+    @RequestMapping("/deleteMany")
+    @ResponseBody
+    public Map<String, Object> deleteMany(@RequestParam("studentAndClasses") String studentAndClasses) {
+        Map<String, Object> map = new HashMap(1);
+
+        List<StudentAndClassDetailedDto> studentAndClassesParsed = JSON.parseArray(studentAndClasses, StudentAndClassDetailedDto.class);
+        List<Long> ids = new ArrayList<>();
+        for (StudentAndClassDetailedDto studentAndClassDetailedDto : studentAndClassesParsed) {
+            ids.add(studentAndClassDetailedDto.getId());
+        }
+        studentAndClassService.deleteManyStudentAndClassesByIds(ids);
+        map.put("data", Constants.SUCCESS);
+        return map;
     }
 }

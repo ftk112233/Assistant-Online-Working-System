@@ -77,4 +77,12 @@ public interface AssistantMapper {
      * @return
      */
     void deleteOneAssistantById(@Param("id") Long id);
+
+
+    /**
+     * 根据id删除多个助教
+     *
+     * @param ids 助教id的列表
+     */
+    void deleteManyAssistantsByIds(List<Long> ids);
 }

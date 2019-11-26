@@ -83,7 +83,7 @@ public class PermissionAdminController extends AbstractController {
      * @param model
      * @return
      */
-    @RequestMapping("/addForm")
+    @RequestMapping("/insertForm")
     public String addForm(Model model) {
         model.addAttribute(ModelConstants.ROLES_MODEL_KEY, JSON.toJSONString(UserUtils.USER_ROLES));
         return "permission/admin/permissionFormAdd";

@@ -79,6 +79,12 @@
     <delete id="deleteOneTeacherById">
         delete from teacher where id=#{id}
     </delete>
+    <delete id="deleteManyTeachersByIds">
+        delete from teacher where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
     <select id="getTeacherByName" resultMap="BaseResultMap">
         select * from teacher where teacher_name=#{teacherName}
     </select>

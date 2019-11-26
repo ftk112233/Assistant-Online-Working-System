@@ -381,9 +381,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
     @Override
     public void deleteManyUsersByIds(List<Long> ids) {
-        for (Long id : ids) {
-            deleteOneUserById(id);
-        }
+        userMapper.deleteManyUsersByIds(ids);
     }
 
     @Override

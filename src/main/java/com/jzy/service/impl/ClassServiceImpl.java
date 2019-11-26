@@ -8,6 +8,7 @@ import com.jzy.manager.util.ClassUtils;
 import com.jzy.model.dto.ClassDetailedDto;
 import com.jzy.model.dto.ClassSearchCondition;
 import com.jzy.model.dto.MyPage;
+import com.jzy.model.entity.Assistant;
 import com.jzy.model.entity.Class;
 import com.jzy.service.ClassService;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +44,16 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     }
 
     @Override
+    public ClassDetailedDto getClassDetailByClassId(String classId) {
+        if (StringUtils.isEmpty(classId)){
+            return null;
+        } else {
+            ClassDetailedDto classDetailedDto=classMapper.getClassDetailByClassId(classId);
+            return ClassUtils.parseClassYear(classDetailedDto);
+        }
+    }
+
+    @Override
     public String updateClassByClassId(ClassDetailedDto classDetailedDto) {
         classMapper.updateClassByClassId(classDetailedDto);
         return Constants.SUCCESS;
@@ -50,14 +61,35 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
 
     @Override
     public String insertClass(ClassDetailedDto classDetailedDto) {
+        String result=Constants.SUCCESS;
+
         //新班号不为空
         if (getClassByClassId(classDetailedDto.getClassId()) != null) {
             //添加的班号已存在
             return "classIdRepeat";
         }
 
+        if (!StringUtils.isEmpty(classDetailedDto.getTeacherName())){
+            //修改后的教师姓名不为空
+            if (teacherService.getTeacherByName(classDetailedDto.getTeacherName()) == null){
+                //修改后的教师姓名不存在
+               return "teacherNotExist";
+
+            }
+        }
+
+        if (!StringUtils.isEmpty(classDetailedDto.getAssistantName())){
+            //修改后的助教姓名不为空
+            if (assistantService.getAssistantByName(classDetailedDto.getAssistantName()) == null){
+                //修改后的助教姓名不存在
+                return "assistantNotExist";
+            }
+        }
+
+        classDetailedDto.setParsedClassTime(classDetailedDto.getClassTime());
+
         classMapper.insertClass(classDetailedDto);
-        return Constants.SUCCESS;
+        return result;
     }
 
     @Override
@@ -101,10 +133,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
         for (int i=0;i<classDetailedDtos.size();i++){
             ClassDetailedDto classDetailedDto=classDetailedDtos.get(i);
             if (!StringUtils.isEmpty(classDetailedDto.getClassYear())){
-                String year=classDetailedDto.getClassYear();
-                String parsedYear=year.substring(0, year.indexOf('-'));
-                classDetailedDto.setClassYear(parsedYear);
-                classDetailedDtos.set(i,classDetailedDto);
+                classDetailedDtos.set(i,ClassUtils.parseClassYear(classDetailedDto));
             }
         }
         return new PageInfo<>(classDetailedDtos);
@@ -113,5 +142,49 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     @Override
     public List<String> listAllClassIds() {
         return classMapper.listAllClassIds();
+    }
+
+    @Override
+    public String updateClassInfo(ClassDetailedDto classDetailedDto) {
+        Class originalClass = getClassById(classDetailedDto.getId());
+
+        //班号不为空
+        if (!classDetailedDto.getClassId().equals(originalClass.getClassId())) {
+            //班号修改过了，判断是否与已存在的工号冲突
+            if (getClassByClassId(classDetailedDto.getClassId()) != null) {
+                //修改后的班号已存在
+                return "classIdRepeat";
+            }
+        }
+
+        if (!StringUtils.isEmpty(classDetailedDto.getTeacherName())){
+            //修改后的教师姓名不为空
+            if (teacherService.getTeacherByName(classDetailedDto.getTeacherName()) == null){
+                //修改后的教师姓名不存在
+                return "teacherNotExist";
+            }
+        }
+
+        if (!StringUtils.isEmpty(classDetailedDto.getAssistantName())){
+            //修改后的助教姓名不为空
+            if (assistantService.getAssistantByName(classDetailedDto.getAssistantName()) == null){
+                //修改后的助教姓名不存在
+                return "assistantNotExist";
+            }
+        }
+
+        classDetailedDto.setParsedClassTime(classDetailedDto.getClassTime());
+        classMapper.updateClassInfo(classDetailedDto);
+        return Constants.SUCCESS;
+    }
+
+    @Override
+    public void deleteOneClassById(Long id) {
+        classMapper.deleteOneClassById(id);
+    }
+
+    @Override
+    public void deleteManyClassesByIds(List<Long> ids) {
+        classMapper.deleteManyClassesByIds(ids);
     }
 }

@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>助教管理-新东方优能中学助教工作平台</title>
+    <title>学生上课信息管理-新东方优能中学助教工作平台</title>
     <meta name="renderer" content="weabkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport"
@@ -17,47 +17,38 @@
 <div class="layui-form" lay-filter="layuiadmin-app-form-list" id="layuiadmin-app-form-list"
      style="padding: 20px 30px 0 0;">
     <div class="layui-form-item">
-        <label class="layui-form-label">工号</label>
+        <label class="layui-form-label">学员号</label>
         <div class="layui-input-inline">
             <input type="text" name="id" value="" style="display:none;" class="layui-input">
-            <input type="text" name="workId" value="" class="layui-input" lay-verify="assistantWorkId" lay-verType="tips"
-                   placeholder="请输入">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">姓名</label>
-        <div class="layui-input-inline">
-            <input type="text" name="name" value="" class="layui-input" lay-verType="tips" lay-verify="realName"
+            <input type="text" name="studentId" value="" class="layui-input" lay-verify="studentId" lay-verType="tips"
                    placeholder="请输入">
         </div>
         <div class="layui-form-mid " style="color:red">*必填项</div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">性别</label>
-        <div class="layui-col-md12 layui-input-inline">
-            <input type="radio" name="sex" id="male" value="男" title="男">
-            <input type="radio" name="sex" id="female" value="女" title="女">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">部门</label>
+        <label class="layui-form-label">修改所读班级班号</label>
         <div class="layui-input-inline">
-            <input type="text" name="depart" value="" class="layui-input" lay-verType="tips" lay-verify="depart"
-                   placeholder="请输入">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">校区</label>
-        <div class="layui-input-inline">
-            <select name="campus" id="campus" lay-verType="tips" lay-verify="campus" lay-search>
-                <option value="">请选择</option>
+            <select name="classId" id="classId"  lay-verify="classId" lay-verType="tips" lay-search>
+                <option value="">请输入或选择班级编码</option>
             </select>
         </div>
+        <div class="layui-form-mid " style="color:red">*必填项</div>
+        <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #1E9FFF"
+                id="preview-class">预览班级信息
+        </button>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">联系方式</label>
+        <label class="layui-form-label">使用当前时间作为进班时间 </label>
         <div class="layui-input-inline">
-            <input type="text" name="phone" value="" class="layui-input" lay-verify="myphone" lay-verType="tips" placeholder="请输入">
+            <input type="checkbox" name="currentTime" lay-skin="switch" lay-text="是|否"
+                   lay-filter="currentTime" checked>
+        </div>
+    </div>
+    <div class="layui-form-item" id="div-registerTime" hidden="hidden">
+        <label class="layui-form-label">自定进班时间</label>
+        <div class="layui-input-inline">
+            <input name="registerTime" id="registerTime" lay-verify="registerTime" lay-verType="tips"
+                   autocomplete="off" class="layui-input" placeholder="yyyy-MM-dd HH:mm:ss">
         </div>
     </div>
     <div class="layui-form-item">
@@ -91,16 +82,43 @@
                 , form = layui.form
                 , laydate = layui.laydate;
 
+        laydate.render({
+            elem: '#registerTime'
+            ,type: 'datetime'
+        });
 
-        var campusNames = eval('(' + '${campusNames}' + ')');
-        for (var i = 0; i < campusNames.length; i++) {
-            var json = campusNames[i];
+        var classIds = eval('(' + '${classIds}' + ')');
+        for (var i = 0; i < classIds.length; i++) {
+            var json = classIds[i];
             var str = "";
             str += '<option value="' + json + '">' + json + '</option>';
-            $("#campus").append(str);
+            $("#classId").append(str);
         }
-        $("#campus").val('${assistantEdit.assistantCampus!""}');
+
         form.render();
+
+        //监听自动解析开关
+        form.on('switch(currentTime)', function (data) {
+            //开关是否开启，true或者false
+            var checked = data.elem.checked;
+            if (checked) {
+                $("#div-registerTime").hide();
+            } else {
+                $("#div-registerTime").show();
+            }
+        });
+
+        //解析班级编码
+        $("#preview-class").click(function () {
+            var othis = $(this)
+                    , href = '/class/admin/getPreviewClassInfo?classId=' + $("#classId").val()
+                    , text = "预览班级信息"
+                    , router = layui.router();
+
+
+            var topLayui = parent === self ? layui : top.layui;
+            topLayui.index.openTabsPage(href, text || othis.text());
+        });
     });
 </script>
 </body>

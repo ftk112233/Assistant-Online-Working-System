@@ -2,6 +2,7 @@ package com.jzy.manager.util;
 
 import com.jzy.manager.constant.Constants;
 import com.jzy.model.dto.ClassDetailedDto;
+import com.jzy.model.dto.StudentAndClassDetailedDto;
 import com.jzy.model.entity.Class;
 import org.apache.commons.lang3.StringUtils;
 
@@ -119,7 +120,19 @@ public class ClassUtils {
      * @return
      */
     public static boolean isValidClassDetailedDtoInfo(ClassDetailedDto classDetailedDto) {
-        return isValidClassInfo(classDetailedDto);
+        return isValidClassInfo(classDetailedDto)
+                && (StringUtils.isEmpty(classDetailedDto.getTeacherName()) || TeacherUtils.isValidTeacherName(classDetailedDto.getTeacherName()))
+                && (StringUtils.isEmpty(classDetailedDto.getAssistantName()) || AssistantUtils.isValidAssistantName(classDetailedDto.getAssistantName()));
+    }
+
+    /**
+     * 输入的classDetailedDto是否合法
+     *
+     * @param classDetailedDto 输入的ClassDetailedDto对象
+     * @return
+     */
+    public static boolean isValidClassUpdateInfo(ClassDetailedDto classDetailedDto) {
+        return isValidClassDetailedDtoInfo(classDetailedDto);
     }
 
     /**
@@ -165,5 +178,18 @@ public class ClassUtils {
      */
     public static String getCurrentYear() {
        return MyTimeUtils.getCurrentYear()+"";
+    }
+
+    /**
+     * 将输入对象的年份字段由yyyy-mm-dd转成yyyy
+     *
+     * @param input
+     * @return
+     */
+    public static ClassDetailedDto parseClassYear(ClassDetailedDto input){
+        String year=input.getClassYear();
+        String parsedYear=year.substring(0, year.indexOf('-'));
+        input.setClassYear(parsedYear);
+        return input;
     }
 }

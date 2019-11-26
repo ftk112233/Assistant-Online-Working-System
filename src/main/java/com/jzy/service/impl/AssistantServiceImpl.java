@@ -173,8 +173,6 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
 
     @Override
     public void deleteManyAssistantsByIds(List<Long> ids) {
-        for (Long id : ids) {
-            deleteOneAssistantById(id);
-        }
+        assistantMapper.deleteManyAssistantsByIds(ids);
     }
 }

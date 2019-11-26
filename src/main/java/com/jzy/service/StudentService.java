@@ -1,5 +1,8 @@
 package com.jzy.service;
 
+import com.github.pagehelper.PageInfo;
+import com.jzy.model.dto.MyPage;
+import com.jzy.model.dto.StudentSearchCondition;
 import com.jzy.model.entity.Student;
 
 import java.util.List;
@@ -87,4 +90,13 @@ public interface StudentService {
      * @return
      */
     String insertAndUpdateOneStudentFromExcel(Student student) throws Exception;
+
+    /**
+     * 查询学员个人信息
+     *
+     * @param myPage    分页{页号，每页数量}
+     * @param condition 查询条件入参
+     * @return
+     */
+    PageInfo<Student> listStudents(MyPage myPage, StudentSearchCondition condition);
 }

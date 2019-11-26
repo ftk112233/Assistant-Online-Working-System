@@ -112,7 +112,7 @@ public class AssistantAdminController extends AbstractController {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!AssistantUtils.isValidAssistantUpdateInfo(assistant)) {
-            String msg = "updateById方法错误入参";
+            String msg = "insert方法错误入参";
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }

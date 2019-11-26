@@ -94,6 +94,58 @@
     <select id="getStudentByStudentId" resultMap="BaseResultMap">
         select * from student where student_id=#{studentId}
     </select>
+    <select id="listStudents" resultMap="BaseResultMap"
+            parameterType="com.jzy.model.dto.StudentSearchCondition">
+        select * from student s
+        <where>
+            <if test="studentId != null and studentId!=''">
+                <bind name="studentIdLike" value=" '%' + studentId + '%' "/>
+                and s.student_id like #{studentIdLike}
+            </if>
+            <if test="studentName != null and studentName!=''">
+                <bind name="studentNameLike" value=" '%' + studentName + '%' "/>
+                and s.student_name like #{studentNameLike}
+            </if>
+            <if test="studentSex != null and studentSex!=''">
+                and s.student_sex=#{studentSex}
+            </if>
+            <if test="studentPhone != null and studentPhone!=''">
+                <bind name="studentPhoneLike" value=" '%' + studentPhone + '%' "/>
+                and s.student_phone like #{studentPhoneLike}
+            </if>
+            <if test="studentSchool != null and studentSchool!=''">
+                <bind name="studentSchoolLike" value=" '%' + studentSchool + '%' "/>
+                and s.student_school like #{studentSchoolLike}
+            </if>
+        </where>
+        <if test="condition1 == 'studentId'">
+            order by s.student_id
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'studentName'">
+            order by s.student_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'studentSchool'">
+            order by s.student_school
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+    </select>
 
 
 </mapper>

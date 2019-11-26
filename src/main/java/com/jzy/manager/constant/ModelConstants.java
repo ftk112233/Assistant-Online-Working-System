@@ -81,4 +81,14 @@ public class ModelConstants {
      */
     public static final String CLASS_EDIT_MODEL_KEY="classEdit";
 
+    /**
+     * 跳转编辑学员上课信息iframe页面时，存放的model键
+     */
+    public static final String STUDENT_AND_CLASS_EDIT_MODEL_KEY="studentAndClassEdit";
+
+    /**
+     * 跳转预览班级iframe页面时，存放的model键
+     */
+    public static final String CLASS_PREVIEW_MODEL_KEY="classPreview";
+
 }

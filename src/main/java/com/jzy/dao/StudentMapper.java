@@ -1,7 +1,10 @@
 package com.jzy.dao;
 
+import com.jzy.model.dto.StudentSearchCondition;
 import com.jzy.model.entity.Student;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @author JinZhiyun
@@ -49,4 +52,12 @@ public interface StudentMapper {
      * @return
      */
     void updateStudentNameByStudentId(Student student);
+
+    /**
+     * 查询学员个人信息
+     *
+     * @param condition 查询条件入参
+     * @return
+     */
+    List<Student> listStudents(StudentSearchCondition condition);
 }

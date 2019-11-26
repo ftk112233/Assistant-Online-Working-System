@@ -24,6 +24,7 @@ public class StudentAndClassUtils {
     public static boolean isValidClassId(Long classId) {
         return classId!=null;
     }
+
     public static boolean isValidRegisterTime(Date registerTime) {
         return true;
     }
@@ -52,5 +53,28 @@ public class StudentAndClassUtils {
     public static boolean isValidStudentAndClassDetailedDtoInfo(StudentAndClassDetailedDto studentAndClassDetailedDto){
         return studentAndClassDetailedDto!=null && StudentUtils.isValidStudentId(studentAndClassDetailedDto.getStudentId()) && ClassUtils.isValidClassId(studentAndClassDetailedDto.getClassId())
                 && isValidRegisterTime(studentAndClassDetailedDto.getRegisterTime()) && isValidRemark(studentAndClassDetailedDto.getRemark());
+    }
+
+    /**
+     * 更新操作输入的studentAndClassDetailedDto是否合法
+     *
+     * @param studentAndClassDetailedDto 输入的studentAndClassDetailedDto对象
+     * @return
+     */
+    public static boolean isValidStudentAndClassUpdateDtoInfo(StudentAndClassDetailedDto studentAndClassDetailedDto){
+        return isValidStudentAndClassDetailedDtoInfo(studentAndClassDetailedDto);
+    }
+
+    /**
+     * 将输入对象的年份字段由yyyy-mm-dd转成yyyy
+     *
+     * @param input
+     * @return
+     */
+    public static StudentAndClassDetailedDto parseClassYear(StudentAndClassDetailedDto input){
+        String year=input.getClassYear();
+        String parsedYear=year.substring(0, year.indexOf('-'));
+        input.setClassYear(parsedYear);
+        return input;
     }
 }

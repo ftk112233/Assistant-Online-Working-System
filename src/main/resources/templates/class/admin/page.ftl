@@ -388,8 +388,8 @@
                     //执行 Ajax 后重载
                     $.ajax({
                         type: 'post',
-                        data: {assistants: JSON.stringify(checkData)},
-                        url: "${ctx}/assistant/admin/deleteMany",
+                        data: {classes: JSON.stringify(checkData)},
+                        url: "${ctx}/class/admin/deleteMany",
                         beforeSend: function (data) {
                             layer.load(1, {shade: [0.1, '#fff']}); //上传loading
                         }
@@ -398,17 +398,21 @@
                             if (data.data === "success") {
                                 layer.msg('已删除');
                                 table.reload('classTables', {
-                                    url: '${ctx}/assistant/admin/getAssistantInfo' //向后端默认传page和limit); //重载表格
+                                    url: '${ctx}/class/admin/getClassInfo' //向后端默认传page和limit); //重载表格
                                     , request: {
                                         pageName: 'pageNum',
                                         limitName: 'pageSize'  //如不配置，默认为page=1&limit=10
+                                    }
+                                    , where: {
+                                        classYear: '${currentYear!""}'
+                                        , classSeason: '${currentSeason!""}'
                                     }
                                     , page: {
                                         curr: 1 //重新从第 1 页开始
                                     }
                                 });
                             } else {
-                                layer.msg('未知错误');
+                                layer.msg('无法完成操作');
                             }
                         }
 
@@ -419,8 +423,8 @@
             add: function () {
                 var index = layer.open({
                     type: 2
-                    , title: '添加助教'
-                    , content: '${ctx}/assistant/admin/updateForm'
+                    , title: '添加班级'
+                    , content: '${ctx}/class/admin/updateForm'
                     , maxmin: true
                     , btn: ['确定', '取消']
                     , yes: function (index, layero) {
@@ -432,20 +436,28 @@
                             var field = data.field; //获取提交的字段
                             // var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
                             var json = {
-                                    assistantWorkId: field.workId
-                                    , assistantName: field.name
-                                    , assistantSex: field.sex
-                                    , assistantDepart: field.depart
-                                    , assistantCampus: field.campus
-                                    , assistantPhone: field.phone
-                                    , assistantRemark: field.remark
+                                classId: field.classId
+                                , className: field.className
+                                , classCampus: field.campus
+                                , classGrade: field.grade
+                                , classSubject: field.subject
+                                , classType: field.type
+                                , classYear: field.year
+                                , classSeason: field.season
+                                , classTime: field.classTime
+                                , classTimes: field.classTimes
+                                , classroom: field.classroom
+                                , teacherName: field.teacherName
+                                , assistantName: field.assistantName
+                                , classTeacherRequirement: field.classTeacherRequirement
+                                , classRemark: field.remark
                             };
 
                             //提交 Ajax 成功后，关闭当前弹层并重载表格
                             $.ajax({
                                 data: json,
                                 type: 'post',
-                                url: "${ctx}/assistant/admin/insert",
+                                url: "${ctx}/class/admin/insert",
                                 beforeSend: function (data) {
                                     layer.load(1, {shade: [0.1, '#fff']}); //上传loading
                                 }
@@ -458,12 +470,14 @@
                                         });
 
                                         layer.close(index); //再执行关闭
-                                    } else if (data.data === "workIdRepeat") {
-                                        return layer.msg('对不起，该工号已存在！');
-                                    } else if (data.data === "nameRepeat") {
-                                        return layer.msg('对不起，该助教姓名已存在！');
+                                    } else if (data.data === "classIdRepeat") {
+                                        return layer.msg('对不起，该班号已存在！');
+                                    } else if (data.data === "assistantNotExist") {
+                                        return layer.msg('对不起，该助教不存在！');
+                                    } else if (data.data === "teacherNotExist") {
+                                        return layer.msg('对不起，该教师不存在！');
                                     } else {
-                                        return layer.msg('未知错误');
+                                        return layer.msg('无法完成操作');
                                     }
                                 }
                             });
@@ -498,12 +512,12 @@
                 var topLayui = parent === self ? layui : top.layui;
                 topLayui.index.openTabsPage(href, text || othis.text());
             } else if (obj.event === 'del') {
-                layer.confirm('确定删除此助教吗？', function (index) {
+                layer.confirm('确定删除此班级吗？删除此班级将会删除该班的学生的上课记录', function (index) {
                     //提交删除ajax
                     $.ajax({
                         data: data,
                         type: 'post',
-                        url: "${ctx}/assistant/admin/deleteOne",
+                        url: "${ctx}/class/admin/deleteOne",
                         beforeSend: function (data) {
                             layer.load(1, {shade: [0.1, '#fff']}); //上传loading
                         }
@@ -547,19 +561,27 @@
                             var field = data.field; //获取提交的字段
                             var json = {
                                 id: field.id
-                                , assistantWorkId: field.workId
-                                , assistantName: field.name
-                                , assistantSex: field.sex
-                                , assistantDepart: field.depart
-                                , assistantCampus: field.campus
-                                , assistantPhone: field.phone
-                                , assistantRemark: field.remark
+                                , classId: field.classId
+                                , className: field.className
+                                , classCampus: field.campus
+                                , classGrade: field.grade
+                                , classSubject: field.subject
+                                , classType: field.type
+                                , classYear: field.year
+                                , classSeason: field.season
+                                , classTime: field.classTime
+                                , classTimes: field.classTimes
+                                , classroom: field.classroom
+                                , teacherName: field.teacherName
+                                , assistantName: field.assistantName
+                                , classTeacherRequirement: field.classTeacherRequirement
+                                , classRemark: field.remark
                             };
 
                             $.ajax({
                                 data: json,
                                 type: 'post',
-                                url: "${ctx}/assistant/admin/updateById",
+                                url: "${ctx}/class/admin/updateById",
                                 beforeSend: function (data) {
                                     layer.load(1, {shade: [0.1, '#fff']}); //上传loading
                                 }
@@ -583,7 +605,7 @@
                                     } else if (data.data === "teacherNotExist") {
                                         return layer.msg('对不起，该教师不存在！');
                                     } else {
-                                        return layer.msg('未知错误');
+                                        return layer.msg('无法完成操作');
                                     }
                                 }
                             });
@@ -594,18 +616,18 @@
                     }
                     ,
                     success: function (layero, index) {
-                        console.log(data.assistantSex)
                         //给iframe元素赋值
                         var othis = layero.find('iframe').contents().find("#layuiadmin-app-form-list").click();
                         othis.find('input[name="id"]').val(data.id);
                         othis.find('input[name="classId"]').val(data.classId);
                         othis.find('input[name="className"]').val(data.className);
                         othis.find('input[name="year"]').val(data.classYear);
-                        othis.find('input[name="sex"][value="男"]').attr("checked", data.assistantSex === '男');
-                        othis.find('input[name="sex"][value="女"]').attr("checked", data.assistantSex === '女');
-                        othis.find('input[name="depart"]').val(data.assistantDepart);
-                        othis.find('input[name="phone"]').val(data.assistantPhone);
-                        othis.find('textarea[name="remark"]').val(data.assistantRemark);
+                        othis.find('input[name="classTime"]').val(data.classTime);
+                        othis.find('input[name="classTimes"]').val(data.classTimes);
+                        othis.find('input[name="teacherName"]').val(data.teacherName);
+                        othis.find('input[name="assistantName"]').val(data.assistantName);
+                        othis.find('textarea[name="classTeacherRequirement"]').val(data.classTeacherRequirement);
+                        othis.find('textarea[name="remark"]').val(data.classRemark);
                     }
                 });
                 layer.full(index);

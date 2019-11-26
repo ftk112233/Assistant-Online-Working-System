@@ -20,10 +20,16 @@
         <label class="layui-form-label">班级编码</label>
         <div class="layui-input-inline">
             <input type="text" name="id" value="" style="display:none;" class="layui-input">
-            <input type="text" name="classId" value="" class="layui-input" lay-verify="classId" lay-verType="tips"
+            <input type="text" name="classId" id="classId" value="" class="layui-input" lay-verify="classId" lay-verType="tips"
                    placeholder="请输入">
         </div>
         <div class="layui-form-mid " style="color:red">*必填项</div>
+        <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #1E9FFF"
+                id="parse-classId">解析班号
+        </button>
+        <i class="layui-icon layui-icon-tips" lay-tips="解析班号：2019年新东方优能中学部的班级编码为12位，如U6MCFB020001，其中U表示优能中学部，6表示六年级，M学科，C为班型：志高，F为班级规模：25人，B表示季度，02表示曹杨校区，'0001'为序号。以下标注绿色'可解析'的字段都可点击此按钮根据班号解析填充。"></i>
+    </div>
+    <div class="layui-form-item">
         <label class="layui-form-label">班级名称</label>
         <div class="layui-input-inline">
             <input type="text" name="className" value="" class="layui-input" lay-verType="tips" lay-verify="className"
@@ -33,18 +39,15 @@
     <div class="layui-form-item">
         <label class="layui-form-label">年份</label>
         <div class="layui-input-inline">
-            <div class="layui-input-inline">
-                <input type="text" class="layui-input" placeholder="yyyy" id="year" name="year">
-            </div>
+            <input type="text" class="layui-input" placeholder="yyyy" id="year" name="year">
         </div>
         <label class="layui-form-label">季度</label>
         <div class="layui-input-inline">
-            <div class="layui-input-inline">
-                <select name="season" id="season">
-                    <option value="">请选择季度</option>
-                </select>
-            </div>
+            <select name="season" id="season">
+                <option value="">请选择季度</option>
+            </select>
         </div>
+        <div class="layui-form-mid " style="color:#5FB878">*可解析</div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">曹杨</label>
@@ -53,6 +56,7 @@
                 <option value="">请选择校区</option>
             </select>
         </div>
+        <div class="layui-form-mid " style="color:#5FB878">*可解析</div>
         <label class="layui-form-label">教室</label>
         <div class="layui-input-inline">
             <select name="classroom" id="classroom"
@@ -62,24 +66,53 @@
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">部门</label>
+        <label class="layui-form-label">年级</label>
         <div class="layui-input-inline">
-            <input type="text" name="depart" value="" class="layui-input" lay-verType="tips" lay-verify="depart"
-                   placeholder="请输入">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">校区</label>
-        <div class="layui-input-inline">
-            <select name="campus" id="campus" lay-verType="tips" lay-verify="campus" lay-search>
-                <option value="">请选择</option>
+            <select name="grade" id="grade">
+                <option value="">请选择年级</option>
             </select>
         </div>
+        <div class="layui-form-mid " style="color:#5FB878">*可解析</div>
+        <label class="layui-form-label">学科</label>
+        <div class="layui-input-inline">
+            <select name="subject" id="subject">
+                <option value="">请选择学科</option>
+            </select>
+        </div>
+        <div class="layui-form-mid " style="color:#5FB878">*可解析</div>
+        <label class="layui-form-label">班型</label>
+        <div class="layui-input-inline">
+            <select name="type" id="type">
+                <option value="">请选择班型</option>
+            </select>
+        </div>
+        <div class="layui-form-mid " style="color:#5FB878">*可解析</div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">联系方式</label>
+        <label class="layui-form-label">上课时间</label>
         <div class="layui-input-inline">
-            <input type="text" name="phone" value="" class="layui-input" lay-verify="myphone" lay-verType="tips" placeholder="请输入">
+            <input type="text" name="classTime" lay-verType="tips" lay-verify="classTime" placeholder="周六8:00-10:00" autocomplete="off" class="layui-input">
+        </div>
+        <label class="layui-form-label">上课次数</label>
+        <div class="layui-input-inline">
+            <input type="text" name="classTimes"  lay-verType="tips" lay-verify="classTimes" placeholder="16" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">上课教师</label>
+        <div class="layui-input-inline">
+            <input type="text" name="teacherName" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+        <label class="layui-form-label">助教</label>
+        <div class="layui-input-inline">
+            <input type="text" name="assistantName" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">任课老师要求</label>
+        <div class="layui-input-inline">
+            <textarea name="classTeacherRequirement" style="width: 400px; height: 100px;" class="layui-textarea"
+                      lay-verType="tips" lay-verify="classTeacherRequirement" placeholder="请输入"></textarea>
         </div>
     </div>
     <div class="layui-form-item">
@@ -115,7 +148,7 @@
 
         laydate.render({
             elem: '#year'
-            ,type: 'year'
+            , type: 'year'
         });
 
         var campusNames = eval('(' + '${campusNames}' + ')');
@@ -143,6 +176,8 @@
             str += '<option value="' + json + '">' + json + '</option>';
             $("#grade").append(str);
         }
+        $("#grade").val('${classEdit.classGrade!""}');
+
 
         var subjects = eval('(' + '${subjects}' + ')');
         for (var i = 0; i < subjects.length; i++) {
@@ -151,6 +186,7 @@
             str += '<option value="' + json + '">' + json + '</option>';
             $("#subject").append(str);
         }
+        $("#subject").val('${classEdit.classSubject!""}');
 
         var types = eval('(' + '${types}' + ')');
         for (var i = 0; i < types.length; i++) {
@@ -159,6 +195,7 @@
             str += '<option value="' + json + '">' + json + '</option>';
             $("#type").append(str);
         }
+        $("#type").val('${classEdit.classType!""}');
 
         $.ajax({
             type: "get",
@@ -191,6 +228,51 @@
                         $("#classroom").append('<option value="' + json + '">' + json + '</option>');
                     }
                     form.render('select');
+                }
+            });
+        });
+
+        //解析班级编码
+        $("#parse-classId").click(function () {
+            $.ajax({
+                type: "get",
+                data: {classId: $("#classId").val()},
+                url: "${ctx}/class/getParsedClassByParsingClassId",
+                success: function (data) {
+                    if (data.classCampus !==''){
+                        $("#campus").val(data.classCampus);
+
+
+                        $("#classroom").empty();
+                        $("#classroom").append('<option value="">请选择教室</option>');
+                        var campus_name = data.classCampus;
+                        $.ajax({
+                            type: "get",
+                            data: {campusName: campus_name},
+                            url: "${ctx}/class/getClassroomsByCampus",
+                            success: function (data) {
+                                for (var i = 0; i < data.length; i++) {
+                                    var json = data[i];
+                                    $("#classroom").append('<option value="' + json + '">' + json + '</option>');
+                                }
+                                form.render('select');
+                            }
+                        });
+                    }
+                    if (data.classSeason !==''){
+                        $("#season").val(data.classSeason);
+                    }
+                    if (data.classGrade !==''){
+                        $("#grade").val(data.classGrade);
+                    }
+                    if (data.classSubject !==''){
+                        $("#subject").val(data.classSubject);
+                    }
+                    if (data.classType !==''){
+                        $("#type").val(data.classType);
+                    }
+
+                    form.render();
                 }
             });
         });

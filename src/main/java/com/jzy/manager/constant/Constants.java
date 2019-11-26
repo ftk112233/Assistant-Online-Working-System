@@ -41,4 +41,10 @@ public class Constants {
      * 返回json的值，表示未知错误
      */
     public static final String UNKNOWN_ERROR="unknownError";
+
+    /**
+     * 返回json的值，表示失败
+     */
+    public static final String ON="on";
+
 }

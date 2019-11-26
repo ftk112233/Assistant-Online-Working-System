@@ -1,8 +1,14 @@
 package com.jzy.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jzy.dao.StudentMapper;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.util.StudentAndClassUtils;
 import com.jzy.manager.util.StudentUtils;
+import com.jzy.model.dto.MyPage;
+import com.jzy.model.dto.StudentAndClassDetailedDto;
+import com.jzy.model.dto.StudentSearchCondition;
 import com.jzy.model.entity.Student;
 import com.jzy.service.StudentService;
 import org.apache.commons.lang3.StringUtils;
@@ -120,6 +126,13 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
             insertStudent(student);
         }
         return Constants.SUCCESS;
+    }
+
+    @Override
+    public PageInfo<Student> listStudents(MyPage myPage, StudentSearchCondition condition) {
+        PageHelper.startPage(myPage.getPageNum(), myPage.getPageSize());
+        List<Student> students = studentMapper.listStudents(condition);
+        return new PageInfo<>(students);
     }
 
 }
