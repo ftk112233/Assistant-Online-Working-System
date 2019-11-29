@@ -131,8 +131,9 @@
                     </button>
                     <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #5FB878"
                             id="query-my-class-assistant" lay-submit
-                            lay-filter="query-my-class-assistant">助教-查询我的班级
+                            lay-filter="query-my-class-assistant"  lay-tips="在'查询我的班级'的功能中，用到的查询条件只有：年份-季度、校区，确保这些条件正确即可~">查询我的班级
                     </button>
+
                 </div>
             </div>
         </div>
@@ -144,6 +145,7 @@
             <table id="classTables" lay-filter="LAY-app-content-comm"></table>
             <script type="text/html" id="test-table-operate-barDemo1">
                 <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="show-class-student">查看该班学生</a>
+                <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="make-table">开班做表</a>
             </script>
             <script type="text/html" id="table-content-list1">
                 <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i
@@ -242,7 +244,7 @@
             $.ajax({
                 type: "get",
                 data: {campusName: campus_name},
-                url: "${ctx}/class/getClassroomsByCampus",
+                url: "${ctx}/class/listClassroomsByCampus",
                 success: function (data) {
                     for (var i = 0; i < data.length; i++) {
                         var json = data[i];
@@ -285,7 +287,7 @@
                 , {field: 'classTeacherRequirement', title: '任课老师要求', hide: true}
                 , {field: 'classRemark', title: '备注', hide: true}
                 , {field: 'classStudentsCount', title: '班级人数', width: 110}
-                , {width: 130, title: '', toolbar: '#test-table-operate-barDemo1'}
+                , {minWidth: 150, align: 'center', title: '跳转', toolbar: '#test-table-operate-barDemo1'}
                 , {title: '操作', minWidth: 150, align: 'center', fixed: 'right', toolbar: '#table-content-list1'}
             ]]
             , where: {
@@ -506,6 +508,16 @@
                 var othis = $(this)
                         , href = '${ctx}/studentAndClass/admin/page?classId='+data.classId
                         , text = "上课信息"
+                        , router = layui.router();
+
+
+                var topLayui = parent === self ? layui : top.layui;
+                topLayui.index.openTabsPage(href, text || othis.text());
+            } else if (obj.event === 'make-table') {
+                //打开一个新页面
+                var othis = $(this)
+                        , href = '${ctx}/toolbox/assistant/startClassExcel?classId='+data.classId+'&classCampus='+data.classCampus
+                        , text = "开班做表魔法"
                         , router = layui.router();
 
 

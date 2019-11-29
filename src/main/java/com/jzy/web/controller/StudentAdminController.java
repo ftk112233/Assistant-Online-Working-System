@@ -3,17 +3,13 @@ package com.jzy.web.controller;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jzy.manager.constant.Constants;
-import com.jzy.manager.constant.ModelConstants;
-import com.jzy.manager.util.ClassUtils;
-import com.jzy.model.CampusEnum;
+import com.jzy.manager.util.StudentUtils;
 import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.StudentAndClassDetailedDto;
-import com.jzy.model.dto.StudentAndClassSearchCondition;
 import com.jzy.model.dto.StudentSearchCondition;
 import com.jzy.model.entity.Student;
 import com.jzy.model.excel.Excel;
 import com.jzy.model.excel.ExcelVersionEnum;
-import com.jzy.model.excel.input.StudentListExcel;
+import com.jzy.model.excel.input.StudentListImportToDatabaseExcel;
 import com.jzy.model.vo.ResultMap;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -76,12 +72,12 @@ public class StudentAdminController extends AbstractController {
         }
 
 
-        StudentListExcel excel = null;
+        StudentListImportToDatabaseExcel excel = null;
 
         if (type != null) {
             if (type.equals(1)) {
                 try {
-                    excel = new StudentListExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
+                    excel = new StudentListImportToDatabaseExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
                     excel.readStudentAndClassInfoFromExcel();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -100,7 +96,7 @@ public class StudentAdminController extends AbstractController {
                 }
             } else if (type.equals(2)) {
                 try {
-                    excel = new StudentListExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
+                    excel = new StudentListImportToDatabaseExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
                     excel.readStudentDetailInfoFromExcel();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -148,4 +144,95 @@ public class StudentAdminController extends AbstractController {
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
     }
 
+    /**
+     * 重定向到编辑学生iframe子页面并返回相应model
+     *
+     * @param model
+     * @return
+     */
+    @RequestMapping("/updateForm")
+    public String updateForm(Model model) {
+        return "student/personal/admin/studentForm";
+    }
+
+    /**
+     * 学生管理中的编辑学生请求，由id修改
+     *
+     * @param student 修改后的学生信息
+     * @return
+     */
+    @RequestMapping("/updateById")
+    @ResponseBody
+    public Map<String, Object> updateById(Student student) {
+        Map<String, Object> map = new HashMap<>(1);
+
+        if (!StudentUtils.isValidStudentUpdateInfo(student)) {
+            String msg = "updateById方法错误入参";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+
+        map.put("data", studentService.updateStudentInfo(student));
+
+        return map;
+    }
+
+    /**
+     * 学生管理中的添加学生请求
+     *
+     * @param student 新添加学生的信息
+     * @return
+     */
+    @RequestMapping("/insert")
+    @ResponseBody
+    public Map<String, Object> insert(Student student) {
+        Map<String, Object> map = new HashMap<>(1);
+
+        if (!StudentUtils.isValidStudentUpdateInfo(student)) {
+            String msg = "insert方法错误入参";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+
+        map.put("data", studentService.insertStudent(student));
+
+        return map;
+    }
+
+    /**
+     * 删除一个学生ajax交互
+     *
+     * @param id 被删除学生的id
+     * @return
+     */
+    @RequestMapping("/deleteOne")
+    @ResponseBody
+    public Map<String, Object> deleteOne(@RequestParam("id") Long id) {
+        Map<String, Object> map = new HashMap(1);
+
+        studentService.deleteOneStudentById(id);
+        map.put("data", Constants.SUCCESS);
+        return map;
+    }
+
+    /**
+     * 删除多个学生ajax交互
+     *
+     * @param students 多个学生的json串，用fastjson转换为list
+     * @return
+     */
+    @RequestMapping("/deleteMany")
+    @ResponseBody
+    public Map<String, Object> deleteMany(@RequestParam("students") String students) {
+        Map<String, Object> map = new HashMap(1);
+
+        List<Student> studentsParsed = JSON.parseArray(students, Student.class);
+        List<Long> ids = new ArrayList<>();
+        for (Student student : studentsParsed) {
+            ids.add(student.getId());
+        }
+        studentService.deleteManyStudentsByIds(ids);
+        map.put("data", Constants.SUCCESS);
+        return map;
+    }
 }

@@ -25,7 +25,7 @@
                         <div class="layui-form-item" id="div-classroom">
                             <label class="layui-form-label">学员姓名</label>
                             <div class="layui-input-inline">
-                                <input name="classId" lay-verify="realName" lay-verType="tips"
+                                <input name="studentName" lay-verify="realName" lay-verType="tips"
                                        autocomplete="off" class="layui-input"
                                        placeholder="魔仙小蓝">
                             </div>
@@ -42,10 +42,13 @@
                             <div class="layui-form-mid " style="color:red">*必填项</div>
                             <label class="layui-form-label">原班号</label>
                             <div class="layui-input-inline">
-                                <input name="classId" lay-verify="classId" lay-verType="tips"
-                                       autocomplete="off" class="layui-input"
-                                       placeholder="U6MCFC020001">
+                                <select name="originalClassId" id="originalClassId" lay-verify="classId" lay-verType="tips" lay-search>
+                                    <option value="">请输入或选择班级编码</option>
+                                </select>
                             </div>
+                            <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #1E9FFF"
+                                    id="preview-class">预览班级信息
+                            </button>
                             <div class="layui-form-mid " style="color:red">*必填项</div>
                         </div>
                         <div class="layui-form-item">
@@ -59,14 +62,17 @@
                             <div class="layui-form-mid " style="color:red">*必填项</div>
                             <label class="layui-form-label">补课班号</label>
                             <div class="layui-input-inline">
-                                <input name="classId" lay-verify="classId" lay-verType="tips"
-                                       autocomplete="off" class="layui-input"
-                                       placeholder="U6MCFC020002">
+                                <select name="currentClassId" id="currentClassId" lay-verify="classId" lay-verType="tips" lay-search>
+                                    <option value="">请输入或选择班级编码</option>
+                                </select>
                             </div>
+                            <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #1E9FFF"
+                                    id="preview-class2">预览班级信息
+                            </button>
                             <div class="layui-form-mid " style="color:red">*必填项</div>
                             <label class="layui-form-label">补课日期</label>
                             <div class="layui-input-inline">
-                                <input type="text" class="layui-input" placeholder="yyyy-MM-dd" id="date" name="date" lay-verify="date">
+                                <input type="text" class="layui-input" placeholder="yyyy-MM-dd" id="date" name="date" lay-verify="required" lay-verType="tips">
                             </div>
                             <div class="layui-form-mid " style="color:red">*必填项</div>
                         </div>
@@ -122,7 +128,6 @@
             $("#originalCampus").append(str);
             $("#currentCampus").append(str);
         }
-        form.render('select');
 
         //联动监听select
         form.on('select(originalCampus)', function (data) {
@@ -131,8 +136,49 @@
             form.render('select');
         });
 
+        var classIds = eval('(' + '${classIds}' + ')');
+        for (var i = 0; i < classIds.length; i++) {
+            var json = classIds[i];
+            var str = "";
+            str += '<option value="' + json + '">' + json + '</option>';
+            $("#originalClassId").append(str);
+        }
+
+        for (var i = 0; i < classIds.length; i++) {
+            var json = classIds[i];
+            var str = "";
+            str += '<option value="' + json + '">' + json + '</option>';
+            $("#currentClassId").append(str);
+        }
+
         laydate.render({
             elem: '#date' //指定元素
+        });
+
+        form.render();
+
+
+        //解析班级编码
+        $("#preview-class").click(function () {
+            var othis = $(this)
+                    , href = '${ctx}/class/admin/getPreviewClassInfo?classId=' + $("#originalClassId").val()
+                    , text = "预览班级信息"
+                    , router = layui.router();
+
+
+            var topLayui = parent === self ? layui : top.layui;
+            topLayui.index.openTabsPage(href, text || othis.text());
+        });
+
+        $("#preview-class2").click(function () {
+            var othis = $(this)
+                    , href = '${ctx}/class/admin/getPreviewClassInfo?classId=' + $("#currentClassId").val()
+                    , text = "预览班级信息"
+                    , router = layui.router();
+
+
+            var topLayui = parent === self ? layui : top.layui;
+            topLayui.index.openTabsPage(href, text || othis.text());
         });
 
 
@@ -153,79 +199,20 @@
             }
         });
 
-        upload.render({
-            elem: '#my_button_upload'
-            , url: '${ctx}/user/admin/import'
-            , data: {
-                //上传用户和助教
-                type: 2
-            }
-            , accept: 'file' //普通文件
-            , exts: 'xls|xlsx' //允许上传的文件后缀
-            , before: function (obj) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
-                layer.load(1, {shade: [0.1, '#fff']}); //上传loading
-            }
-            , done: function (res) {//返回值接收
-                layer.closeAll('loading'); //关闭loading
-                if (res.msg === "success") {
-                    return layer.msg('导入成功', {
-                        icon: 1
-                        , time: 1000
-                    });
-                } else {
-                    return layer.msg('导入失败', {
-                        offset: '15px'
-                        , icon: 2
-                        , time: 2000
-                    });
-                }
-            }
-            , error: function () {
-                layer.closeAll('loading'); //关闭loading
-                return layer.msg('导入失败', {
-                    offset: '15px'
-                    , icon: 2
-                    , time: 2000
-                });
-            }
-        });
-
         //提交
         form.on('submit(download)', function (obj) {
             var field = obj.field;
 
-            console.log(field)
-            $.ajax({
-                url: '${ctx}/user/updateOwnPassword' //实际使用请改成服务端真实接口
-                , type: 'post'
-                ,
-                data: {
-                    "oldPassword": field.oldPassword,
-                    "newPassword": field.repassword
-                }
-                ,
-                success: function (res) {
-                    if (res.data === "oldPasswordWrong") {
-                        return layer.msg('原始密码错误', {
-                            icon: 5,
-                            anim: 6
-                        });
-                    } else if (res.data === "success") {
-                        layer.msg('修改已完成，请F5刷新页面', {
-                            icon: 1
-                            , time: 1000
-                        }, function () {
-                            location.href = '${ctx}/user/setPassword';
-                        });
-                    } else {
-                        return layer.msg('未知错误', {
-                            icon: 5,
-                            anim: 6
-                        });
-                    }
+            if (field.originalClassId == field.currentClassId){
+                return layer.msg("原班号不能与补课班号相同!");
+            }
 
-                }
-            });
+            layer.load(1, {shade: [0.1, '#fff']}); //上传loading
+
+            location.href='${ctx}/toolbox/assistant/exportAssistantMissLessonTable?sync='+field.sync + '&studentName='+field.studentName+'&originalCampus='+field.originalCampus
+                    +'&currentCampus='+ field.currentCampus+'&originalClassId='+ field.originalClassId+'&currentClassId='+ field.currentClassId+'&date='+ field.date
+            ;
+            layer.closeAll('loading'); //关闭loading
 
         });
         //=========================================================//

@@ -65,7 +65,7 @@ public class AssistantAdminController extends AbstractController {
     }
 
     /**
-     * 重定向到编辑助教权限iframe子页面并返回相应model
+     * 重定向到编辑助教iframe子页面并返回相应model
      *
      * @param model
      * @param assistant 当前要被编辑的助教信息

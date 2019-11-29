@@ -20,6 +20,7 @@
         <result column="student_sex" property="studentSex" jdbcType="VARCHAR"/>
         <result column="student_phone" property="studentPhone" jdbcType="VARCHAR"/>
         <result column="student_phone_backup" property="studentPhoneBackup" jdbcType="VARCHAR"/>
+        <result column="student_school" property="studentSchool" jdbcType="VARCHAR"/>
         <result column="class_id" property="classId" jdbcType="BIGINT"/>
         <result column="class_name" property="className" jdbcType="VARCHAR"/>
         <result column="class_campus" property="classCampus" jdbcType="VARCHAR"/>
@@ -36,6 +37,10 @@
         <result column="classroom" property="classroom" jdbcType="VARCHAR"/>
         <result column="register_time" property="registerTime" jdbcType="TIMESTAMP"/>
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="StudentAndClassDetailedWithSubjectsResultMap" type="com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto" extends="StudentAndClassDetailedResultMap">
+
     </resultMap>
 
     <insert id="insertStudentAndClass" parameterType="com.jzy.model.dto.StudentAndClassDetailedDto">
@@ -111,7 +116,7 @@
     <select id="listStudentAndClasses" resultMap="StudentAndClassDetailedResultMap"
             parameterType="com.jzy.model.dto.StudentAndClassSearchCondition">
         select sc.id, sc.create_time, sc.update_time,sc.register_time,sc.remark,
-          s.student_id,s.student_name,s.student_sex,s.student_phone,s.student_phone_backup,
+          s.student_id,s.student_name,s.student_sex,s.student_phone,s.student_phone_backup,s.student_school,
           class_tmp.class_id,class_tmp.class_name,class_tmp.class_campus,class_tmp.class_grade,class_tmp.class_subject,
         class_tmp.class_type,class_tmp.class_year,class_tmp.class_season,class_tmp.class_time,class_tmp.class_simplified_time,
         class_tmp.class_times,class_tmp.assistant_name,class_tmp.teacher_name,class_tmp.classroom
@@ -247,6 +252,30 @@
     </select>
     <select id="getStudentAndClassById" resultMap="BaseResultMap">
         select * from student_class where id=#{id}
+    </select>
+    <select id="listStudentAndClassesByClassId" resultMap="StudentAndClassDetailedWithSubjectsResultMap">
+        select sc.id, sc.create_time, sc.update_time,sc.register_time,sc.remark,
+        s.student_id,s.student_name,s.student_sex,s.student_phone,s.student_phone_backup,s.student_school,
+        class_tmp.class_id,class_tmp.class_name,class_tmp.class_campus,class_tmp.class_grade,class_tmp.class_subject,
+        class_tmp.class_type,class_tmp.class_year,class_tmp.class_season,class_tmp.class_time,class_tmp.class_simplified_time,
+        class_tmp.class_times,class_tmp.assistant_name,class_tmp.teacher_name,class_tmp.classroom,class_tmp.class_teacher_requirement
+        from (select c.*, a.assistant_name as assistant_name, t.teacher_name as teacher_name
+        from class c left join assistant a on c.class_assistant_id = a.id left join teacher t on c.class_teacher_id = t.id
+        where c.class_id=#{classId}) as class_tmp, student_class sc, student s where sc.class_id=class_tmp.id and sc.student_id=s.id
+        order by sc.register_time asc
+    </select>
+    <select id="listStudentAndClassesWithSubjectsByStudentId"
+            resultMap="StudentAndClassDetailedResultMap" parameterType="com.jzy.model.dto.StudentAndClassSearchCondition">
+        select sc.id, sc.create_time, sc.update_time,sc.register_time,sc.remark,
+        s.student_id,s.student_name,s.student_sex,s.student_phone,s.student_phone_backup,s.student_school,
+        c.class_id,c.class_name,c.class_campus,c.class_grade,c.class_subject,
+        c.class_type,c.class_year,c.class_season,c.class_time,c.class_simplified_time,
+        c.class_times,c.classroom,c.class_teacher_requirement
+        from class c, student_class sc, student s
+        <where>
+            sc.class_id=c.id and sc.student_id=s.id
+            and s.student_id=#{studentId} and c.class_year=#{classYear} and c.class_season=#{classSeason}
+        </where>
     </select>
 
 </mapper>

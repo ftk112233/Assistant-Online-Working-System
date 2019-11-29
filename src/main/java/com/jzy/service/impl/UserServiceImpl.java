@@ -47,6 +47,11 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     }
 
     @Override
+    public List<User> listAllUsers() {
+        return userMapper.listAllUsers();
+    }
+
+    @Override
     public User getUserByName(String userName) {
         return StringUtils.isEmpty(userName) ? null : userMapper.getUserByName(userName);
     }
@@ -333,6 +338,17 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             user.setUserWorkId(null);
         }
 
+        return insertUserWithUnrepeateWorkId(user);
+    }
+
+
+    /**
+     * 插入工号不重复的用户信息
+     *
+     * @param user
+     * @return
+     */
+    private  String insertUserWithUnrepeateWorkId(User user) {
         if (!StringUtils.isEmpty(user.getUserIdCard())) {
             //新身份证不为空
             if (getUserByIdCard(user.getUserIdCard()) != null) {
@@ -418,7 +434,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         if (originalUser == null) {
             //插入
-            insertUser(user);
+            insertUserWithUnrepeateWorkId(user);
         }
         return Constants.SUCCESS;
     }

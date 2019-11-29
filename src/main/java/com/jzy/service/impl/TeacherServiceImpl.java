@@ -48,15 +48,25 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
 
     @Override
     public String insertTeacher(Teacher teacher) {
+        if (getTeacherByName(teacher.getTeacherName()) != null) {
+            //添加的姓名已存在
+            return "nameRepeat";
+        }
+
+        return insertTeacherWithUnrepeatedName(teacher);
+    }
+
+    /**
+     * 插入姓名不重复的教师信息
+     *
+     * @param teacher
+     * @return
+     */
+    private  String insertTeacherWithUnrepeatedName(Teacher teacher) {
         //新工号不为空
         if (getTeacherByWorkId(teacher.getTeacherWorkId()) != null) {
             //添加的工号已存在
             return "workIdRepeat";
-        }
-
-        if (getTeacherByName(teacher.getTeacherName()) != null) {
-            //添加的姓名已存在
-            return "nameRepeat";
         }
 
         if (StringUtils.isEmpty(teacher.getTeacherSex())) {
@@ -112,7 +122,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
          * 由于目前版本从表格只能读取教师姓名字段，所以不用工号做重名校验。只要当前名字不存在，即插入
          */
         if (getTeacherByName(teacher.getTeacherName()) == null) {
-            insertTeacher(teacher);
+            insertTeacherWithUnrepeatedName(teacher);
         }
 
         return Constants.SUCCESS;

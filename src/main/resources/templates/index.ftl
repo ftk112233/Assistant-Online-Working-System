@@ -67,7 +67,7 @@
                         <dd style="text-align: center;"><a href="${ctx}/logout">退出</a></dd>
                     </dl>
                 </li>
-                <#--TODO-->
+            <#--TODO-->
                 <li class="layui-nav-item layui-hide-xs" lay-unselect>
                     <a href="javascript:;" layadmin-event="about"><i
                             class="layui-icon layui-icon-more-vertical"></i></a>
@@ -94,10 +94,10 @@
                                 <a lay-href="${ctx}/console">控制台</a>
                             </dd>
                             <dd data-name="console">
-                                <a lay-href="home/homepage1.html">主页一</a>
+                                <a lay-href="${ctx}/comingSoon">可视化</a>
                             </dd>
                             <dd data-name="console">
-                                <a lay-href="home/homepage2.html">主页二</a>
+                                <a lay-href="${ctx}/problemCollection">问题收集</a>
                             </dd>
                         </dl>
                     </li>
@@ -138,15 +138,19 @@
                             <dd data-name="grid">
                                 <a href="javascript:;">学管</a>
                                 <dl class="layui-nav-child">
-                                    <dd data-name="mobile"><a lay-href="${ctx}/toolbox/assistantAdministrator/infoImport">信息导入</a></dd>
-                                    <dd data-name="mobile"><a lay-href="component/grid/mobile.html">表格模板导入</a></dd>
+                                    <dd data-name="mobile"><a
+                                            lay-href="${ctx}/toolbox/assistantAdministrator/infoImport">信息导入</a></dd>
+                                    <dd data-name="mobile"><a
+                                            lay-href="${ctx}/toolbox/assistantAdministrator/templateImport">表格模板导入</a>
+                                    </dd>
                                 </dl>
                             </dd>
                             <dd data-name="laydate">
                                 <a href="javascript:;">助教</a>
                                 <dl class="layui-nav-child">
                                     <dd data-name="demo1">
-                                        <a lay-href="${ctx}/toolbox/assistant/startClassExcel" lay-text="开班做表魔法">开班做表魔法</a>
+                                        <a lay-href="${ctx}/toolbox/assistant/startClassExcel"
+                                           lay-text="开班做表魔法">开班做表魔法</a>
                                     </dd>
                                     <dd data-name="demo2">
                                         <a lay-href="${ctx}/toolbox/assistant/missLessonStudentExcel" lay-text="开补课单魔法">开补课单魔法</a>
@@ -174,6 +178,9 @@
                                 <a href="javascript:;">系统设置</a>
                                 <dl class="layui-nav-child">
                                     <dd><a lay-href="${ctx}/permission/admin/page">权限管理</a></dd>
+                                </dl>
+                                <dl class="layui-nav-child">
+                                    <dd><a lay-href="${ctx}/system/announcement">公告推送</a></dd>
                                 </dl>
                             </dd>
                         </dl>
@@ -225,19 +232,31 @@
         base: '${ctx}/plugins/layuiadmin/' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use('index');
+    }).use(['index', 'user', 'upload', 'laydate'], function () {
+        var $ = layui.$
+                , admin = layui.admin
+                , form = layui.form
+                , table = layui.table
+                , laypage = layui.laypage
+                , laytpl = layui.laytpl
+                , upload = layui.upload
+                , laydate = layui.laydate;
+
+        <#--console.log('${announcement}')-->
+        <#if announcement.read == false>
+            layer.open({
+                type: 1,
+                skin: 'layui-layer-rim', //加上边框
+                area: ['${announcement.width!""}', '${announcement.height!""}'], //宽高
+                title: ['${announcement.parsedTitle!""}', 'color:#393D49;background-color:#01AAED;'],
+                content: '${announcement.parsedContent!""}'
+            });
+        </#if>
+
+    });
+
 </script>
 
-<!-- 百度统计 -->
-<script>
-    var _hmt = _hmt || [];
-    (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?d214947968792b839fd669a4decaaffc";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-    })();
-</script>
 </body>
 </html>
 

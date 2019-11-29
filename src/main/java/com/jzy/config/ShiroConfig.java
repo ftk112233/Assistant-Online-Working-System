@@ -77,6 +77,7 @@ public class ShiroConfig {
         /**
          * 允许未登录下的访问路径
          */
+        filterChainDefinitionMap.put("/comingSoon", "anon"); //comingSoon
         filterChainDefinitionMap.put("/400", "anon"); //400
         filterChainDefinitionMap.put("/404", "anon"); //404
         filterChainDefinitionMap.put("/500", "anon"); //500
@@ -116,9 +117,19 @@ public class ShiroConfig {
         permissions.put("/studentAndClass/admin/insert*", "perms[studentAndClass:admin:insert]"); //添加学员上课信息的权限，助教长以上级别才有
         permissions.put("/studentAndClass/admin/delete*", "perms[studentAndClass:admin:delete]"); //删除学员上课信息的权限，助教长以上级别才有
         permissions.put("/studentAndClass/admin/import*", "perms[studentAndClass:admin:import]"); //excel导入学员上课信息的权限，助教长以上级别才有
+        permissions.put("/student/admin/update*", "perms[student:admin:update]"); //编辑学员个人信息的权限，助教长以上级别才有
+        permissions.put("/student/admin/insert*", "perms[student:admin:insert]"); //添加学员个人信息的权限，助教长以上级别才有
+        permissions.put("/student/admin/delete*", "perms[student:admin:delete]"); //删除学员个人信息的权限，助教长以上级别才有
+        permissions.put("/student/admin/import*", "perms[student:admin:import]"); //excel导入学员个人信息的权限，助教长以上级别才有
+        permissions.put("/missLessonStudent/admin/update*", "perms[missLessonStudent:admin:update]"); //编辑补课学员信息的权限，助教长以上级别才有
+        permissions.put("/missLessonStudent/admin/insert*", "perms[missLessonStudent:admin:insert]"); //添加补课学员信息的权限，助教长以上级别才有
+        permissions.put("/missLessonStudent/admin/delete*", "perms[missLessonStudent:admin:delete]"); //删除补课学员信息的权限，助教长以上级别才有
+        permissions.put("/missLessonStudent/admin/import*", "perms[missLessonStudent:admin:import]"); //excel导入补课学员信息的权限，助教长以上级别才有
 
-        permissions.put("/toolbox/assistant/**", "perms[toolbox:assistant]"); //百宝箱助教区的权限，助教以上级别才有
+        permissions.put("/toolbox/assistant/**", "perms[toolbox:assistant]"); //百宝箱助教区的权限，教师助教以上级别才有
         permissions.put("/toolbox/assistantAdministrator/**", "perms[toolbox:assistantAdministrator]"); //百宝箱学管区的权限，助教长以上级别才有
+
+        permissions.put("/system/**", "perms[system:admin]"); //推送公告等系统设置，只能管理员
 
         filterChainDefinitionMap.putAll(permissions);
 

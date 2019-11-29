@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>学生上课管理-新东方优能中学助教工作平台</title>
+    <title>学生个人信息管理-新东方优能中学助教工作平台</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport"
@@ -139,8 +139,10 @@
                 , {field: 'updateTime', title: '更新时间', sort: true, hide: true}
                 , {field: 'studentId', title: '学员号', width: 180, sort: true}
                 , {field: 'studentName', title: '学员姓名', width: 180, sort: true}
+                , {field: 'studentSex', title: '性别', width: 80, sort: true}
                 , {field: 'studentPhone', title: '手机', width: 120}
-                , {field: 'studentPhone', title: '备用手机', width: 120}
+                , {field: 'studentPhoneBackup', title: '备用手机', width: 120}
+                , {field: 'studentSchool', title: '学校', sort: true}
                 , {field: 'studentRemark', title: '备注'}
                 , {title: '操作', minWidth: 150, align: 'center', fixed: 'right', toolbar: '#table-content-list1'}
             ]]
@@ -181,6 +183,10 @@
                 url: '${ctx}/student/admin/getStudentInfo' //向后端默认传page和limit
                 , where: { //设定异步数据接口的额外参数，任意设
                     studentId : field.studentId
+                    , studentName : field.studentName
+                    , studentSex : field.sex
+                    , studentPhone : field.studentPhone
+                    , studentSchool : field.school
                     , condition1: field.condition1
                     , condition2: field.condition2
                 }
@@ -211,8 +217,8 @@
                     //执行 Ajax 后重载
                     $.ajax({
                         type: 'post',
-                        data: {studentAndClasses: JSON.stringify(checkData)},
-                        url: "${ctx}/studentAndClass/admin/deleteMany",
+                        data: {students: JSON.stringify(checkData)},
+                        url: "${ctx}/student/admin/deleteMany",
                         beforeSend: function (data) {
                             layer.load(1, {shade: [0.1, '#fff']}); //上传loading
                         }
@@ -221,17 +227,12 @@
                             if (data.data === "success") {
                                 layer.msg('已删除');
                                 table.reload('studentTable', {
-                                    url: '${ctx}/studentAndClass/admin/getStudentAndClassInfo' //向后端默认传page和limit); //重载表格
+                                    url: '${ctx}/student/admin/getStudentInfo' //向后端默认传page和limit); //重载表格
                                     , request: {
                                         pageName: 'pageNum',
                                         limitName: 'pageSize'  //如不配置，默认为page=1&limit=10
                                     }
                                     , where: {
-                                        classYear: '${currentYear!""}'
-                                        , classSeason: '${currentSeason!""}'
-                                        ,classId: '${classId!""}'
-                                        , condition1: 'registerTime'
-                                        , condition2: 'asc'
                                     }
                                     , page: {
                                         curr: 1 //重新从第 1 页开始
@@ -249,8 +250,8 @@
             add: function () {
                 var index = layer.open({
                     type: 2
-                    , title: '新建报班'
-                    , content: '${ctx}/studentAndClass/admin/insertForm'
+                    , title: '添加学生'
+                    , content: '${ctx}/student/admin/updateForm'
                     , maxmin: true
                     , btn: ['确定', '取消']
                     , yes: function (index, layero) {
@@ -262,18 +263,20 @@
                             var field = data.field; //获取提交的字段
                             // var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
                             var json = {
-                                    studentId: field.studentId
-                                    , classId: field.classId
-                                    , currentTime: field.currentTime
-                                    , registerTime: field.registerTime
-                                    , remark: field.remark
+                                studentId: field.studentId
+                                , studentName: field.studentName
+                                , studentSex: field.sex
+                                , studentPhone: field.studentPhone
+                                , studentPhoneBackup: field.studentPhoneBackup
+                                , studentSchool: field.school
+                                , studentRemark: field.remark
                             };
 
                             //提交 Ajax 成功后，关闭当前弹层并重载表格
                             $.ajax({
                                 data: json,
                                 type: 'post',
-                                url: "${ctx}/studentAndClass/admin/insert",
+                                url: "${ctx}/student/admin/insert",
                                 beforeSend: function (data) {
                                     layer.load(1, {shade: [0.1, '#fff']}); //上传loading
                                 }
@@ -286,12 +289,8 @@
                                         });
 
                                         layer.close(index); //再执行关闭
-                                    } else if (data.data === "studentNotExist") {
-                                        return layer.msg('对不起，该学员不存在！');
-                                    } else if (data.data === "classNotExist") {
-                                        return layer.msg('对不起，该班级不存在！');
-                                    } else if (data.data === "studentAndClassExist") {
-                                        return layer.msg('对不起，该上课记录已存在！');
+                                    }  else if (data.data === "studentIdRepeat") {
+                                        return layer.msg('该学员号已存在！');
                                     } else {
                                         return layer.msg('无法完成操作');
                                     }
@@ -317,12 +316,12 @@
         table.on('tool(LAY-app-content-comm)', function (obj) {
             var data = obj.data;
             if (obj.event === 'del') {
-                layer.confirm('确定删除此学员上课记录吗？', function (index) {
+                layer.confirm('确定删除此学员记录吗？删除此学生将会删除学生的所有上课记录', function (index) {
                     //提交删除ajax
                     $.ajax({
                         data: data,
                         type: 'post',
-                        url: "${ctx}/studentAndClass/admin/deleteOne",
+                        url: "${ctx}/student/admin/deleteOne",
                         beforeSend: function (data) {
                             layer.load(1, {shade: [0.1, '#fff']}); //上传loading
                         }
@@ -347,9 +346,9 @@
                 var index = layer.open({
                     type: 2
                     ,
-                    title: '编辑学员上课信息'
+                    title: '编辑学生'
                     ,
-                    content: '${ctx}/studentAndClass/admin/updateForm?id=' + data.id+'&classId='+data.classId
+                    content: '${ctx}/student/admin/updateForm?id=' + data.id
                     ,
                     maxmin: true
                     ,
@@ -365,17 +364,19 @@
                             var json = {
                                 id: field.id
                                 , studentId: field.studentId
-                                , classId: field.classId
-                                , currentTime: field.currentTime
-                                , registerTime: field.registerTime
-                                , remark: field.remark
+                                , studentName: field.studentName
+                                , studentSex: field.sex
+                                , studentPhone: field.studentPhone
+                                , studentPhoneBackup: field.studentPhoneBackup
+                                , studentSchool: field.school
+                                , studentRemark: field.remark
                             };
 
 
                             $.ajax({
                                 data: json,
                                 type: 'post',
-                                url: "${ctx}/studentAndClass/admin/updateById",
+                                url: "${ctx}/student/admin/updateById",
                                 beforeSend: function (data) {
                                     layer.load(1, {shade: [0.1, '#fff']}); //上传loading
                                 }
@@ -392,13 +393,9 @@
                                         form.render();
 
                                         layer.close(index); //关闭弹层
-                                    } else if (data.data === "studentNotExist") {
-                                        return layer.msg('对不起，该学员不存在！');
-                                    } else if (data.data === "classNotExist") {
-                                        return layer.msg('对不起，该班级不存在！');
-                                    } else if (data.data === "studentAndClassExist") {
-                                        return layer.msg('对不起，该上课记录已存在！');
-                                    }  else {
+                                    } else if (data.data === "studentIdRepeat") {
+                                        return layer.msg('该学员号已存在！');
+                                    } else {
                                         return layer.msg('无法完成操作');
                                     }
                                 }
@@ -416,8 +413,12 @@
                         othis.find('input[name="id"]').val(data.id);
                         othis.find('input[name="studentId"]').val(data.studentId);
                         othis.find('input[name="studentName"]').val(data.studentName);
-                        othis.find('input[name="registerTime"]').val(data.registerTime);
-                        othis.find('textarea[name="remark"]').val(data.remark);
+                        othis.find('input[name="sex"][value="男"]').attr("checked", data.studentSex === '男');
+                        othis.find('input[name="sex"][value="女"]').attr("checked", data.studentSex === '女');
+                        othis.find('input[name="studentPhone"]').val(data.studentPhone);
+                        othis.find('input[name="studentPhoneBackup"]').val(data.studentPhoneBackup);
+                        othis.find('input[name="school"]').val(data.studentSchool);
+                        othis.find('textarea[name="remark"]').val(data.studentRemark);
                     }
                 });
                 layer.full(index);

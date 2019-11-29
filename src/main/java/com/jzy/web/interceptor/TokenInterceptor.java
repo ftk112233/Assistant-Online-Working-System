@@ -8,7 +8,6 @@ package com.jzy.web.interceptor;
  * @Version 1.0
  **/
 
-import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 

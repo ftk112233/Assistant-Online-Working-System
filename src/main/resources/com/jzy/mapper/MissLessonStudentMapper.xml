@@ -17,5 +17,291 @@
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
     </resultMap>
 
+    <resultMap id="MissLessonStudentDetailedResultMap" type="com.jzy.model.dto.MissLessonStudentDetailedDto"
+               extends="BaseColumnResultMap">
+        <result column="student_id" property="studentId" jdbcType="VARCHAR"/>
+        <result column="student_name" property="studentName" jdbcType="VARCHAR"/>
+        <result column="student_phone" property="studentPhone" jdbcType="VARCHAR"/>
+        <result column="original_class_id" property="originalClassId" jdbcType="VARCHAR"/>
+        <result column="original_class_name" property="originalClassName" jdbcType="VARCHAR"/>
+        <result column="original_classroom" property="originalClassroom" jdbcType="VARCHAR"/>
+        <result column="original_class_time" property="originalClassTime" jdbcType="VARCHAR"/>
+        <result column="original_class_simplified_time" property="originalClassSimplifiedTime" jdbcType="VARCHAR"/>
+        <result column="original_assistant_name" property="originalAssistantName" jdbcType="VARCHAR"/>
+        <result column="original_teacher_name" property="originalTeacherName" jdbcType="VARCHAR"/>
+        <result column="current_class_id" property="currentClassId" jdbcType="VARCHAR"/>
+        <result column="current_class_name" property="currentClassName" jdbcType="VARCHAR"/>
+        <result column="current_classroom" property="currentClassroom" jdbcType="VARCHAR"/>
+        <result column="current_class_time" property="currentClassTime" jdbcType="VARCHAR"/>
+        <result column="current_class_simplified_time" property="currentClassSimplifiedTime" jdbcType="VARCHAR"/>
+        <result column="current_class_grade" property="currentClassGrade" jdbcType="VARCHAR"/>
+        <result column="current_class_subject" property="currentClassSubject" jdbcType="VARCHAR"/>
+        <result column="current_assistant_name" property="currentAssistantName" jdbcType="VARCHAR"/>
+        <result column="current_teacher_name" property="currentTeacherName" jdbcType="VARCHAR"/>
+        <result column="date" property="date" jdbcType="DATE"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+    <insert id="insertMissLessonStudent" parameterType="com.jzy.model.dto.MissLessonStudentDetailedDto">
+        insert into miss_lesson_student
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="studentId != null and studentId!=''">
+                student_id,
+            </if>
+            <if test="studentName != null and studentName!=''" >
+                student_name,
+            </if>
+            <if test="studentPhone != null and studentPhone!=''" >
+                student_phone,
+            </if>
+            <if test="originalClassId != null and originalClassId!=''" >
+                original_class_id,
+            </if>
+            <if test="currentClassId != null and currentClassId!=''" >
+                current_class_id,
+            </if>
+            <if test="date != null" >
+                date,
+            </if>
+            <if test="remark != null and remark!=''" >
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="studentId != null and studentId!=''">
+                #{studentId},
+            </if>
+            <if test="studentName != null and studentName!=''" >
+                #{studentName},
+            </if>
+            <if test="studentPhone != null and studentPhone!=''" >
+                #{studentPhone},
+            </if>
+            <if test="originalClassId != null and originalClassId!=''" >
+                (select id from class where class_id=#{originalClassId,jdbcType=VARCHAR}),
+            </if>
+            <if test="currentClassId != null and currentClassId!=''" >
+                (select id from class where class_id=#{currentClassId,jdbcType=VARCHAR}),
+            </if>
+            <if test="date != null" >
+                #{date},
+            </if>
+            <if test="remark != null and remark!=''" >
+                #{remark},
+            </if>
+        </trim>
+    </insert>
+    <update id="missLessonStudentDetailedDto" parameterType="com.jzy.model.dto.MissLessonStudentDetailedDto">
+        update miss_lesson_student m
+        <set>
+            m.student_id = #{studentId,jdbcType=VARCHAR},
+            <if test="studentName != null  and studentName!=''">
+                m.student_name = #{studentName,jdbcType=VARCHAR},
+            </if>
+            m.student_phone = #{studentPhone,jdbcType=VARCHAR},
+            <if test="originalClassId != null  and originalClassId!=''">
+                m.original_class_id = (select id from class where class_id=#{originalClassId,jdbcType=VARCHAR}),
+            </if>
+            <if test="currentClassId != null  and currentClassId!=''">
+                m.current_class_id = (select id from class where class_id=#{currentClassId,jdbcType=VARCHAR}),
+            </if>
+            m.date=#{date,jdbcType=DATE},
+            m.remark = #{remark,jdbcType=VARCHAR},
+        </set>
+        where m.id = #{id}
+    </update>
+    <delete id="deleteOneMissLessonStudentById">
+        delete from miss_lesson_student where id=#{id}
+    </delete>
+    <delete id="deleteManyMissLessonStudentsByIds">
+        delete from miss_lesson_student where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="listMissLessonStudents" resultMap="MissLessonStudentDetailedResultMap"
+            parameterType="com.jzy.model.dto.MissLessonStudentSearchCondition">
+        select tmp.*, a1.assistant_name as original_assistant_name, t1.teacher_name as original_teacher_name,
+        a2.assistant_name as current_assistant_name, t2.teacher_name as current_teacher_name
+        from (select m_l_s.id, m_l_s.create_time,
+        m_l_s.update_time,m_l_s.student_id,m_l_s.student_name,m_l_s.student_phone,m_l_s.date,m_l_s.remark
+        , c1.class_id as original_class_id,c1.class_name as original_class_name,c1.classroom as original_classroom,
+        c1.class_time as original_class_time
+        , c1.class_simplified_time as original_class_simplified_time, c1.class_teacher_id as original_teacher_id,
+        c1.class_assistant_id as original_assistant_id
+        ,c2.class_id as current_class_id,c2.class_name as current_class_name,c2.classroom as current_classroom,
+        c2.class_time as current_class_time
+        , c2.class_simplified_time as current_class_simplified_time,c2.class_grade as current_class_grade,c2.class_subject as current_class_subject
+        ,c2.class_teacher_id as current_teacher_id,c2.class_assistant_id as current_assistant_id
+        from miss_lesson_student m_l_s, class c1, class c2
+        <where>
+            m_l_s.original_class_id=c1.id and m_l_s.current_class_id=c2.id
+            <if test="studentId != null and studentId!=''">
+                <bind name="studentIdLike" value=" '%' + studentId + '%' "/>
+                and m_l_s.studnent_id like #{studentIdLike}
+            </if>
+            <if test="studentName != null and studentName!=''">
+                <bind name="studentNameLike" value=" '%' + studentName + '%' "/>
+                and m_l_s.student_name like #{studentNameLike}
+            </if>
+            <if test="date != null">
+                and m_l_s.date=#{date}
+            </if>
+            <if test="originalClassId != null and originalClassId!=''">
+                <bind name="originalClassIdLike" value=" '%' + originalClassId + '%' "/>
+                and c1.class_id like #{originalClassIdLike}
+            </if>
+            <if test="originalClassName != null and originalClassName!=''">
+                <bind name="originalClassNameLike" value=" '%' + originalClassName + '%' "/>
+                and c1.class_name like #{originalClassNameLike}
+            </if>
+            <if test="currentClassId != null and currentClassId!=''">
+                <bind name="currentClassIdLike" value=" '%' + currentClassId + '%' "/>
+                and c2.class_id like #{currentClassIdLike}
+            </if>
+            <if test="currentClassName != null and currentClassName!=''">
+                <bind name="currentClassNameLike" value=" '%' + currentClassName + '%' "/>
+                and c2.class_name like #{currentClassNameLike}
+            </if>
+        </where>) tmp
+        left join assistant a1 on tmp.original_assistant_id = a1.id left join teacher t1 on tmp.original_teacher_id =
+        t1.id
+        left join assistant a2 on tmp.current_assistant_id = a2.id left join teacher t2 on tmp.current_teacher_id =
+        t2.id
+        <where>
+            <if test="originalAssistantWorkId != null and originalAssistantWorkId!=''">
+                <bind name="originalAssistantWorkIdLike" value=" '%' + originalAssistantWorkId + '%' "/>
+                and a1.assistant_work_id like #{originalAssistantWorkIdLike}
+            </if>
+            <if test="originalAssistantName != null and originalAssistantName!=''">
+                <bind name="originalAssistantNameLike" value=" '%' + originalAssistantName + '%' "/>
+                and a1.assistant_name like #{originalAssistantNameLike}
+            </if>
+            <if test="originalTeacherWorkId != null and originalTeacherWorkId!=''">
+                <bind name="originalTeacherWorkIdLike" value=" '%' + originalTeacherWorkId + '%' "/>
+                and t1.teacher_work_id like #{originalTeacherWorkIdLike}
+            </if>
+            <if test="originalTeacherName != null and originalTeacherName!=''">
+                <bind name="originalTeacherNameLike" value=" '%' + originalTeacherName + '%' "/>
+                and t1.teacher_name like #{originalTeacherNameLike}
+            </if>
+            <if test="currentAssistantWorkId != null and currentAssistantWorkId!=''">
+                <bind name="currentAssistantWorkIdLike" value=" '%' + currentAssistantWorkId + '%' "/>
+                and a2.assistant_work_id like #{currentAssistantWorkIdLike}
+            </if>
+            <if test="currentAssistantName != null and currentAssistantName!=''">
+                <bind name="currentAssistantNameLike" value=" '%' + currentAssistantName + '%' "/>
+                and a2.assistant_name like #{currentAssistantNameLike}
+            </if>
+            <if test="currentTeacherWorkId != null and currentTeacherWorkId!=''">
+                <bind name="currentTeacherWorkIdLike" value=" '%' + currentTeacherWorkId + '%' "/>
+                and t2.teacher_work_id like #{currentTeacherWorkIdLike}
+            </if>
+            <if test="currentTeacherName != null and currentTeacherName!=''">
+                <bind name="currentTeacherNameLike" value=" '%' + currentTeacherName + '%' "/>
+                and t2.teacher_name like #{currentTeacherNameLike}
+            </if>
+        </where>
+        <if test="condition1 == 'studentId'">
+            order by tmp.student_id
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'studentName'">
+            order by tmp.student_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'originalClassId'">
+            order by tmp.original_class_id
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'currentClassId'">
+            order by tmp.current_class_id
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'originalClassName'">
+            order by tmp.original_class_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'currentClassName'">
+            order by tmp.current_class_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'date'">
+            order by tmp.date
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'originalAssistantName'">
+            order by a1.assistant_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'currentAssistantName'">
+            order by a2.assistant_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'originalTeacherName'">
+            order by t1.teacher_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'currentTeacherName'">
+            order by t2.teacher_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+    </select>
+
 
 </mapper>

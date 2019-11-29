@@ -60,4 +60,27 @@ public interface StudentMapper {
      * @return
      */
     List<Student> listStudents(StudentSearchCondition condition);
+
+    /**
+     * 修改学生信息由id修改
+     *
+     * @param student 修改后的学生信息
+     * @return
+     */
+    void updateStudentInfo(Student student);
+
+    /**
+     * 删除一个学生，根据学生id
+     *
+     * @param id 被删除学生的id
+     * @return
+     */
+    void deleteOneStudentById(Long id);
+
+    /**
+     * 根据id删除多个学生
+     *
+     * @param ids 学生id的列表
+     */
+    void deleteManyStudentsByIds(List<Long> ids);
 }

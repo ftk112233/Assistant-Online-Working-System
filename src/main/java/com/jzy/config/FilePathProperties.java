@@ -1,6 +1,7 @@
 package com.jzy.config;
 
 import com.jzy.manager.util.FileUtils;
+import com.jzy.model.CampusEnum;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +34,9 @@ public class FilePathProperties {
     @Value("${toolbox.example.directory}")
     private String toolboxExampleDirectory;
 
+    @Value("${toolbox.template.directory}")
+    private String toolboxTemplateDirectory;
+
     /**
      * 返回用户上传头像所存储目录
      *
@@ -43,7 +47,7 @@ public class FilePathProperties {
     }
 
     /**
-     * 工具箱上传表格实例的目录
+     * 工具箱上传表格示例的目录
      *
      * @return
      */
@@ -52,11 +56,47 @@ public class FilePathProperties {
     }
 
     /**
-     * 工具箱上传表格实例的全路径，根据key确定具体文件
+     * 工具箱上传表格示例的全路径，根据key确定具体文件
      *
      * @return
      */
     public String getToolboxExamplePathAndNameByKey(Integer key) {
-        return getToolboxExamplePath()+FileUtils.FILE_NAMES.get(key);
+        return getToolboxExamplePath()+FileUtils.EXAMPLES.get(key);
+    }
+
+    /**
+     * 工具箱表格模板的目录
+     *
+     * @return
+     */
+    public String getToolboxTemplatePath() {
+        return root+ SEPARATOR +toolboxDirectory+ SEPARATOR +toolboxTemplateDirectory+ SEPARATOR;
+    }
+
+    /**
+     * 工具箱指定校区的助教工作手册模板的目录
+     *
+     * @return
+     */
+    public String getToolboxAssistantTutorialTemplatePathAndName(String campus) {
+        return getToolboxTemplatePath()+CampusEnum.getCampusEnumByNameString(campus)+SEPARATOR+FileUtils.TEMPLATES.get(1);
+    }
+
+    /**
+     * 工具箱指定校区的座位表模板的目录
+     *
+     * @return
+     */
+    public String getToolboxSeatTableTemplatePathAndName(String campus) {
+        return getToolboxTemplatePath()+CampusEnum.getCampusEnumByNameString(campus)+SEPARATOR+FileUtils.TEMPLATES.get(2);
+    }
+
+    /**
+     * 工具箱指定校区的补课单模板的目录
+     *
+     * @return
+     */
+    public String getToolboxMissLessonTemplatePathAndName(String campus) {
+        return getToolboxTemplatePath()+CampusEnum.getCampusEnumByNameString(campus)+SEPARATOR+FileUtils.TEMPLATES.get(3);
     }
 }

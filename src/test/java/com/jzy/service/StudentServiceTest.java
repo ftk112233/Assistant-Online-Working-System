@@ -2,7 +2,7 @@ package com.jzy.service;
 
 import com.jzy.BaseTest;
 import com.jzy.manager.util.FileUtils;
-import com.jzy.model.excel.input.StudentListExcel;
+import com.jzy.model.excel.input.StudentListImportToDatabaseExcel;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,7 +14,7 @@ public class StudentServiceTest extends BaseTest {
 
     @Test
     public void insertAndUpdateStudentsFromExcel() throws Exception {
-        StudentListExcel excel = new StudentListExcel("D:\\aows_resources\\toolbox\\example\\"+FileUtils.FILE_NAMES.get(4));
+        StudentListImportToDatabaseExcel excel = new StudentListImportToDatabaseExcel("D:\\aows_resources\\toolbox\\example\\"+FileUtils.EXAMPLES.get(4));
         excel.readStudentDetailInfoFromExcel();
         studentService.insertAndUpdateStudentsDetailedFromExcel(new ArrayList<>(excel.getStudents()));
     }

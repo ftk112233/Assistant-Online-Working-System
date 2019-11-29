@@ -2,6 +2,7 @@ package com.jzy.config;
 
 import com.jzy.web.interceptor.EmailVerifyCodeInterceptor;
 import com.jzy.web.interceptor.TokenInterceptor;
+import com.jzy.web.interceptor.ToolboxUploadCacheInterceptor;
 import com.jzy.web.interceptor.UpdateSessionUserInfoInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,11 @@ public class SpringmvcConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
+    public ToolboxUploadCacheInterceptor toolboxUploadCacheInterceptor(){
+        return new ToolboxUploadCacheInterceptor();
+    }
+
+    @Bean
     public TokenInterceptor tokenInterceptor(){
         return new TokenInterceptor();
     }
@@ -38,6 +44,10 @@ public class SpringmvcConfig extends WebMvcConfigurerAdapter {
         registry.addInterceptor(updateSessionUserInfoInterceptor())
                 .addPathPatterns("/index").addPathPatterns("/user/setInfo").addPathPatterns("/user/setEmail")
                 .addPathPatterns("/user/setPhone").addPathPatterns("/user/setPassword").addPathPatterns("/user/admin/page"); //拦截项目中的哪些请求
+
+        //ToolboxUploadCacheInterceptor
+        registry.addInterceptor(toolboxUploadCacheInterceptor())
+                .addPathPatterns("/index"); //拦截项目中的哪些请求
 
         //TokenInterceptor
         registry.addInterceptor(tokenInterceptor())

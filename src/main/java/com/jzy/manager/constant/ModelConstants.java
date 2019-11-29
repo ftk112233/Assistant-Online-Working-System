@@ -62,6 +62,11 @@ public class ModelConstants {
     public static final String CLASS_ID_MODEL_KEY="classId";
 
     /**
+     * 通过"开班做表"功能跳转做表页面是，传递的班级校区的model键
+     */
+    public static final String CLASS_CAMPUS_MODEL_KEY="classCampus";
+
+    /**
      * 跳转编辑用户iframe页面时，存放的model键
      */
     public static final String USER_EDIT_MODEL_KEY="userEdit";
@@ -90,5 +95,25 @@ public class ModelConstants {
      * 跳转预览班级iframe页面时，存放的model键
      */
     public static final String CLASS_PREVIEW_MODEL_KEY="classPreview";
+
+    /**
+     * 跳转编辑学生iframe页面时，存放的model键
+     */
+    public static final String STUDENT_EDIT_MODEL_KEY="studentEdit";
+
+    /**
+     * 跳转编辑补课学生iframe页面时，存放的model键
+     */
+    public static final String MISS_LESSON_STUDENT_EDIT_MODEL_KEY="missLessonStudentEdit";
+
+    /**
+     * 跳转系统公告推送页面时，存放的model键
+     */
+    public static final String ANNOUNCEMENT_EDIT_MODEL_KEY="announcementEdit";
+
+    /**
+     * 跳转主页面时，存放的关于公告信息的model键
+     */
+    public static final String ANNOUNCEMENT_MODEL_KEY="announcement";
 
 }

@@ -48,6 +48,11 @@ public class StudentAndClassDetailedDto extends BaseEntity {
     private String studentPhoneBackup;
 
     /**
+     * 学生联系方式（备用）
+     */
+    private String studentSchool;
+
+    /**
      * 班级编码，唯一，非空，2019年新东方优能中学部的班级编码为12位，U6MCFB020001，
      * 其中‘u'表示优能中学部，6表示六年级，M学科，C为班型：志高，F为班级规模：25人，B表示季度，’02‘表示曹杨校区，'0001'为序号。
      * 所以这里另外加年级，学科等字段，以便后续班级编码规则改变系统更新
@@ -118,6 +123,11 @@ public class StudentAndClassDetailedDto extends BaseEntity {
      * 班级上课教室，如：313
      */
     private String classroom;
+
+    /**
+     * 任课教师开课要求，可以为空，长度不超过200
+     */
+    private String classTeacherRequirement;
 
     /**
      * 学生报名进班时间

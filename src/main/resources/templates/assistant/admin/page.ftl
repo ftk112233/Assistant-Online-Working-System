@@ -90,18 +90,6 @@
                 <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #FFB800"
                         id="import-assistant"><i class="layui-icon">&#xe67c;</i>导入助教
                 </button>
-                <i class="layui-icon layui-icon-tips" lay-tips="上传excel要求说明：<br>
-                                                                1、第1行、第2行与导入无关。有效内容从第3行开始，第3行为列名属性：序号、部门、校区、姓名、员工号等......<br>
-                                                                2、第3行所有列名属性中系统将读取以下名称的列导入数据库，这些列的先后顺序无关，但列名称必须与要求相符（如下所示）！！<br>
-                                                                    ====部门、校区、姓名、员工号、身份证号、手机号、备注====<br>
-                                                                3、第四行开始是数据:<br>
-                                                                    1)员工号必须唯一且准确<br>
-                                                                    2)身份证号必须唯一且准确<br>
-                                                                    3)手机号必须唯一且准确<br>
-                                                                    4)确保您当前要导入校区的助教信息表中没有姓名相同的助教，否则请联系系统管理员<br>
-                                                                4、其他：<br>
-                                                                    1)姓名导入助教表中时，对于重名助教会在重名的名字后面加'1'以区别<br>
-                                                                                        "></i>
             </div>
             <table id="assistantTable" lay-filter="LAY-app-content-comm"></table>
             <script type="text/html" id="table-content-list1">

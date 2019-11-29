@@ -55,4 +55,14 @@ public class StudentUtils {
                 && isValidStudentPhoneBackup(student.getStudentPhoneBackup()) && isValidStudentSchool(student.getStudentSchool())
                 && isValidStudentRemark(student.getStudentRemark());
     }
+
+    /**
+     * 输入的student是否合法
+     *
+     * @param student 输入的student对象
+     * @return
+     */
+    public static boolean isValidStudentUpdateInfo(Student student){
+        return isValidStudentInfo(student);
+    }
 }

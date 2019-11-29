@@ -3,6 +3,7 @@ package com.jzy.service;
 import com.github.pagehelper.PageInfo;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.StudentAndClassDetailedDto;
+import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
 import com.jzy.model.dto.StudentAndClassSearchCondition;
 import com.jzy.model.entity.StudentAndClass;
 
@@ -102,4 +103,20 @@ public interface StudentAndClassService {
      * @param ids 学员上课记录id的列表
      */
     void deleteManyStudentAndClassesByIds(List<Long> ids);
+
+    /**
+     * 根据班级编码查询班级的所有学生及班级的详细信息
+     *
+     * @param classId 班级编码
+     * @return
+     */
+    List<StudentAndClassDetailedWithSubjectsDto> listStudentAndClassesByClassId(String classId);
+
+    /**
+     * 根据班级编码查询班级的所有学生及班级的详细信息，包括该学生在当前班级id所解析到的年份、季度下所修读的所有学科
+     *
+     * @param classId 班级编码
+     * @return
+     */
+    List<StudentAndClassDetailedWithSubjectsDto> listStudentAndClassesWithSubjectsByClassId(String classId);
 }

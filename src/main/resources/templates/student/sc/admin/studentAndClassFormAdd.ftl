@@ -111,7 +111,7 @@
         //解析班级编码
         $("#preview-class").click(function () {
             var othis = $(this)
-                    , href = '/class/admin/getPreviewClassInfo?classId=' + $("#classId").val()
+                    , href = '${ctx}/class/admin/getPreviewClassInfo?classId=' + $("#classId").val()
                     , text = "预览班级信息"
                     , router = layui.router();
 

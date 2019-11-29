@@ -792,8 +792,20 @@ public class Excel implements Serializable, Resettable {
     public void submitWrite() throws IOException {
         if (!StringUtils.isEmpty(inputFilePath)) {
             os = new FileOutputStream(new File(inputFilePath));
-            this.workbook.write(os);
+            submitWrite(os);
         }
+    }
+
+
+    /**
+     * 将当前修改保存到输出流
+     *
+     * @param outputStream
+     *            输出流
+     * @throws IOException
+     */
+    public void submitWrite(OutputStream outputStream) throws IOException {
+            this.workbook.write(outputStream);
     }
 
     /**
@@ -805,7 +817,7 @@ public class Excel implements Serializable, Resettable {
      */
     public void submitWrite(String outputPath) throws IOException {
         os = new FileOutputStream(new File(outputPath));
-        this.workbook.write(os);
+        submitWrite(os);
     }
 
     /**

@@ -76,7 +76,7 @@
     </div>
 
     <div class="layui-trans layadmin-user-login-footer">
-        <p>© 2019 <a href="http://kurochan1998.github.io/about/" target="_blank">blog.kurochan.top</a></p>
+        <p>© 2019 <a href="http://kurochan1998.github.io/about/" target="_blank">kurochan.top</a></p>
     </div>
 </div>
 

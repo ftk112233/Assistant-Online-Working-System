@@ -1,6 +1,7 @@
 package com.jzy.dao;
 
 import com.jzy.model.dto.StudentAndClassDetailedDto;
+import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
 import com.jzy.model.dto.StudentAndClassSearchCondition;
 import com.jzy.model.entity.StudentAndClass;
 import org.apache.ibatis.annotations.Param;
@@ -78,4 +79,20 @@ public interface StudentAndClassMapper {
      * @param ids 学员上课记录id的列表
      */
     void deleteManyStudentAndClassesByIds(List<Long> ids);
+
+    /**
+     * 根据班级编码查询班级的所有学生及班级的详细信息
+     *
+     * @param classId 班级编码
+     * @return
+     */
+    List<StudentAndClassDetailedWithSubjectsDto> listStudentAndClassesByClassId(@Param("classId") String classId);
+
+    /**
+     * 根据学员号, 当前年份-季度，查询该学生的所有上课详细信息
+     *
+     * @param condition 学员号, 当前年份-季度等信息
+     * @return
+     */
+    List<StudentAndClassDetailedDto> listStudentAndClassesWithSubjectsByStudentId(StudentAndClassSearchCondition condition);
 }

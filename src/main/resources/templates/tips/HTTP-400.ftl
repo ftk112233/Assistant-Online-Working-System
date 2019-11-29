@@ -20,8 +20,8 @@
                 <span class="layui-anim layui-anim-loop layui-anim-">4</span>
                 <span class="layui-anim layui-anim-loop layui-anim-rotate">0</span>
                 <span class="layui-anim layui-anim-loop layui-anim-">0</span>
-                请求错误
             </h1>
+            请求错误
         </div>
     </div>
 </div>

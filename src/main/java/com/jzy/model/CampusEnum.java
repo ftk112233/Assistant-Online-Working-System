@@ -40,7 +40,9 @@ public enum CampusEnum {
 
     /**
      * <校区名称, 校区所有教室所组成的列表>的键值对
+     * 改用数据库存储
      */
+    @Deprecated
     public static final Map<String, List<String>> CAMPUS_CLASSROOMS = new HashMap<>(CAMPUS_COUNT);
 
     static {
@@ -197,11 +199,12 @@ public enum CampusEnum {
     }
 
     /**
-     * 根据输入的校区名称返回其所有的教师门牌号
+     * 根据输入的校区名称返回其所有的教师门牌号，改用数据库查询
      *
      * @param campusName 校区名称
      * @return
      */
+    @Deprecated
     public static List<String> getClassroomsByCampusName(String campusName){
         return CAMPUS_CLASSROOMS.get(campusName);
     }

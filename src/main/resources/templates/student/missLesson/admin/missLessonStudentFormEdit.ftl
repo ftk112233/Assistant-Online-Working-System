@@ -20,15 +20,29 @@
         <label class="layui-form-label">学员号</label>
         <div class="layui-input-inline">
             <input type="text" name="id" value="" style="display:none;" class="layui-input">
-            <input type="text" name="studentId" value="" class="layui-input" lay-verify="studentId" lay-verType="tips"
+            <input type="text" name="studentId" value="" class="layui-input" lay-verify="missLessonStudentId" lay-verType="tips"
+                   placeholder="请输入">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">学员姓名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="studentName" value="" class="layui-input" lay-verType="tips" lay-verify="studentName"
                    placeholder="请输入">
         </div>
         <div class="layui-form-mid " style="color:red">*必填项</div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">修改所读班级班号</label>
+        <label class="layui-form-label">手机</label>
         <div class="layui-input-inline">
-            <select name="classId" id="classId"  lay-verify="classId" lay-verType="tips" lay-search>
+            <input type="text" name="studentPhone" value="" class="layui-input" lay-verType="tips" lay-verify="studentPhone"
+                   placeholder="请输入">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">原班班号</label>
+        <div class="layui-input-inline">
+            <select name="originalClassId" id="originalClassId"  lay-verify="classId" lay-verType="tips" lay-search>
                 <option value="">请输入或选择班级编码</option>
             </select>
         </div>
@@ -38,17 +52,21 @@
         </button>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">使用当前时间作为进班时间 </label>
+        <label class="layui-form-label">补课班班号</label>
         <div class="layui-input-inline">
-            <input type="checkbox" name="currentTime" lay-skin="switch" lay-text="是|否"
-                   lay-filter="currentTime" checked>
+            <select name="currentClassId" id="currentClassId"  lay-verify="classId" lay-verType="tips" lay-search>
+                <option value="">请输入或选择班级编码</option>
+            </select>
         </div>
+        <div class="layui-form-mid " style="color:red">*必填项</div>
+        <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #1E9FFF"
+                id="preview-class2">预览班级信息
+        </button>
     </div>
-    <div class="layui-form-item" id="div-registerTime" hidden="hidden">
-        <label class="layui-form-label">自定进班时间</label>
+    <div class="layui-form-item">
+        <label class="layui-form-label">补课日期</label>
         <div class="layui-input-inline">
-            <input name="registerTime" id="registerTime" lay-verify="registerTime" lay-verType="tips"
-                   autocomplete="off" class="layui-input" placeholder="yyyy-MM-dd HH:mm:ss">
+            <input type="text" class="layui-input" placeholder="yyyy-MM-dd" id="date" name="date">
         </div>
     </div>
     <div class="layui-form-item">
@@ -83,35 +101,34 @@
                 , laydate = layui.laydate;
 
         laydate.render({
-            elem: '#registerTime'
-            ,type: 'datetime'
+            elem: '#date'
+            , type: 'date'
         });
+
 
         var classIds = eval('(' + '${classIds}' + ')');
         for (var i = 0; i < classIds.length; i++) {
             var json = classIds[i];
             var str = "";
             str += '<option value="' + json + '">' + json + '</option>';
-            $("#classId").append(str);
+            $("#originalClassId").append(str);
         }
+        $("#originalClassId").val('${missLessonStudentEdit.originalClassId}');
 
-        form.render();
+        for (var i = 0; i < classIds.length; i++) {
+            var json = classIds[i];
+            var str = "";
+            str += '<option value="' + json + '">' + json + '</option>';
+            $("#currentClassId").append(str);
+        }
+        $("#currentClassId").val('${missLessonStudentEdit.currentClassId}');
 
-        //监听自动解析开关
-        form.on('switch(currentTime)', function (data) {
-            //开关是否开启，true或者false
-            var checked = data.elem.checked;
-            if (checked) {
-                $("#div-registerTime").hide();
-            } else {
-                $("#div-registerTime").show();
-            }
-        });
+        form.render('select');
 
         //解析班级编码
         $("#preview-class").click(function () {
             var othis = $(this)
-                    , href = '/class/admin/getPreviewClassInfo?classId=' + $("#classId").val()
+                    , href = '/class/admin/getPreviewClassInfo?classId=' + $("#originalClassId").val()
                     , text = "预览班级信息"
                     , router = layui.router();
 
@@ -119,6 +136,19 @@
             var topLayui = parent === self ? layui : top.layui;
             topLayui.index.openTabsPage(href, text || othis.text());
         });
+
+        //解析班级编码
+        $("#preview-class2").click(function () {
+            var othis = $(this)
+                    , href = '/class/admin/getPreviewClassInfo?classId=' + $("#currentClassId").val()
+                    , text = "预览班级信息"
+                    , router = layui.router();
+
+
+            var topLayui = parent === self ? layui : top.layui;
+            topLayui.index.openTabsPage(href, text || othis.text());
+        });
+
     });
 </script>
 </body>

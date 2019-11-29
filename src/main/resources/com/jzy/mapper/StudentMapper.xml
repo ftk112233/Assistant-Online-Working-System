@@ -88,6 +88,30 @@
         </set>
         where student_id = #{studentId}
     </update>
+    <update id="updateStudentInfo" parameterType="com.jzy.model.entity.Student">
+        update student
+        <set>
+            <if test="studentId != null  and studentId!=''">
+                student_id = #{studentId,jdbcType=VARCHAR},
+            </if>
+            student_name = #{studentName,jdbcType=VARCHAR},
+            student_sex = #{studentSex,jdbcType=VARCHAR},
+            student_phone = #{studentPhone,jdbcType=VARCHAR},
+            student_phone_backup = #{studentPhoneBackup,jdbcType=VARCHAR},
+            student_school = #{studentSchool,jdbcType=VARCHAR},
+            student_remark = #{studentRemark,jdbcType=VARCHAR},
+        </set>
+        where id = #{id}
+    </update>
+    <delete id="deleteOneStudentById">
+        delete from student where id=#{id}
+    </delete>
+    <delete id="deleteManyStudentsByIds">
+        delete from student where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
     <select id="getStudentById" resultMap="BaseResultMap">
         select * from student where id=#{id}
     </select>

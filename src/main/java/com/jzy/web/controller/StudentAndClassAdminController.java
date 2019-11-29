@@ -121,8 +121,6 @@ public class StudentAndClassAdminController extends AbstractController {
         return "student/sc/admin/studentAndClassFormAdd";
     }
 
-
-
     /**
      * 学员上课信息管理中的报班请求
      *
@@ -144,7 +142,6 @@ public class StudentAndClassAdminController extends AbstractController {
 
         return map;
     }
-
 
     /**
      * 删除一个学员上课记录ajax交互

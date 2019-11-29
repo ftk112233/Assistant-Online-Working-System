@@ -32,6 +32,9 @@ public abstract class AbstractServiceImpl {
     protected AssistantService assistantService;
 
     @Autowired
+    protected CampusAndClassroomService campusAndClassroomService;
+
+    @Autowired
     protected RoleAndPermissionService roleAndPermissionService;
 
     @Autowired

@@ -8,7 +8,6 @@ import com.jzy.manager.util.ClassUtils;
 import com.jzy.model.dto.ClassDetailedDto;
 import com.jzy.model.dto.ClassSearchCondition;
 import com.jzy.model.dto.MyPage;
-import com.jzy.model.entity.Assistant;
 import com.jzy.model.entity.Class;
 import com.jzy.service.ClassService;
 import org.apache.commons.lang3.StringUtils;
@@ -35,20 +34,20 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
 
     @Override
     public Class getClassById(Long id) {
-        return id == null ? null :classMapper.getClassById(id);
+        return id == null ? null : classMapper.getClassById(id);
     }
 
     @Override
     public Class getClassByClassId(String classId) {
-        return StringUtils.isEmpty(classId) ? null :classMapper.getClassByClassId(classId);
+        return StringUtils.isEmpty(classId) ? null : classMapper.getClassByClassId(classId);
     }
 
     @Override
     public ClassDetailedDto getClassDetailByClassId(String classId) {
-        if (StringUtils.isEmpty(classId)){
+        if (StringUtils.isEmpty(classId)) {
             return null;
         } else {
-            ClassDetailedDto classDetailedDto=classMapper.getClassDetailByClassId(classId);
+            ClassDetailedDto classDetailedDto = classMapper.getClassDetailByClassId(classId);
             return ClassUtils.parseClassYear(classDetailedDto);
         }
     }
@@ -61,26 +60,35 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
 
     @Override
     public String insertClass(ClassDetailedDto classDetailedDto) {
-        String result=Constants.SUCCESS;
-
         //新班号不为空
         if (getClassByClassId(classDetailedDto.getClassId()) != null) {
             //添加的班号已存在
             return "classIdRepeat";
         }
 
-        if (!StringUtils.isEmpty(classDetailedDto.getTeacherName())){
+        return insertClassWithUnrepeatedClassId(classDetailedDto);
+    }
+
+
+    /**
+     * 插入班号不重复的班级信息
+     *
+     * @param classDetailedDto
+     * @return
+     */
+    private String insertClassWithUnrepeatedClassId(ClassDetailedDto classDetailedDto) {
+        if (!StringUtils.isEmpty(classDetailedDto.getTeacherName())) {
             //修改后的教师姓名不为空
-            if (teacherService.getTeacherByName(classDetailedDto.getTeacherName()) == null){
+            if (teacherService.getTeacherByName(classDetailedDto.getTeacherName()) == null) {
                 //修改后的教师姓名不存在
-               return "teacherNotExist";
+                return "teacherNotExist";
 
             }
         }
 
-        if (!StringUtils.isEmpty(classDetailedDto.getAssistantName())){
+        if (!StringUtils.isEmpty(classDetailedDto.getAssistantName())) {
             //修改后的助教姓名不为空
-            if (assistantService.getAssistantByName(classDetailedDto.getAssistantName()) == null){
+            if (assistantService.getAssistantByName(classDetailedDto.getAssistantName()) == null) {
                 //修改后的助教姓名不存在
                 return "assistantNotExist";
             }
@@ -89,13 +97,14 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
         classDetailedDto.setParsedClassTime(classDetailedDto.getClassTime());
 
         classMapper.insertClass(classDetailedDto);
-        return result;
+        return Constants.SUCCESS;
+
     }
 
     @Override
     public String insertAndUpdateClassesFromExcel(List<ClassDetailedDto> classDetailedDtos) throws Exception {
         for (ClassDetailedDto classDetailedDto : classDetailedDtos) {
-            if (ClassUtils.isValidClassInfo(classDetailedDto)){
+            if (ClassUtils.isValidClassInfo(classDetailedDto)) {
                 insertAndUpdateOneClassFromExcel(classDetailedDto);
             } else {
                 String msg = "输入助教排班表中读取到的classDetailedDtos不合法！";
@@ -114,13 +123,13 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
             throw new InvalidParameterException(msg);
         }
 
-        Class originalClasses=getClassByClassId(classDetailedDto.getClassId());
+        Class originalClasses = getClassByClassId(classDetailedDto.getClassId());
         if (originalClasses != null) {
             //班号已存在，更新
             updateClassByClassId(classDetailedDto);
         } else {
             //插入
-            insertClass(classDetailedDto);
+            insertClassWithUnrepeatedClassId(classDetailedDto);
         }
 
         return Constants.SUCCESS;
@@ -130,10 +139,10 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     public PageInfo<ClassDetailedDto> listClasses(MyPage myPage, ClassSearchCondition condition) {
         PageHelper.startPage(myPage.getPageNum(), myPage.getPageSize());
         List<ClassDetailedDto> classDetailedDtos = classMapper.listClasses(condition);
-        for (int i=0;i<classDetailedDtos.size();i++){
-            ClassDetailedDto classDetailedDto=classDetailedDtos.get(i);
-            if (!StringUtils.isEmpty(classDetailedDto.getClassYear())){
-                classDetailedDtos.set(i,ClassUtils.parseClassYear(classDetailedDto));
+        for (int i = 0; i < classDetailedDtos.size(); i++) {
+            ClassDetailedDto classDetailedDto = classDetailedDtos.get(i);
+            if (!StringUtils.isEmpty(classDetailedDto.getClassYear())) {
+                classDetailedDtos.set(i, ClassUtils.parseClassYear(classDetailedDto));
             }
         }
         return new PageInfo<>(classDetailedDtos);
@@ -157,17 +166,17 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
             }
         }
 
-        if (!StringUtils.isEmpty(classDetailedDto.getTeacherName())){
+        if (!StringUtils.isEmpty(classDetailedDto.getTeacherName())) {
             //修改后的教师姓名不为空
-            if (teacherService.getTeacherByName(classDetailedDto.getTeacherName()) == null){
+            if (teacherService.getTeacherByName(classDetailedDto.getTeacherName()) == null) {
                 //修改后的教师姓名不存在
                 return "teacherNotExist";
             }
         }
 
-        if (!StringUtils.isEmpty(classDetailedDto.getAssistantName())){
+        if (!StringUtils.isEmpty(classDetailedDto.getAssistantName())) {
             //修改后的助教姓名不为空
-            if (assistantService.getAssistantByName(classDetailedDto.getAssistantName()) == null){
+            if (assistantService.getAssistantByName(classDetailedDto.getAssistantName()) == null) {
                 //修改后的助教姓名不存在
                 return "assistantNotExist";
             }

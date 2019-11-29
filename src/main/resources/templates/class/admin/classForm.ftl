@@ -200,7 +200,7 @@
         $.ajax({
             type: "get",
             data: {campusName: '${classEdit.classCampus!""}'},
-            url: "${ctx}/class/getClassroomsByCampus",
+            url: "${ctx}/class/listClassroomsByCampus",
             success: function (data) {
                 for (var i = 0; i < data.length; i++) {
                     var json = data[i];
@@ -221,7 +221,7 @@
             $.ajax({
                 type: "get",
                 data: {campusName: campus_name},
-                url: "${ctx}/class/getClassroomsByCampus",
+                url: "${ctx}/class/listClassroomsByCampus",
                 success: function (data) {
                     for (var i = 0; i < data.length; i++) {
                         var json = data[i];
@@ -249,7 +249,7 @@
                         $.ajax({
                             type: "get",
                             data: {campusName: campus_name},
-                            url: "${ctx}/class/getClassroomsByCampus",
+                            url: "${ctx}/class/listClassroomsByCampus",
                             success: function (data) {
                                 for (var i = 0; i < data.length; i++) {
                                     var json = data[i];

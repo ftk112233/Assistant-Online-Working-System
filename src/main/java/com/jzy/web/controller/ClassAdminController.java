@@ -61,8 +61,8 @@ public class ClassAdminController extends AbstractController{
         map2.put("src", "");
         map.put("data", map2);
 
-        if (clazz == null || !ClassUtils.isValidClassYear(clazz.getClassYear())) {
-            map.put("msg", "yearInvalid");
+        if (clazz == null || StringUtils.isEmpty(clazz.getClassYear()) || !ClassUtils.isValidClassYear(clazz.getClassYear())) {
+            map.put("msg", "campusInvalid");
             return map;
         }
 
@@ -279,6 +279,9 @@ public class ClassAdminController extends AbstractController{
     @RequestMapping("/getPreviewClassInfo")
     public String getPreviewClassInfo(Model model, Class clazz) {
         ClassDetailedDto classDetailedDto=classService.getClassDetailByClassId(clazz.getClassId());
+        if (classDetailedDto == null){
+            classDetailedDto=new ClassDetailedDto();
+        }
 //
 //        model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
 //        model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(ClassUtils.SEASONS));

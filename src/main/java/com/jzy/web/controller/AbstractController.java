@@ -38,6 +38,9 @@ public abstract class AbstractController {
     protected AssistantService assistantService;
 
     @Autowired
+    protected CampusAndClassroomService campusAndClassroomService;
+
+    @Autowired
     protected RoleAndPermissionService roleAndPermissionService;
 
     @Autowired

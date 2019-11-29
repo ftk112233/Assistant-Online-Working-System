@@ -4,10 +4,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.StudentMapper;
 import com.jzy.manager.constant.Constants;
-import com.jzy.manager.util.StudentAndClassUtils;
 import com.jzy.manager.util.StudentUtils;
 import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.StudentAndClassDetailedDto;
 import com.jzy.model.dto.StudentSearchCondition;
 import com.jzy.model.entity.Student;
 import com.jzy.service.StudentService;
@@ -59,6 +57,20 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
             return "studentIdRepeat";
         }
 
+        return insertStudentWithUnrepeatedStudentId(student);
+    }
+
+    /**
+     * 插入不重复的学员信息
+     *
+     * @param student
+     * @return
+     */
+    private  String insertStudentWithUnrepeatedStudentId(Student student) {
+        if (StringUtils.isEmpty(student.getStudentSex())) {
+            student.setStudentSex(null);
+        }
+
         studentMapper.insertStudent(student);
         return Constants.SUCCESS;
     }
@@ -91,7 +103,7 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
             //学员编号已存在，更新
             updateStudentByStudentId(student);
         } else {
-            insertStudent(student);
+            insertStudentWithUnrepeatedStudentId(student);
         }
         return Constants.SUCCESS;
     }
@@ -133,6 +145,36 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
         PageHelper.startPage(myPage.getPageNum(), myPage.getPageSize());
         List<Student> students = studentMapper.listStudents(condition);
         return new PageInfo<>(students);
+    }
+
+    @Override
+    public String updateStudentInfo(Student student) {
+        Student originalStudent = getStudentById(student.getId());
+
+        if (!student.getStudentId().equals(originalStudent.getStudentId())) {
+            //学员号修改过了，判断是否与已存在的学员号冲突
+            if (getStudentByStudentId(student.getStudentId()) != null) {
+                //修改后的学员号已存在
+                return "studentIdRepeat";
+            }
+        }
+
+        if (StringUtils.isEmpty(student.getStudentSex())) {
+            student.setStudentSex(null);
+        }
+
+        studentMapper.updateStudentInfo(student);
+        return Constants.SUCCESS;
+    }
+
+    @Override
+    public void deleteOneStudentById(Long id) {
+        studentMapper.deleteOneStudentById(id);
+    }
+
+    @Override
+    public void deleteManyStudentsByIds(List<Long> ids) {
+        studentMapper.deleteManyStudentsByIds(ids);
     }
 
 }

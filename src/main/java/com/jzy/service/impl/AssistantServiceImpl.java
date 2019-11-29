@@ -54,6 +54,16 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
             return "workIdRepeat";
         }
 
+        return insertAssistantWithUnrepeatedWorkId(assistant);
+    }
+
+    /**
+     * 插入工号不重复的助教信息
+     *
+     * @param assistant
+     * @return
+     */
+    private String insertAssistantWithUnrepeatedWorkId(Assistant assistant) {
         if (getAssistantByName(assistant.getAssistantName()) != null) {
             //添加的姓名已存在
             return "nameRepeat";
@@ -102,7 +112,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     @Override
     public String updateAssistantByWorkId(Assistant assistant) {
         Assistant originalAssistant = getAssistantByWorkId(assistant.getAssistantWorkId());
-        return updateAssistantByWorkId(originalAssistant,assistant);
+        return updateAssistantByWorkId(originalAssistant, assistant);
     }
 
     @Override
@@ -142,19 +152,19 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
         }
 
 
-        Assistant originalAssistant=getAssistantByWorkId(assistant.getAssistantWorkId());
+        Assistant originalAssistant = getAssistantByWorkId(assistant.getAssistantWorkId());
         if (originalAssistant != null) {
             //工号已存在，更新
-            updateAssistantByWorkId(originalAssistant,assistant);
+            updateAssistantByWorkId(originalAssistant, assistant);
         } else {
             //插入
             Assistant tmp = getAssistantByName(assistant.getAssistantName());
-            if (tmp != null) {
+            do {
                 //添加的姓名已存在，在后面加一个'1'
                 assistant.setAssistantName(tmp.getAssistantName() + "1");
-            }
-
-            insertAssistant(assistant);
+                tmp = getAssistantByName(assistant.getAssistantName());
+            } while (tmp != null);
+            insertAssistantWithUnrepeatedWorkId(assistant);
         }
         return Constants.SUCCESS;
     }

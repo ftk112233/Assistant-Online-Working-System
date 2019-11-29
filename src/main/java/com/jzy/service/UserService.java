@@ -26,6 +26,13 @@ public interface UserService {
     User getUserById(Long id);
 
     /**
+     * 查询出所有的用户
+     *
+     * @return
+     */
+    List<User> listAllUsers();
+
+    /**
      * 根据用户名查询出用户信息
      *
      * @param userName 用户名

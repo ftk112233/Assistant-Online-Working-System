@@ -70,7 +70,7 @@
     </div>
 
     <div class="layui-trans layadmin-user-login-footer">
-        <p>© 2019 <a href="http://kurochan1998.github.io/about/" target="_blank">blog.kurochan.top</a></p>
+        <p>© 2019 <a href="http://kurochan1998.github.io/about/" target="_blank">kurochan.top</a></p>
     </div>
 </div>
 
@@ -100,7 +100,6 @@
         //提交
         form.on('submit(LAY-user-login-submit)', function (obj) {
             var field = obj.field;
-            console.log(field);//测试是否获取到表单数据，调试模式下在页面控制台查看
 
             //禁用5秒
             disabledSubmitButtonWithTime('my_button', '登 入', 5);

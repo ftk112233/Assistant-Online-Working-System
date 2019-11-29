@@ -108,6 +108,8 @@
                             <i class="layui-icon layui-timeline-axis"></i>
                             <div class="layui-timeline-content layui-text">
                                 <h3 class="layui-timeline-title">STEP2: 导入排班表</h3>
+                                <p>这一步中，如果您是在原来的基础上更新排班表，如场景4（参见前言），<b style="color: red;">必须先前往：信息管理>班级信息</b>，查询出当前<b style="color: red;">年份-季度-校区</b>的班级记录，全部删除后，再执行以下步骤。为什么要这样做？
+                                    因为系统更新的原则：对于新的班级执行插入；对于修改过的班级执行更新；而对于已经不再有效的班级，系统无法从excel中悉知，因此需要先删除这些特例!<b style="color: red;">（如果有取消的班级必须进行以上操作，如原班级有4个：a、b、c、d，现在只有a、b、c；如果仅仅是修改或是新增，可以不用）</b></p>
                                 <p>上传excel要求说明：<a
                                         href="${ctx}/toolbox/assistantAdministrator/downloadExample/3">查看范例</a></p>
                                 <ul>
@@ -137,7 +139,8 @@
                                 <label class="layui-form-label">自动解析&nbsp; <i class="layui-icon layui-icon-tips"
                                                                               lay-tips="开启'自动解析'将自动根据2019年新东方班级编码规则从班级编码中解析出校区、季度、班型等信息。如果班号不符合此规则，可以关闭此选项，手动设置"></i></label>
                                 <div class="layui-input-inline">
-                                    <input type="checkbox" name="parseClassId" id="parseClassId" lay-skin="switch" lay-text="ON|OFF"
+                                    <input type="checkbox" name="parseClassId" id="parseClassId" lay-skin="switch"
+                                           lay-text="ON|OFF"
                                            lay-filter="parseClassId" checked>
                                 </div>
                             </div>
@@ -145,7 +148,8 @@
                                  id="div2-import-teacher-and-class" hidden="hidden">
                                 <label class="layui-form-label">开课学期所在年份</label>
                                 <div class="layui-input-inline">
-                                    <input type="text" class="layui-input" placeholder="yyyy" id="year" name="year" lay-verify="required">
+                                    <input type="text" class="layui-input" placeholder="yyyy" id="year" name="year"
+                                           lay-verify="required">
                                 </div>
                                 <div class="layui-form-mid " style="color:red">*必填项</div>
                                 <label class="layui-form-label" id="season_l" hidden="hidden">季度</label>
@@ -161,82 +165,87 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="layui-timeline-content layui-text" id="div-import-teacher-and-class""
-                                 hidden="hidden">
-                                <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel"
-                                        style="background-color: #FFB800"
-                                        id="import-teacher-and-class" lay-submit lay-filter="import-teacher-and-class"><i
-                                        class="layui-icon">&#xe67c;</i>导入排班信息</button>
-                            </div>
-                        </li>
-                        <li class="layui-timeline-item">
-                            <i class="layui-icon layui-timeline-axis"></i>
-                            <div class="layui-timeline-content layui-text">
-                                <h3 class="layui-timeline-title">STEP3: 导入学生花名册（从总部软件中导出的花名册）</h3>
-                                <p>上传excel要求说明：<a
-                                        href="${ctx}/toolbox/assistantAdministrator/downloadExample/3">查看范例</a></p>
-                                <ul>
-                                    <li>第1行为列名属性。所有列名属性中系统将读取以下名称的列导入数据库，这些列的先后顺序无关，但列名称必须与要求相符（如下所示）！！<br>
-                                        ________________________________________<br>
-                                        | 学员编号 | 姓名 | 班级编码 | 进班日期 | 业务备注 |<br>
-                                        ________________________________________
-                                    </li>
-
-                                    <li>进班日期、业务备注列不是必须的。<br>
-                                        导入进班日期的目的是方便根据时间排序，来制作座位表</li>
-                                </ul>
-                            </div>
-                            <div class="layui-form layui-timeline-content" style="margin-bottom: 20px;">
-                                <input type="checkbox" name="read_step3" id="read_step3" lay-skin="primary"
-                                       lay-filter="read_step3" title=""><b style="color: red;">我已认真阅读以上内容</b>
-                            </div>
-                            <div class="layui-timeline-content layui-text" id="div-import-student-and-class"
-                                 hidden="hidden">
-                                <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel"
-                                        style="background-color: #FFB800"
-                                        id="import-student-and-class" lay-filter="import-student-and-class"><i
-                                        class="layui-icon">&#xe67c;</i>导入学生和上课信息
-                            </div>
-                        </li>
-                        <li class="layui-timeline-item">
-                            <i class="layui-icon layui-timeline-axis"></i>
-                            <div class="layui-timeline-content layui-text">
-                                <h3 class="layui-timeline-title">STEP4: 导入学生花名册（每季开课前带学生联系方式等详细信息的学生名单）</h3>
-                                <p>上传excel要求说明：<a
-                                        href="${ctx}/toolbox/assistantAdministrator/downloadExample/4">查看范例</a></p>
-                                <ul>
-                                    <li>第1行为列名属性。所有列名属性中系统将读取以下名称的列导入数据库，这些列的先后顺序无关，但列名称必须与要求相符（如下所示）！！<br>
-                                        ___________________________________<br>
-                                        | 学员编号 | 姓名 | 手机 | 备用手机 |<br>
-                                        ___________________________________
-                                    </li>
-
-                                    <li>备用手机列不是必须的。</li>
-                                </ul>
-                            </div>
-                            <div class="layui-form layui-timeline-content" style="margin-bottom: 20px;">
-                                <input type="checkbox" name="read_step4" id="read_step4" lay-skin="primary"
-                                       lay-filter="read_step4" title=""><b style="color: red;">我已认真阅读以上内容</b>
-                            </div>
-                            <div class="layui-timeline-content layui-text" id="div-import-student-detailed"
-                                 hidden="hidden">
-                                <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel"
-                                        style="background-color: #FFB800"
-                                        id="import-student-detailed" lay-filter="import-student-detailed"><i
-                                        class="layui-icon">&#xe67c;</i>导入学生详细信息
-                            </div>
-                        </li>
-                        <li class="layui-timeline-item">
-                            <i class="layui-icon layui-timeline-axis"></i>
-                            <div class="layui-timeline-content layui-text">
-                                <div class="layui-timeline-title">大功告成！</div>
-                            </div>
-                        </li>
-                    </ul>
+                            <div class="layui-timeline-content layui-text" id="div-import-teacher-and-class"
+                            "
+                            hidden="hidden">
+                            <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel"
+                                    style="background-color: #FFB800"
+                                    id="import-teacher-and-class" lay-submit lay-filter="import-teacher-and-class"><i
+                                    class="layui-icon">&#xe67c;</i>导入排班信息
+                            </button>
                 </div>
+                </li>
+                <li class="layui-timeline-item">
+                    <i class="layui-icon layui-timeline-axis"></i>
+                    <div class="layui-timeline-content layui-text">
+                        <h3 class="layui-timeline-title">STEP3: 导入学生花名册（从总部软件中导出的花名册）</h3>
+                        <p>这一步中，如果您是在原来的基础上更新名单，如场景5（参见前言），<b style="color: red;">必须先前往：信息管理>学员信息>上课信息</b>，查询出当前<b style="color: red;">年份-季度-校区</b>的学生上课记录，全部删除后，再执行以下步骤。为什么要这样做？
+                            因为系统更新的原则：对于新进班的学生执行插入；对于转班的学生执行更新；而对于退班的学生，系统无法从excel中悉知，因此需要先删除这些退班特例!（<b style="color: red;">如果有退班的学生必须进行以上操作</b>）</p>
+                        <p>上传excel要求说明：<a
+                                href="${ctx}/toolbox/assistantAdministrator/downloadExample/3">查看范例</a></p>
+                        <ul>
+                            <li>第1行为列名属性。所有列名属性中系统将读取以下名称的列导入数据库，这些列的先后顺序无关，但列名称必须与要求相符（如下所示）！！<br>
+                                ________________________________________<br>
+                                | 学员编号 | 姓名 | 班级编码 | 进班日期 | 业务备注 |<br>
+                                ________________________________________
+                            </li>
+
+                            <li>进班日期、业务备注列不是必须的。<br>
+                                导入进班日期的目的是方便根据时间排序，来制作座位表
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="layui-form layui-timeline-content" style="margin-bottom: 20px;">
+                        <input type="checkbox" name="read_step3" id="read_step3" lay-skin="primary"
+                               lay-filter="read_step3" title=""><b style="color: red;">我已认真阅读以上内容</b>
+                    </div>
+                    <div class="layui-timeline-content layui-text" id="div-import-student-and-class"
+                         hidden="hidden">
+                        <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel"
+                                style="background-color: #FFB800"
+                                id="import-student-and-class" lay-filter="import-student-and-class"><i
+                                class="layui-icon">&#xe67c;</i>导入学生和上课信息
+                    </div>
+                </li>
+                <li class="layui-timeline-item">
+                    <i class="layui-icon layui-timeline-axis"></i>
+                    <div class="layui-timeline-content layui-text">
+                        <h3 class="layui-timeline-title">STEP4: 导入学生花名册（每季开课前带学生联系方式等详细信息的学生名单）</h3>
+                        <p>上传excel要求说明：<a
+                                href="${ctx}/toolbox/assistantAdministrator/downloadExample/4">查看范例</a></p>
+                        <ul>
+                            <li>第1行为列名属性。所有列名属性中系统将读取以下名称的列导入数据库，这些列的先后顺序无关，但列名称必须与要求相符（如下所示）！！<br>
+                                ___________________________________<br>
+                                | 学员编号 | 姓名 | 手机 | 备用手机 |<br>
+                                ___________________________________
+                            </li>
+
+                            <li>备用手机列不是必须的。</li>
+                        </ul>
+                    </div>
+                    <div class="layui-form layui-timeline-content" style="margin-bottom: 20px;">
+                        <input type="checkbox" name="read_step4" id="read_step4" lay-skin="primary"
+                               lay-filter="read_step4" title=""><b style="color: red;">我已认真阅读以上内容</b>
+                    </div>
+                    <div class="layui-timeline-content layui-text" id="div-import-student-detailed"
+                         hidden="hidden">
+                        <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel"
+                                style="background-color: #FFB800"
+                                id="import-student-detailed" lay-filter="import-student-detailed"><i
+                                class="layui-icon">&#xe67c;</i>导入学生详细信息
+                    </div>
+                </li>
+                <li class="layui-timeline-item">
+                    <i class="layui-icon layui-timeline-axis"></i>
+                    <div class="layui-timeline-content layui-text">
+                        <div class="layui-timeline-title">大功告成！</div>
+                    </div>
+                </li>
+                </ul>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <script src="${ctx}/custom/js/external/jquery-3.3.1.min.js"></script>
@@ -354,7 +363,7 @@
 
         laydate.render({
             elem: '#year'
-            ,type: 'year'
+            , type: 'year'
         });
 
         var campusNames = eval('(' + '${campusNames}' + ')');
@@ -380,16 +389,16 @@
             elem: '#import-teacher-and-class'
             , url: '${ctx}/class/admin/import'
             , data: {
-                classYear: function(){
+                classYear: function () {
                     return $("#year").val();
                 }
-                ,classSeason: function(){
+                , classSeason: function () {
                     return $("#season").val();
                 }
-                ,classCampus: function(){
+                , classCampus: function () {
                     return $("#campus").val();
                 }
-                , parseClassId: function(){
+                , parseClassId: function () {
                     return $("#parseClassId").val();
                 }
             }
@@ -405,13 +414,13 @@
                         icon: 1
                         , time: 1000
                     });
-                } else if (res.msg === "yearInvalid"){
-                    return layer.msg('清选择正确的年份!', {
+                } else if (res.msg === "yearInvalid") {
+                    return layer.msg('请选择正确的年份!', {
                         offset: '15px'
                         , icon: 2
                         , time: 2000
                     });
-                }else {
+                } else {
                     return layer.msg('导入失败', {
                         offset: '15px'
                         , icon: 2
@@ -446,7 +455,7 @@
             elem: '#import-student-and-class'
             , url: '${ctx}/student/admin/import'
             , data: {
-                type : 1
+                type: 1
             }
             , accept: 'file' //普通文件
             , exts: 'xls|xlsx' //允许上传的文件后缀
@@ -495,7 +504,7 @@
             elem: '#import-student-detailed'
             , url: '${ctx}/student/admin/import'
             , data: {
-                type : 2
+                type: 2
             }
             , accept: 'file' //普通文件
             , exts: 'xls|xlsx' //允许上传的文件后缀

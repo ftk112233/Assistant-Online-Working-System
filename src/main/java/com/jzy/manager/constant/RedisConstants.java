@@ -35,4 +35,15 @@ public class RedisConstants {
      * 邮箱验证码键
      */
     public static final String USER_VERIFYCODE_EMAIL_KEY = USER_VERIFYCODE_KEY +":email";
+
+
+    /**
+     * 系统缓存根键
+     */
+    private static final String SYSTEM_KEY = ROOT_KEY +":system";
+
+    /**
+     * 系统公告的键
+     */
+    public static final String ANNOUNCEMENT_SYSTEM_KEY = SYSTEM_KEY +":announcement";
 }

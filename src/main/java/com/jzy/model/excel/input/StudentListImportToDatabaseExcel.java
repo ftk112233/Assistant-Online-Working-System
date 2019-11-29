@@ -27,13 +27,13 @@ import java.util.Set;
 /**
  * @author JinZhiyun
  * @version 1.0
- * @ClassName StudentListExcel
- * @description 学生花名册
+ * @ClassName StudentListImportToDatabaseExcel
+ * @description 学生花名册用来导入数据库的
  * @date 2019/11/1 11:07
  **/
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class StudentListExcel extends Excel implements Serializable {
+public class StudentListImportToDatabaseExcel extends Excel implements Serializable {
     private static final long serialVersionUID = 3823535210593191680L;
 
     private static final String STUDENT_ID_COLUMN = ExcelConstants.STUDENT_ID_COLUMN;
@@ -76,22 +76,22 @@ public class StudentListExcel extends Excel implements Serializable {
      */
     private List<StudentAndClassDetailedDto> studentAndClassDetailedDtos;
 
-    public StudentListExcel() {
+    public StudentListImportToDatabaseExcel() {
     }
 
-    public StudentListExcel(String inputFile) throws IOException, InputFileTypeException {
+    public StudentListImportToDatabaseExcel(String inputFile) throws IOException, InputFileTypeException {
         super(inputFile);
     }
 
-    public StudentListExcel(File file) throws IOException, InputFileTypeException {
+    public StudentListImportToDatabaseExcel(File file) throws IOException, InputFileTypeException {
         super(file);
     }
 
-    public StudentListExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InputFileTypeException {
+    public StudentListImportToDatabaseExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InputFileTypeException {
         super(inputStream, version);
     }
 
-    public StudentListExcel(Workbook workbook) {
+    public StudentListImportToDatabaseExcel(Workbook workbook) {
         super(workbook);
     }
 
@@ -242,7 +242,7 @@ public class StudentListExcel extends Excel implements Serializable {
     }
 
     public static void main(String[] args) throws IOException {
-        StudentListExcel excel = new StudentListExcel("D:\\aows_resources\\toolbox\\example\\"+FileUtils.FILE_NAMES.get(4));
+        StudentListImportToDatabaseExcel excel = new StudentListImportToDatabaseExcel("D:\\aows_resources\\toolbox\\example\\"+FileUtils.EXAMPLES.get(4));
         excel.readStudentDetailInfoFromExcel();
         for (Student student:excel.getStudents()){
             System.out.println(student);

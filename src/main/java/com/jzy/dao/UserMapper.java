@@ -143,4 +143,11 @@ public interface UserMapper {
      * @param ids 用户id的list
      */
     void deleteManyUsersByIds(List<Long> ids);
+
+    /**
+     * 查询出所有的用户
+     *
+     * @return
+     */
+    List<User> listAllUsers();
 }

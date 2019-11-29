@@ -1,5 +1,6 @@
 package com.jzy.manager.util;
 
+import com.jzy.model.excel.Excel;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,15 +19,25 @@ import java.util.Map;
  **/
 public class FileUtils {
     /**
-     * 系统中存储的模板文件的名称
+     * 系统中存储的上传表格示例文件的名称
      */
-    public static final Map<Integer, String> FILE_NAMES = new HashMap<>();
+    public static final Map<Integer, String> EXAMPLES = new HashMap<>();
+
+    /**
+     * 系统中存储的表格文件的名称
+     */
+    public static final Map<Integer, String> TEMPLATES = new HashMap<>();
 
     static {
-        FILE_NAMES.put(1, "助教信息.xlsx");
-        FILE_NAMES.put(2, "曹杨秋季助教排班.xlsx");
-        FILE_NAMES.put(3, "秋下花名册.xls");
-        FILE_NAMES.put(4, "秋季花名册_开班.xlsx");
+        EXAMPLES.put(1, "助教信息.xlsx");
+        EXAMPLES.put(2, "曹杨秋季助教排班.xlsx");
+        EXAMPLES.put(3, "秋下花名册.xls");
+        EXAMPLES.put(4, "秋季花名册_开班.xlsx");
+        EXAMPLES.put(5, "座位表.xlsx");
+
+        TEMPLATES.put(1, "教师和助教工作表5.0.xlsx");
+        TEMPLATES.put(2, "座位表.xlsx");
+        TEMPLATES.put(3, "补课单.xlsx");
     }
 
     private FileUtils() {
@@ -219,5 +230,40 @@ public class FileUtils {
         toClient.write(buffer);
         toClient.flush();
         toClient.close();
+    }
+
+
+    /**
+     * 从服务器制定目录下载文件
+     *
+     * @param request
+     * @param response
+     * @param excelToDownload  服务器中被下载的excel文件
+     * @param downloadFileName 下载下来的文件名称
+     * @throws IOException
+     */
+    public static void downloadFile(HttpServletRequest request, HttpServletResponse response, Excel excelToDownload, String downloadFileName) throws IOException {
+        response.reset(); // 清除buffer缓存
+        // 指定下载的文件名
+        String Agent = request.getHeader("User-Agent");
+        if (null != Agent) {
+            Agent = Agent.toLowerCase();
+            if (Agent.indexOf("firefox") != -1) {
+                response.addHeader("Content-Disposition", String.format("attachment;filename*=utf-8'zh_cn'%s", URLEncoder.encode(downloadFileName, "utf-8")));
+            } else {
+                response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(downloadFileName, "utf-8"));
+            }
+        }
+        response.setContentType("application/vnd.ms-excel;charset=UTF-8");
+        response.setHeader("Pragma", "no-cache");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setDateHeader("Expires", 0);
+
+        OutputStream output = response.getOutputStream();
+        BufferedOutputStream bufferedOutPut = new BufferedOutputStream(output);
+        bufferedOutPut.flush();
+        //输出
+        excelToDownload.submitWrite(bufferedOutPut);
+        bufferedOutPut.close();
     }
 }

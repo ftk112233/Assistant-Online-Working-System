@@ -1,10 +1,13 @@
 package com.jzy.web.controller;
 
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.constant.ModelConstants;
+import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.util.*;
 import com.jzy.manager.constant.SessionConstants;
 import com.jzy.model.dto.*;
 import com.jzy.model.entity.User;
+import com.jzy.model.vo.Announcement;
 import com.jzy.model.vo.EmailVerifyCodeSession;
 import com.jzy.model.vo.UserLoginInput;
 import com.jzy.model.vo.UserLoginResult;
@@ -39,6 +42,11 @@ import java.util.concurrent.TimeUnit;
 @Controller
 public class AuthenticationController extends AbstractController {
     private final static Logger logger = Logger.getLogger(AbstractController.class);
+
+    @RequestMapping("/comingSoon")
+    public String comingSoon() {
+        return "tips/comingSoon";
+    }
 
     @RequestMapping("/400")
     public String error400() {
@@ -108,8 +116,22 @@ public class AuthenticationController extends AbstractController {
 
 
     @RequestMapping("/index")
-    public String index(HttpServletRequest request, HttpServletResponse response) {
-        System.out.println("++++"+ShiroUtils.getSession().getAttribute(SessionConstants.USER_INFO_SESSION_KEY));
+    public String index(HttpServletRequest request, HttpServletResponse response, Model model) {
+        User user=userService.getSessionUserInfo();
+        Announcement announcement=new Announcement();
+        if (!hashOps.hasKey(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, user.getId().toString())){
+            //已读公告，即缓存无
+            announcement.setRead(true);
+        } else {
+            announcement=(Announcement) hashOps.get(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, user.getId().toString());
+            if (!announcement.isPermanent()){
+                //阅后即焚，则清除缓存
+                hashOps.delete(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, user.getId().toString());
+            }
+        }
+        model.addAttribute(ModelConstants.ANNOUNCEMENT_MODEL_KEY,announcement);
+
+
         if (SecurityUtils.getSubject().isAuthenticated() || SecurityUtils.getSubject().isRemembered()){
             //登录成功后设置CsrfToken
             CookieUtils.setCSRFTokenCookieAndSession(request, response);
@@ -353,6 +375,7 @@ public class AuthenticationController extends AbstractController {
                 subject.login(token);
                 //登录成功，设置用户信息到session。注意这里的用户应该是游客！
                 User guest=new User();
+                guest.setId(-1L);
                 guest.setUserWorkId(UUID.randomUUID().toString());
                 guest.setUserName(UUID.randomUUID().toString());
                 guest.setUserRealName(CodeUtils.sixRandomCodes());

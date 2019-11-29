@@ -63,4 +63,28 @@ public class ExcelConstants {
     public static final String REGISTER_TIME_COLUMN ="进班日期";
 
     public static final String REMARK_COLUMN_2 ="业务备注";
+
+
+    /*===================助教工作手册表列属性名===================*/
+    public static final String CAMPUS_COLUMN_2 = "校区";
+
+    public static final String CLASS_ID_COLUMN_3 = "班号";
+
+    public static final String TEACHER_NAME_COLUMN_3 = "教师姓名";
+
+    public static final String ASSISTANT_NAME_COLUMN_3 = "助教";
+
+    public static final String STUDENT_ID_COLUMN_2 = "学员编号";
+
+    public static final String STUDENT_NAME_COLUMN_2 = "学员姓名";
+
+    public static final String STUDENT_PHONE_COLUMN_2 = "家长联系方式";
+
+    public static final String TEACHER_REQUIREMENT_COLUMN = "任课教师的要求";
+
+    public static final String SUBJECTS_COLUMN="所有在读学科※";
+
+    /*===================用户单独做座位表时上传的名单表列属性名===================*/
+    public static final String STUDENT_NAME_COLUMN_3 = "学员姓名";
+
 }

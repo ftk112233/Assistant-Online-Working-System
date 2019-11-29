@@ -192,6 +192,9 @@
                 </if>
             </if>
     </select>
+    <select id="listAllUsers" resultMap="BaseResultMap">
+        select * from user;
+    </select>
 
     <update id="updatePasswordByEmail" parameterType="com.jzy.model.entity.User">
         UPDATE user

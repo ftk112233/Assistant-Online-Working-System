@@ -59,12 +59,6 @@ layui.define(['table', 'form'], function (exports) {
                 return '校区长度不能超过20个字符';
             }
         }
-        , studentPhone: function (value) {
-            //学员联系方式不做手机正则校验
-            if (value !== '' && value.length !== 11) {
-                return '不正确的手机格式';
-            }
-        }
         , realNamePermNull: function (value) {
             if (value.length > 50) {
                 return '姓名不能不能超过50个字符！';
@@ -105,10 +99,25 @@ layui.define(['table', 'form'], function (exports) {
             }
         }
         , studentName: function (value) {
-            if (value.length > 50) {
-                return '学员姓名不能不能超过50个字符！';
+            if (!(value !== '' && value.length <= 50)) {
+                return '学员姓名不能为空，且不能超过50个字符！';
             }
         }
+        , studentPhone: function (value) {
+            //学员联系方式不做手机正则校验
+            if (value !== '' && value.length !== 11) {
+                return '不正确的手机格式';
+            }
+        }
+        , school: function (value) {
+            if (value.length > 50) {
+                return '学校不能超过50个字符';
+            }
+        },missLessonStudentId: function (value) {
+            if (value.length > 32) {
+                return '补课学生学员号不能超过32个字符';
+            }
+    }
     });
 
     exports('myform', {})
