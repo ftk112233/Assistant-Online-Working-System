@@ -29,7 +29,7 @@
                     </a>
                 </li>
                 <li class="layui-nav-item layui-hide-xs" lay-unselect>
-                    <a href="http://kurochan1998.github.io/" target="_blank" title="开发者博客">
+                    <a href="http://blog.kurochan.top/" target="_blank" title="开发者博客">
                         <i class="layui-icon layui-icon-website"></i>
                     </a>
                 </li>
