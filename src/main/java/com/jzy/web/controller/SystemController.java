@@ -33,7 +33,7 @@ public class SystemController extends AbstractController {
     @RequestMapping("/announcement")
     public String announcement(Model model) {
         Announcement announcement= (Announcement) hashOps.get(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, 0 + "");
-        model.addAttribute(ModelConstants.ANNOUNCEMENT_EDIT_MODEL_KEY,announcement);
+        model.addAttribute(ModelConstants.ANNOUNCEMENT_EDIT_MODEL_KEY,announcement == null ? new Announcement():announcement);
         return "system/announcement";
     }
 

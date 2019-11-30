@@ -1,9 +1,6 @@
 package com.jzy.config;
 
-import com.jzy.web.interceptor.EmailVerifyCodeInterceptor;
-import com.jzy.web.interceptor.TokenInterceptor;
-import com.jzy.web.interceptor.ToolboxUploadCacheInterceptor;
-import com.jzy.web.interceptor.UpdateSessionUserInfoInterceptor;
+import com.jzy.web.interceptor.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -34,6 +31,11 @@ public class SpringmvcConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
+    public CsrfInterceptor csrfInterceptor(){
+        return new CsrfInterceptor();
+    }
+
+    @Bean
     public EmailVerifyCodeInterceptor emailVerifyCodeInterceptor(){
         return new EmailVerifyCodeInterceptor();
     }
@@ -53,10 +55,9 @@ public class SpringmvcConfig extends WebMvcConfigurerAdapter {
         registry.addInterceptor(tokenInterceptor())
                 .addPathPatterns("/**"); //拦截项目中的哪些请求
 
-        //CsrfInterceptor
-//        registry.addInterceptor(new CsrfInterceptor())
-//                .addPathPatterns("/user/reset*").addPathPatterns("/*/update*")
-//                .addPathPatterns("/*/insert*").addPathPatterns("/*/delete*"); //拦截项目中的哪些请求
+//        CsrfInterceptor
+        registry.addInterceptor(csrfInterceptor())
+                .addPathPatterns("/user/updateOwn*").addPathPatterns("/user/addNew*").addPathPatterns("/user/modifyCurrent*"); //拦截项目中的哪些请求
 
         //EmailVerifyCodeInterceptor
         registry.addInterceptor(emailVerifyCodeInterceptor())

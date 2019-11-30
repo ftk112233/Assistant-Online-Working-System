@@ -275,6 +275,7 @@ public class UserAdminController extends AbstractController {
             } else if (type.equals(2)) {
                 try {
                     userService.insertAndUpdateUsersFromExcel(excel.getUsers());
+                    System.out.println(excel.getAssistants()+"???????");
                     assistantService.insertAndUpdateAssistantsFromExcel(excel.getAssistants());
                 } catch (Exception e) {
                     e.printStackTrace();

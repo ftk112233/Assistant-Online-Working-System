@@ -66,10 +66,12 @@
                                     <option value="">请输入或选择班级编码</option>
                                 </select>
                             </div>
-                            <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #1E9FFF"
-                                    id="preview-class2">预览班级信息
-                            </button>
                             <div class="layui-form-mid " style="color:red">*必填项</div>
+                            <div class="layui-input-inline">
+                                <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #1E9FFF"
+                                        id="preview-class2">预览班级信息
+                                </button>
+                            </div>
                             <label class="layui-form-label">补课日期</label>
                             <div class="layui-input-inline">
                                 <input type="text" class="layui-input" placeholder="yyyy-MM-dd" id="date" name="date" lay-verify="required" lay-verType="tips">

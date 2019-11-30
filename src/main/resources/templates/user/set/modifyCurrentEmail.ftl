@@ -134,7 +134,7 @@
                         /*****************************************************/
                         //验证码正确后修改绑定邮箱ajax
                         $.ajax({
-                            url: '${ctx}/user/modifyCurrentEmail' //实际使用请改成服务端真实接口
+                            url: '${ctx}/user/modifyCurrentEmail?csrfToken='+'${csrfToken!""}' //实际使用请改成服务端真实接口
                             , type: 'post'
                             ,
                             data: {

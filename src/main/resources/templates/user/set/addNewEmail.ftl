@@ -117,7 +117,7 @@
 
             //同时验证码正确后，修改绑定邮箱ajax
             $.ajax({
-                url: '${ctx}/user/addNewEmail' //实际使用请改成服务端真实接口
+                url: '${ctx}/user/addNewEmail?csrfToken='+'${csrfToken!""}' //实际使用请改成服务端真实接口
                 , type: 'post'
                 ,
                 data: {

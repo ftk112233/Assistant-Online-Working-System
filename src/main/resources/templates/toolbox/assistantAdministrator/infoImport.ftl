@@ -54,7 +54,7 @@
                         <li class="layui-timeline-item">
                             <i class="layui-icon layui-timeline-axis"></i>
                             <div class="layui-timeline-content layui-text">
-                                <h3 class="layui-timeline-title">STEP1: 导入助教信息表</h3>
+                                <h3 class="layui-timeline-title">STEP1: 导入助教信息表（耗时参考：45行/5秒）</h3>
                                 <p>上传excel要求说明：<a
                                         href="${ctx}/toolbox/assistantAdministrator/downloadExample/1">查看范例</a></p>
                                 <ul>
@@ -107,7 +107,7 @@
                         <li class="layui-timeline-item">
                             <i class="layui-icon layui-timeline-axis"></i>
                             <div class="layui-timeline-content layui-text">
-                                <h3 class="layui-timeline-title">STEP2: 导入排班表</h3>
+                                <h3 class="layui-timeline-title">STEP2: 导入排班表（耗时参考：185行/6秒）</h3>
                                 <p>这一步中，如果您是在原来的基础上更新排班表，如场景4（参见前言），<b style="color: red;">必须先前往：信息管理>班级信息</b>，查询出当前<b style="color: red;">年份-季度-校区</b>的班级记录，全部删除后，再执行以下步骤。为什么要这样做？
                                     因为系统更新的原则：对于新的班级执行插入；对于修改过的班级执行更新；而对于已经不再有效的班级，系统无法从excel中悉知，因此需要先删除这些特例!<b style="color: red;">（如果有取消的班级必须进行以上操作，如原班级有4个：a、b、c、d，现在只有a、b、c；如果仅仅是修改或是新增，可以不用）</b></p>
                                 <p>上传excel要求说明：<a
@@ -178,7 +178,7 @@
                 <li class="layui-timeline-item">
                     <i class="layui-icon layui-timeline-axis"></i>
                     <div class="layui-timeline-content layui-text">
-                        <h3 class="layui-timeline-title">STEP3: 导入学生花名册（从总部软件中导出的花名册）</h3>
+                        <h3 class="layui-timeline-title">STEP3: 导入学生花名册（从总部软件中导出的花名册）（耗时参考：4183行/2分30秒）</h3>
                         <p>这一步中，如果您是在原来的基础上更新名单，如场景5（参见前言），<b style="color: red;">必须先前往：信息管理>学员信息>上课信息</b>，查询出当前<b style="color: red;">年份-季度-校区</b>的学生上课记录，全部删除后，再执行以下步骤。为什么要这样做？
                             因为系统更新的原则：对于新进班的学生执行插入；对于转班的学生执行更新；而对于退班的学生，系统无法从excel中悉知，因此需要先删除这些退班特例!（<b style="color: red;">如果有退班的学生必须进行以上操作</b>）</p>
                         <p>上传excel要求说明：<a
@@ -210,7 +210,7 @@
                 <li class="layui-timeline-item">
                     <i class="layui-icon layui-timeline-axis"></i>
                     <div class="layui-timeline-content layui-text">
-                        <h3 class="layui-timeline-title">STEP4: 导入学生花名册（每季开课前带学生联系方式等详细信息的学生名单）</h3>
+                        <h3 class="layui-timeline-title">STEP4: 导入学生花名册（每季开课前带学生联系方式等详细信息的学生名单）（耗时参考：4264行/35秒）</h3>
                         <p>上传excel要求说明：<a
                                 href="${ctx}/toolbox/assistantAdministrator/downloadExample/4">查看范例</a></p>
                         <ul>

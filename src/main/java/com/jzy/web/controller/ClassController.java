@@ -24,9 +24,9 @@ public class ClassController extends AbstractController {
      * @param campusName 校区名称
      * @return
      */
-    @RequestMapping("/getClassroomsByCampus")
+    @RequestMapping("/listClassroomsByCampus")
     @ResponseBody
-    public List<String> getClassroomsByCampus(@RequestParam(value = "campusName",required = false) String campusName) {
+    public List<String> listClassroomsByCampus(@RequestParam(value = "campusName",required = false) String campusName) {
         return campusAndClassroomService.listClassroomsByCampus(campusName);
     }
 

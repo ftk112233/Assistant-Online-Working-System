@@ -101,7 +101,7 @@
             disabledSubmitButtonWithTime('my_button', '确认修改', 5);
 
             $.ajax({
-                url: '${ctx}/user/modifyCurrentPhone' //实际使用请改成服务端真实接口
+                url: '${ctx}/user/modifyCurrentPhone?csrfToken='+'${csrfToken!""}' //实际使用请改成服务端真实接口
                 , type: 'post'
                 ,
                 data: {

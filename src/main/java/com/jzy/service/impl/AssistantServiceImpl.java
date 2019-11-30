@@ -159,11 +159,11 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
         } else {
             //插入
             Assistant tmp = getAssistantByName(assistant.getAssistantName());
-            do {
+            while (tmp != null){
                 //添加的姓名已存在，在后面加一个'1'
                 assistant.setAssistantName(tmp.getAssistantName() + "1");
                 tmp = getAssistantByName(assistant.getAssistantName());
-            } while (tmp != null);
+            }
             insertAssistantWithUnrepeatedWorkId(assistant);
         }
         return Constants.SUCCESS;
