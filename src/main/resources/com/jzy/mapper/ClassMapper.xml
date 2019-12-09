@@ -30,6 +30,7 @@
         <result column="assistant_name" property="assistantName" jdbcType="VARCHAR"/>
         <result column="teacher_name" property="teacherName" jdbcType="VARCHAR"/>
         <result column="class_student_count" property="classStudentsCount" jdbcType="BIGINT"/>
+        <result column="classroom_capacity" property="classroomCapacity" jdbcType="INTEGER"/>
     </resultMap>
     <insert id="insertClass" parameterType="com.jzy.model.dto.ClassDetailedDto">
         insert into class
@@ -52,7 +53,7 @@
             <if test="classType != null and classType!=''">
                 class_type,
             </if>
-            <if test="classYear != null">
+            <if test="classYear != null and classYear!=''">
                 class_year,
             </if>
             <if test="classSeason != null and classSeason != ''">
@@ -188,6 +189,61 @@
             #{id}
         </foreach>
     </delete>
+    <delete id="deleteClassesByCondition" parameterType="com.jzy.model.dto.ClassSearchCondition">
+        delete c.* from class c left join assistant a on c.class_assistant_id = a.id left join teacher t on c.class_teacher_id = t.id
+        <where>
+            <if test="classYear != null and classYear!=''">
+                and c.class_year=#{classYear}
+            </if>
+            <if test="classSeason != null and classSeason!=''">
+                and c.class_season=#{classSeason}
+            </if>
+            <if test="classCampus != null and classCampus!=''">
+                and c.class_campus=#{classCampus}
+            </if>
+            <if test="classId != null and classId!=''">
+                <bind name="classIdLike" value=" '%' + classId + '%' "/>
+                and c.class_id like #{classIdLike}
+            </if>
+            <if test="className != null and className!=''">
+                <bind name="classNameLike" value=" '%' + className + '%' "/>
+                and c.class_name like #{classNameLike}
+            </if>
+            <if test="assistantWorkId != null and assistantWorkId!=''">
+                <bind name="assistantWorkIdLike" value=" '%' + assistantWorkId + '%' "/>
+                and a.assistant_work_id like #{assistantWorkIdLike}
+            </if>
+            <if test="assistantName != null and assistantName!=''">
+                <bind name="assistantNameLike" value=" '%' + assistantName + '%' "/>
+                and a.assistant_name like #{assistantNameLike}
+            </if>
+            <if test="teacherWorkId != null and teacherWorkId!=''">
+                <bind name="teacherWorkIdLike" value=" '%' + teacherWorkId + '%' "/>
+                and t.teacher_work_id like #{teacherWorkIdLike}
+            </if>
+            <if test="teacherName != null and teacherName!=''">
+                <bind name="teacherNameLike" value=" '%' + teacherName + '%' "/>
+                and t.teacher_name like #{teacherNameLike}
+            </if>
+            <if test="classTime != null and classTime!=''">
+                <bind name="classTimeLike" value=" '%' + classTime + '%' "/>
+                and c.class_time like #{classTimeLike}
+            </if>
+            <if test="classGrade != null and classGrade!=''">
+                and c.class_grade=#{classGrade}
+            </if>
+            <if test="classSubject != null and classSubject!=''">
+                and c.class_subject=#{classSubject}
+            </if>
+            <if test="classType != null and classType!=''">
+                and c.class_type=#{classType}
+            </if>
+            <if test="classroom != null and classroom!=''">
+                <bind name="classroomLike" value=" '%' + classroom + '%' "/>
+                and c.classroom like #{classroomLike}
+            </if>
+        </where>
+    </delete>
     <select id="getClassById" resultMap="BaseResultMap">
         select * from class where id=#{id};
     </select>
@@ -196,7 +252,7 @@
     </select>
     <select id="listClasses" resultMap="ClassDetailedResultMap"
             parameterType="com.jzy.model.dto.ClassSearchCondition">
-      select class_tmp.*, count(sc.id) as class_student_count
+      select class_tmp.*, count(sc.id) as class_student_count, cc.classroom_capacity as classroom_capacity
         from (select c.*, a.assistant_name as assistant_name, t.teacher_name as teacher_name
         from class c left join assistant a on c.class_assistant_id = a.id left join teacher t on c.class_teacher_id = t.id
         <where>
@@ -252,7 +308,14 @@
             </if>
         </where>
          ) as class_tmp left join student_class sc on sc.class_id=class_tmp.id left join student s on sc.student_id=s.id
+        left join campus_classroom cc on class_tmp.class_campus=cc.campus and class_tmp.classroom=cc.classroom
         group by class_tmp.id
+        <if test="isFull == 'full'">
+            having count(sc.id) &gt;= cc.classroom_capacity
+        </if>
+        <if test="isFull == 'notFull'">
+            having count(sc.id) &lt; cc.classroom_capacity
+        </if>
         <if test="condition1 == 'classId'">
             order by class_tmp.class_id
             <if test="condition2 == 'asc'">

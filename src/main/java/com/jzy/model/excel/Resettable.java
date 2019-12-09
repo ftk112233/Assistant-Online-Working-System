@@ -11,5 +11,6 @@ public interface Resettable {
     /**
      * 重置成员变量
      */
-    default void resetParam(){}
+    default void resetParam() {
+    }
 }

@@ -131,6 +131,11 @@
                         , icon: 2
                         , time: 2000
                     });
+                } else if (res.msg === "sheetNameError"){
+                    return layer.alert('sheet名不是纯数字!', {
+                        skin: 'layui-layer-lan'
+                        ,closeBtn: 0
+                    });
                 }else {
                     return layer.msg('导入失败', {
                         offset: '15px'

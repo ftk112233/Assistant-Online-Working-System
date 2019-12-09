@@ -1,7 +1,6 @@
 package com.jzy.manager.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,8 +17,6 @@ import java.util.regex.Pattern;
  * @date 2019/11/15 17:03
  **/
 public class MyStringUtils {
-    private static Logger logger = LoggerFactory.getLogger(MyStringUtils.class);
-
     private MyStringUtils() {
     }
 
@@ -91,6 +88,9 @@ public class MyStringUtils {
      * @return
      */
     public static boolean isPhone(String phone) {
+        if (phone == null) {
+            return false;
+        }
         String regex = "^((13[0-9])|(14[5,7,9])|(15([0-3]|[5-9]))|(166)|(17[0,1,3,5,6,7,8])|(18[0-9])|(19[8|9]))\\d{8}$";
         if (phone.length() != 11) {
             return false;
@@ -204,7 +204,6 @@ public class MyStringUtils {
             // 非18位为假
             int s = 18;
             if (idcard.length() != s) {
-                logger.error("身份证位数不正确!");
                 return false;
             }
             // 获取前17位
@@ -320,7 +319,7 @@ public class MyStringUtils {
          * @param idcard
          * @return
          */
-        public static String convertIdcarBy15bit(String idcard) {
+        public static String convertIdCardBy15bit(String idcard) {
             if (idcard == null) {
                 return null;
             }
@@ -506,11 +505,16 @@ public class MyStringUtils {
      * @return
      */
     public static String getMaxLengthNumberSubstring(String string) {
+        if (StringUtils.isEmpty(string)) {
+            return string;
+        }
+
         String result = "";
         int count = 0;
         char[] arr = string.toCharArray();
         for (int i = 0; i < arr.length; i++) {
-            if ('0' <= arr[i] && '9' >= arr[i]) {//当前的是数字
+            if ('0' <= arr[i] && '9' >= arr[i]) {
+                //当前的是数字
                 count = 1;//初始化计算器
                 int index = i;//在后面的循环存储截至索引
                 for (int j = i + 1; j < arr.length; j++) {
@@ -524,10 +528,7 @@ public class MyStringUtils {
                 if (count > result.length()) {
                     result = string.substring(i, index + 1);
                 }
-            } else {
-                continue;
             }
-
         }
         return result;
     }
@@ -540,7 +541,12 @@ public class MyStringUtils {
      * @return
      */
     public static String getParsedTime(String string) {
+        if (StringUtils.isEmpty(string)) {
+            return string;
+        }
+
         String result = "";
+
         //冒号的第一次出现位置
         int firstIdx = string.indexOf(':');
         if (firstIdx < 1) {
@@ -573,9 +579,5 @@ public class MyStringUtils {
         }
 
         return result;
-    }
-
-    public static void main(String[] args) throws Exception {
-        System.out.println(getParsedTime("周五不上课, 周六0:15-1:15(11.2,11.9休息,11.3,11.4上课) "));
     }
 }

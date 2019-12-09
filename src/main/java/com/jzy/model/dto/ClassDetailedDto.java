@@ -33,4 +33,14 @@ public class ClassDetailedDto extends Class {
      * 班上学生数量
      */
     private Long classStudentsCount;
+
+    /**
+     * 班级教室容量
+     */
+    private Integer classroomCapacity;
+
+    /**
+     * 是否慢班
+     */
+    boolean full;
 }

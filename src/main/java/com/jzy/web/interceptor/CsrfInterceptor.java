@@ -1,8 +1,9 @@
 package com.jzy.web.interceptor;
 
 import com.jzy.manager.constant.Constants;
-import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
+import com.jzy.manager.util.ShiroUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -16,12 +17,12 @@ import javax.servlet.http.HttpServletResponse;
  * @version 1.0
  * @ClassName CsrfInterceptor
  * @description CSRFToken拦截器验证，拦截所有涉及修改操作的请求，防止CSRF攻击。
- *  拦截的基本方法是检查请求的参数中是否有csrftoken ,并检查这个值，是否合法有效（不为空，
- *      并且得到的参数等于cookies 中保存的值，而且还要等于session 中的值，那么就是合法的）
+ * 拦截的基本方法是检查请求的参数中是否有csrftoken ,并检查这个值，是否合法有效（不为空，
+ * 并且得到的参数等于cookies 中保存的值，而且还要等于session 中的值，那么就是合法的）
  * @date 2019/10/11 8:42
  **/
 public class CsrfInterceptor implements HandlerInterceptor {
-    private final static Logger logger = Logger.getLogger(CsrfInterceptor.class);
+    private final static Logger logger = LogManager.getLogger(CsrfInterceptor.class);
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -43,7 +44,7 @@ public class CsrfInterceptor implements HandlerInterceptor {
                 keyFromRequestParam.equals((String) request.getSession().getAttribute(Constants.CSRF_NUMBER)))) {
             result = true;
         } else {
-            logger.error("可疑CSRF请求！");
+            logger.error("可疑CSRF请求！"+"from ip: "+ShiroUtils.getClientIpAddress(request));
             request.getRequestDispatcher("/400").forward(request, response);
         }
 

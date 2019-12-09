@@ -54,21 +54,21 @@
                         <li class="layui-timeline-item">
                             <i class="layui-icon layui-timeline-axis"></i>
                             <div class="layui-timeline-content layui-text">
-                                <h3 class="layui-timeline-title">STEP1: 导入助教信息表（耗时参考：45行/5秒）</h3>
+                                <h3 class="layui-timeline-title">STEP1: 导入助教信息表</h3>
                                 <p>上传excel要求说明：<a
                                         href="${ctx}/toolbox/assistantAdministrator/downloadExample/1">查看范例</a></p>
                                 <ul>
                                     <li>第1行、第2行与导入无关。有效内容从第3行开始，第3行为列名属性：序号、部门、校区、姓名、员工号等......</li>
                                     <li>第3行所有列名属性中系统将读取以下名称的列导入数据库，这些列的先后顺序无关，但列名称必须与要求相符（如下所示）！！<br>
-                                        ___________________________________________<br>
-                                        |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                        上海新东方劳务明细表&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
-                                        ___________________________________________<br>
-                                        |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                        日期：XXXX年XX月XX日&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
-                                        ___________________________________________<br>
-                                        | 部门 | 校区 | 姓名 | 员工号 | 身份证号 | 手机号 | 备注 |<br>
-                                        ___________________________________________
+                                        _____________________________________________<br>
+                                        |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        上海新东方劳务明细表&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+                                        _____________________________________________<br>
+                                        |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        日期：XXXX年XX月XX日&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+                                        _____________________________________________<br>
+                                        | 部门 | 校区 | 姓名 | 员工号 | 身份证号 | 手机号码 | 备注 |<br>
+                                        _____________________________________________
                                     </li>
 
                                     <li>第四行开始是数据:<br>
@@ -107,11 +107,15 @@
                         <li class="layui-timeline-item">
                             <i class="layui-icon layui-timeline-axis"></i>
                             <div class="layui-timeline-content layui-text">
-                                <h3 class="layui-timeline-title">STEP2: 导入排班表（耗时参考：185行/6秒）</h3>
-                                <p>这一步中，如果您是在原来的基础上更新排班表，如场景4（参见前言），<b style="color: red;">必须先前往：信息管理>班级信息</b>，查询出当前<b style="color: red;">年份-季度-校区</b>的班级记录，全部删除后，再执行以下步骤。为什么要这样做？
-                                    因为系统更新的原则：对于新的班级执行插入；对于修改过的班级执行更新；而对于已经不再有效的班级，系统无法从excel中悉知，因此需要先删除这些特例!<b style="color: red;">（如果有取消的班级必须进行以上操作，如原班级有4个：a、b、c、d，现在只有a、b、c；如果仅仅是修改或是新增，可以不用）</b></p>
+                                <h3 class="layui-timeline-title">STEP2: 导入排班表</h3>
+                                <p>这一步中，如果您是在原来的基础上更新排班表且有失效而取消的班级<b
+                                        style="color: red;">（如果有取消的班级必须进行以上操作，如原班级有4个：a、b、c、d，现在只有a、b、c；如果仅仅是修改或是新增，可以不用）</b>
+                                    ，<b style="color: red;">必须先前往：信息管理>班级信息</b>，查询出当前<b
+                                        style="color: red;">年份-季度-校区</b>的班级记录，全部删除后，再执行以下步骤(<b style="color: red;">或勾选'先删后导'选项，推荐</b>)。为什么要这样做？
+                                    因为系统更新的原则：对于新的班级执行插入；对于修改过的班级执行更新；而对于已经不再有效的班级，系统无法从excel中悉知，因此需要先删除这些特例!<b style="color: red;">删除了班级后，其下的所有学生上课记录也将删除，因此如果执行了这一操作，必须再执行STEP3！</b>
+                                </p>
                                 <p>上传excel要求说明：<a
-                                        href="${ctx}/toolbox/assistantAdministrator/downloadExample/3">查看范例</a></p>
+                                        href="${ctx}/toolbox/assistantAdministrator/downloadExample/2">查看范例</a></p>
                                 <ul>
                                     <li>第1行为列名属性。所有列名属性中系统将读取以下名称的列导入数据库，这些列的先后顺序无关，但列名称必须与要求相符（如下所示）！！<br>
                                         _________________________________________________<br>
@@ -142,6 +146,13 @@
                                     <input type="checkbox" name="parseClassId" id="parseClassId" lay-skin="switch"
                                            lay-text="ON|OFF"
                                            lay-filter="parseClassId" checked>
+                                </div>
+                                <label class="layui-form-label">先删后导&nbsp; <i class="layui-icon layui-icon-tips"
+                                                                              lay-tips="开启'先删后导'将先删除对应年份-季度-校区的所有班级，再对导入信息执行插入。开启此选项会使导入时间变长，如果更新的排班表中只有更改或增加的班级（根据我的经验通常情况是只有修改的），而没有删减的班级可以关闭此选项。"></i></label>
+                                <div class="layui-input-inline">
+                                    <input type="checkbox" name="deleteFirst1" id="deleteFirst1" lay-skin="switch"
+                                           lay-text="ON|OFF"
+                                           lay-filter="deleteFirst1">
                                 </div>
                             </div>
                             <div class="layui-form layui-form-item layui-timeline-content" style="margin-bottom: 20px;"
@@ -178,9 +189,11 @@
                 <li class="layui-timeline-item">
                     <i class="layui-icon layui-timeline-axis"></i>
                     <div class="layui-timeline-content layui-text">
-                        <h3 class="layui-timeline-title">STEP3: 导入学生花名册（从总部软件中导出的花名册）（耗时参考：4183行/2分30秒）</h3>
-                        <p>这一步中，如果您是在原来的基础上更新名单，如场景5（参见前言），<b style="color: red;">必须先前往：信息管理>学员信息>上课信息</b>，查询出当前<b style="color: red;">年份-季度-校区</b>的学生上课记录，全部删除后，再执行以下步骤。为什么要这样做？
-                            因为系统更新的原则：对于新进班的学生执行插入；对于转班的学生执行更新；而对于退班的学生，系统无法从excel中悉知，因此需要先删除这些退班特例!（<b style="color: red;">如果有退班的学生必须进行以上操作</b>）</p>
+                        <h3 class="layui-timeline-title">STEP3: 导入学生花名册（从总部软件中导出的花名册）</h3>
+                        <p>这一步中，如果您是在原来的基础上更新名单<b
+                                style="color: red;">（如果有退班的学生必须进行该操作；如果仅仅是转班或是新增，可以不用）</b>，<b style="color: red;">必须先前往：信息管理>学员信息>上课信息</b>，查询出当前<b
+                                style="color: red;">年份-季度-校区</b>的学生上课记录，全部删除后，再执行以下步骤(<b style="color: red;">或勾选'先删后导'选项，推荐</b>)。为什么要这样做？
+                            因为系统更新的原则：对于新进班的学生执行插入；对于转班的学生执行更新；而对于退班的学生，系统无法从excel中悉知，因此需要先删除这些退班特例!</p>
                         <p>上传excel要求说明：<a
                                 href="${ctx}/toolbox/assistantAdministrator/downloadExample/3">查看范例</a></p>
                         <ul>
@@ -199,6 +212,16 @@
                         <input type="checkbox" name="read_step3" id="read_step3" lay-skin="primary"
                                lay-filter="read_step3" title=""><b style="color: red;">我已认真阅读以上内容</b>
                     </div>
+                    <div class="layui-form layui-form-item layui-timeline-content" style="margin-bottom: 20px;"
+                         id="div0-import-student-and-class" hidden="hidden">
+                        <label class="layui-form-label">先删后导&nbsp; <i class="layui-icon layui-icon-tips"
+                                                                      lay-tips="开启'先删后导'将先删除对应年份-季度-校区的所有学生上课记录，再对导入信息执行插入。开启此选项会使导入时间变长，如果更新的上课记录中只有转班或新报班的学生（根据我的经验通常情况下不可能），而没有退班的学生可以关闭此选项。"></i></label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="deleteFirst2" id="deleteFirst2" lay-skin="switch"
+                                   lay-text="ON|OFF"
+                                   lay-filter="deleteFirst2" checked>
+                        </div>
+                    </div>
                     <div class="layui-timeline-content layui-text" id="div-import-student-and-class"
                          hidden="hidden">
                         <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel"
@@ -210,14 +233,14 @@
                 <li class="layui-timeline-item">
                     <i class="layui-icon layui-timeline-axis"></i>
                     <div class="layui-timeline-content layui-text">
-                        <h3 class="layui-timeline-title">STEP4: 导入学生花名册（每季开课前带学生联系方式等详细信息的学生名单）（耗时参考：4264行/35秒）</h3>
+                        <h3 class="layui-timeline-title">STEP4: 导入学生花名册（每季开课前带学生联系方式等详细信息的学生名单）</h3>
                         <p>上传excel要求说明：<a
                                 href="${ctx}/toolbox/assistantAdministrator/downloadExample/4">查看范例</a></p>
                         <ul>
                             <li>第1行为列名属性。所有列名属性中系统将读取以下名称的列导入数据库，这些列的先后顺序无关，但列名称必须与要求相符（如下所示）！！<br>
-                                ___________________________________<br>
+                                _____________________________<br>
                                 | 学员编号 | 姓名 | 手机 | 备用手机 |<br>
-                                ___________________________________
+                                _____________________________
                             </li>
 
                             <li>备用手机列不是必须的。</li>
@@ -301,24 +324,31 @@
             , done: function (res) {//返回值接收
                 layer.closeAll('loading'); //关闭loading
                 if (res.msg === "success") {
-                    return layer.msg('导入成功', {
-                        icon: 1
-                        , time: 1000
+                    return layer.alert('导入成功！' +'<br>'+
+                            '总耗时：'+res.excelSpeed.parsedTime+'<br>'+
+                            '导入表格记录数：'+res.excelSpeed.count+'条；平均速度：'+res.excelSpeed.parsedSpeed+'。<br>'+
+                            '变更数据库记录数：删除'+res.databaseSpeed.deleteCount+'条；插入'+res.databaseSpeed.insertCount
+                            +'条；更新'+res.databaseSpeed.updateCount+'条；平均速度：'+res.databaseSpeed.parsedSpeed+'。', {
+                        skin: 'layui-layer-molv' //样式类名
+                        ,closeBtn: 0
+                    });
+                } else if (res.msg === "excelColumnNotFound") {
+                    return layer.alert('表格中有列属性名不符合规范!', {
+                        skin: 'layui-layer-lan'
+                        ,closeBtn: 0
                     });
                 } else {
-                    return layer.msg('导入失败', {
-                        offset: '15px'
-                        , icon: 2
-                        , time: 2000
+                    return layer.alert('导入失败!', {
+                        skin: 'layui-layer-lan'
+                        ,closeBtn: 0
                     });
                 }
             }
             , error: function () {
                 layer.closeAll('loading'); //关闭loading
-                return layer.msg('导入失败', {
-                    offset: '15px'
-                    , icon: 2
-                    , time: 2000
+                return layer.alert('导入失败!', {
+                    skin: 'layui-layer-lan'
+                    ,closeBtn: 0
                 });
             }
         });
@@ -399,7 +429,10 @@
                     return $("#campus").val();
                 }
                 , parseClassId: function () {
-                    return $("#parseClassId").val();
+                    return $("#parseClassId").prop("checked");
+                }
+                , deleteFirst: function () {
+                    return  $("#deleteFirst1").prop("checked");
                 }
             }
             , accept: 'file' //普通文件
@@ -410,30 +443,36 @@
             , done: function (res) {//返回值接收
                 layer.closeAll('loading'); //关闭loading
                 if (res.msg === "success") {
-                    return layer.msg('导入成功', {
-                        icon: 1
-                        , time: 1000
+                    return layer.alert('导入成功！' +'<br>'+
+                            '总耗时：'+res.excelSpeed.parsedTime+'<br>'+
+                            '导入表格记录数：'+res.excelSpeed.count+'条；平均速度：'+res.excelSpeed.parsedSpeed+'。<br>'+
+                            '变更数据库记录数：删除'+res.databaseSpeed.deleteCount+'条；插入'+res.databaseSpeed.insertCount
+                            +'条；更新'+res.databaseSpeed.updateCount+'条；平均速度：'+res.databaseSpeed.parsedSpeed+'。', {
+                        skin: 'layui-layer-molv' //样式类名
+                        ,closeBtn: 0
                     });
                 } else if (res.msg === "yearInvalid") {
-                    return layer.msg('请选择正确的年份!', {
-                        offset: '15px'
-                        , icon: 2
-                        , time: 2000
+                    return layer.alert('请选择正确的年份!', {
+                        skin: 'layui-layer-lan'
+                        ,closeBtn: 0
+                    });
+                }else if (res.msg === "excelColumnNotFound") {
+                    return layer.alert('表格中有列属性名不符合规范!', {
+                        skin: 'layui-layer-lan'
+                        ,closeBtn: 0
                     });
                 } else {
-                    return layer.msg('导入失败', {
-                        offset: '15px'
-                        , icon: 2
-                        , time: 2000
+                    return layer.alert('导入失败!', {
+                        skin: 'layui-layer-lan'
+                        ,closeBtn: 0
                     });
                 }
             }
             , error: function () {
                 layer.closeAll('loading'); //关闭loading
-                return layer.msg('导入失败', {
-                    offset: '15px'
-                    , icon: 2
-                    , time: 2000
+                return layer.alert('导入失败!', {
+                    skin: 'layui-layer-lan'
+                    ,closeBtn: 0
                 });
             }
         });
@@ -445,8 +484,10 @@
             var checked = data.elem.checked;
             if (checked) {
                 $("#div-import-student-and-class").show();
+                $("#div0-import-student-and-class").show();
             } else {
                 $("#div-import-student-and-class").hide();
+                $("#div0-import-student-and-class").hide();
             }
         });
 
@@ -456,6 +497,9 @@
             , url: '${ctx}/student/admin/import'
             , data: {
                 type: 1
+                , deleteFirst: function () {
+                    return  $("#deleteFirst2").prop("checked");
+                }
             }
             , accept: 'file' //普通文件
             , exts: 'xls|xlsx' //允许上传的文件后缀
@@ -465,24 +509,36 @@
             , done: function (res) {//返回值接收
                 layer.closeAll('loading'); //关闭loading
                 if (res.msg === "success") {
-                    return layer.msg('导入成功', {
-                        icon: 1
-                        , time: 1000
+                    return layer.alert('导入成功！' +'<br>'+
+                            '总耗时：'+res.excelSpeed.parsedTime+'<br>'+
+                            '导入表格记录数：'+res.excelSpeed.count+'条；平均速度：'+res.excelSpeed.parsedSpeed+'。<br>'+
+                            '变更数据库记录数：删除'+res.databaseSpeed.deleteCount+'条；插入'+res.databaseSpeed.insertCount
+                            +'条；更新'+res.databaseSpeed.updateCount+'条；平均速度：'+res.databaseSpeed.parsedSpeed+'。', {
+                        skin: 'layui-layer-molv' //样式类名
+                        ,closeBtn: 0
                     });
-                } else {
-                    return layer.msg('导入失败', {
-                        offset: '15px'
-                        , icon: 2
-                        , time: 2000
+                }  else if (res.msg === "excelColumnNotFound") {
+                    return layer.alert('表格中有列属性名不符合规范!', {
+                        skin: 'layui-layer-lan'
+                        ,closeBtn: 0
+                    });
+                } else if (res.msg === "unEnableToParseRegisterTime") {
+                    return layer.alert('无法解析进班时间!', {
+                        skin: 'layui-layer-lan'
+                        ,closeBtn: 0
+                    });
+                }else {
+                    return layer.alert('导入失败!', {
+                        skin: 'layui-layer-lan'
+                        ,closeBtn: 0
                     });
                 }
             }
             , error: function () {
                 layer.closeAll('loading'); //关闭loading
-                return layer.msg('导入失败', {
-                    offset: '15px'
-                    , icon: 2
-                    , time: 2000
+                return layer.alert('导入失败!', {
+                    skin: 'layui-layer-lan'
+                    ,closeBtn: 0
                 });
             }
         });
@@ -514,24 +570,31 @@
             , done: function (res) {//返回值接收
                 layer.closeAll('loading'); //关闭loading
                 if (res.msg === "success") {
-                    return layer.msg('导入成功', {
-                        icon: 1
-                        , time: 1000
+                    return layer.alert('导入成功！' +'<br>'+
+                            '总耗时：'+res.excelSpeed.parsedTime+'<br>'+
+                            '导入表格记录数：'+res.excelSpeed.count+'条；平均速度：'+res.excelSpeed.parsedSpeed+'。<br>'+
+                            '变更数据库记录数：删除'+res.databaseSpeed.deleteCount+'条；插入'+res.databaseSpeed.insertCount
+                            +'条；更新'+res.databaseSpeed.updateCount+'条；平均速度：'+res.databaseSpeed.parsedSpeed+'。', {
+                        skin: 'layui-layer-molv' //样式类名
+                        ,closeBtn: 0
+                    });
+                } else if (res.msg === "excelColumnNotFound") {
+                    return layer.alert('表格中有列属性名不符合规范!', {
+                        skin: 'layui-layer-lan'
+                        ,closeBtn: 0
                     });
                 } else {
-                    return layer.msg('导入失败', {
-                        offset: '15px'
-                        , icon: 2
-                        , time: 2000
+                    return layer.alert('导入失败!', {
+                        skin: 'layui-layer-lan'
+                        ,closeBtn: 0
                     });
                 }
             }
             , error: function () {
                 layer.closeAll('loading'); //关闭loading
-                return layer.msg('导入失败', {
-                    offset: '15px'
-                    , icon: 2
-                    , time: 2000
+                return layer.alert('导入失败!', {
+                    skin: 'layui-layer-lan'
+                    ,closeBtn: 0
                 });
             }
         });

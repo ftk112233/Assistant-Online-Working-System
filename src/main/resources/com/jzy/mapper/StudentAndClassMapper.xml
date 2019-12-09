@@ -108,6 +108,75 @@
             #{id}
         </foreach>
     </delete>
+    <delete id="deleteStudentAndClassesByCondition"
+            parameterType="com.jzy.model.dto.StudentAndClassSearchCondition">
+        delete sc.* from (select c.*, a.assistant_name as assistant_name, t.teacher_name as teacher_name
+        from class c left join assistant a on c.class_assistant_id = a.id left join teacher t on c.class_teacher_id = t.id
+        <where>
+            <if test="classYear != null and classYear!=''">
+                and c.class_year=#{classYear}
+            </if>
+            <if test="classSeason != null and classSeason!=''">
+                and c.class_season=#{classSeason}
+            </if>
+            <if test="classCampus != null and classCampus!=''">
+                and c.class_campus=#{classCampus}
+            </if>
+            <if test="classId != null and classId!=''">
+                <bind name="classIdLike" value=" '%' + classId + '%' "/>
+                and c.class_id like #{classIdLike}
+            </if>
+            <if test="className != null and className!=''">
+                <bind name="classNameLike" value=" '%' + className + '%' "/>
+                and c.class_name like #{classNameLike}
+            </if>
+            <if test="assistantWorkId != null and assistantWorkId!=''">
+                <bind name="assistantWorkIdLike" value=" '%' + assistantWorkId + '%' "/>
+                and a.assistant_work_id like #{assistantWorkIdLike}
+            </if>
+            <if test="assistantName != null and assistantName!=''">
+                <bind name="assistantNameLike" value=" '%' + assistantName + '%' "/>
+                and a.assistant_name like #{assistantNameLike}
+            </if>
+            <if test="teacherWorkId != null and teacherWorkId!=''">
+                <bind name="teacherWorkIdLike" value=" '%' + teacherWorkId + '%' "/>
+                and t.teacher_work_id like #{teacherWorkIdLike}
+            </if>
+            <if test="teacherName != null and teacherName!=''">
+                <bind name="teacherNameLike" value=" '%' + teacherName + '%' "/>
+                and t.teacher_name like #{teacherNameLike}
+            </if>
+            <if test="classTime != null and classTime!=''">
+                <bind name="classTimeLike" value=" '%' + classTime + '%' "/>
+                and c.class_time like #{classTimeLike}
+            </if>
+            <if test="classGrade != null and classGrade!=''">
+                and c.class_grade=#{classGrade}
+            </if>
+            <if test="classSubject != null and classSubject!=''">
+                and c.class_subject=#{classSubject}
+            </if>
+            <if test="classType != null and classType!=''">
+                and c.class_type=#{classType}
+            </if>
+            <if test="classroom != null and classroom!=''">
+                <bind name="classroomLike" value=" '%' + classroom + '%' "/>
+                and c.classroom like #{classroomLike}
+            </if>
+        </where>
+        ) as class_tmp, student_class sc, student s
+        <where>
+            sc.class_id=class_tmp.id and sc.student_id=s.id
+            <if test="studentId != null and studentId!=''">
+                <bind name="studentIdLike" value=" '%' + studentId + '%' "/>
+                and s.student_id like #{studentIdLike}
+            </if>
+            <if test="studentName != null and studentName!=''">
+                <bind name="studentNameLike" value=" '%' + studentName + '%' "/>
+                and s.student_name like #{studentNameLike}
+            </if>
+        </where>
+    </delete>
 
     <select id="countStudentAndClassByStudentIdAndClassId" resultType="Long">
         select count(*) from student s inner join student_class s_c on s.id = s_c.student_id and  s.student_id=#{studentId}
@@ -276,6 +345,60 @@
             sc.class_id=c.id and sc.student_id=s.id
             and s.student_id=#{studentId} and c.class_year=#{classYear} and c.class_season=#{classSeason}
         </where>
+    </select>
+    <select id="countStudentsGroupByClassGrade" resultType="com.jzy.model.dto.echarts.GroupedByGradeObjectTotal"
+            parameterType="com.jzy.model.dto.StudentAndClassSearchCondition">
+        select c.class_grade as name, count(distinct sc.student_id) as value from class c inner join student_class sc on c.id = sc.class_id
+        <where>
+            <if test="classYear != null and classYear!=''">
+                and c.class_year=#{classYear}
+            </if>
+            <if test="classSeason != null and classSeason!=''">
+                and c.class_season=#{classSeason}
+            </if>
+            <if test="classCampus != null and classCampus!=''">
+                and c.class_campus=#{classCampus}
+            </if>
+        </where>
+         group by c.class_grade
+    </select>
+    <select id="countStudentsGroupByClassSubject" resultType="com.jzy.model.dto.echarts.GroupedBySubjectObjectTotal"
+            parameterType="com.jzy.model.dto.StudentAndClassSearchCondition">
+        select c.class_subject as name, count(sc.student_id) as value from class c inner join student_class sc on c.id = sc.class_id
+        <where>
+            <if test="classYear != null and classYear!=''">
+                and c.class_year=#{classYear}
+            </if>
+            <if test="classSeason != null and classSeason!=''">
+                and c.class_season=#{classSeason}
+            </if>
+            <if test="classCampus != null and classCampus!=''">
+                and c.class_campus=#{classCampus}
+            </if>
+        </where>
+        group by c.class_subject
+    </select>
+    <select id="countStudentsGroupByClassType" resultType="com.jzy.model.dto.echarts.GroupedByTypeObjectTotal"
+            parameterType="com.jzy.model.dto.StudentAndClassSearchCondition">
+        select c.class_type as name, count(sc.student_id) as value from class c inner join student_class sc on c.id = sc.class_id
+        <where>
+            <if test="classYear != null and classYear!=''">
+                and c.class_year=#{classYear}
+            </if>
+            <if test="classSeason != null and classSeason!=''">
+                and c.class_season=#{classSeason}
+            </if>
+            <if test="classCampus != null and classCampus!=''">
+                and c.class_campus=#{classCampus}
+            </if>
+            <if test="classGrade != null and classGrade!=''">
+                and c.class_grade=#{classGrade}
+            </if>
+            <if test="classSubject != null and classSubject!=''">
+                and c.class_subject=#{classSubject}
+            </if>
+        </where>
+        group by c.class_type
     </select>
 
 </mapper>

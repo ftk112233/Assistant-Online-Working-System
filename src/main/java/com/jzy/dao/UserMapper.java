@@ -1,7 +1,9 @@
 package com.jzy.dao;
 
 import com.jzy.model.dto.UserSearchCondition;
+import com.jzy.model.dto.UserSendToSearchCondition;
 import com.jzy.model.entity.User;
+import com.jzy.model.dto.UserSendTo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -68,14 +70,14 @@ public interface UserMapper {
      * @param userEmail 用户邮箱
      * @param userPassword 用户新密码（密文），直接set到数据库
      */
-    void updatePasswordByEmail(@Param("userEmail") String userEmail, @Param("userPassword") String userPassword);
+    long updatePasswordByEmail(@Param("userEmail") String userEmail, @Param("userPassword") String userPassword);
 
     /**
      * 用户自己更新用户信息，只有部分字段，注意不是用户管理中的更新
      *
      * @param user 用户信息
      */
-    void updateOwnInfo(User user);
+    long updateOwnInfo(User user);
 
     /**
      * 根据id修改用户邮箱
@@ -83,7 +85,7 @@ public interface UserMapper {
      * @param id 用户id
      * @param userEmail 新安全邮箱
      */
-    void updateEmailById(@Param("id") Long id, @Param("userEmail") String userEmail);
+    long updateEmailById(@Param("id") Long id, @Param("userEmail") String userEmail);
 
     /**
      * 根据id修改用户手机
@@ -91,7 +93,7 @@ public interface UserMapper {
      * @param id 用户id
      * @param userPhone 新安全手机
      */
-    void updatePhoneById(@Param("id") Long id,@Param("userPhone") String userPhone);
+    long updatePhoneById(@Param("id") Long id,@Param("userPhone") String userPhone);
 
     /**
      * 根据id修改用户密码，这里密码是密文，加密操作在service层完成
@@ -99,7 +101,7 @@ public interface UserMapper {
      * @param id 用户id
      * @param userPassword 用户密文密码
      */
-    void updatePasswordById(@Param("id") Long id,@Param("userPassword") String userPassword);
+    long updatePasswordById(@Param("id") Long id,@Param("userPassword") String userPassword);
 
     /**
      * 查询所有符合条件的用户信息
@@ -114,35 +116,35 @@ public interface UserMapper {
      *
      * @param user 修改后的用户信息
      */
-    void updateUserInfo(User user);
+    long updateUserInfo(User user);
 
     /**
      * 插入新用户
      *
      * @param user 新用户信息
      */
-    void insertUser(User user);
+    long insertUser(User user);
 
     /**
      * 根据id删除一个用户
      *
      * @param id 用户id
      */
-    void deleteOneUserById(@Param("id") Long id);
+    long deleteOneUserById(@Param("id") Long id);
 
     /**
      * 根据工号更新用户信息
      *
      * @param user 新的用户信息
      */
-    void updateUserByWorkId(User user);
+    long updateUserByWorkId(User user);
 
     /**
      * 根据id删除多个用户
      *
      * @param ids 用户id的list
      */
-    void deleteManyUsersByIds(List<Long> ids);
+    long deleteManyUsersByIds(List<Long> ids);
 
     /**
      * 查询出所有的用户
@@ -150,4 +152,12 @@ public interface UserMapper {
      * @return
      */
     List<User> listAllUsers();
+
+    /**
+     * 发送消息页面，用户综合查询
+     *
+     * @param condition 查询条件入参
+     * @return
+     */
+    List<UserSendTo> listUsersSendTo(UserSendToSearchCondition condition);
 }

@@ -4,19 +4,29 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
+import com.jzy.manager.exception.ExcelColumnNotFoundException;
+import com.jzy.manager.exception.InputFileTypeException;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.ClassUtils;
+import com.jzy.manager.util.UserMessageUtils;
 import com.jzy.model.CampusEnum;
 import com.jzy.model.dto.ClassDetailedDto;
 import com.jzy.model.dto.ClassSearchCondition;
 import com.jzy.model.dto.MyPage;
+import com.jzy.model.dto.UpdateResult;
+import com.jzy.model.entity.Assistant;
 import com.jzy.model.entity.Class;
 import com.jzy.model.entity.User;
+import com.jzy.model.entity.UserMessage;
 import com.jzy.model.excel.Excel;
 import com.jzy.model.excel.ExcelVersionEnum;
 import com.jzy.model.excel.input.ClassArrangementExcel;
 import com.jzy.model.vo.ResultMap;
+import com.jzy.model.vo.Speed;
+import com.jzy.model.vo.SqlProceedSpeed;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,11 +35,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @ClassName ClassAdminController
@@ -40,29 +46,30 @@ import java.util.Map;
  **/
 @Controller
 @RequestMapping("/class/admin")
-public class ClassAdminController extends AbstractController{
-    private final static Logger logger = Logger.getLogger(ClassAdminController.class);
+public class ClassAdminController extends AbstractController {
+    private final static Logger logger = LogManager.getLogger(ClassAdminController.class);
 
     /**
      * 导入排班表
      *
-     * @param file         上传的文件
-     * @param parseClassId 是否开启自动解析的开关
-     * @param clazz        开班年份、校区、季度等信息的封装
+     * @param file                上传的文件
+     * @param parseClassIdChecked 是否开启自动解析的开关
+     * @param clazz               开班年份、校区、季度等信息的封装
      * @return
      */
     @RequestMapping("/import")
     @ResponseBody
-    public Map<String, Object> importExcel(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam("parseClassId") String parseClassId, Class clazz) {
+    public Map<String, Object> importExcel(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam("parseClassId") boolean parseClassIdChecked,
+                                           @RequestParam("deleteFirst") boolean deleteFirstChecked, Class clazz) throws InvalidParameterException {
         Map<String, Object> map2 = new HashMap<>(1);
-        Map<String, Object> map = new HashMap<>(3);
+        Map<String, Object> map = new HashMap<>();
         //返回layui规定的文件上传模块JSON格式
         map.put("code", 0);
         map2.put("src", "");
         map.put("data", map2);
 
         if (clazz == null || StringUtils.isEmpty(clazz.getClassYear()) || !ClassUtils.isValidClassYear(clazz.getClassYear())) {
-            map.put("msg", "campusInvalid");
+            map.put("msg", "yearInvalid");
             return map;
         }
 
@@ -84,39 +91,111 @@ public class ClassAdminController extends AbstractController{
             throw new InvalidParameterException(msg);
         }
 
+        long startTime = System.currentTimeMillis();   //获取开始时间
+        int excelEffectiveDataRowCount = 0; //表格有效数据行数
+        int databaseUpdateRowCount = 0; //数据库更新记录数
+        int databaseInsertRowCount = 0; //数据库插入记录数
+        int databaseDeleteRowCount = 0; //数据库删除记录数
 
         ClassArrangementExcel excel = null;
         try {
             excel = new ClassArrangementExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
-            excel.readClassDetailFromExcel();
+            excelEffectiveDataRowCount = excel.readClassDetailFromExcel();
         } catch (IOException e) {
+            e.printStackTrace();
+            map.put("msg", Constants.FAILURE);
+            return map;
+        } catch (ExcelColumnNotFoundException e) {
+            e.printStackTrace();
+            map.put("msg", "excelColumnNotFound");
+            return map;
+        } catch (InputFileTypeException e) {
             e.printStackTrace();
             map.put("msg", Constants.FAILURE);
             return map;
         }
 
         try {
-            teacherService.insertAndUpdateTeachersFromExcel(new ArrayList<>(excel.getTeachers()));
+            UpdateResult teacherResult = teacherService.insertAndUpdateTeachersFromExcel(new ArrayList<>(excel.getTeachers()));
+            databaseInsertRowCount += (int) teacherResult.getInsertCount();
+            databaseUpdateRowCount += (int) teacherResult.getUpdateCount();
 
-            List<ClassDetailedDto> classDetailedDtos=excel.getClassDetailedDtos();
-            for (ClassDetailedDto classDetailedDto:classDetailedDtos) {
+            List<ClassDetailedDto> classDetailedDtos = excel.getClassDetailedDtos();
+            for (ClassDetailedDto classDetailedDto : classDetailedDtos) {
                 classDetailedDto.setClassYear(clazz.getClassYear());
-                if (!StringUtils.isEmpty(clazz.getClassSeason())){
-                    classDetailedDto.setClassSeason(clazz.getClassSeason());
-                }
-                if (!StringUtils.isEmpty(clazz.getClassCampus())){
-                    classDetailedDto.setClassCampus(clazz.getClassCampus());
+                if (!parseClassIdChecked) {
+                    //未开启自动解析
+                    if (!StringUtils.isEmpty(clazz.getClassSeason())) {
+                        classDetailedDto.setClassSeason(clazz.getClassSeason());
+                    }
+                    if (!StringUtils.isEmpty(clazz.getClassCampus())) {
+                        classDetailedDto.setClassCampus(clazz.getClassCampus());
+                    }
                 }
             }
-            classService.insertAndUpdateClassesFromExcel(classDetailedDtos);
+
+            if (deleteFirstChecked) {
+                //如果开启先导后删
+                if (classDetailedDtos.size() > 0) {
+                    ClassDetailedDto dto = classDetailedDtos.get(0);
+                    ClassSearchCondition condition = new ClassSearchCondition();
+                    condition.setClassYear(dto.getClassYear());
+                    condition.setClassSeason(dto.getClassSeason());
+                    condition.setClassCampus(dto.getClassCampus());
+                    databaseDeleteRowCount += (int) classService.deleteClassesByCondition(condition).getDeleteCount();
+                }
+            }
+
+            //插入&更新
+            UpdateResult classResult = classService.insertAndUpdateClassesFromExcel(classDetailedDtos);
+            databaseInsertRowCount += (int) classResult.getInsertCount();
+            databaseUpdateRowCount += (int) classResult.getUpdateCount();
+
+
+            long endTime = System.currentTimeMillis(); //获取结束时间
+            Speed speedOfExcelImport = new Speed(excelEffectiveDataRowCount, endTime - startTime);
+            SqlProceedSpeed speedOfDatabaseImport = new SqlProceedSpeed(databaseUpdateRowCount, databaseInsertRowCount, databaseDeleteRowCount, endTime - startTime);
+            speedOfExcelImport.parseSpeed();
+            speedOfDatabaseImport.parseSpeed();
+            map.put("excelSpeed", speedOfExcelImport);
+            map.put("databaseSpeed", speedOfDatabaseImport);
+
+            //向对应校区的用户发送通知消息
+            if (classDetailedDtos.size() > 0) {
+                ClassDetailedDto classDetailedDto = classDetailedDtos.get(0);
+                String campus = classDetailedDto.getClassCampus();
+                if (!StringUtils.isEmpty(campus)) {
+                    List<Assistant> assistants = assistantService.listAssistantsByCampus(campus);
+                    List<Long> userIds = new ArrayList<>();
+                    for (Assistant assistant : assistants) {
+                        userIds.add(userService.getUserByWorkId(assistant.getAssistantWorkId()).getId());
+                    }
+
+                    for (Long userId : userIds) {
+                        UserMessage message = new UserMessage();
+                        message.setUserId(userId);
+                        message.setUserFromId(userService.getSessionUserInfo().getId());
+                        message.setMessageTitle("排班信息有变化");
+                        StringBuffer messageContent = new StringBuffer();
+                        messageContent.append("你的学管老师刚刚更新了" + classDetailedDto.getClassCampus() + "校区" + classDetailedDto.getClassYear() + "年" + classDetailedDto.getClassSeason() + "的排班表。")
+                                .append("<br>点<a lay-href='/class/admin/page' lay-text='班级信息'>这里</a>前往查看。");
+                        message.setMessageContent(messageContent.toString());
+                        message.setMessageTime(new Date());
+                        if (UserMessageUtils.isValidUserMessageUpdateInfo(message)) {
+                            userMessageService.insertUserMessage(message);
+                        }
+                    }
+                }
+            }
+
+
+            map.put("msg", Constants.SUCCESS);
         } catch (Exception e) {
             e.printStackTrace();
             map.put("msg", Constants.FAILURE);
             return map;
         }
 
-
-        map.put("msg", Constants.SUCCESS);
         return map;
     }
 
@@ -131,11 +210,11 @@ public class ClassAdminController extends AbstractController{
         model.addAttribute(ModelConstants.CURRENT_SEASON_MODEL_KEY, ClassUtils.getCurrentSeason());
 
         model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
-        model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(ClassUtils.SEASONS));
+        model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(Class.SEASONS));
         model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
-        model.addAttribute(ModelConstants.GRADES_MODEL_KEY, JSON.toJSONString(ClassUtils.GRADES));
-        model.addAttribute(ModelConstants.SUBJECTS_MODEL_KEY, JSON.toJSONString(ClassUtils.SUBJECTS));
-        model.addAttribute(ModelConstants.TYPES_MODEL_KEY, JSON.toJSONString(ClassUtils.TYPES));
+        model.addAttribute(ModelConstants.GRADES_MODEL_KEY, JSON.toJSONString(Class.GRADES));
+        model.addAttribute(ModelConstants.SUBJECTS_MODEL_KEY, JSON.toJSONString(Class.SUBJECTS));
+        model.addAttribute(ModelConstants.TYPES_MODEL_KEY, JSON.toJSONString(Class.TYPES));
         return "class/admin/page";
     }
 
@@ -148,7 +227,7 @@ public class ClassAdminController extends AbstractController{
      */
     @RequestMapping("/getClassInfo")
     @ResponseBody
-    public ResultMap<List<ClassDetailedDto>> getTeacherInfo(MyPage myPage, ClassSearchCondition condition) {
+    public ResultMap<List<ClassDetailedDto>> getClassInfo(MyPage myPage, ClassSearchCondition condition) {
         PageInfo<ClassDetailedDto> pageInfo = classService.listClasses(myPage, condition);
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
     }
@@ -163,7 +242,7 @@ public class ClassAdminController extends AbstractController{
     @RequestMapping("/getOwnClassInfoByAssistant")
     @ResponseBody
     public ResultMap<List<ClassDetailedDto>> getOwnClassInfoByAssistant(MyPage myPage, ClassSearchCondition condition) {
-        User user=userService.getSessionUserInfo();
+        User user = userService.getSessionUserInfo();
         condition.setAssistantWorkId(user.getUserWorkId());
         PageInfo<ClassDetailedDto> pageInfo = classService.listClasses(myPage, condition);
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
@@ -179,10 +258,10 @@ public class ClassAdminController extends AbstractController{
     @RequestMapping("/updateForm")
     public String updateForm(Model model, Class clazz) {
         model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
-        model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(ClassUtils.SEASONS));
-        model.addAttribute(ModelConstants.GRADES_MODEL_KEY, JSON.toJSONString(ClassUtils.GRADES));
-        model.addAttribute(ModelConstants.SUBJECTS_MODEL_KEY, JSON.toJSONString(ClassUtils.SUBJECTS));
-        model.addAttribute(ModelConstants.TYPES_MODEL_KEY, JSON.toJSONString(ClassUtils.TYPES));
+        model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(Class.SEASONS));
+        model.addAttribute(ModelConstants.GRADES_MODEL_KEY, JSON.toJSONString(Class.GRADES));
+        model.addAttribute(ModelConstants.SUBJECTS_MODEL_KEY, JSON.toJSONString(Class.SUBJECTS));
+        model.addAttribute(ModelConstants.TYPES_MODEL_KEY, JSON.toJSONString(Class.TYPES));
 
         model.addAttribute(ModelConstants.CLASS_EDIT_MODEL_KEY, clazz);
         return "class/admin/classForm";
@@ -196,7 +275,7 @@ public class ClassAdminController extends AbstractController{
      */
     @RequestMapping("/updateById")
     @ResponseBody
-    public Map<String, Object> updateById(ClassDetailedDto classDetailedDto) {
+    public Map<String, Object> updateById(ClassDetailedDto classDetailedDto) throws InvalidParameterException {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!ClassUtils.isValidClassDetailedDtoInfo(classDetailedDto)) {
@@ -218,7 +297,7 @@ public class ClassAdminController extends AbstractController{
      */
     @RequestMapping("/insert")
     @ResponseBody
-    public Map<String, Object> insert(ClassDetailedDto classDetailedDto) {
+    public Map<String, Object> insert(ClassDetailedDto classDetailedDto) throws InvalidParameterException {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!ClassUtils.isValidClassUpdateInfo(classDetailedDto)) {
@@ -226,7 +305,7 @@ public class ClassAdminController extends AbstractController{
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
-        map.put("data", classService.insertClass(classDetailedDto));
+        map.put("data", classService.insertClass(classDetailedDto).getResult());
 
         return map;
     }
@@ -268,6 +347,20 @@ public class ClassAdminController extends AbstractController{
         return map;
     }
 
+    /**
+     * 条件删除多个助教ajax交互
+     *
+     * @param condition 输入的查询条件
+     * @return
+     */
+    @RequestMapping("/deleteByCondition")
+    @ResponseBody
+    public Map<String, Object> deleteByCondition(ClassSearchCondition condition) {
+        Map<String, Object> map = new HashMap(1);
+        map.put("data", classService.deleteClassesByCondition(condition).getResult());
+        return map;
+    }
+
 
     /**
      * 重定向到预览班级信息iframe子页面并返回相应model
@@ -278,16 +371,10 @@ public class ClassAdminController extends AbstractController{
      */
     @RequestMapping("/getPreviewClassInfo")
     public String getPreviewClassInfo(Model model, Class clazz) {
-        ClassDetailedDto classDetailedDto=classService.getClassDetailByClassId(clazz.getClassId());
-        if (classDetailedDto == null){
-            classDetailedDto=new ClassDetailedDto();
+        ClassDetailedDto classDetailedDto = classService.getClassDetailByClassId(clazz.getClassId());
+        if (classDetailedDto == null) {
+            classDetailedDto = new ClassDetailedDto();
         }
-//
-//        model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
-//        model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(ClassUtils.SEASONS));
-//        model.addAttribute(ModelConstants.GRADES_MODEL_KEY, JSON.toJSONString(ClassUtils.GRADES));
-//        model.addAttribute(ModelConstants.SUBJECTS_MODEL_KEY, JSON.toJSONString(ClassUtils.SUBJECTS));
-//        model.addAttribute(ModelConstants.TYPES_MODEL_KEY, JSON.toJSONString(ClassUtils.TYPES));
 
         model.addAttribute(ModelConstants.CLASS_PREVIEW_MODEL_KEY, classDetailedDto);
         return "class/admin/classPreviewForm";

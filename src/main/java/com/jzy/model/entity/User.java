@@ -1,12 +1,13 @@
 package com.jzy.model.entity;
 
 import com.jzy.manager.util.ShiroUtils;
-import com.jzy.manager.util.UserUtils;
+import com.jzy.model.RoleEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -21,6 +22,16 @@ import java.util.UUID;
 @Data
 public class User extends BaseEntity {
     private static final long serialVersionUID = 3383159835719833836L;
+
+    /**
+     * 用户的所有角色
+     */
+    public static List<String> ROLES = RoleEnum.getRolesList();
+
+    /**
+     * 用户默认头像
+     */
+    public static final String USER_ICON_DEFAULT = "user_icon_default.jpg";
 
     /**
      * 用户的工号，即助教的工号，唯一，长度不超过32可以为空
@@ -80,7 +91,7 @@ public class User extends BaseEntity {
     /**
      * 为新插入或修改过的user配置默认的密码和盐
      */
-    public User setDefaultUserPasswordAndSalt(){
+    public void setDefaultUserPasswordAndSalt(){
         String uuid = UUID.randomUUID().toString().replace("-", "");
         this.setUserSalt(uuid);
         if (StringUtils.isEmpty(this.getUserPassword())) {
@@ -99,17 +110,15 @@ public class User extends BaseEntity {
             //若密码不为空
             this.setUserPassword(ShiroUtils.encryptUserPassword(this.getUserPassword(), uuid));
         }
-        return this;
     }
 
     /**
      * 为新插入或修改过的user配置默认的头像
      */
-    public User setDefaultUserIcon(){
+    public void setDefaultUserIcon(){
         if (StringUtils.isEmpty(this.getUserIcon())) {
             //用户头像为空
-            this.setUserIcon(UserUtils.USER_ICON_DEFAULT);
+            this.setUserIcon(USER_ICON_DEFAULT);
         }
-        return this;
     }
 }

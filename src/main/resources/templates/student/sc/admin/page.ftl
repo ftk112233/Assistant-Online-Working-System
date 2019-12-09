@@ -144,10 +144,11 @@
                             id="clear">
                         清空
                     </button>
-                    <#--<button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #5FB878"-->
-                            <#--id="query-my-class-assistant" lay-submit-->
-                            <#--lay-filter="query-my-class-assistant">助教-查询我的班级-->
-                    <#--</button>-->
+                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit
+                            lay-filter="deleteByCondition"
+                            id="deleteByCondition" lay-tips="'条件删除'将批量删除根据前面的查询条件查询出的所有记录，使用前请先查询预览这些记录是否正确！">
+                        条件删除
+                    </button>
                 </div>
             </div>
         </div>
@@ -292,8 +293,8 @@
                 , {field: 'classGrade', title: '年级', width: 110, sort: true, hide: true}
                 , {field: 'classSubject', title: '学科', width: 80, sort: true, hide: true}
                 , {field: 'classType', title: '班型', width: 80, sort: true, hide: true}
-                , {field: 'classYear', title: '年份', width: 80, sort: true}
-                , {field: 'classSeason', title: '季度', width: 80, sort: true}
+                , {field: 'classYear', title: '年份', width: 80, sort: true, hide: true}
+                , {field: 'classSeason', title: '季度', width: 80, sort: true, hide: true}
                 , {field: 'classTime', title: '详细上课时间', hide: true}
                 , {field: 'classSimplifiedTime', title: '上课时间', width: 120}
                 , {field: 'classTimes', title: '上课次数', width: 110, hide: true}
@@ -302,7 +303,7 @@
                 , {field: 'classroom', title: '上课教室', width: 110}
                 , {field: 'registerTime', title: '进班时间', sort: true}
                 , {field: 'remark', title: '报班备注', hide: true}
-                , {title: '操作', minWidth: 150, align: 'center', fixed: 'right', toolbar: '#table-content-list1'}
+                , {title: '操作', minWidth: 150, align: 'center', toolbar: '#table-content-list1'}
             ]]
             , where: {
                 classYear: '${currentYear!""}'
@@ -313,7 +314,7 @@
             }
             , page: true
             , limit: 10
-            , limits: [5, 10, 15, 20, 9999999]
+            , limits: [5, 10, 15, 20, 50]
             , request: {
                 pageName: 'pageNum',
                 limitName: 'pageSize'  //如不配置，默认为page=1&limit=10
@@ -369,6 +370,65 @@
                 , page: {
                     curr: 1 //重新从第 1 页开始
                 }
+            });
+        });
+
+
+        //监听搜索
+        form.on('submit(deleteByCondition)', function (data) {
+            var field = data.field;
+            console.log(field)
+            layer.confirm('确定要根据上述条件删除数据吗？', function (index) {
+                //执行 Ajax 后重载
+                $.ajax({
+                    type: 'post',
+                    data: {
+                        classYear: field.year
+                        , classSeason: field.season
+                        , classCampus: field.campus
+                        , studentId : field.studentId
+                        , studentName : field.studentName
+                        , classId: field.classId
+                        , className: field.className
+                        , assistantName: field.assistantName
+                        , teacherName: field.teacherName
+                        , classTime: field.classTime
+                        , classGrade: field.grade
+                        , classSubject: field.subject
+                        , classType: field.type
+                        , classroom: field.classroom
+                    },
+                    url: "${ctx}/studentAndClass/admin/deleteByCondition",
+                    beforeSend: function (data) {
+                        layer.load(1, {shade: [0.1, '#fff']}); //上传loading
+                    }
+                    , success: function (data) {
+                        layer.closeAll('loading'); //关闭loading
+                        if (data.data === "success") {
+                            layer.msg('已删除');
+                            table.reload('scTables', {
+                                url: '${ctx}/studentAndClass/admin/getStudentAndClassInfo' //向后端默认传page和limit); //重载表格
+                                , request: {
+                                    pageName: 'pageNum',
+                                    limitName: 'pageSize'  //如不配置，默认为page=1&limit=10
+                                }
+                                , where: {
+                                    classYear: field.year
+                                    , classSeason: field.season
+                                    , condition1: 'registerTime'
+                                    , condition2: 'asc'
+                                }
+                                , page: {
+                                    curr: 1 //重新从第 1 页开始
+                                }
+                            });
+                        } else {
+                            layer.msg('无法完成操作');
+                        }
+                    }
+
+                });
+
             });
         });
 

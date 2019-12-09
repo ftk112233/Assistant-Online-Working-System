@@ -1,6 +1,8 @@
 package com.jzy.web.controller;
 
 import com.jzy.model.entity.Class;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +20,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/class")
 public class ClassController extends AbstractController {
+    private final static Logger logger = LogManager.getLogger(ClassController.class);
+
     /**
      * 查询校区下的所有教室
      *
@@ -26,7 +30,7 @@ public class ClassController extends AbstractController {
      */
     @RequestMapping("/listClassroomsByCampus")
     @ResponseBody
-    public List<String> listClassroomsByCampus(@RequestParam(value = "campusName",required = false) String campusName) {
+    public List<String> listClassroomsByCampus(@RequestParam(value = "campusName", required = false) String campusName) {
         return campusAndClassroomService.listClassroomsByCampus(campusName);
     }
 
@@ -38,8 +42,8 @@ public class ClassController extends AbstractController {
      */
     @RequestMapping("/getParsedClassByParsingClassId")
     @ResponseBody
-    public Class getParsedClassByParsingClassId(@RequestParam(value = "classId",required = false) String classId) {
-        Class clazz=new Class();
+    public Class getParsedClassByParsingClassId(@RequestParam(value = "classId", required = false) String classId) {
+        Class clazz = new Class();
         clazz.setParsedClassId(classId);
         return clazz;
     }

@@ -59,7 +59,6 @@ public class AssistantInfoExcel extends Excel {
      */
     private List<Assistant> assistants;
 
-
     public AssistantInfoExcel() {
     }
 
@@ -81,8 +80,11 @@ public class AssistantInfoExcel extends Excel {
 
     /**
      * 从助教信息表中读取信息，封装成user对象和assistant对象添加到成员变量列表中
+     *
+     * @return 返回表格有效数据的行数
+     * @throws ExcelColumnNotFoundException
      */
-    public void readUsersAndAssistantsFromExcel() throws ExcelColumnNotFoundException {
+    public int readUsersAndAssistantsFromExcel() throws ExcelColumnNotFoundException {
         resetParam();
 
         int sheetIx = 0;
@@ -125,14 +127,18 @@ public class AssistantInfoExcel extends Excel {
             throw new ExcelColumnNotFoundException("助教信息列属性中有未匹配的属性名");
         }
 
+        int effectiveDataRowCount=0;
+
         int rowCount = this.getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
             User user = new User();
             Assistant assistant = new Assistant();
 
-            if (StringUtils.isEmpty(this.getValueAt(sheetIx, i, columnIndexOfWorkId))){
+            if (StringUtils.isEmpty(this.getValueAt(sheetIx, i, columnIndexOfWorkId))) {
                 //当前行工号为空，跳过
                 continue;
+            } else {
+                effectiveDataRowCount++;
             }
 
             String depart = this.getValueAt(sheetIx, i, columnIndexOfDepart);
@@ -162,41 +168,34 @@ public class AssistantInfoExcel extends Excel {
 
 
             //用户名默认身份证
-            String userName = StringUtils.isEmpty(idCard) ? "a_" + CodeUtils.sixRandomCodes() + CodeUtils.sixRandomCodes() : "a_" + idCard;
+            String userName = StringUtils.isEmpty(idCard) ? "a_" + CodeUtils.randomCodes() + CodeUtils.randomCodes() : "a_" + idCard;
             user.setUserName(userName);
             user.setUserRole("助教");
 
-            /**
-             * 用户密码，盐，用户头像等设置
-             */
-            user.setDefaultUserPasswordAndSalt();
-
-            user.setDefaultUserIcon();
 
             users.add(user);
             assistants.add(assistant);
         }
 
+        return effectiveDataRowCount;
     }
 
     /**
      * 从助教信息表中读取信息，封装成user对象
      *
-     * @return 读取到的所有user对象
+     * @return 返回表格有效数据的行数
      */
-    public List<User> readUsers() throws ExcelColumnNotFoundException {
-        readUsersAndAssistantsFromExcel();
-        return users;
+    public int readUsers() throws ExcelColumnNotFoundException {
+        return readUsersAndAssistantsFromExcel();
     }
 
     /**
      * 从助教信息表中读取信息，封装成assistant对象
      *
-     * @return 读取到的所有assistant对象
+     * @return 返回表格有效数据的行数
      */
-    public List<Assistant> readAssistants() throws ExcelColumnNotFoundException {
-        readUsersAndAssistantsFromExcel();
-        return assistants;
+    public int readAssistants() throws ExcelColumnNotFoundException {
+        return readUsersAndAssistantsFromExcel();
     }
 
     @Override

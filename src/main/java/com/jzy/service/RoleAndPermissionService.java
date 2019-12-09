@@ -35,8 +35,8 @@ public interface RoleAndPermissionService {
     /**
      * 返回符合条件的用户权限分页结果
      *
-     * @param myPage 分页{页号，每页数量}
-     * @param condition  查询条件入参
+     * @param myPage    分页{页号，每页数量}
+     * @param condition 查询条件入参
      * @return
      */
     PageInfo<RoleAndPermission> listRoleAndPerms(MyPage myPage, RoleAndPermissionSearchCondition condition);
@@ -55,7 +55,7 @@ public interface RoleAndPermissionService {
      * @param id 自增id
      * @return
      */
-    RoleAndPermission getRoleAndPermById( Long id);
+    RoleAndPermission getRoleAndPermById(Long id);
 
     /**
      * 角色权限管理中的添加角色权限
@@ -70,12 +70,12 @@ public interface RoleAndPermissionService {
      *
      * @param id 角色权限id
      */
-    void deleteOneRoleAndPermissionById(Long id);
+    long deleteOneRoleAndPermissionById(Long id);
 
     /**
      * 根据id删除多个角色权限
      *
      * @param ids 角色权限id的列表
      */
-    void deleteManyRoleAndPermissionsByIds(List<Long> ids);
+    long deleteManyRoleAndPermissionsByIds(List<Long> ids);
 }

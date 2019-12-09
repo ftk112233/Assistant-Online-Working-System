@@ -66,10 +66,10 @@ public class StudentListForSeatTableUploadByUserExcel extends Excel implements S
      *
      * @return map类型成员变量studentNames
      */
-    public List<String> readStudentNames() {
+    public List<String> readStudentNames() throws ExcelColumnNotFoundException {
         resetParam();
 
-        int sheetIndex=0;
+        int sheetIndex = 0;
 
         int targetRowColumnCount = this.getColumnCount(sheetIndex, startRow);
 
@@ -79,7 +79,7 @@ public class StudentListForSeatTableUploadByUserExcel extends Excel implements S
         int columnIndexOfStudentName = -1;
         for (int i = 0; i < targetRowColumnCount; i++) {
             if (STUDENT_NAME_COLUMN.equals(this.getValueAt(sheetIndex, startRow, i))) {
-                columnIndexOfStudentName=i;
+                columnIndexOfStudentName = i;
                 break;
             }
         }
@@ -89,9 +89,11 @@ public class StudentListForSeatTableUploadByUserExcel extends Excel implements S
             throw new ExcelColumnNotFoundException("名单列属性中有未匹配的属性名");
         }
 
-        for (int i = startRow+1; i < getRowCount(sheetIndex); i++) { // 遍历表格所有行
+        for (int i = startRow + 1; i < getRowCount(sheetIndex); i++) {
+            // 遍历表格所有行
             String value = this.getValueAt(sheetIndex, i, columnIndexOfStudentName);
-            if (!StringUtils.isEmpty(value)) { // “学员姓名”列对应行元素非空
+            if (!StringUtils.isEmpty(value)) {
+                // “学员姓名”列对应行元素非空
                 studentNames.add(value);
             }
         }

@@ -37,7 +37,7 @@ public interface ClassMapper {
      * @param classDetailedDto 修改后的班级信息
      * @return
      */
-    void updateClassByClassId(ClassDetailedDto classDetailedDto);
+    long updateClassByClassId(ClassDetailedDto classDetailedDto);
 
     /**
      * 添加班级
@@ -45,7 +45,7 @@ public interface ClassMapper {
      * @param classDetailedDto 新添加班级的信息
      * @return
      */
-    void insertClass(ClassDetailedDto classDetailedDto);
+    long insertClass(ClassDetailedDto classDetailedDto);
 
     /**
      * 返回符合条件的班级信息分页结果
@@ -69,14 +69,14 @@ public interface ClassMapper {
      * @param classDetailedDto 修改后的班级信息
      * @return
      */
-    void updateClassInfo(ClassDetailedDto classDetailedDto);
+    long updateClassInfo(ClassDetailedDto classDetailedDto);
 
     /**
      * 删除一个班级
      *
      * @param id 被删除班级的id
      */
-    void deleteOneClassById(Long id);
+    long deleteOneClassById(Long id);
 
     /**
      * 根据班级编码查询班级详细信息，注意这里classId不是主键id
@@ -91,5 +91,13 @@ public interface ClassMapper {
      *
      * @param ids 班级id的列表
      */
-    void deleteManyClassesByIds(List<Long> ids);
+    long deleteManyClassesByIds(List<Long> ids);
+
+    /**
+     * 根据输入条件删除指定的班级
+     *
+     * @param condition 输入条件封装
+     * @return
+     */
+    long deleteClassesByCondition(ClassSearchCondition condition);
 }

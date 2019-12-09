@@ -90,7 +90,7 @@
             </if>
         </trim>
     </insert>
-    <update id="missLessonStudentDetailedDto" parameterType="com.jzy.model.dto.MissLessonStudentDetailedDto">
+    <update id="updateMissLessonStudentInfo" parameterType="com.jzy.model.dto.MissLessonStudentDetailedDto">
         update miss_lesson_student m
         <set>
             m.student_id = #{studentId,jdbcType=VARCHAR},
@@ -118,7 +118,6 @@
             #{id}
         </foreach>
     </delete>
-
     <select id="listMissLessonStudents" resultMap="MissLessonStudentDetailedResultMap"
             parameterType="com.jzy.model.dto.MissLessonStudentSearchCondition">
         select tmp.*, a1.assistant_name as original_assistant_name, t1.teacher_name as original_teacher_name,

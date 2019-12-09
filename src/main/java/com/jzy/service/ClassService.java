@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.jzy.model.dto.ClassDetailedDto;
 import com.jzy.model.dto.ClassSearchCondition;
 import com.jzy.model.dto.MyPage;
+import com.jzy.model.dto.UpdateResult;
 import com.jzy.model.entity.Class;
 
 import java.util.List;
@@ -46,7 +47,7 @@ public interface ClassService {
      * @param classDetailedDto 修改后的班级信息
      * @return
      */
-    String updateClassByClassId(ClassDetailedDto classDetailedDto);
+    UpdateResult updateClassByClassId(ClassDetailedDto classDetailedDto);
 
     /**
      * 添加班级
@@ -54,29 +55,31 @@ public interface ClassService {
      * @param classDetailedDto 新添加班级的信息
      * @return
      */
-    String insertClass(ClassDetailedDto classDetailedDto);
+    UpdateResult insertClass(ClassDetailedDto classDetailedDto);
 
     /**
      * 根据从excel中读取到的classDetailedDtos信息，更新插入多个。根据班号判断：
-     *      if 当前班号不存在
-     *          执行插入
-     *      else
-     *          根据班号更新
+     * if 当前班号不存在
+     * 执行插入
+     * else
+     * 根据班号更新
+     *
      * @param classDetailedDtos
      * @return
      */
-    String insertAndUpdateClassesFromExcel(List<ClassDetailedDto> classDetailedDtos) throws Exception;
+    UpdateResult insertAndUpdateClassesFromExcel(List<ClassDetailedDto> classDetailedDtos) throws Exception;
 
     /**
      * 根据从excel中读取到的classDetailedDtos信息，更新插入一个。根据班号判断：
-     *      if 当前班号不存在
-     *          执行插入
-     *      else
-     *          根据班号更新
+     * if 当前班号不存在
+     * 执行插入
+     * else
+     * 根据班号更新
+     *
      * @param classDetailedDto
      * @return
      */
-    String insertAndUpdateOneClassFromExcel(ClassDetailedDto classDetailedDto) throws Exception;
+    UpdateResult insertAndUpdateOneClassFromExcel(ClassDetailedDto classDetailedDto) throws Exception;
 
     /**
      * 查询班级信息的ajax交互
@@ -108,12 +111,20 @@ public interface ClassService {
      *
      * @param id 被删除班级的id
      */
-    void deleteOneClassById(Long id);
+    long deleteOneClassById(Long id);
 
     /**
      * 根据id删除多个班级
      *
      * @param ids 班级id的列表
      */
-    void deleteManyClassesByIds(List<Long> ids);
+    long deleteManyClassesByIds(List<Long> ids);
+
+    /**
+     * 根据输入条件删除指定的班级
+     *
+     * @param condition 输入条件封装
+     * @return
+     */
+    UpdateResult deleteClassesByCondition(ClassSearchCondition condition);
 }

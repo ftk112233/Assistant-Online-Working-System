@@ -259,7 +259,12 @@
                         icon: 1
                         , time: 1000
                     });
-                } else {
+                } else if (res.msg === "excelColumnNotFound") {
+                    return layer.alert('表格中有列属性名不符合规范!', {
+                        skin: 'layui-layer-lan'
+                        ,closeBtn: 0
+                    });
+                }else {
                     return layer.msg('上传失败', {
                         offset: '15px'
                         , icon: 2
@@ -269,7 +274,7 @@
             }
             , error: function () {
                 layer.closeAll('loading'); //关闭loading
-                return layer.msg('导入失败', {
+                return layer.msg('上传失败', {
                     offset: '15px'
                     , icon: 2
                     , time: 2000
@@ -357,7 +362,7 @@
             }
             , error: function () {
                 layer.closeAll('loading'); //关闭loading
-                return layer.msg('导入失败', {
+                return layer.msg('上传失败', {
                     offset: '15px'
                     , icon: 2
                     , time: 2000

@@ -64,7 +64,7 @@
                 <label>验证码登入</label>
                 <a href="${ctx}/loginByEmailCode"><i class="layui-icon layui-icon-cellphone"></i></a>
 
-                <a href="${ctx}/guestLogin" class="layadmin-user-jump-change layadmin-link">这些登录方式太烦了, 我懒?</a>
+                <a href="${ctx}/guestLogin" class="layadmin-user-jump-change layadmin-link">懒癌患者登录方式?</a>
             </div>
         </div>
     </div>

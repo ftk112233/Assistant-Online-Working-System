@@ -1,5 +1,7 @@
 package com.jzy.manager.util;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.jzy.model.excel.Excel;
 import org.apache.commons.lang3.StringUtils;
 
@@ -7,7 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -175,8 +179,14 @@ public class FileUtils {
 
     }
 
+    /**
+     * 输入文件名是否是图片
+     *
+     * @param imgPath
+     * @return
+     */
     public static boolean isImage(String imgPath) {
-        Boolean flag = false;
+        boolean flag = false;
         //图片格式
         final String[] fileTypes = new String[]{
                 ".jpg", ".bmp", ".jpeg", ".png", ".gif",
@@ -265,5 +275,21 @@ public class FileUtils {
         //输出
         excelToDownload.submitWrite(bufferedOutPut);
         bufferedOutPut.close();
+    }
+
+    /**
+     * 文件复制
+     * @param srcPath 源文件路径
+     * @param targetPath 复制后存放路径
+     * @throws Exception
+     */
+    public static void copyFile(String srcPath, String targetPath) throws Exception {
+        org.apache.commons.io.FileUtils.copyFile(new File(srcPath), new File(targetPath));
+    }
+
+    public static void main(String[] args) {
+        System.out.println(JSON.toJSONString(Arrays.asList("1", "2", "a")));
+        List<String> strings=JSONArray.parseArray(JSON.toJSONString(Arrays.asList("1", "2", "a")), String.class);
+        System.out.println(strings);
     }
 }

@@ -2,6 +2,7 @@ package com.jzy.web.controller;
 
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.SessionConstants;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.FileUtils;
 import com.jzy.manager.util.ShiroUtils;
 import com.jzy.manager.util.UserUtils;
@@ -9,7 +10,8 @@ import com.jzy.model.dto.EmailVerifyCode;
 import com.jzy.model.entity.User;
 import com.jzy.model.vo.EmailVerifyCodeSession;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/user")
 public class UserController extends AbstractController {
-    private final static Logger logger = Logger.getLogger(UserController.class);
+    private final static Logger logger = LogManager.getLogger(UserController.class);
 
     /**
      * 跳转设置用户基本资料页面
@@ -50,9 +51,9 @@ public class UserController extends AbstractController {
     /**
      * 跳转绑定/修改邮箱界面
      * if 已绑定
-     *  跳转修改页面
+     * 跳转修改页面
      * else
-     *  跳转设置页面
+     * 跳转设置页面
      *
      * @return
      */
@@ -94,7 +95,7 @@ public class UserController extends AbstractController {
      */
     @RequestMapping("/uploadUserIcon")
     @ResponseBody
-    public Map<String, Object> uploadUserIcon(@RequestParam(value = "file", required = false) MultipartFile file) {
+    public Map<String, Object> uploadUserIcon(@RequestParam(value = "file", required = false) MultipartFile file) throws InvalidParameterException {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>(3);
 
@@ -117,7 +118,7 @@ public class UserController extends AbstractController {
      */
     @RequestMapping("/updateOwnInfo")
     @ResponseBody
-    public Map<String, Object> updateInfoByCurrentUser(User user) {
+    public Map<String, Object> updateInfoByCurrentUser(User user) throws InvalidParameterException {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserUpdateOwnInfo(user)) {
@@ -139,22 +140,23 @@ public class UserController extends AbstractController {
      */
     @RequestMapping("/updateOwnPassword")
     @ResponseBody
-    public Map<String, Object> updatePasswordByCurrentUser(@RequestParam("oldPassword") String userOldPassword, @RequestParam("newPassword") String userNewPassword) {
+    public Map<String, Object> updatePasswordByCurrentUser(@RequestParam("oldPassword") String userOldPassword, @RequestParam("newPassword") String userNewPassword) throws InvalidParameterException {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserPassword(userNewPassword)) {
-            logger.error("updatePasswordByCurrentUser方法错误入参");
-            throw new InvalidParameterException("updatePasswordByCurrentUser方法错误入参");
+            String msg = "updatePasswordByCurrentUser方法错误入参";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
         }
 
         User userInfoSession = userService.getSessionUserInfo();
-        String correctOldPasswordEncrypted=userService.getUserById(userInfoSession.getId()).getUserPassword();
-        String inputOldPasswordEncrypted=ShiroUtils.encryptUserPassword(userOldPassword,userInfoSession.getUserSalt());
-        if (!inputOldPasswordEncrypted.equals(correctOldPasswordEncrypted)){
+        String correctOldPasswordEncrypted = userService.getUserById(userInfoSession.getId()).getUserPassword();
+        String inputOldPasswordEncrypted = ShiroUtils.encryptUserPassword(userOldPassword, userInfoSession.getUserSalt());
+        if (!inputOldPasswordEncrypted.equals(correctOldPasswordEncrypted)) {
             //原始密码不匹配
             map.put("data", "oldPasswordWrong");
         } else {
-            userService.updatePasswordById(userInfoSession.getId(),userInfoSession.getUserSalt(), userNewPassword);
+            userService.updatePasswordById(userInfoSession.getId(), userInfoSession.getUserSalt(), userNewPassword);
             map.put("data", Constants.SUCCESS);
         }
 
@@ -166,24 +168,23 @@ public class UserController extends AbstractController {
      *
      * @param request
      * @param response
-     * @param user 含用户头像信息
-     * @throws Exception
+     * @param user     含用户头像信息
      */
     @RequestMapping("/showIcon")
-    public void showIcon(HttpServletRequest request, HttpServletResponse response, User user) throws Exception {
+    public void showIcon(HttpServletRequest request, HttpServletResponse response, User user) {
         //生成验证码
         FileInputStream fis = null;
         OutputStream os = null;
 
         String fileName;
         if (user != null) {
-            fileName=user.getUserIcon();
+            fileName = user.getUserIcon();
             if (StringUtils.isEmpty(fileName) || !FileUtils.isImage(fileName)) {
                 //为空，或不合法的格式，直接给默认头像
-                fileName = UserUtils.USER_ICON_DEFAULT;
+                fileName = User.USER_ICON_DEFAULT;
             }
         } else {
-            fileName = UserUtils.USER_ICON_DEFAULT;
+            fileName = User.USER_ICON_DEFAULT;
         }
 
         try {
@@ -214,27 +215,30 @@ public class UserController extends AbstractController {
      */
     @RequestMapping("/addNewEmail")
     @ResponseBody
-    public Map<String, Object> addNewEmail(@RequestParam(value = "emailVerifyCode",required = false) String emailVerifyCode,@RequestParam("newEmail") String newEmail) {
+    public Map<String, Object> addNewEmail(@RequestParam(value = "emailVerifyCode", required = false) String emailVerifyCode, @RequestParam("newEmail") String newEmail) throws InvalidParameterException {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserEmail(newEmail)) {
-            logger.error("addNewEmail方法错误入参");
-            throw new InvalidParameterException("addNewEmail方法错误入参");
+            String msg = "addNewEmail方法错误入参";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
         }
         User userInfoSession = userService.getSessionUserInfo();
         //前端服务端双重校验确保安全
         if (userInfoSession.getUserEmail() != null && userInfoSession.getUserEmail().equals(newEmail)) {
-            logger.error("addNewEmail方法错误入参, 未对原有邮箱进行修改");
-            throw new InvalidParameterException("addNewEmail方法错误入参, 未对原有邮箱进行修改");
+            String msg = "addNewEmail方法错误入参, 未对原有邮箱进行修改";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
         } else {
-            if (StringUtils.isEmpty(newEmail)){
-                logger.error("addNewEmail方法错误入参, 未对原有邮箱进行修改");
-                throw new InvalidParameterException("addNewEmail方法错误入参, 未对原有邮箱进行修改");
+            if (StringUtils.isEmpty(newEmail)) {
+                String msg = "addNewEmail方法错误入参, 新邮箱为空";
+                logger.error(msg);
+                throw new InvalidParameterException(msg);
             }
         }
 
         //auth=true，即已经经过了服务端验证
-        ShiroUtils.getSession().setAttribute(SessionConstants.USER_EMAIL_SESSION_KEY, new EmailVerifyCodeSession(newEmail,true));
+        ShiroUtils.getSession().setAttribute(SessionConstants.USER_EMAIL_SESSION_KEY, new EmailVerifyCodeSession(newEmail, true));
         if (!userService.ifValidEmailVerifyCode(new EmailVerifyCode(newEmail, emailVerifyCode))) {
             map.put("data", "verifyCodeWrong");
         } else {
@@ -258,22 +262,25 @@ public class UserController extends AbstractController {
      */
     @RequestMapping("/modifyCurrentEmail")
     @ResponseBody
-    public Map<String, Object> modifyCurrentEmail(@RequestParam("oldEmail") String userOldEmail, @RequestParam("newEmail") String userNewEmail) {
+    public Map<String, Object> modifyCurrentEmail(@RequestParam("oldEmail") String userOldEmail, @RequestParam("newEmail") String userNewEmail) throws InvalidParameterException {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserEmail(userNewEmail)) {
-            logger.error("modifyCurrentEmail方法错误入参");
-            throw new InvalidParameterException("modifyCurrentEmail方法错误入参");
+            String msg = "modifyCurrentEmail方法错误入参";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
         }
         User userInfoSession = userService.getSessionUserInfo();
         //前端服务端双重校验确保安全
         if (userInfoSession.getUserEmail() != null && userInfoSession.getUserEmail().equals(userNewEmail)) {
-            logger.error("modifyCurrentEmail方法错误入参, 未对原有邮箱进行修改");
-            throw new InvalidParameterException("modifyCurrentEmail方法错误入参, 未对原有邮箱进行修改");
-        }else {
-            if (StringUtils.isEmpty(userNewEmail)){
-                logger.error("modifyCurrentEmail方法错误入参, 未对原有邮箱进行修改");
-                throw new InvalidParameterException("modifyCurrentEmail方法错误入参, 未对原有邮箱进行修改");
+            String msg = "modifyCurrentEmail方法错误入参, 未对原有邮箱进行修改";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        } else {
+            if (StringUtils.isEmpty(userNewEmail)) {
+                String msg = "modifyCurrentEmail方法错误入参, 新邮箱为空";
+                logger.error(msg);
+                throw new InvalidParameterException(msg);
             }
         }
 
@@ -296,12 +303,13 @@ public class UserController extends AbstractController {
      */
     @RequestMapping("/modifyCurrentPhone")
     @ResponseBody
-    public Map<String, Object> modifyCurrentPhone(@RequestParam("newPhone") String userNewPhone) {
+    public Map<String, Object> modifyCurrentPhone(@RequestParam("newPhone") String userNewPhone) throws InvalidParameterException {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserPhone(userNewPhone)) {
-            logger.error("modifyCurrentPhone方法错误入参");
-            throw new InvalidParameterException("modifyCurrentPhone方法错误入参");
+            String msg = "modifyCurrentPhone方法错误入参";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
         }
         User userInfoSession = userService.getSessionUserInfo();
 

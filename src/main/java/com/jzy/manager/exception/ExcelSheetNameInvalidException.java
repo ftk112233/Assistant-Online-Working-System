@@ -7,7 +7,7 @@ package com.jzy.manager.exception;
  * @Date 2019/11/28 11:40
  * @Version 1.0
  **/
-public class ExcelSheetNameInvalidException extends RuntimeException {
+public class ExcelSheetNameInvalidException extends Exception {
     public ExcelSheetNameInvalidException() {
     }
 

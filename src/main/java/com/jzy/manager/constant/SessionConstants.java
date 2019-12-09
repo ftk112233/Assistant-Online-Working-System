@@ -10,17 +10,18 @@ import com.google.code.kaptcha.Constants;
  * @date 2019/11/14 23:20
  **/
 public class SessionConstants {
-    private SessionConstants(){}
+    private SessionConstants() {
+    }
 
     /**
      * KAPTCHA图形验证码session的键
      */
-    public static final String KAPTCHA_SESSION_KEY=Constants.KAPTCHA_SESSION_KEY;
+    public static final String KAPTCHA_SESSION_KEY = Constants.KAPTCHA_SESSION_KEY;
 
     /**
      * 用户登录信息session的键
      */
-    public static final String USER_INFO_SESSION_KEY ="userInfo";
+    public static final String USER_INFO_SESSION_KEY = "userInfo";
 
     /**
      * 用户发送邮箱验证码的邮箱存放到的相应session的键
@@ -35,5 +36,5 @@ public class SessionConstants {
     /**
      * 通过小问题免密登录的键
      */
-    public static final String LOGIN_QUESTION_ID_SESSION_KEY = "loginQuestionId";
+    public static final String LOGIN_QUESTION_SESSION_KEY = "loginQuestion";
 }

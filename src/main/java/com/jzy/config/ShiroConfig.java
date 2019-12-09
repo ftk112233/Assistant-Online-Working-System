@@ -103,8 +103,11 @@ public class ShiroConfig {
          * 授权拦截
          */
         Map<String, String> permissions = new LinkedHashMap<>();
-        permissions.put("/user/admin/**", "perms[user:admin]"); //用户管理，管理员和学管有
+        permissions.put("/user/admin/import*", "perms[user:admin:import]"); //用户信息导入，管理员和学管和助教长有
         permissions.put("/user/showIcon", "perms[user:showIcon]"); //游客只有获取头像接口的权限
+        permissions.put("/user/admin/**", "perms[user:admin]"); //用户管理，管理员和学管有
+        permissions.put("/user/message/many/**", "perms[user:message:many]"); //批量发消息，管理员和学管和助教长有
+        permissions.put("/user/message/all/**", "perms[user:message:all]"); //发全体消息，管理员和学管有
         permissions.put("/user/**", "perms[user:basic]"); //基本用户信息的操作，除游客外都有权限
         permissions.put("/permission/admin/**", "perms[permission:admin]"); //角色权限的权限，管理员才有
         permissions.put("/assistant/admin/**", "perms[assistant:admin]"); //管理助教的权限，助教长以上级别才有
@@ -116,7 +119,6 @@ public class ShiroConfig {
         permissions.put("/studentAndClass/admin/update*", "perms[studentAndClass:admin:update]"); //编辑学员上课信息的权限，助教长以上级别才有
         permissions.put("/studentAndClass/admin/insert*", "perms[studentAndClass:admin:insert]"); //添加学员上课信息的权限，助教长以上级别才有
         permissions.put("/studentAndClass/admin/delete*", "perms[studentAndClass:admin:delete]"); //删除学员上课信息的权限，助教长以上级别才有
-        permissions.put("/studentAndClass/admin/import*", "perms[studentAndClass:admin:import]"); //excel导入学员上课信息的权限，助教长以上级别才有
         permissions.put("/student/admin/update*", "perms[student:admin:update]"); //编辑学员个人信息的权限，助教长以上级别才有
         permissions.put("/student/admin/insert*", "perms[student:admin:insert]"); //添加学员个人信息的权限，助教长以上级别才有
         permissions.put("/student/admin/delete*", "perms[student:admin:delete]"); //删除学员个人信息的权限，助教长以上级别才有
@@ -124,7 +126,12 @@ public class ShiroConfig {
         permissions.put("/missLessonStudent/admin/update*", "perms[missLessonStudent:admin:update]"); //编辑补课学员信息的权限，助教长以上级别才有
         permissions.put("/missLessonStudent/admin/insert*", "perms[missLessonStudent:admin:insert]"); //添加补课学员信息的权限，助教长以上级别才有
         permissions.put("/missLessonStudent/admin/delete*", "perms[missLessonStudent:admin:delete]"); //删除补课学员信息的权限，助教长以上级别才有
-        permissions.put("/missLessonStudent/admin/import*", "perms[missLessonStudent:admin:import]"); //excel导入补课学员信息的权限，助教长以上级别才有
+        permissions.put("/question/admin/update*", "perms[question:admin:update]"); //编辑登录问题的权限，助教长以上级别才有
+        permissions.put("/question/admin/insert*", "perms[question:admin:insert]"); //添加登录问题的权限，助教以上级别才有
+        permissions.put("/question/admin/delete*", "perms[question:admin:delete]"); //删除登录问题的权限，助教长以上级别才有
+        permissions.put("/usefulInformation/admin/update*", "perms[usefulInformation:admin:update]"); //编辑常用信息的权限，助教长以上级别才有
+        permissions.put("/usefulInformation/admin/insert*", "perms[usefulInformation:admin:insert]"); //添加常用信息的权限，助教长以上级别才有
+        permissions.put("/usefulInformation/admin/delete*", "perms[usefulInformation:admin:delete]"); //删除常用信息的权限，助教长以上级别才有
 
         permissions.put("/toolbox/assistant/**", "perms[toolbox:assistant]"); //百宝箱助教区的权限，教师助教以上级别才有
         permissions.put("/toolbox/assistantAdministrator/**", "perms[toolbox:assistantAdministrator]"); //百宝箱学管区的权限，助教长以上级别才有
@@ -137,10 +144,10 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/logout", "logout");  // 用户退出，只需配置logout即可实现该功能
 
         /*=======================================================*/
-        filterChainDefinitionMap.put("/**", "user");   //rememberMe后可以访问的路径
+//        filterChainDefinitionMap.put("/**", "user");   //rememberMe后可以访问的路径
 
         /*=======================================================*/
-//        filterChainDefinitionMap.put("/**", "authc");       // 其他路径均需要身份认证，一般位于最下面，优先级最低
+        filterChainDefinitionMap.put("/**", "authc");       // 其他路径均需要身份认证，一般位于最下面，优先级最低
 
         /*=======================================================*/
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
@@ -162,7 +169,7 @@ public class ShiroConfig {
         sessionManager.setGlobalSessionTimeout(SessionUtils.SESSION_EXPIRE_TIME);
         //是否删除过期session
         sessionManager.setDeleteInvalidSessions(true);
-        sessionManager.setSessionIdCookie(rememberMeCookie());
+        sessionManager.setSessionIdCookieEnabled(true);
         return sessionManager;
     }
 
@@ -188,7 +195,6 @@ public class ShiroConfig {
      */
     @Bean
     public CookieRememberMeManager rememberMeManager(){
-        //System.out.println("ShiroConfiguration.rememberMeManager()");
         CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
         cookieRememberMeManager.setCookie(rememberMeCookie());
         //rememberMe cookie加密的密钥 建议每个项目都不一样 默认AES算法 密钥长度(128 256 512 位)
@@ -204,7 +210,8 @@ public class ShiroConfig {
     @Bean(name = "securityManager")
     public DefaultWebSecurityManager defaultWebSecurityManager(){
         DefaultWebSecurityManager securityManager=new DefaultWebSecurityManager();
-        securityManager.setRememberMeManager(rememberMeManager());
+//        securityManager.setRememberMeManager(rememberMeManager());
+        securityManager.setSessionManager(sessionManager());
         securityManager.setRealm(userRealm());
         return securityManager;
     }

@@ -7,7 +7,7 @@ package com.jzy.manager.exception;
  * @description 班上学生人数过多的异常
  * @date 2019/11/1 18:20
  **/
-public class ClassTooManyStudentsException extends RuntimeException {
+public class ClassTooManyStudentsException extends Exception {
     public ClassTooManyStudentsException() {
     }
 

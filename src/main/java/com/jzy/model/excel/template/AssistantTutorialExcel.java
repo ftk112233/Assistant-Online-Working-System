@@ -13,9 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author JinZhiyun
@@ -29,7 +27,7 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
 
     private static final String CAMPUS_COLUMN = ExcelConstants.CAMPUS_COLUMN_2;
 
-    private static final String CLASS_ID_COLUMN =ExcelConstants.CLASS_ID_COLUMN_3;
+    private static final String CLASS_ID_COLUMN = ExcelConstants.CLASS_ID_COLUMN_3;
 
     private static final String TEACHER_NAME_COLUMN = ExcelConstants.TEACHER_NAME_COLUMN_3;
 
@@ -43,7 +41,7 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
 
     private static final String TEACHER_REQUIREMENT_COLUMN = ExcelConstants.TEACHER_REQUIREMENT_COLUMN;
 
-    private static final String SUBJECTS_COLUMN=ExcelConstants.SUBJECTS_COLUMN;
+    private static final String SUBJECTS_COLUMN = ExcelConstants.SUBJECTS_COLUMN;
 
     /**
      * 班上默认最大人数上限
@@ -92,23 +90,21 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
     /**
      * 修改制作开班电话表
      *
-     * @param data
-     *            从数据库中读取到的信息或手动输入的表格中读到的信息，以及用户输入的信息
+     * @param data 从数据库中读取到的信息或手动输入的表格中读到的信息，以及用户输入的信息
      * @return
      * @throws IOException
      * @throws ClassTooManyStudentsException
      */
-    public boolean writeClassStartSheet(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException, ClassTooManyStudentsException {
+    public boolean writeClassStartSheet(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException, ClassTooManyStudentsException, ExcelColumnNotFoundException {
         // 获得班上学生总人数
         int rowCountToSave = data.size();
         if (rowCountToSave > MAX_CLASS_STUDENTS_COUNT) {
             throw new ClassTooManyStudentsException("班上学生人数超过了" + MAX_CLASS_STUDENTS_COUNT + "！");
         }
 
-        int startRow=0;
+        int startRow = 0;
         // 先扫描第startRow行找到"校区"、"班号"、"教师姓名"等信息所在列的位置
-        int columnIndexOfCampus = -1, columnIndexOfClassId = -2, columnIndexOfTeacherName = -3, columnIndexOfAssistantName = -4, columnIndexOfStudentId = -7, columnIndexOfStudentName = -9
-                , columnIndexOfStudentPhone = -10,  columnIndexOfTeacherRequirement = -11,  columnIndexOfSubjects = -12;
+        int columnIndexOfCampus = -1, columnIndexOfClassId = -2, columnIndexOfTeacherName = -3, columnIndexOfAssistantName = -4, columnIndexOfStudentId = -7, columnIndexOfStudentName = -9, columnIndexOfStudentPhone = -10, columnIndexOfTeacherRequirement = -11, columnIndexOfSubjects = -12;
         int row0ColumnCount = this.getColumnCount(CLASS_START_SHEET_INDEX, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
             String value = this.getValueAt(CLASS_START_SHEET_INDEX, startRow, i);
@@ -153,27 +149,27 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
 
 
         for (int i = 0; i < rowCountToSave; i++) {
-            StudentAndClassDetailedWithSubjectsDto object=data.get(i);
+            StudentAndClassDetailedWithSubjectsDto object = data.get(i);
             //遍历每行要填的学生上课信息对象
             // 填校区
-            this.setValueAt(CLASS_START_SHEET_INDEX,i+1,columnIndexOfCampus,object.getClassCampus());
+            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfCampus, object.getClassCampus());
             // 填班号
-            this.setValueAt(CLASS_START_SHEET_INDEX,i+1,columnIndexOfClassId,object.getClassId());
+            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfClassId, object.getClassId());
             // 填教师姓名
-            this.setValueAt(CLASS_START_SHEET_INDEX,i+1,columnIndexOfTeacherName,object.getTeacherName());
+            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfTeacherName, object.getTeacherName());
             // 填助教
-            this.setValueAt(CLASS_START_SHEET_INDEX,i+1,columnIndexOfAssistantName,object.getAssistantName());
+            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfAssistantName, object.getAssistantName());
             // 填学员编号
-            this.setValueAt(CLASS_START_SHEET_INDEX,i+1,columnIndexOfStudentId,object.getStudentId());
+            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentId, object.getStudentId());
             // 填学员姓名
-            this.setValueAt(CLASS_START_SHEET_INDEX,i+1,columnIndexOfStudentName,object.getStudentName());
+            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentName, object.getStudentName());
             // 填学员联系方式
-            this.setValueAt(CLASS_START_SHEET_INDEX,i+1,columnIndexOfStudentPhone,object.getStudentPhone());
+            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentPhone, object.getStudentPhone());
             // 填任课教师要求
-            this.setValueAt(CLASS_START_SHEET_INDEX,i+1,columnIndexOfTeacherRequirement,object.getClassTeacherRequirement());
+            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfTeacherRequirement, object.getClassTeacherRequirement());
             // 填所有在读学科
-            String subjectsToString=object.getSubjects() == null ? "" : object.getSubjects().toString();
-            this.setValueAt(CLASS_START_SHEET_INDEX,i+1,columnIndexOfSubjects,subjectsToString);
+            String subjectsToString = object.getSubjects() == null ? "" : object.getSubjects().toString();
+            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfSubjects, subjectsToString);
         }
 
         // 删除多余行
@@ -185,33 +181,32 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
     /**
      * 修改制作签到表
      *
-     * @param data
-     *            从数据库中读取到的信息或手动输入的表格中读到的信息，以及用户输入的信息
+     * @param data 从数据库中读取到的信息或手动输入的表格中读到的信息，以及用户输入的信息
      * @return
      * @throws IOException
      * @throws ClassTooManyStudentsException
      */
-    public boolean writeSignSheet(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException, ClassTooManyStudentsException {
+    public boolean writeSignSheet(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException, ClassTooManyStudentsException, ExcelColumnNotFoundException {
         // 获得班上学生总人数
         int rowCountToSave = data.size();
         if (rowCountToSave > MAX_CLASS_STUDENTS_COUNT) {
             throw new ClassTooManyStudentsException("班上学生人数超过了" + MAX_CLASS_STUDENTS_COUNT + "！");
         }
 
-        StudentAndClassDetailedWithSubjectsDto dto=new StudentAndClassDetailedWithSubjectsDto();
-        if (rowCountToSave>0){
+        StudentAndClassDetailedWithSubjectsDto dto = new StudentAndClassDetailedWithSubjectsDto();
+        if (rowCountToSave > 0) {
             //取第一个对象为例，填充表格第一行、第二行
-            dto=data.get(0);
+            dto = data.get(0);
         }
         // 填表格第一行
-        String str1="班号："+dto.getClassId()+"                  班级名称："+dto.getClassName();
-        this.setValueAt(SIGN_SHEET_INDEX,0,0,str1);
+        String str1 = "班号：" + dto.getClassId() + "                  班级名称：" + dto.getClassName();
+        this.setValueAt(SIGN_SHEET_INDEX, 0, 0, str1);
         // 填表格第二行
-        String str2="上课时间："+ dto.getClassSimplifiedTime()+ "         上课教室："+dto.getClassroom()+
-                "          教师："+dto.getTeacherName()+"             助教："+dto.getAssistantName();
-        this.setValueAt(SIGN_SHEET_INDEX,1,0,str2);
+        String str2 = "上课时间：" + dto.getClassSimplifiedTime() + "         上课教室：" + dto.getClassroom() +
+                "          教师：" + dto.getTeacherName() + "             助教：" + dto.getAssistantName();
+        this.setValueAt(SIGN_SHEET_INDEX, 1, 0, str2);
 
-        int startRow=2;
+        int startRow = 2;
         // 先扫描第startRow行找到"学员编号"、"学员姓名"、"家长联系方式"等信息所在列的位置
         int columnIndexOfStudentId = -7, columnIndexOfStudentName = -9, columnIndexOfStudentPhone = -10;
         int row0ColumnCount = this.getColumnCount(SIGN_SHEET_INDEX, startRow); // 第startRow行的列数
@@ -238,14 +233,14 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
 
 
         for (int i = 0; i < rowCountToSave; i++) {
-            StudentAndClassDetailedWithSubjectsDto object=data.get(i);
+            StudentAndClassDetailedWithSubjectsDto object = data.get(i);
             //遍历每行要填的学生上课信息对象
             // 填学员编号
-            this.setValueAt(SIGN_SHEET_INDEX,i+1,columnIndexOfStudentId,object.getStudentId());
+            this.setValueAt(SIGN_SHEET_INDEX, i + 1, columnIndexOfStudentId, object.getStudentId());
             // 填学员姓名
-            this.setValueAt(SIGN_SHEET_INDEX,i+1,columnIndexOfStudentName,object.getStudentName());
+            this.setValueAt(SIGN_SHEET_INDEX, i + 1, columnIndexOfStudentName, object.getStudentName());
             // 填学员联系方式
-            this.setValueAt(SIGN_SHEET_INDEX,i+1,columnIndexOfStudentPhone,object.getStudentPhone());
+            this.setValueAt(SIGN_SHEET_INDEX, i + 1, columnIndexOfStudentPhone, object.getStudentPhone());
             // 填任课教师要求
         }
 
@@ -267,14 +262,14 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
      * @throws IOException
      * @throws ClassTooManyStudentsException
      */
-    public boolean writeCallbackSheet(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException, ClassTooManyStudentsException {
+    public boolean writeCallbackSheet(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException, ClassTooManyStudentsException, ExcelColumnNotFoundException {
         // 获得班上学生总人数
         int rowCountToSave = data.size();
         if (rowCountToSave > MAX_CLASS_STUDENTS_COUNT) {
             throw new ClassTooManyStudentsException("班上学生人数超过了" + MAX_CLASS_STUDENTS_COUNT + "！");
         }
 
-        int startRow=0;
+        int startRow = 0;
         // 先扫描第startRow行找到"校区"、"班号"、"教师姓名"等信息所在列的位置
         int columnIndexOfCampus = -1, columnIndexOfClassId = -2, columnIndexOfTeacherName = -3, columnIndexOfAssistantName = -4, columnIndexOfStudentId = -7, columnIndexOfStudentName = -9;
         int row0ColumnCount = this.getColumnCount(CALLBACK_SHEET_INDEX, startRow); // 第startRow行的列数
@@ -304,27 +299,27 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
         }
 
         if (columnIndexOfCampus < 0 || columnIndexOfClassId < 0 || columnIndexOfTeacherName < 0 || columnIndexOfAssistantName < 0
-                || columnIndexOfStudentId < 0 || columnIndexOfStudentName < 0 ) {
+                || columnIndexOfStudentId < 0 || columnIndexOfStudentName < 0) {
             //列属性中有未匹配的属性名
             throw new ExcelColumnNotFoundException("助教工作手册-首课回访表sheet列属性中有未匹配的属性名");
         }
 
 
         for (int i = 0; i < rowCountToSave; i++) {
-            StudentAndClassDetailedWithSubjectsDto object=data.get(i);
+            StudentAndClassDetailedWithSubjectsDto object = data.get(i);
             //遍历每行要填的学生上课信息对象
             // 填校区
-            this.setValueAt(CALLBACK_SHEET_INDEX,i+1,columnIndexOfCampus,object.getClassCampus());
+            this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfCampus, object.getClassCampus());
             // 填班号
-            this.setValueAt(CALLBACK_SHEET_INDEX,i+1,columnIndexOfClassId,object.getClassId());
+            this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfClassId, object.getClassId());
             // 填教师姓名
-            this.setValueAt(CALLBACK_SHEET_INDEX,i+1,columnIndexOfTeacherName,object.getTeacherName());
+            this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfTeacherName, object.getTeacherName());
             // 填助教
-            this.setValueAt(CALLBACK_SHEET_INDEX,i+1,columnIndexOfAssistantName,object.getAssistantName());
+            this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfAssistantName, object.getAssistantName());
             // 填学员编号
-            this.setValueAt(CALLBACK_SHEET_INDEX,i+1,columnIndexOfStudentId,object.getStudentId());
+            this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfStudentId, object.getStudentId());
             // 填学员姓名
-            this.setValueAt(CALLBACK_SHEET_INDEX,i+1,columnIndexOfStudentName,object.getStudentName());
+            this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfStudentName, object.getStudentName());
         }
 
         // 删除多余行
@@ -335,7 +330,7 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
 
     /**
      * 修改制作座位表，这里暂时不做处理标准，
-     * 若之后有更改要另外操作请使用 {@link SeatTemplate}
+     * 若之后有更改要另外操作请使用 {@link SeatTableTemplateExcel}
      *
      * @param data 从花名册中读取到的信息以及用户输入的信息
      * @return
@@ -349,11 +344,11 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
     /**
      * 使用巴啦啦能量！完成对助教工作手册的所有处理（不含开班电话）！
      *
-      * @param data 从花名册或数据库中读取到的信息以及用户输入的信息
+     * @param data 从花名册或数据库中读取到的信息以及用户输入的信息
      * @return
      * @throws IOException
      */
-    public boolean writeAssistantTutorialWithoutSeatTable(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException {
+    public boolean writeAssistantTutorialWithoutSeatTable(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException, ExcelColumnNotFoundException, ClassTooManyStudentsException {
         return writeClassStartSheet(data) && writeSignSheet(data) && writeCallbackSheet(data);
     }
 }

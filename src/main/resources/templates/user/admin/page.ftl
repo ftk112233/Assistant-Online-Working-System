@@ -89,6 +89,11 @@
                             id="clear">
                         清空
                     </button>
+                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit
+                            lay-filter="deleteByCondition"
+                            id="deleteByCondition" lay-tips="'条件删除'将批量删除根据前面的查询条件查询出的所有记录，使用前请先查询预览这些记录是否正确！">
+                        条件删除
+                    </button>
                 </div>
             </div>
         </div>
@@ -102,7 +107,7 @@
                 <i class="layui-icon layui-icon-tips" lay-tips="上传excel要求说明：<br>
                                                                 1、第1行、第2行与导入无关。有效内容从第3行开始，第3行为列名属性：序号、部门、校区、姓名、员工号等......<br>
                                                                 2、第3行所有列名属性中系统将读取以下名称的列导入数据库，这些列的先后顺序无关，但列名称必须与要求相符（如下所示）！！<br>
-                                                                    ====部门、校区、姓名、员工号、身份证号、手机号、备注====<br>
+                                                                    ====部门、校区、姓名、员工号、身份证号、手机号码、备注====<br>
                                                                 3、第四行开始是数据:<br>
                                                                     1)员工号必须唯一且准确<br>
                                                                     2)身份证号必须唯一且准确<br>
@@ -117,7 +122,7 @@
                 <i class="layui-icon layui-icon-tips" lay-tips="上传excel要求说明：<br>
                                                                 1、第1行、第2行与导入无关。有效内容从第3行开始，第3行为列名属性：序号、部门、校区、姓名、员工号等......<br>
                                                                 2、第3行所有列名属性中系统将读取以下名称的列导入数据库，这些列的先后顺序无关，但列名称必须与要求相符（如下所示）！！<br>
-                                                                    ====部门、校区、姓名、员工号、身份证号、手机号、备注====<br>
+                                                                    ====部门、校区、姓名、员工号、身份证号、手机号码、备注====<br>
                                                                 3、第四行开始是数据:<br>
                                                                     1)员工号必须唯一且准确<br>
                                                                     2)身份证号必须唯一且准确<br>
@@ -137,7 +142,10 @@
             </script>
         </div>
         <script type="text/html" id="imgTpl">
-            <img src="${ctx}/user/showIcon?userIcon={{ d.userIcon }}" style="height:50px;">
+                <div style="cursor: pointer;" onclick="show_img(this)">
+                    <img src="${ctx}/user/showIcon?userIcon={{ d.userIcon }}" style="height:50px;" id="icon">
+                </div>
+
         </script>
     </div>
 </div>
@@ -158,6 +166,7 @@
 <script src="${ctx}/plugins/layuiadmin/layui/layui.js"></script>
 <script src="${ctx}/custom/js/myLayVerify.js"></script>
 <script>
+
     layui.config({
         base: '${ctx}/plugins/layuiadmin/' //静态资源所在路径
     }).extend({
@@ -171,6 +180,19 @@
                 , laytpl = layui.laytpl
                 , upload = layui.upload;
 
+        show_img =function(t) {
+            var t = $(t).find("img");
+            //页面层
+            layer.open({
+                type: 1,
+                title: false,
+                closeBtn: 0,
+                area: ['auto'],
+                skin: 'layui-layer-nobg', //没有背景色
+                shadeClose: true,
+                content: '<div style="text-align:center"><img style="height:600px;" src="' + $(t).attr('src') + '" /></div>'
+            });
+        };
 
         upload.render({
             elem: '#import-user-and-assistant'
@@ -187,24 +209,31 @@
             , done: function (res) {//返回值接收
                 layer.closeAll('loading'); //关闭loading
                 if (res.msg === "success") {
-                    return layer.msg('导入成功', {
-                        icon: 1
-                        , time: 1000
+                    return layer.alert('导入成功！' + '<br>' +
+                            '总耗时：' + res.excelSpeed.parsedTime + '<br>' +
+                            '导入表格记录数：' + res.excelSpeed.count + '条；平均速度：' + res.excelSpeed.parsedSpeed + '。<br>' +
+                            '变更数据库记录数：删除' + res.databaseSpeed.deleteCount + '条；插入' + res.databaseSpeed.insertCount
+                            + '条；更新' + res.databaseSpeed.updateCount + '条；平均速度：' + res.databaseSpeed.parsedSpeed + '。', {
+                        skin: 'layui-layer-molv' //样式类名
+                        , closeBtn: 0
+                    });
+                } else if (res.msg === "excelColumnNotFound") {
+                    return layer.alert('表格中有列属性名不符合规范!', {
+                        skin: 'layui-layer-lan'
+                        , closeBtn: 0
                     });
                 } else {
-                    return layer.msg('导入失败', {
-                        offset: '15px'
-                        , icon: 2
-                        , time: 2000
+                    return layer.alert('导入失败!', {
+                        skin: 'layui-layer-lan'
+                        , closeBtn: 0
                     });
                 }
             }
             , error: function () {
                 layer.closeAll('loading'); //关闭loading
-                return layer.msg('导入失败', {
-                    offset: '15px'
-                    , icon: 2
-                    , time: 2000
+                return layer.alert('导入失败!', {
+                    skin: 'layui-layer-lan'
+                    , closeBtn: 0
                 });
             }
         });
@@ -225,24 +254,31 @@
             , done: function (res) {//返回值接收
                 layer.closeAll('loading'); //关闭loading
                 if (res.msg === "success") {
-                    return layer.msg('导入成功', {
-                        icon: 1
-                        , time: 1000
+                    return layer.alert('导入成功！' + '<br>' +
+                            '总耗时：' + res.excelSpeed.parsedTime + '<br>' +
+                            '导入表格记录数：' + res.excelSpeed.count + '条；平均速度：' + res.excelSpeed.parsedSpeed + '。<br>' +
+                            '变更数据库记录数：删除' + res.databaseSpeed.deleteCount + '条；插入' + res.databaseSpeed.insertCount
+                            + '条；更新' + res.databaseSpeed.updateCount + '条；平均速度：' + res.databaseSpeed.parsedSpeed + '。', {
+                        skin: 'layui-layer-molv' //样式类名
+                        , closeBtn: 0
+                    });
+                } else if (res.msg === "excelColumnNotFound") {
+                    return layer.alert('表格中有列属性名不符合规范!', {
+                        skin: 'layui-layer-lan'
+                        , closeBtn: 0
                     });
                 } else {
-                    return layer.msg('导入失败', {
-                        offset: '15px'
-                        , icon: 2
-                        , time: 2000
+                    return layer.alert('导入失败!', {
+                        skin: 'layui-layer-lan'
+                        , closeBtn: 0
                     });
                 }
             }
             , error: function () {
                 layer.closeAll('loading'); //关闭loading
-                return layer.msg('导入失败', {
-                    offset: '15px'
-                    , icon: 2
-                    , time: 2000
+                return layer.alert('导入失败!', {
+                    skin: 'layui-layer-lan'
+                    , closeBtn: 0
                 });
             }
         });
@@ -282,11 +318,11 @@
                 , {field: 'userEmail', title: '邮箱'}
                 , {field: 'userPhone', title: '联系方式', width: 120}
                 , {field: 'userRemark', title: '备注', width: 150}
-                , {title: '操作', minWidth: 150, align: 'center', fixed: 'right', toolbar: '#table-content-list1'}
+                , {title: '操作', minWidth: 150, align: 'center', toolbar: '#table-content-list1'}
             ]]
             , page: true
             , limit: 10
-            , limits: [5, 10, 15, 20, 9999999]
+            , limits: [5, 10, 15, 20, 50]
             , request: {
                 pageName: 'pageNum',
                 limitName: 'pageSize'  //如不配置，默认为page=1&limit=10
@@ -337,6 +373,63 @@
             });
         });
 
+
+        //监听搜索
+        form.on('submit(deleteByCondition)', function (data) {
+            var field = data.field;
+            console.log(field)
+            layer.confirm('确定要根据上述条件删除数据吗？', function (index) {
+                //执行 Ajax 后重载
+                $.ajax({
+                    type: 'post',
+                    data: {
+                        userWorkId: field.userWorkId
+                        , userIdCard: field.userIdCard
+                        , userName: field.userName
+                        , userRealName: field.userRealName
+                        , userRole: field.userRole
+                        , userEmail: field.userEmail
+                        , userPhone: field.userPhone
+                    },
+                    url: "${ctx}/user/admin/deleteByCondition",
+                    beforeSend: function (data) {
+                        layer.load(1, {shade: [0.1, '#fff']}); //上传loading
+                    }
+                    , success: function (data) {
+                        layer.closeAll('loading'); //关闭loading
+                        if (data.data === "success") {
+                            layer.msg('已删除');
+                            table.reload('userTable', {
+                                url: '${ctx}/user/admin/getUserInfo' //向后端默认传page和limit); //重载表格
+                                , request: {
+                                    pageName: 'pageNum',
+                                    limitName: 'pageSize'  //如不配置，默认为page=1&limit=10
+                                }
+                                , page: {
+                                    curr: 1 //重新从第 1 页开始
+                                }
+                            });
+                        } else if (data.data === "noPermissionsToDeleteYourself") {
+                            return layer.msg('您不能删除自己!', {
+                                offset: '15px'
+                                , icon: 2
+                                , time: 2000
+                            });
+                        } else if (data.data === "noPermissions") {
+                            return layer.msg('对不起，您没有权限删除高级别用户!', {
+                                offset: '15px'
+                                , icon: 2
+                                , time: 2000
+                            });
+                        } else {
+                            layer.msg('无法完成操作');
+                        }
+                    }
+
+                });
+
+            });
+        });
 
         var $ = layui.$, active = {
             batchdel: function () {
@@ -398,7 +491,7 @@
                 var index = layer.open({
                     type: 2
                     , title: '添加用户'
-                    , content: '${ctx}/user/admin/updateForm'
+                    , content: '${ctx}/user/admin/insertForm'
                     , maxmin: true
                     , btn: ['确定', '取消']
                     , yes: function (index, layero) {
@@ -516,7 +609,7 @@
                     ,
                     title: '编辑用户'
                     ,
-                    content: '${ctx}/user/admin/updateForm?id=' + data.id + '&userRole=' + data.userRole
+                    content: '${ctx}/user/admin/updateForm?id=' + data.id + '&userRole=' + data.userRole+'&userIcon=' + data.userIcon
                     ,
                     maxmin: true
                     ,
@@ -535,6 +628,7 @@
                                 , userIdCard: field.idCard
                                 , userName: field.userName
                                 , userRealName: field.userRealName
+                                , userIcon :field.hiddenIconUrl
                                 , userRole: field.userRole
                                 , userEmail: field.userEmail
                                 , userPhone: field.userPhone

@@ -50,7 +50,7 @@ public class SeatTableTemplateExcel extends Excel implements Serializable {
      * @throws IOException
      */
     private boolean deleteOtherSheets(String classroom) throws IOException {
-        if (StringUtils.isEmpty(classroom)){
+        if (StringUtils.isEmpty(classroom)) {
             return false;
         }
         int start = 0;
@@ -87,11 +87,13 @@ public class SeatTableTemplateExcel extends Excel implements Serializable {
         int targetSheetIndex = 0; //在第0张sheet找
         int rowCount = this.getRowCount(targetSheetIndex);
         for (int i = 0; i < rowCount; i++) {
-            for (int j = 0; j < this.getColumnCount(targetSheetIndex, i); j++) { //遍历表格所有行
+            for (int j = 0; j < this.getColumnCount(targetSheetIndex, i); j++) {
+                //遍历表格所有行
                 String value = this.getValueAt(targetSheetIndex, i, j);
-                if (StringUtils.isNumeric(value)) { //对所有为数字的单元格（即座位号）填充姓名
-                    int index=Integer.parseInt(value) - 1;
-                    if (index<data.size()) {
+                if (StringUtils.isNumeric(value)) {
+                    //对所有为数字的单元格（即座位号）填充姓名
+                    int index = Integer.parseInt(value) - 1;
+                    if (index < data.size()) {
                         //座位号值大于学生数量的座位不填
                         this.setValueAt(targetSheetIndex, i, j, data.get(Integer.parseInt(value) - 1).getStudentName());
                     }

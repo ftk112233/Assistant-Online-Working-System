@@ -94,4 +94,9 @@ public class ClassSearchCondition extends SearchCondition {
      */
     private String assistantName;
 
+    /**
+     * 是否满班
+     */
+    private String isFull;
+
 }

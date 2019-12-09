@@ -6,8 +6,9 @@ import java.util.*;
  * @author JinZhiyun
  * @version 1.0
  * @ClassName CampusEnum
- * @description 校区的枚举类，全市一共21个校区（不计算部分校区如曹杨有一校区和二小区），1.0版本目前通过数据表存储校区信息，
+ * @description 校区的枚举类，全市一共21个校区（不计算部分校区如曹杨有一校区和二小区），1.0版本目前通过枚举存储校区信息，
  * 因为校区的信息几乎不会增删改，通过枚举类的结构相较于数据表能够大大减少查询开销
+ * 同时对于季度、班型等通过成员变量code来存储班号中对应代码，但考虑到校区中诸如一个校区可能存在一校区、二校区情况，如曹杨。所以改用采用Map来存储code
  * @date 2019/10/31 21:43
  **/
 public enum CampusEnum {
@@ -36,14 +37,14 @@ public enum CampusEnum {
     /**
      * <校区编码，校区名称>的键值对
      */
-    public static final Map<String, String> CAMPUSES = new HashMap<>(CAMPUS_COUNT);
+    private static final Map<String, String> CAMPUSES = new HashMap<>(CAMPUS_COUNT);
 
     /**
      * <校区名称, 校区所有教室所组成的列表>的键值对
-     * 改用数据库存储
+     * 考虑教室和座位的进经常更新，改用数据库存储
      */
     @Deprecated
-    public static final Map<String, List<String>> CAMPUS_CLASSROOMS = new HashMap<>(CAMPUS_COUNT);
+    private static final Map<String, List<String>> CAMPUS_CLASSROOMS = new HashMap<>(CAMPUS_COUNT);
 
     static {
         /**
@@ -179,12 +180,12 @@ public enum CampusEnum {
     }
 
     /**
-     *根据输入校区编码找到对应校区名称
+     * 根据输入校区编码找到对应校区名称
      *
      * @param campusCode 校区编码
      * @return
      */
-    public static String getCampusNameByCode(String campusCode){
+    public static String getCampusNameByCode(String campusCode) {
         return CAMPUSES.get(campusCode);
     }
 
@@ -194,7 +195,7 @@ public enum CampusEnum {
      * @param campusCode 校区编码
      * @return
      */
-    public static CampusEnum getCampusEnumByCode(String campusCode){
+    public static CampusEnum getCampusEnumByCode(String campusCode) {
         return getCampusEnumByNameString(CAMPUSES.get(campusCode));
     }
 
@@ -205,7 +206,7 @@ public enum CampusEnum {
      * @return
      */
     @Deprecated
-    public static List<String> getClassroomsByCampusName(String campusName){
+    public static List<String> getClassroomsByCampusName(String campusName) {
         return CAMPUS_CLASSROOMS.get(campusName);
     }
 }

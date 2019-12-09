@@ -1,5 +1,6 @@
 package com.jzy.web.shiro;
 
+import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.SessionConstants;
 import com.jzy.manager.util.ShiroUtils;
 import com.jzy.model.entity.User;
@@ -21,7 +22,7 @@ import java.util.List;
  * @author JinZhiyun
  * @version 1.0
  * @ClassName UserRealm
- * @description //TODO
+ * @description shiro的realm
  * @date 2019/11/13 18:41
  **/
 public class UserRealm extends AuthorizingRealm {
@@ -57,8 +58,7 @@ public class UserRealm extends AuthorizingRealm {
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-//        System.out.println("++++++++++++++");
-        User user =userService.getSessionUserInfo();
+        User user = userService.getSessionUserInfo();
         // 权限信息对象info,用来存放查出的用户的所有的角色（role）及权限（permission）
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         // 用户的角色集合
@@ -67,7 +67,7 @@ public class UserRealm extends AuthorizingRealm {
 //        info.setRoles(roles);
 //         用户的角色对应的所有权限，如果只使用角色定义访问权限，下面可以不要
 //         只有角色并没有颗粒度到每一个按钮 或 是操作选项  PERMISSIONS 是可选项
-        List<String> permissions=roleAndPermissionService.listPermsByRole(user.getUserRole());
+        List<String> permissions = roleAndPermissionService.listPermsByRole(user.getUserRole());
         info.addStringPermissions(permissions);
         return info;
     }
@@ -84,9 +84,9 @@ public class UserRealm extends AuthorizingRealm {
         UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
 
         String loginWithoutPasswordSuccess = (String) ShiroUtils.getSession().getAttribute(SessionConstants.LOGIN_WITHOUT_PASSWORD_SESSION_KEY);
-        if ("true".equals(loginWithoutPasswordSuccess)) {
+        if (Constants.SUCCESS.equals(loginWithoutPasswordSuccess)) {
             //通过邮箱证码等手段免密登录成功
-            return new SimpleAuthenticationInfo(new User(), ShiroUtils.FINAL_PASSWORD_CIPHERTEXT,
+            return new SimpleAuthenticationInfo(new User(), ShiroUtils.FINAL_PASSWORD_CIPHER_TEXT,
                     ByteSource.Util.bytes(ShiroUtils.FINAL_PASSWORD_SALT), getName());
         }
 
@@ -101,7 +101,8 @@ public class UserRealm extends AuthorizingRealm {
         String key = UserLoginResult.getUserLoginFailKey(userNameInput);
         if (redisTemplate.hasKey(key)) {
             int wrongTimes = Integer.parseInt(valueOps.get(key).toString());
-            if (wrongTimes == UserLoginResult.DEFAULT_WRONG_TIMES) { //检查当前用户名是否处于冻结状态
+            if (wrongTimes == UserLoginResult.DEFAULT_WRONG_TIMES) {
+                //检查当前用户名是否处于冻结状态
                 throw new LockedAccountException("用户被锁定！");
             }
         }

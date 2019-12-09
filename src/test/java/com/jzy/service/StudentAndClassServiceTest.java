@@ -2,7 +2,9 @@ package com.jzy.service;
 
 import com.jzy.BaseTest;
 import com.jzy.config.FilePathProperties;
+import com.jzy.manager.exception.InputFileTypeException;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
+import com.jzy.model.dto.StudentAndClassSearchCondition;
 import com.jzy.model.excel.input.StudentListImportToDatabaseExcel;
 import com.jzy.model.excel.template.SeatTableTemplateExcel;
 import org.junit.Test;
@@ -44,7 +46,7 @@ public class StudentAndClassServiceTest extends BaseTest {
     }
 
     @Test
-    public void listStudentAndClassesWithSubjectsByClassId() throws IOException {
+    public void listStudentAndClassesWithSubjectsByClassId() throws IOException, InputFileTypeException {
         List<StudentAndClassDetailedWithSubjectsDto> results=studentAndClassService.listStudentAndClassesWithSubjectsByClassId("U6ECFC020006");
 //        AssistantTutorialExcel excel=new AssistantTutorialExcel(filePathProperties.getToolboxAssistantTutorialTemplatePathAndName("曹杨"));
         SeatTableTemplateExcel excel=new SeatTableTemplateExcel(filePathProperties.getToolboxSeatTableTemplatePathAndName("曹杨"));
@@ -53,5 +55,15 @@ public class StudentAndClassServiceTest extends BaseTest {
         hashOps.put("h",1+"","111");
         hashOps.put("h",1+"","121");
 
+    }
+
+    @Test
+    public void countStudentsGroupByClassGrade() {
+        System.out.println(studentAndClassService.countStudentsGroupByClassGrade(new StudentAndClassSearchCondition()));
+    }
+
+    @Test
+    public void countStudentsGroupByClassGradeAndType() {
+        System.out.println(studentAndClassService.countStudentsGroupByClassGradeAndType(new StudentAndClassSearchCondition()));
     }
 }

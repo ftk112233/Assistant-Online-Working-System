@@ -1,5 +1,8 @@
 package com.jzy.manager.util;
 
+import com.jzy.model.entity.Question;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,26 +10,34 @@ import java.util.Map;
  * @author JinZhiyun
  * @version 1.0
  * @ClassName QuestionUtils
- * @description 通过问题免密登录工具类
+ * @description 登录问题的工具类 {@link com.jzy.model.entity.Question}
+ * 增删改入参对象字段的校验，服务端的校验应该与前端js保持一致，且必须严格于数据库列属性要求的标准
+ * 现改用数据库存储所有问题信息，便于修改，舍弃静态Map的方式
  * @date 2019/11/17 18:06
  **/
 public class QuestionUtils {
-    private QuestionUtils(){}
+    private QuestionUtils() {
+    }
+
+    /**
+     * 永真答案
+     */
+    private static final String ALWAYS_TRUE_ANSWER = Question.ALWAYS_TRUE_ANSWER;
 
     /**
      * 问题总数
      */
-    public static final int QUESTION_COUNT = 4;
+    private static final int QUESTION_COUNT = 4;
 
     /**
      * 所有问题，键的顺序问题和答案相同
      */
-    public static final Map<Integer, String> QUESTIONS=new HashMap<>(QUESTION_COUNT);
+    private static final Map<Integer, String> QUESTIONS = new HashMap<>(QUESTION_COUNT);
 
     /**
      * 所有答案，键的顺序问题和答案相同
      */
-    public static final Map<Integer, String> ANSWERS=new HashMap<>(QUESTION_COUNT);
+    private static final Map<Integer, String> ANSWERS = new HashMap<>(QUESTION_COUNT);
 
     static {
         QUESTIONS.put(1, "金爷爷最喜欢的二次元角色是?");
@@ -51,7 +62,8 @@ public class QuestionUtils {
      * @param id 问题的键
      * @return
      */
-    public static String getQuestionById(Integer id){
+    @Deprecated
+    public static String getQuestionById(Integer id) {
         return QUESTIONS.get(id);
     }
 
@@ -61,30 +73,126 @@ public class QuestionUtils {
      * @param id 问题的键
      * @return
      */
-    public static String getAnswerById(Integer id){
+    @Deprecated
+    public static String getAnswerById(Integer id) {
         return ANSWERS.get(id);
     }
 
     /**
      * 根据问题的键和输入的答案判断问题是否正确
      *
-     * @param id 问题的键
+     * @param id          问题的键
      * @param inputAnswer 输入的答案
      * @return
      */
-    public static boolean isValidAnswer(Integer id , String inputAnswer){
-        if (id.equals(1)){
-            if (ANSWERS.get(id).equals(inputAnswer) || "初音".equals(inputAnswer)){
+    @Deprecated
+    public static boolean isCorrectAnswer(Integer id, String inputAnswer) {
+        if (isAlwaysTrueAnswer(inputAnswer)) {
+            return true;
+        }
+
+        if (id.equals(1)) {
+            if (ANSWERS.get(id).equals(inputAnswer) || "初音".equals(inputAnswer)) {
                 return true;
             }
         }
 
-        if (id.equals(3)){
-            if (ANSWERS.get(id).equals(inputAnswer) || "精进".equals(inputAnswer)){
+        if (id.equals(3)) {
+            if (ANSWERS.get(id).equals(inputAnswer) || "精进".equals(inputAnswer)) {
                 return true;
             }
         }
 
         return ANSWERS.get(id).equals(inputAnswer);
+    }
+
+    /**
+     * 是否等于万能答案
+     *
+     * @param inputAnswer 输入的答案
+     * @return
+     */
+    public static boolean isAlwaysTrueAnswer(String inputAnswer) {
+        return ALWAYS_TRUE_ANSWER.equals(inputAnswer);
+    }
+
+    /**
+     * 得到默认问题
+     *
+     * @return 问题对象
+     */
+    public static Question getDefaultQuestion() {
+        Integer id = 1;
+        return new Question(QUESTIONS.get(id), ANSWERS.get(id));
+    }
+
+    /**
+     * 默认问题的答案是否正确
+     *
+     * @param inputAnswer 输入的答案
+     * @return
+     */
+    public static boolean isCorrectDefaultQuestionAnswer(String inputAnswer) {
+        if (isAlwaysTrueAnswer(inputAnswer)) {
+            return true;
+        }
+
+        if (ANSWERS.get(1).equals(inputAnswer) || "初音".equals(inputAnswer)) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public static boolean isValidContent(String content) {
+        return !StringUtils.isEmpty(content) && content.length() <= 500;
+    }
+
+    /**
+     * 万能答案不校验，不更新，永远使用数据库默认值
+     *
+     * @param answer
+     * @return
+     */
+    public static boolean isValidTrueAnswer(String answer) {
+        return true;
+    }
+
+    public static boolean isValidAnswer(String answer) {
+        return !StringUtils.isEmpty(answer) && answer.length() <= 100;
+    }
+
+    public static boolean isValidAnswer2(String answer2) {
+        return StringUtils.isEmpty(answer2) || answer2.length() <= 100;
+    }
+
+    public static boolean isValidCreatorId(Long creator) {
+        return true;
+    }
+
+    public static boolean isValidRemark(String remark) {
+        return remark == null || remark.length() <= 500;
+    }
+
+    /**
+     * question是否合法
+     *
+     * @param question 输入的question对象
+     * @return
+     */
+    public static boolean isValidQuestionInfo(Question question) {
+        return question != null && isValidContent(question.getContent()) && isValidTrueAnswer(question.getTrueAnswer()) && isValidAnswer(question.getAnswer())
+                && isValidAnswer2(question.getAnswer2()) && isValidCreatorId(question.getCreatorId())
+                && isValidRemark(question.getRemark());
+    }
+
+    /**
+     * question是否合法
+     *
+     * @param question 输入的question对象
+     * @return
+     */
+    public static boolean isValidQuestionUpdateInfo(Question question) {
+        return isValidQuestionInfo(question);
     }
 }

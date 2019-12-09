@@ -1,11 +1,12 @@
 package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.StudentAndClassDetailedDto;
-import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
-import com.jzy.model.dto.StudentAndClassSearchCondition;
+import com.jzy.model.dto.*;
+import com.jzy.model.dto.echarts.GroupedByGradeAndTypeObjectTotal;
+import com.jzy.model.dto.echarts.GroupedBySubjectAndTypeObjectTotal;
+import com.jzy.model.dto.echarts.GroupedByTypeObjectTotal;
 import com.jzy.model.entity.StudentAndClass;
+import com.jzy.model.vo.echarts.NamesAndValues;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public interface StudentAndClassService {
      * 查询指定学员编号和班号的记录数，即当前学员是否报了当前班
      *
      * @param studentId 学员编号
-     * @param classId 班号
+     * @param classId   班号
      * @return
      */
     Long countStudentAndClassByStudentIdAndClassId(String studentId, String classId);
@@ -40,7 +41,7 @@ public interface StudentAndClassService {
      * @param studentAndClassDetailedDto
      * @return
      */
-    String insertStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto);
+    UpdateResult insertStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto);
 
     /**
      * 根据当前学员号和报班班号更新，报班情况
@@ -48,29 +49,31 @@ public interface StudentAndClassService {
      * @param studentAndClassDetailedDto
      * @return
      */
-    String updateStudentAndClassByStudentIdAndClassId(StudentAndClassDetailedDto studentAndClassDetailedDto);
+    UpdateResult updateStudentAndClassByStudentIdAndClassId(StudentAndClassDetailedDto studentAndClassDetailedDto);
 
     /**
      * 根据从excel中读取到的studentAndClassDetailedDtos信息，更新插入多个。根据学员号和班号判断：
-     *      if 当前学员号和班号组合不存在
-     *          执行插入
-     *      else
-     *          根据学员号和班号更新
+     * if 当前学员号和班号组合不存在
+     * 执行插入
+     * else
+     * 根据学员号和班号更新
+     *
      * @param studentAndClassDetailedDtos
      * @return
      */
-    String insertAndUpdateStudentAndClassesFromExcel(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos) throws Exception;
+    UpdateResult insertAndUpdateStudentAndClassesFromExcel(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos) throws Exception;
 
     /**
      * 根据从excel中读取到的studentAndClassDetailedDto信息，更新插入一个。根据学员号和班号判断：
-     *      if 当前学员号和班号组合不存在
-     *          执行插入
-     *      else
-     *          根据学员号和班号更新
+     * if 当前学员号和班号组合不存在
+     * 执行插入
+     * else
+     * 根据学员号和班号更新
+     *
      * @param studentAndClassDetailedDto
      * @return
      */
-    String insertAndUpdateOneStudentAndClassFromExcel(StudentAndClassDetailedDto studentAndClassDetailedDto) throws Exception;
+    UpdateResult insertAndUpdateOneStudentAndClassFromExcel(StudentAndClassDetailedDto studentAndClassDetailedDto) throws Exception;
 
     /**
      * 查询学员上课信息的ajax交互
@@ -95,14 +98,14 @@ public interface StudentAndClassService {
      * @param id 被删除学员上课的id
      * @return
      */
-    void deleteOneStudentAndClassById(Long id);
+    long deleteOneStudentAndClassById(Long id);
 
     /**
      * 根据id删除多个学员上课记录
      *
      * @param ids 学员上课记录id的列表
      */
-    void deleteManyStudentAndClassesByIds(List<Long> ids);
+    long deleteManyStudentAndClassesByIds(List<Long> ids);
 
     /**
      * 根据班级编码查询班级的所有学生及班级的详细信息
@@ -119,4 +122,52 @@ public interface StudentAndClassService {
      * @return
      */
     List<StudentAndClassDetailedWithSubjectsDto> listStudentAndClassesWithSubjectsByClassId(String classId);
+
+    /**
+     * 条件删除多个学生上课记录
+     *
+     * @param condition 输入的查询条件
+     * @return
+     */
+    UpdateResult deleteStudentAndClassesByCondition(StudentAndClassSearchCondition condition);
+
+    /**
+     * 查询指定年级的学生人数
+     *
+     * @param condition 年份-季度-校区
+     * @return
+     */
+    NamesAndValues countStudentsGroupByClassGrade(StudentAndClassSearchCondition condition);
+
+    /**
+     * 查询指定学科的学生人数
+     *
+     * @param condition 年份-季度-校区
+     * @return
+     */
+    NamesAndValues countStudentsGroupByClassSubject(StudentAndClassSearchCondition condition);
+
+    /**
+     * 查询指定班型的学生人数
+     *
+     * @param condition 年份-季度-校区
+     * @return
+     */
+    List<GroupedByTypeObjectTotal> countStudentsGroupByClassType(StudentAndClassSearchCondition condition);
+
+    /**
+     * 查询指定年级对应人数，以及该年级下各班型对应人数
+     *
+     * @param condition 年份-季度-校区
+     * @return 结果已排序
+     */
+    List<GroupedByGradeAndTypeObjectTotal> countStudentsGroupByClassGradeAndType(StudentAndClassSearchCondition condition);
+
+    /**
+     * 查询指定学科对应人数，以及该年级下各学科对应人数
+     *
+     * @param condition 年份-季度-校区
+     * @return 结果已排序
+     */
+    List<GroupedBySubjectAndTypeObjectTotal> countStudentsGroupByClassSubjectAndType(StudentAndClassSearchCondition condition);
 }

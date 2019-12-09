@@ -3,6 +3,7 @@ package com.jzy.service;
 import com.github.pagehelper.PageInfo;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.StudentSearchCondition;
+import com.jzy.model.dto.UpdateResult;
 import com.jzy.model.entity.Student;
 
 import java.util.List;
@@ -37,59 +38,63 @@ public interface StudentService {
      * @param student 修改后的学生信息
      * @return
      */
-    String updateStudentByStudentId(Student student);
+    UpdateResult updateStudentByStudentId(Student student);
 
     /**
      * 添加学生
      *
      * @param student 添加学生的信息
      */
-    String insertStudent(Student student);
+    UpdateResult insertStudent(Student student);
 
 
     /**
      * 根据从excel中读取到的students信息（包括手机等字段），更新插入多个。根据学员编号判断：
-     *      if 当前学员编号不存在
-     *          执行插入
-     *      else
-     *          根据学员编号更新
+     * if 当前学员编号不存在
+     * 执行插入
+     * else
+     * 根据学员编号更新
+     *
      * @param students
      * @return
      */
-    String insertAndUpdateStudentsDetailedFromExcel(List<Student> students) throws Exception;
+    UpdateResult insertAndUpdateStudentsDetailedFromExcel(List<Student> students) throws Exception;
 
     /**
      * 根据从excel中读取到的students信息（包括手机等字段），更新插入一个。根据学员编号判断：
-     *      if 当前学员编号不存在
-     *          执行插入
-     *      else
-     *          根据学员编号更新
+     * if 当前学员编号不存在
+     * 执行插入
+     * else
+     * 根据学员编号更新
+     *
      * @param student
      * @return
      */
-    String insertAndUpdateOneStudentDetailedFromExcel(Student student) throws Exception;
+    UpdateResult insertAndUpdateOneStudentDetailedFromExcel(Student student) throws Exception;
 
     /**
      * 根据从excel中读取到的students信息（一般就学号姓名，不包括手机等字段），更新插入多个。根据学员编号判断：
-     *      if 当前学员编号不存在
-     *          执行插入
-     *      else
-     *          根据学员编号更新
+     * if 当前学员编号不存在
+     * 执行插入
+     * else
+     * 根据学员编号更新
+     *
      * @param students
      * @return
      */
-    String insertAndUpdateStudentsFromExcel(List<Student> students) throws Exception;
+    UpdateResult insertAndUpdateStudentsFromExcel(List<Student> students) throws Exception;
 
     /**
      * 根据从excel中读取到的students信息（一般就学号姓名，不包括手机等字段），更新插入一个。根据学员编号判断：
-     *      if 当前学员编号不存在
-     *          执行插入
-     *      else
-     *          根据学员编号更新
+     * if 当前学员编号不存在
+     * 执行插入
+     * else
+     * 根据学员编号更新
+     *
      * @param student
      * @return
      */
-    String insertAndUpdateOneStudentFromExcel(Student student) throws Exception;
+    UpdateResult insertAndUpdateOneStudentFromExcel(Student student) throws Exception;
 
     /**
      * 查询学员个人信息
@@ -114,12 +119,20 @@ public interface StudentService {
      * @param id 被删除学生的id
      * @return
      */
-    void deleteOneStudentById(Long id);
+    long deleteOneStudentById(Long id);
 
     /**
      * 根据id删除多个学生
      *
      * @param ids 学生id的列表
      */
-    void deleteManyStudentsByIds(List<Long> ids);
+    long deleteManyStudentsByIds(List<Long> ids);
+
+    /**
+     * 条件删除多个学生
+     *
+     * @param condition 输入的查询条件
+     * @return
+     */
+    String deleteStudentsByCondition(StudentSearchCondition condition);
 }

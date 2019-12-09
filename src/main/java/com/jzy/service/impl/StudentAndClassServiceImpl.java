@@ -4,22 +4,23 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.StudentAndClassMapper;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.StudentAndClassUtils;
-import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.StudentAndClassDetailedDto;
-import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
-import com.jzy.model.dto.StudentAndClassSearchCondition;
+import com.jzy.model.dto.*;
+import com.jzy.model.dto.echarts.*;
 import com.jzy.model.entity.Class;
 import com.jzy.model.entity.Student;
 import com.jzy.model.entity.StudentAndClass;
+import com.jzy.model.vo.echarts.NamesAndValues;
 import com.jzy.service.StudentAndClassService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,7 +32,7 @@ import java.util.List;
  **/
 @Service
 public class StudentAndClassServiceImpl extends AbstractServiceImpl implements StudentAndClassService {
-    private final static Logger logger = Logger.getLogger(StudentAndClassServiceImpl.class);
+    private final static Logger logger = LogManager.getLogger(StudentAndClassServiceImpl.class);
 
     @Autowired
     private StudentAndClassMapper studentAndClassMapper;
@@ -47,10 +48,10 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
     }
 
     @Override
-    public String insertStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto) {
+    public UpdateResult insertStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto) {
         if (countStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto.getStudentId(), studentAndClassDetailedDto.getClassId()) > 0) {
             //重复报班
-            return "studentAndClassExist";
+            return new UpdateResult("studentAndClassExist");
         }
 
         return insertNewStudentAndClass(studentAndClassDetailedDto);
@@ -62,61 +63,72 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
      * @param studentAndClassDetailedDto
      * @return
      */
-    private String insertNewStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto) {
+    private UpdateResult insertNewStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto) {
         Student student = studentService.getStudentByStudentId(studentAndClassDetailedDto.getStudentId());
         if (student == null) {
             //学员号不存在
-            return "studentNotExist";
+            return new UpdateResult("studentNotExist");
         }
 
         Class clazz = classService.getClassByClassId(studentAndClassDetailedDto.getClassId());
         if (clazz == null) {
             //班号不存在
-            return "classNotExist";
+            return new UpdateResult("classNotExist");
         }
 
-        studentAndClassMapper.insertStudentAndClass(studentAndClassDetailedDto);
-        return Constants.SUCCESS;
+        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        long count = studentAndClassMapper.insertStudentAndClass(studentAndClassDetailedDto);
+        result.setInsertCount(count);
+        return result;
     }
 
 
     @Override
-    public String updateStudentAndClassByStudentIdAndClassId(StudentAndClassDetailedDto studentAndClassDetailedDto) {
-        studentAndClassMapper.updateStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto);
-        return Constants.SUCCESS;
+    public UpdateResult updateStudentAndClassByStudentIdAndClassId(StudentAndClassDetailedDto studentAndClassDetailedDto) {
+        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        long count = studentAndClassMapper.updateStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto);
+        result.setUpdateCount(count);
+        return result;
     }
 
     @Override
-    public String insertAndUpdateStudentAndClassesFromExcel(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos) throws Exception {
+    public UpdateResult insertAndUpdateStudentAndClassesFromExcel(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos) throws Exception {
+        UpdateResult result = new UpdateResult();
+
         for (StudentAndClassDetailedDto studentAndClassDetailedDto : studentAndClassDetailedDtos) {
             if (StudentAndClassUtils.isValidStudentAndClassDetailedDtoInfo(studentAndClassDetailedDto)) {
-                insertAndUpdateOneStudentAndClassFromExcel(studentAndClassDetailedDto);
+                UpdateResult resultTmp = insertAndUpdateOneStudentAndClassFromExcel(studentAndClassDetailedDto);
+                result.add(resultTmp);
             } else {
                 String msg = "输入学生花名册表中读取到的studentAndClassDetailedDtos不合法!";
                 logger.error(msg);
                 throw new InvalidParameterException(msg);
             }
         }
-        return Constants.SUCCESS;
+        result.setResult(Constants.SUCCESS);
+        return result;
     }
 
     @Override
-    public String insertAndUpdateOneStudentAndClassFromExcel(StudentAndClassDetailedDto studentAndClassDetailedDto) throws Exception {
+    public UpdateResult insertAndUpdateOneStudentAndClassFromExcel(StudentAndClassDetailedDto studentAndClassDetailedDto) throws Exception {
         if (studentAndClassDetailedDto == null) {
             String msg = "insertAndUpdateOneStudentAndClassFromExcel方法输入studentAndClassDetailedDto为null!";
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
 
+        UpdateResult result = new UpdateResult();
+
         Long count = countStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto.getStudentId(), studentAndClassDetailedDto.getClassId());
         if (count > 0) {
             //记录已存在，更新
-            updateStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto);
+            result.add(updateStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto));
         } else {
             //插入
-            insertNewStudentAndClass(studentAndClassDetailedDto);
+            result.add(insertNewStudentAndClass(studentAndClassDetailedDto));
         }
-        return Constants.SUCCESS;
+        result.setResult(Constants.SUCCESS);
+        return result;
     }
 
     @Override
@@ -126,7 +138,8 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
         for (int i = 0; i < studentAndClassDetailedDtos.size(); i++) {
             StudentAndClassDetailedDto studentAndClassDetailedDto = studentAndClassDetailedDtos.get(i);
             if (!StringUtils.isEmpty(studentAndClassDetailedDto.getClassYear())) {
-                studentAndClassDetailedDtos.set(i, StudentAndClassUtils.parseClassYear(studentAndClassDetailedDto));
+                studentAndClassDetailedDto.setClassYear(Class.parseYear(studentAndClassDetailedDto.getClassYear()));
+                studentAndClassDetailedDtos.set(i, studentAndClassDetailedDto);
             }
         }
         return new PageInfo<>(studentAndClassDetailedDtos);
@@ -172,13 +185,19 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
     }
 
     @Override
-    public void deleteOneStudentAndClassById(Long id) {
-        studentAndClassMapper.deleteOneStudentAndClassById(id);
+    public long deleteOneStudentAndClassById(Long id) {
+        if (id == null) {
+            return 0;
+        }
+        return studentAndClassMapper.deleteOneStudentAndClassById(id);
     }
 
     @Override
-    public void deleteManyStudentAndClassesByIds(List<Long> ids) {
-        studentAndClassMapper.deleteManyStudentAndClassesByIds(ids);
+    public long deleteManyStudentAndClassesByIds(List<Long> ids) {
+        if (ids == null || ids.size() == 0) {
+            return 0;
+        }
+        return studentAndClassMapper.deleteManyStudentAndClassesByIds(ids);
     }
 
     @Override
@@ -200,12 +219,87 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
 
             List<String> subjects = new ArrayList<>();
             for (StudentAndClassDetailedDto tmp : tmps) {
-                subjects.add(tmp.getClassSubject());
+                if (!StringUtils.isEmpty(tmp.getClassSubject())) {
+                    subjects.add(tmp.getClassSubject());
+                }
             }
             //读取设置该学生所有修读的学科
             dto.setSubjects(subjects);
         }
         return dtos;
+    }
+
+    @Override
+    public UpdateResult deleteStudentAndClassesByCondition(StudentAndClassSearchCondition condition) {
+        long count = studentAndClassMapper.deleteStudentAndClassesByCondition(condition);
+        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        result.setDeleteCount(count);
+        return result;
+    }
+
+    @Override
+    public NamesAndValues countStudentsGroupByClassGrade(StudentAndClassSearchCondition condition) {
+        NamesAndValues namesAndValues = new NamesAndValues();
+        List<GroupedByGradeObjectTotal> objectTotals = studentAndClassMapper.countStudentsGroupByClassGrade(condition);
+        namesAndValues.addAll(objectTotals);
+        return namesAndValues;
+    }
+
+    @Override
+    public NamesAndValues countStudentsGroupByClassSubject(StudentAndClassSearchCondition condition) {
+        NamesAndValues namesAndValues = new NamesAndValues();
+        List<GroupedBySubjectObjectTotal> objectTotals = studentAndClassMapper.countStudentsGroupByClassSubject(condition);
+        namesAndValues.addAll(objectTotals);
+        return namesAndValues;
+    }
+
+    @Override
+    public List<GroupedByTypeObjectTotal> countStudentsGroupByClassType(StudentAndClassSearchCondition condition) {
+        return studentAndClassMapper.countStudentsGroupByClassType(condition);
+    }
+
+    @Override
+    public List<GroupedByGradeAndTypeObjectTotal> countStudentsGroupByClassGradeAndType(StudentAndClassSearchCondition condition) {
+        //先查出各年级对应人数
+        List<GroupedByGradeObjectTotal> objectTotals = studentAndClassMapper.countStudentsGroupByClassGrade(condition);
+        Collections.sort(objectTotals);
+
+        //结果集
+        List<GroupedByGradeAndTypeObjectTotal> byGradeAndTypeObjectTotals = new ArrayList<>();
+        for (GroupedByGradeObjectTotal objectTotal : objectTotals) {
+            //遍历各年级
+            condition.setClassGrade(objectTotal.getName());
+            //查出当前年级各班型对应人数
+            List<GroupedByTypeObjectTotal> byTypeObjectTotals = studentAndClassMapper.countStudentsGroupByClassType(condition);
+            Collections.sort(byTypeObjectTotals);
+
+            //把含有当前年级对应人数，以及该年级下各班型对应人数信息的对象添加到结果集
+            byGradeAndTypeObjectTotals.add(new GroupedByGradeAndTypeObjectTotal(objectTotal, byTypeObjectTotals));
+        }
+
+        return byGradeAndTypeObjectTotals;
+    }
+
+    @Override
+    public List<GroupedBySubjectAndTypeObjectTotal> countStudentsGroupByClassSubjectAndType(StudentAndClassSearchCondition condition) {
+        //先查出各学科对应人数
+        List<GroupedBySubjectObjectTotal> objectTotals = studentAndClassMapper.countStudentsGroupByClassSubject(condition);
+        Collections.sort(objectTotals);
+
+        //结果集
+        List<GroupedBySubjectAndTypeObjectTotal> bySubjectAndTypeObjectTotals = new ArrayList<>();
+        for (GroupedBySubjectObjectTotal objectTotal : objectTotals) {
+            //遍历各学科
+            condition.setClassSubject(objectTotal.getName());
+            //查出当前学科各班型对应人数
+            List<GroupedByTypeObjectTotal> byTypeObjectTotals = studentAndClassMapper.countStudentsGroupByClassType(condition);
+            Collections.sort(byTypeObjectTotals);
+
+            //把含有当前学科对应人数，以及该学科下各班型对应人数信息的对象添加到结果集
+            bySubjectAndTypeObjectTotals.add(new GroupedBySubjectAndTypeObjectTotal(objectTotal, byTypeObjectTotals));
+        }
+
+        return bySubjectAndTypeObjectTotals;
     }
 
 }

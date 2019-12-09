@@ -51,11 +51,4 @@ public class Assistant extends BaseEntity {
      * 助教备注，空或者长度小于等于500
      */
     private String assistantRemark;
-
-    public Assistant() {
-    }
-
-    public Assistant(String assistantWorkId) {
-        this.assistantWorkId = assistantWorkId;
-    }
 }

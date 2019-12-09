@@ -2,6 +2,7 @@ package com.jzy.model.excel.input;
 
 import com.jzy.manager.exception.ExcelSheetNameInvalidException;
 import com.jzy.manager.exception.InputFileTypeException;
+import com.jzy.model.entity.CampusAndClassroom;
 import com.jzy.model.excel.Excel;
 import com.jzy.model.excel.ExcelVersionEnum;
 import lombok.Data;
@@ -48,9 +49,9 @@ public class SeatTableTemplateInputExcel extends Excel implements Serializable {
     }
 
     /**
-     * 从座位表模板中读取的教室门牌号
+     * 从座位表模板中读取的教室
      */
-    private List<String> classrooms;
+    private List<CampusAndClassroom> campusAndClassrooms;
 
 
     /**
@@ -59,25 +60,45 @@ public class SeatTableTemplateInputExcel extends Excel implements Serializable {
      * @return
      * @throws IOException
      */
-    public List<String> readSeatTable() throws IOException {
+    public List<CampusAndClassroom> readSeatTable() throws IOException, ExcelSheetNameInvalidException {
         resetParam();
 
-        int sheetCount=this.getSheetCount();
+        int sheetCount = this.getSheetCount();
         for (int i = 0; i < sheetCount; i++) {
-            String classroom=this.getSheetName(i);
-            if (!StringUtils.isNumeric(classroom)){
+            String classroom = this.getSheetName(i);
+            if (!StringUtils.isNumeric(classroom)) {
                 //如果sheet名（教室门牌号）不是纯数字
                 throw new ExcelSheetNameInvalidException("教室门牌号不是纯数字!");
             }
-            classrooms.add(classroom);
+            CampusAndClassroom campusAndClassroom=new CampusAndClassroom();
+            campusAndClassroom.setClassroom(classroom);
+
+            int rowCount = this.getRowCount(i);
+            Integer maxCapacity =null;
+            for (int j = 0; j < rowCount; j++) {
+                for (int k = 0; k < this.getColumnCount(i, j); k++) {
+                    //遍历表格所有行
+                    String value = this.getValueAt(i, j, k);
+                    if (StringUtils.isNumeric(value)) {
+                        //对所有为数字的单元格找到最大的作为当前教室容量
+                        Integer cap = Integer.parseInt(value);
+                        if (maxCapacity == null || cap>maxCapacity){
+                            maxCapacity=cap;
+                        }
+                    }
+                }
+            }
+            campusAndClassroom.setClassroomCapacity(maxCapacity);
+
+            campusAndClassrooms.add(campusAndClassroom);
         }
 
-        return classrooms;
+        return campusAndClassrooms;
     }
 
     @Override
     public void resetParam() {
-        classrooms=new ArrayList<>();
+        campusAndClassrooms = new ArrayList<>();
     }
 }
 

@@ -36,7 +36,7 @@ public class MyTimeUtils {
     public static long getTime() {
         //在获取现在的时间
         Calendar calendar = Calendar.getInstance();
-        Long date = calendar.getTime().getTime();            //获取毫秒时间
+        long date = calendar.getTime().getTime();            //获取毫秒时间
         return date;
     }
 
@@ -50,7 +50,7 @@ public class MyTimeUtils {
     public static boolean cmpTime(long timeComparedTo, long validTime) {
         //在获取现在的时间
         Calendar calendar = Calendar.getInstance();
-        Long timeNow = calendar.getTime().getTime();            //获取毫秒时间
+        long timeNow = calendar.getTime().getTime();            //获取毫秒时间
         if (timeNow - timeComparedTo > validTime) {
             return false;
         } else {
@@ -66,11 +66,14 @@ public class MyTimeUtils {
      * @Param [birthDay]
      **/
     public static int getAgeByBirth(Date birthDay) {
+        if (birthDay == null) {
+            return -1;
+        }
         int age = 0;
         Calendar cal = Calendar.getInstance();
-        if (cal.before(birthDay)) { //出生日期晚于当前时间，无法计算
-            throw new IllegalArgumentException(
-                    "The birthDay is before Now.It's unbelievable!");
+        if (cal.before(birthDay)) {
+            //出生日期晚于当前时间，无法计算
+            return -1;
         }
         int yearNow = cal.get(Calendar.YEAR);  //当前年份
         int monthNow = cal.get(Calendar.MONTH);  //当前月份
@@ -82,7 +85,9 @@ public class MyTimeUtils {
         age = yearNow - yearBirth;   //计算整岁数
         if (monthNow <= monthBirth) {
             if (monthNow == monthBirth) {
-                if (dayOfMonthNow < dayOfMonthBirth) age--;//当前日期在生日之前，年龄减一
+                if (dayOfMonthNow < dayOfMonthBirth) {
+                    age--;//当前日期在生日之前，年龄减一
+                }
             } else {
                 age--;//当前月份在生日之前，年龄减一
             }
@@ -157,13 +162,13 @@ public class MyTimeUtils {
     /**
      * 将cst时间转为Date
      *
-     * @param CST cst时间字符串
+     * @param cst cst时间字符串
      * @return
      * @throws ParseException
      */
-    public static Date cstToDate(String CST) throws ParseException {
+    public static Date cstToDate(String cst) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
-        return sdf.parse(CST);
+        return sdf.parse(cst);
     }
 
     /**
@@ -171,7 +176,7 @@ public class MyTimeUtils {
      *
      * @return
      */
-    public static int getCurrentYear(){
+    public static int getCurrentYear() {
         Calendar cal = Calendar.getInstance();
         int year = cal.get(Calendar.YEAR);
         return year;
@@ -182,7 +187,7 @@ public class MyTimeUtils {
      *
      * @return
      */
-    public static int getCurrentMonth(){
+    public static int getCurrentMonth() {
         Calendar cal = Calendar.getInstance();
         int month = cal.get(Calendar.MONTH) + 1;
         return month;
@@ -193,15 +198,9 @@ public class MyTimeUtils {
      *
      * @return
      */
-    public static int getCurrentDay(){
+    public static int getCurrentDay() {
         Calendar cal = Calendar.getInstance();
         int day = cal.get(Calendar.DATE);
         return day;
-    }
-
-    public static void main(String[] args) {
-        Date d=new Date();
-        System.out.println(d.toString());
-        System.out.println(dateToStrYMDHMS(d));
     }
 }

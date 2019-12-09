@@ -103,6 +103,29 @@
             #{id}
         </foreach>
     </delete>
+    <delete id="deleteAssistantsByCondition" parameterType="com.jzy.model.dto.AssistantSearchCondition">
+        delete a.* from assistant a
+        <where>
+            <if test="assistantWorkId != null and assistantWorkId!=''">
+                <bind name="assistantWorkIdLike" value=" '%' + assistantWorkId + '%' "/>
+                and a.assistant_work_id like #{assistantWorkIdLike}
+            </if>
+            <if test="assistantName != null and assistantName!=''">
+                <bind name="assistantNameLike" value=" '%' + assistantName + '%' "/>
+                and a.assistant_name like #{assistantNameLike}
+            </if>
+            <if test="assistantSex != null and assistantSex!=''">
+                and a.assistant_sex=#{assistantSex}
+            </if>
+            <if test="assistantCampus != null and assistantCampus!=''">
+                and a.assistant_campus=#{assistantCampus}
+            </if>
+            <if test="assistantPhone != null and assistantPhone!=''">
+                <bind name="assistantPhoneLike" value=" '%' + assistantPhone + '%' "/>
+                and a.assistant_phone like #{assistantPhoneLike}
+            </if>
+        </where>
+    </delete>
 
     <select id="getAssistantByWorkId" resultMap="BaseResultMap">
         select * from assistant where assistant_work_id=#{assistantWorkId}
@@ -163,6 +186,9 @@
                 desc
             </if>
         </if>
+    </select>
+    <select id="listAssistantsByCampus" resultMap="BaseResultMap">
+        select * from assistant where assistant_campus=#{campus}
     </select>
 
 </mapper>

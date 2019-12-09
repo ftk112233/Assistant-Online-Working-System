@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jzy.dao.QuestionMapper">
+    <resultMap id="BaseColumnResultMap" type="com.jzy.model.entity.BaseEntity">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap" type="com.jzy.model.entity.Question" extends="BaseColumnResultMap">
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="true_answer" property="trueAnswer" jdbcType="VARCHAR"/>
+        <result column="answer" property="answer" jdbcType="VARCHAR"/>
+        <result column="answer2" property="answer2" jdbcType="VARCHAR"/>
+        <result column="creator_id" property="creatorId" jdbcType="BIGINT"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="QuestionWithCreatorResultMap" type="com.jzy.model.dto.QuestionWithCreatorDto" extends="BaseResultMap">
+        <result column="creator_name" property="creatorName" jdbcType="VARCHAR"/>
+    </resultMap>
+    <insert id="insertQuestion" parameterType="com.jzy.model.entity.Question">
+        insert into question
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="content != null and content!=''">
+                content,
+            </if>
+            <if test="answer != null and answer!=''" >
+                answer,
+            </if>
+            <if test="answer2 != null and answer2!=''" >
+                answer2,
+            </if>
+            <if test="creatorId != null and creatorId!=''" >
+                creator_id,
+            </if>
+            <if test="remark != null and remark!=''" >
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="content != null and content!=''">
+                #{content},
+            </if>
+            <if test="answer != null and answer!=''" >
+                #{answer},
+            </if>
+            <if test="answer2 != null and answer2!=''" >
+                #{answer2},
+            </if>
+            <if test="creatorId != null and creatorId!=''" >
+                #{creatorId},
+            </if>
+            <if test="remark != null and remark!=''" >
+                #{remark},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateQuestionInfo" parameterType="com.jzy.model.entity.Question">
+        update question
+        <set>
+            <if test="content != null  and content!=''">
+                content = #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="answer != null  and answer!=''">
+                answer = #{answer,jdbcType=VARCHAR},
+            </if>
+            answer2 =#{answer2,jdbcType=VARCHAR},
+            remark = #{remark,jdbcType=VARCHAR},
+        </set>
+        where id = #{id}
+    </update>
+    <delete id="deleteOneQuestionById">
+        delete from question where id=#{id}
+    </delete>
+    <delete id="deleteManyQuestionsByIds">
+        delete from question where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getQuestionById" resultMap="BaseResultMap">
+        select * from question where id=#{id}
+    </select>
+    <select id="getQuestionByContent"  resultMap="BaseResultMap">
+        select * from question where content=#{content}
+    </select>
+    <select id="listAllQuestions" resultMap="BaseResultMap">
+        select * from question
+    </select>
+    <select id="listQuestions" resultMap="QuestionWithCreatorResultMap"
+            parameterType="com.jzy.model.dto.QuestionSearchCondition">
+        select q.*, u.user_real_name as creator_name from question q left join user u on q.creator_id=u.id
+        <where>
+            <if test="content != null and content!=''">
+                <bind name="contentLike" value=" '%' + content + '%' "/>
+                and q.content like #{contentLike}
+            </if>
+            <if test="creatorName != null and creatorName!=''">
+                <bind name="creatorNameLike" value=" '%' + creatorName + '%' "/>
+                and u.user_real_name like #{creatorNameLike}
+            </if>
+        </where>
+        <if test="condition1 == 'content'">
+            order by q.content
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'creatorName'">
+            order by u.user_real_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+    </select>
+    <select id="countAllQuestions" resultType="long">
+        select count(*) from question
+    </select>
+</mapper>

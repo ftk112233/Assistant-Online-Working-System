@@ -2,6 +2,8 @@ package com.jzy.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -13,6 +15,8 @@ import java.util.Date;
  * @Date 2019/11/21 21:53
  * @Version 1.0
  **/
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Data
 public class MissLessonStudent extends BaseEntity{
     private static final long serialVersionUID = -6186014025068181186L;

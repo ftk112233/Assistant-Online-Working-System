@@ -38,10 +38,10 @@ public enum ExcelVersionEnum {
         if (pathname == null) {
             return null;
         }
-        if  (pathname.endsWith(".xls")){
+        if (pathname.endsWith(".xls")) {
             return VERSION_2003;
         }
-        if (pathname.endsWith(".xlsx")){
+        if (pathname.endsWith(".xlsx")) {
             return VERSION_2007;
         }
         return null;

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jzy.dao.UsefulInformationMapper">
+    <resultMap id="BaseColumnResultMap" type="com.jzy.model.entity.BaseEntity">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap" type="com.jzy.model.entity.UsefulInformation" extends="BaseColumnResultMap">
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="image" property="image" jdbcType="VARCHAR"/>
+        <result column="belong_to" property="belongTo" jdbcType="VARCHAR"/>
+        <result column="sequence" property="sequence" jdbcType="BIGINT"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+    <insert id="insertUsefulInformation" parameterType="com.jzy.model.entity.UsefulInformation">
+        insert into useful_information
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null and title!=''">
+                title,
+            </if>
+            <if test="content != null and content!=''" >
+                content,
+            </if>
+            <if test="image != null and image!=''" >
+                image,
+            </if>
+            <if test="belongTo != null and belongTo!=''" >
+                belong_to,
+            </if>
+            <if test="sequence != null" >
+                sequence,
+            </if>
+            <if test="remark != null and remark!=''" >
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null and title!=''">
+                #{title},
+            </if>
+            <if test="content != null and content!=''" >
+                #{content},
+            </if>
+            <if test="image != null and image!=''" >
+                #{image},
+            </if>
+            <if test="belongTo != null and belongTo!=''" >
+                #{belongTo},
+            </if>
+            <if test="sequence != null" >
+                #{sequence},
+            </if>
+            <if test="remark != null and remark!=''" >
+                #{remark},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateUsefulInformationInfo" parameterType="com.jzy.model.entity.UsefulInformation">
+        update useful_information
+        <set>
+            <if test="title != null  and title!=''">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null  and content!=''">
+                content = #{content,jdbcType=VARCHAR},
+            </if>
+            image =#{image,jdbcType=VARCHAR},
+            <if test="belongTo != null  and belongTo!=''">
+                belong_to = #{belongTo,jdbcType=VARCHAR},
+            </if>
+            <if test="sequence != null  and sequence!=''">
+                sequence = #{sequence,jdbcType=BIGINT},
+            </if>
+            remark = #{remark,jdbcType=VARCHAR},
+        </set>
+        where id = #{id}
+    </update>
+    <delete id="deleteOneUsefulInformationById">
+        delete from useful_information where id=#{id}
+    </delete>
+    <delete id="deleteManyUsefulInformationByIds">
+        delete from useful_information where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="getUsefulInformationById" resultMap="BaseResultMap">
+        select * from useful_information where id=#{id}
+    </select>
+    <select id="listUsefulInformationByBelongTo" resultMap="BaseResultMap">
+        select * from useful_information where belong_to=#{belongTo} order by sequence
+    </select>
+    <select id="listUsefulInformation" resultMap="BaseResultMap"
+            parameterType="com.jzy.model.dto.UsefulInformationSearchCondition">
+        select * from useful_information u
+        <where>
+            <if test="title != null and title!=''">
+                <bind name="titleLike" value=" '%' + title + '%' "/>
+                and u.title like #{titleLike}
+            </if>
+            <if test="content != null and content!=''">
+                <bind name="contentLike" value=" '%' + content + '%' "/>
+                and u.content like #{contentLike}
+            </if>
+            <if test="belongTo != null and belongTo!=''">
+                and u.belong_to=#{belongTo}
+            </if>
+        </where>
+        <if test="condition1 == 'title'">
+            order by u.title
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'content'">
+            order by u.content
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'sequence'">
+            order by u.sequence
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+    </select>
+    <select id="getRecommendedSequence" resultType="_long">
+        select MAX(sequence) from useful_information where belong_to=#{belongTo}
+    </select>
+    <select id="getUsefulInformationByBelongToAndSequence" resultMap="BaseResultMap">
+        select * from useful_information where belong_to=#{belongTo} and sequence=#{sequence}
+    </select>
+
+</mapper>

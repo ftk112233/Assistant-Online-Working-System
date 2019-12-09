@@ -22,6 +22,7 @@ public interface CampusAndClassroomService {
 
     /**
      * 根据校区查询相应教室
+     *  先从缓存查，如果没有查数据库并设置缓存
      *
      * @param campus 校区名称
      * @return
@@ -31,7 +32,7 @@ public interface CampusAndClassroomService {
     /**
      * 根据校区和教室查询记录
      *
-     * @param campus 校区名称
+     * @param campus    校区名称
      * @param classroom 教室号
      * @return
      */
@@ -44,7 +45,7 @@ public interface CampusAndClassroomService {
      * @param campus 校区名称
      * @return
      */
-    void deleteCampusAndClassroomsByCampus(String campus);
+    long deleteCampusAndClassroomsByCampus(String campus);
 
     /**
      * 插入一个校区和教室记录
@@ -52,5 +53,5 @@ public interface CampusAndClassroomService {
      * @param campusAndClassroom 要插入的对象
      * @return
      */
-    String insetCampusAndClassroom(CampusAndClassroom campusAndClassroom);
+    String insertCampusAndClassroom(CampusAndClassroom campusAndClassroom);
 }

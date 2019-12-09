@@ -44,7 +44,7 @@ public interface AssistantMapper {
      * @param assistant 新添加助教的信息
      * @return
      */
-    void insertAssistant(Assistant assistant);
+    long insertAssistant(Assistant assistant);
 
     /**
      * 修改助教信息由id修改
@@ -52,7 +52,7 @@ public interface AssistantMapper {
      * @param assistant 修改后的助教信息
      * @return
      */
-    void updateAssistantInfo(Assistant assistant);
+    long updateAssistantInfo(Assistant assistant);
 
     /**
      * 修改助教信息由工号修改
@@ -60,7 +60,7 @@ public interface AssistantMapper {
      * @param assistant 修改后的助教信息
      * @return
      */
-    void updateAssistantByWorkId(Assistant assistant);
+    long updateAssistantByWorkId(Assistant assistant);
 
     /**
      * 查询符合条件的助教信息
@@ -76,7 +76,7 @@ public interface AssistantMapper {
      * @param id  被删除助教的id
      * @return
      */
-    void deleteOneAssistantById(@Param("id") Long id);
+    long deleteOneAssistantById(@Param("id") Long id);
 
 
     /**
@@ -84,5 +84,21 @@ public interface AssistantMapper {
      *
      * @param ids 助教id的列表
      */
-    void deleteManyAssistantsByIds(List<Long> ids);
+    long deleteManyAssistantsByIds(List<Long> ids);
+
+    /**
+     * 根据输入条件删除指定的助教
+     *
+     * @param condition 输入条件封装
+     * @return
+     */
+    long deleteAssistantsByCondition(AssistantSearchCondition condition);
+
+    /**
+     * 根据助教校区查询出助教信息
+     *
+     * @param campus 助教校区
+     * @return
+     */
+    List<Assistant> listAssistantsByCampus(@Param("campus") String campus);
 }

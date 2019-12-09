@@ -4,17 +4,20 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.AssistantMapper;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.AssistantUtils;
 import com.jzy.model.dto.AssistantSearchCondition;
 import com.jzy.model.dto.MyPage;
+import com.jzy.model.dto.UpdateResult;
 import com.jzy.model.entity.Assistant;
 import com.jzy.service.AssistantService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,7 +29,7 @@ import java.util.List;
  **/
 @Service
 public class AssistantServiceImpl extends AbstractServiceImpl implements AssistantService {
-    private final static Logger logger = Logger.getLogger(AbstractServiceImpl.class);
+    private final static Logger logger = LogManager.getLogger(AssistantServiceImpl.class);
 
     @Autowired
     private AssistantMapper assistantMapper;
@@ -47,11 +50,21 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     }
 
     @Override
-    public String insertAssistant(Assistant assistant) {
+    public List<Assistant> listAssistantsByCampus(String campus) {
+        if (StringUtils.isEmpty(campus)){
+            return new ArrayList<>();
+        } else {
+            return assistantMapper.listAssistantsByCampus(campus);
+        }
+
+    }
+
+    @Override
+    public UpdateResult insertAssistant(Assistant assistant) {
         //新工号不为空
         if (getAssistantByWorkId(assistant.getAssistantWorkId()) != null) {
             //添加的工号已存在
-            return "workIdRepeat";
+            return new UpdateResult("workIdRepeat");
         }
 
         return insertAssistantWithUnrepeatedWorkId(assistant);
@@ -63,17 +76,19 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
      * @param assistant
      * @return
      */
-    private String insertAssistantWithUnrepeatedWorkId(Assistant assistant) {
+    private UpdateResult insertAssistantWithUnrepeatedWorkId(Assistant assistant) {
         if (getAssistantByName(assistant.getAssistantName()) != null) {
             //添加的姓名已存在
-            return "nameRepeat";
+            return new UpdateResult("nameRepeat");
         }
 
         if (StringUtils.isEmpty(assistant.getAssistantSex())) {
             assistant.setAssistantSex(null);
         }
-        assistantMapper.insertAssistant(assistant);
-        return Constants.SUCCESS;
+
+        UpdateResult result=new UpdateResult(Constants.SUCCESS);
+        result.setInsertCount(assistantMapper.insertAssistant(assistant));
+        return result;
     }
 
     @Override
@@ -110,63 +125,68 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     }
 
     @Override
-    public String updateAssistantByWorkId(Assistant assistant) {
+    public UpdateResult updateAssistantByWorkId(Assistant assistant) {
         Assistant originalAssistant = getAssistantByWorkId(assistant.getAssistantWorkId());
         return updateAssistantByWorkId(originalAssistant, assistant);
     }
 
     @Override
-    public String updateAssistantByWorkId(Assistant originalAssistant, Assistant newAssistant) {
+    public UpdateResult updateAssistantByWorkId(Assistant originalAssistant, Assistant newAssistant) {
         if (!newAssistant.getAssistantName().equals(originalAssistant.getAssistantName())) {
             //姓名修改过了，判断是否与已存在的姓名冲突
             if (getAssistantByName(newAssistant.getAssistantName()) != null) {
                 //修改后的姓名已存在
-                return "nameRepeat";
+                return new UpdateResult("nameRepeat");
             }
         }
 
-        assistantMapper.updateAssistantByWorkId(newAssistant);
-        return Constants.SUCCESS;
+        UpdateResult result=new UpdateResult(Constants.SUCCESS);
+        result.setUpdateCount(assistantMapper.updateAssistantByWorkId(newAssistant));
+        return result;
     }
 
     @Override
-    public String insertAndUpdateAssistantsFromExcel(List<Assistant> assistants) throws Exception {
+    public UpdateResult insertAndUpdateAssistantsFromExcel(List<Assistant> assistants) throws InvalidParameterException {
+        UpdateResult result=new UpdateResult();
         for (Assistant assistant : assistants) {
             if (AssistantUtils.isValidAssistantInfo(assistant)) {
-                insertAndUpdateOneAssistantFromExcel(assistant);
+                result.add(insertAndUpdateOneAssistantFromExcel(assistant));
             } else {
                 String msg = "表格输入的助教assistant不合法!";
                 logger.error(msg);
                 throw new InvalidParameterException(msg);
             }
         }
-        return Constants.SUCCESS;
+        result.setResult(Constants.SUCCESS);
+        return result;
     }
 
     @Override
-    public String insertAndUpdateOneAssistantFromExcel(Assistant assistant) throws Exception {
+    public UpdateResult insertAndUpdateOneAssistantFromExcel(Assistant assistant) throws InvalidParameterException {
         if (assistant == null) {
             String msg = "insertAndUpdateOneAssistantFromExcel方法输入助教assistant为null!";
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
 
+        UpdateResult result=new UpdateResult();
 
         Assistant originalAssistant = getAssistantByWorkId(assistant.getAssistantWorkId());
         if (originalAssistant != null) {
             //工号已存在，更新
-            updateAssistantByWorkId(originalAssistant, assistant);
+            result.add(updateAssistantByWorkId(originalAssistant, assistant));
         } else {
             //插入
             Assistant tmp = getAssistantByName(assistant.getAssistantName());
-            while (tmp != null){
+            while (tmp != null) {
                 //添加的姓名已存在，在后面加一个'1'
                 assistant.setAssistantName(tmp.getAssistantName() + "1");
                 tmp = getAssistantByName(assistant.getAssistantName());
             }
-            insertAssistantWithUnrepeatedWorkId(assistant);
+            result.add(insertAssistantWithUnrepeatedWorkId(assistant));
         }
-        return Constants.SUCCESS;
+        result.setResult(Constants.SUCCESS);
+        return result;
     }
 
     @Override
@@ -177,12 +197,24 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     }
 
     @Override
-    public void deleteOneAssistantById(Long id) {
-        assistantMapper.deleteOneAssistantById(id);
+    public long deleteOneAssistantById(Long id) {
+        if (id == null){
+            return 0;
+        }
+        return assistantMapper.deleteOneAssistantById(id);
     }
 
     @Override
-    public void deleteManyAssistantsByIds(List<Long> ids) {
-        assistantMapper.deleteManyAssistantsByIds(ids);
+    public long deleteManyAssistantsByIds(List<Long> ids) {
+        if (ids == null ||ids.size() == 0){
+            return 0;
+        }
+        return assistantMapper.deleteManyAssistantsByIds(ids);
+    }
+
+    @Override
+    public String deleteAssistantsByCondition(AssistantSearchCondition condition) {
+        assistantMapper.deleteAssistantsByCondition(condition);
+        return Constants.SUCCESS;
     }
 }

@@ -19,7 +19,7 @@
     <div class="layui-form-item">
         <label class="layui-form-label">工号</label>
         <div class="layui-input-inline">
-            <input type="text" name="id" value="" style="display:none;" class="layui-input">
+            <input type="text" name="id" id="id" value="" style="display:none;" class="layui-input">
             <input type="text" name="workId" value="" class="layui-input" lay-verify="workId" lay-verType="tips"
                    placeholder="请输入">
         </div>
@@ -101,10 +101,11 @@
         base: '${ctx}/plugins/layuiadmin/' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use(['index', 'user'], function () {
+    }).use(['index', 'user', 'upload'], function () {
         var $ = layui.$
                 , form = layui.form
-                , laydate = layui.laydate;
+                , laydate = layui.laydate
+                , upload = layui.upload;
 
 
         //填充角色列表

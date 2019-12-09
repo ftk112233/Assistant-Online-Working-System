@@ -14,7 +14,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Data
-public class RoleAndPermissionSearchCondition extends SearchCondition{
+public class RoleAndPermissionSearchCondition extends SearchCondition {
     private static final long serialVersionUID = 4338081881622506749L;
 
     /**

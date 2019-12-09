@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @version 1.0
  * @ClassName EmailVerifyCodeSession
  * @description 验证邮箱验证码后，存入session的对象，若服务端校验成功flag置true，
- *      防止攻击者通过将json数据改成verifyCodeCorrect来绕过验证码
+ * 防止攻击者通过将json数据改成verifyCodeCorrect来绕过验证码
  * @date 2019/10/11 12:13
  **/
 @Data

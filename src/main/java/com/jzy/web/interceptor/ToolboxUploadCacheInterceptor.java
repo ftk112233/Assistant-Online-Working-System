@@ -2,7 +2,8 @@ package com.jzy.web.interceptor;
 
 import com.jzy.service.UserService;
 import com.jzy.web.controller.ToolboxController;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -18,14 +19,14 @@ import javax.servlet.http.HttpServletResponse;
  * @Version 1.0
  **/
 public class ToolboxUploadCacheInterceptor implements HandlerInterceptor {
-    private final static Logger logger = Logger.getLogger(ToolboxUploadCacheInterceptor.class);
+    private final static Logger logger = LogManager.getLogger(ToolboxUploadCacheInterceptor.class);
 
     @Autowired
     private UserService userService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        Long id=userService.getSessionUserInfo().getId();
+        Long id = userService.getSessionUserInfo().getId();
         ToolboxController.studentListUploadByUserCache.remove(id);
         ToolboxController.studentListForSeatTableUploadByUserCache.remove(id);
         return true;

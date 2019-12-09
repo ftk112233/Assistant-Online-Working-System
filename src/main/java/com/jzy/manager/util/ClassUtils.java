@@ -1,12 +1,10 @@
 package com.jzy.manager.util;
 
-import com.jzy.manager.constant.Constants;
+import com.jzy.model.CampusEnum;
+import com.jzy.model.SeasonEnum;
 import com.jzy.model.dto.ClassDetailedDto;
-import com.jzy.model.dto.StudentAndClassDetailedDto;
 import com.jzy.model.entity.Class;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.List;
 
 /**
  * @ClassName ClassUtils
@@ -20,14 +18,6 @@ public class ClassUtils {
     private ClassUtils() {
     }
 
-    public static final List<String> SEASONS = Constants.SEASONS;
-
-    public static final List<String> GRADES = Constants.GRADES;
-
-    public static final List<String> SUBJECTS = Constants.SUBJECTS;
-
-    public static final List<String> TYPES = Constants.TYPES;
-
 
     public static boolean isValidClassId(String classId) {
         return !StringUtils.isEmpty(classId) && classId.length() <= 32;
@@ -38,7 +28,7 @@ public class ClassUtils {
     }
 
     public static boolean isValidClassCampus(String classCampus) {
-        return StringUtils.isEmpty(classCampus) || classCampus.length() <= 50;
+        return StringUtils.isEmpty(classCampus) || (CampusEnum.hasCampusName(classCampus) && classCampus.length() <= 50);
     }
 
     public static boolean isValidClassGrade(String classGrade) {
@@ -145,27 +135,27 @@ public class ClassUtils {
         int day = MyTimeUtils.getCurrentDay();
         //6月20日~8月31日，设定为暑假
         if ((month == 6 && day >= 20) || month == 7 || month == 8) {
-            return SEASONS.get(0);
+            return SeasonEnum.SUMMER.getSeason();
         }
 
         //9月1号~10月31号，设为秋上
         if (month >= 9 && month <= 10) {
-            return SEASONS.get(1);
+            return SeasonEnum.AUTUMN_1.getSeason();
         }
 
         //11月1号~12月31号，设为秋下
         if (month >= 11 && month <= 12) {
-            return SEASONS.get(2);
+            return SeasonEnum.AUTUMN_2.getSeason();
         }
 
         //1月1号~2月10号，设为寒假
         if (month == 1 || (month == 2 && day <= 10)) {
-            return SEASONS.get(3);
+            return SeasonEnum.WINTER.getSeason();
         }
 
         //2月11号~6月20号，设为春季
         if ((month == 2 && day > 10) || (month >= 3 && month <= 5) || (month == 6 && day < 20)) {
-            return SEASONS.get(4);
+            return SeasonEnum.SPRING.getSeason();
         }
 
         return "";
@@ -177,19 +167,7 @@ public class ClassUtils {
      * @return
      */
     public static String getCurrentYear() {
-       return MyTimeUtils.getCurrentYear()+"";
+        return MyTimeUtils.getCurrentYear() + "";
     }
 
-    /**
-     * 将输入对象的年份字段由yyyy-mm-dd转成yyyy
-     *
-     * @param input
-     * @return
-     */
-    public static ClassDetailedDto parseClassYear(ClassDetailedDto input){
-        String year=input.getClassYear();
-        String parsedYear=year.substring(0, year.indexOf('-'));
-        input.setClassYear(parsedYear);
-        return input;
-    }
 }

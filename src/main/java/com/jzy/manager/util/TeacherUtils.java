@@ -8,12 +8,13 @@ import org.apache.commons.lang3.StringUtils;
  * @ClassName TeacherUtils
  * @Author JinZhiyun
  * @Description 教师的工具类 {@link com.jzy.model.entity.Teacher}
- *  对教师的增删改入参对象字段的校验，服务端的校验应该与前端js保持一致，且必须严格于数据库列属性要求的标准
+ * 对教师的增删改入参对象字段的校验，服务端的校验应该与前端js保持一致，且必须严格于数据库列属性要求的标准
  * @Date 2019/11/23 20:17
  * @Version 1.0
  **/
 public class TeacherUtils {
-    private TeacherUtils(){}
+    private TeacherUtils() {
+    }
 
     public static boolean isValidTeacherWorkId(String teacherWorkId) {
         return teacherWorkId == null || teacherWorkId.length() <= 32;
@@ -41,10 +42,10 @@ public class TeacherUtils {
      * @param teacher 输入的teacher对象
      * @return
      */
-    public static boolean isValidTeacherInfo(Teacher teacher){
-        return teacher!=null && isValidTeacherWorkId(teacher.getTeacherWorkId()) && isValidTeacherName(teacher.getTeacherName())
+    public static boolean isValidTeacherInfo(Teacher teacher) {
+        return teacher != null && isValidTeacherWorkId(teacher.getTeacherWorkId()) && isValidTeacherName(teacher.getTeacherName())
                 && isValidTeacherSex(teacher.getTeacherSex()) && isValidTeacherPhone(teacher.getTeacherPhone())
-                && isValidTeacherRemark(teacher.getTeacherRemark()) ;
+                && isValidTeacherRemark(teacher.getTeacherRemark());
     }
 
     /**
@@ -53,7 +54,7 @@ public class TeacherUtils {
      * @param teacher 输入的teacher对象
      * @return
      */
-    public static boolean isValidTeacherUpdateInfo(Teacher teacher){
-        return isValidTeacherInfo(teacher) ;
+    public static boolean isValidTeacherUpdateInfo(Teacher teacher) {
+        return isValidTeacherInfo(teacher);
     }
 }

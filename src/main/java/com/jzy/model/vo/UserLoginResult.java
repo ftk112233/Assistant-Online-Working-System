@@ -56,6 +56,4 @@ public class UserLoginResult implements Serializable {
     public static String getUserLoginFailKey(String userId) {
         return RedisConstants.USER_LOGIN_FAIL_KEY + ":" + userId;
     }
-
-
 }

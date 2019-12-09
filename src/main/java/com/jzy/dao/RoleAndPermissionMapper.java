@@ -52,26 +52,26 @@ public interface RoleAndPermissionMapper {
      *
      * @param roleAndPermission 修改后的角色权限信息
      */
-    void updateRoleAndPermissionInfo(RoleAndPermission roleAndPermission);
+    long updateRoleAndPermissionInfo(RoleAndPermission roleAndPermission);
 
     /**
      * 角色权限管理中的添加角色权限
      *
      * @param roleAndPermission 新添加角色权限的信息
      */
-    void insertRoleAndPermission(RoleAndPermission roleAndPermission);
+    long insertRoleAndPermission(RoleAndPermission roleAndPermission);
 
     /**
      * 根据id删除一个角色权限
      *
      * @param id 角色权限id
      */
-    void deleteOneRoleAndPermissionById(@Param("id") Long id);
+    long deleteOneRoleAndPermissionById(@Param("id") Long id);
 
     /**
      * 根据id删除多个角色权限
      *
      * @param ids 角色权限id的列表
      */
-    void deleteManyRoleAndPermissionsByIds(List<Long> ids);
+    long deleteManyRoleAndPermissionsByIds(List<Long> ids);
 }

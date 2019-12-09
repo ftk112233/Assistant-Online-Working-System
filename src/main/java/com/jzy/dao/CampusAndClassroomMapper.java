@@ -27,12 +27,12 @@ public interface CampusAndClassroomMapper {
      * @param campus 校区名称
      * @return
      */
-    void deleteCampusAndClassroomsByCampus(@Param("campus") String campus);
+    long deleteCampusAndClassroomsByCampus(@Param("campus") String campus);
 
     /**
      * 根据校区和教室查询记录
      *
-     * @param campus 校区名称
+     * @param campus    校区名称
      * @param classroom 教室号
      * @return
      */
@@ -43,7 +43,7 @@ public interface CampusAndClassroomMapper {
      *
      * @param campusAndClassroom 要插入的对象
      */
-    void insetCampusAndClassroom(CampusAndClassroom campusAndClassroom);
+    long insertCampusAndClassroom(CampusAndClassroom campusAndClassroom);
 
     /**
      * 根据校区查询相应教室

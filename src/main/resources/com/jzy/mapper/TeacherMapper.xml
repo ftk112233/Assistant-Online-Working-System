@@ -85,6 +85,26 @@
             #{id}
         </foreach>
     </delete>
+    <delete id="deleteTeachersByCondition" parameterType="com.jzy.model.dto.TeacherSearchCondition">
+        delete t.* from teacher t
+        <where>
+            <if test="teacherWorkId != null and teacherWorkId!=''">
+                <bind name="teacherWorkIdLike" value=" '%' + teacherWorkId + '%' "/>
+                and t.teacher_work_id like #{teacherWorkIdLike}
+            </if>
+            <if test="teacherName != null and teacherName!=''">
+                <bind name="teacherNameLike" value=" '%' + teacherName + '%' "/>
+                and t.teacher_name like #{teacherNameLike}
+            </if>
+            <if test="teacherSex != null and teacherSex!=''">
+                and t.teacher_sex=#{teacherSex}
+            </if>
+            <if test="teacherPhone != null and teacherPhone!=''">
+                <bind name="teacherPhoneLike" value=" '%' + teacherPhone + '%' "/>
+                and t.teacher_phone like #{teacherPhoneLike}
+            </if>
+        </where>
+    </delete>
     <select id="getTeacherByName" resultMap="BaseResultMap">
         select * from teacher where teacher_name=#{teacherName}
     </select>

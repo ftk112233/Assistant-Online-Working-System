@@ -24,12 +24,14 @@
                 <option value="">请选择角色</option>
             </select>
         </div>
+        <div class="layui-form-mid " style="color:red">*必填项</div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">权限</label>
         <div class="layui-input-inline">
             <input type="text" name="perm" value="" class="layui-input" placeholder="请输入" lay-verType="tips" lay-verify="perm">
         </div>
+        <div class="layui-form-mid " style="color:red">*必填项</div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">备注</label>

@@ -4,18 +4,20 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.ClassMapper;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.ClassUtils;
 import com.jzy.model.dto.ClassDetailedDto;
 import com.jzy.model.dto.ClassSearchCondition;
 import com.jzy.model.dto.MyPage;
+import com.jzy.model.dto.UpdateResult;
 import com.jzy.model.entity.Class;
 import com.jzy.service.ClassService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.security.InvalidParameterException;
 import java.util.List;
 
 /**
@@ -27,7 +29,7 @@ import java.util.List;
  **/
 @Service
 public class ClassServiceImpl extends AbstractServiceImpl implements ClassService {
-    private final static Logger logger = Logger.getLogger(ClassServiceImpl.class);
+    private final static Logger logger = LogManager.getLogger(ClassServiceImpl.class);
 
     @Autowired
     private ClassMapper classMapper;
@@ -48,22 +50,25 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
             return null;
         } else {
             ClassDetailedDto classDetailedDto = classMapper.getClassDetailByClassId(classId);
-            return ClassUtils.parseClassYear(classDetailedDto);
+            classDetailedDto.setParsedClassYear();
+            return classDetailedDto;
         }
     }
 
     @Override
-    public String updateClassByClassId(ClassDetailedDto classDetailedDto) {
-        classMapper.updateClassByClassId(classDetailedDto);
-        return Constants.SUCCESS;
+    public UpdateResult updateClassByClassId(ClassDetailedDto classDetailedDto) {
+        long count=classMapper.updateClassByClassId(classDetailedDto);
+        UpdateResult result=new UpdateResult(Constants.SUCCESS);
+        result.setUpdateCount(count);
+        return result;
     }
 
     @Override
-    public String insertClass(ClassDetailedDto classDetailedDto) {
+    public UpdateResult insertClass(ClassDetailedDto classDetailedDto) {
         //新班号不为空
         if (getClassByClassId(classDetailedDto.getClassId()) != null) {
             //添加的班号已存在
-            return "classIdRepeat";
+            return new UpdateResult("classIdRepeat");
         }
 
         return insertClassWithUnrepeatedClassId(classDetailedDto);
@@ -76,12 +81,12 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
      * @param classDetailedDto
      * @return
      */
-    private String insertClassWithUnrepeatedClassId(ClassDetailedDto classDetailedDto) {
+    private UpdateResult insertClassWithUnrepeatedClassId(ClassDetailedDto classDetailedDto) {
         if (!StringUtils.isEmpty(classDetailedDto.getTeacherName())) {
             //修改后的教师姓名不为空
             if (teacherService.getTeacherByName(classDetailedDto.getTeacherName()) == null) {
                 //修改后的教师姓名不存在
-                return "teacherNotExist";
+                return new UpdateResult("teacherNotExist");
 
             }
         }
@@ -90,49 +95,57 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
             //修改后的助教姓名不为空
             if (assistantService.getAssistantByName(classDetailedDto.getAssistantName()) == null) {
                 //修改后的助教姓名不存在
-                return "assistantNotExist";
+                return new UpdateResult("assistantNotExist");
             }
         }
 
         classDetailedDto.setParsedClassTime(classDetailedDto.getClassTime());
 
-        classMapper.insertClass(classDetailedDto);
-        return Constants.SUCCESS;
-
+        long count=classMapper.insertClass(classDetailedDto);
+        UpdateResult result=new UpdateResult(Constants.SUCCESS);
+        result.setInsertCount(count);
+        return result;
     }
 
     @Override
-    public String insertAndUpdateClassesFromExcel(List<ClassDetailedDto> classDetailedDtos) throws Exception {
+    public UpdateResult insertAndUpdateClassesFromExcel(List<ClassDetailedDto> classDetailedDtos) throws Exception {
+        UpdateResult result=new UpdateResult();
         for (ClassDetailedDto classDetailedDto : classDetailedDtos) {
             if (ClassUtils.isValidClassInfo(classDetailedDto)) {
-                insertAndUpdateOneClassFromExcel(classDetailedDto);
+                UpdateResult resultTmp=insertAndUpdateOneClassFromExcel(classDetailedDto);
+                result.add(resultTmp);
             } else {
                 String msg = "输入助教排班表中读取到的classDetailedDtos不合法！";
                 logger.error(msg);
                 throw new InvalidParameterException(msg);
             }
         }
-        return Constants.SUCCESS;
+        result.setResult(Constants.SUCCESS);
+        return result;
     }
 
     @Override
-    public String insertAndUpdateOneClassFromExcel(ClassDetailedDto classDetailedDto) throws Exception {
+    public UpdateResult insertAndUpdateOneClassFromExcel(ClassDetailedDto classDetailedDto) throws Exception {
         if (classDetailedDto == null) {
             String msg = "insertAndUpdateOneClassFromExcel方法输入classDetailedDto为null!";
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
 
+        UpdateResult result=new UpdateResult(Constants.SUCCESS);
+
         Class originalClasses = getClassByClassId(classDetailedDto.getClassId());
         if (originalClasses != null) {
             //班号已存在，更新
-            updateClassByClassId(classDetailedDto);
+            long updateCount=updateClassByClassId(classDetailedDto).getUpdateCount();
+            result.setUpdateCount(updateCount);
         } else {
             //插入
-            insertClassWithUnrepeatedClassId(classDetailedDto);
+            long insertCount=insertClassWithUnrepeatedClassId(classDetailedDto).getInsertCount();
+            result.setInsertCount(insertCount);
         }
 
-        return Constants.SUCCESS;
+        return result;
     }
 
     @Override
@@ -142,7 +155,13 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
         for (int i = 0; i < classDetailedDtos.size(); i++) {
             ClassDetailedDto classDetailedDto = classDetailedDtos.get(i);
             if (!StringUtils.isEmpty(classDetailedDto.getClassYear())) {
-                classDetailedDtos.set(i, ClassUtils.parseClassYear(classDetailedDto));
+                classDetailedDto.setParsedClassYear();
+                classDetailedDtos.set(i, classDetailedDto);
+            }
+
+            if (classDetailedDto.getClassStudentsCount() >= classDetailedDto.getClassroomCapacity()){
+                //慢班判断
+                classDetailedDto.setFull(true);
             }
         }
         return new PageInfo<>(classDetailedDtos);
@@ -188,12 +207,26 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     }
 
     @Override
-    public void deleteOneClassById(Long id) {
-        classMapper.deleteOneClassById(id);
+    public long deleteOneClassById(Long id) {
+        if (id == null) {
+            return 0;
+        }
+        return classMapper.deleteOneClassById(id);
     }
 
     @Override
-    public void deleteManyClassesByIds(List<Long> ids) {
-        classMapper.deleteManyClassesByIds(ids);
+    public long deleteManyClassesByIds(List<Long> ids) {
+        if (ids == null ||ids.size() == 0){
+            return 0;
+        }
+        return classMapper.deleteManyClassesByIds(ids);
+    }
+
+    @Override
+    public UpdateResult deleteClassesByCondition(ClassSearchCondition condition) {
+        long count=classMapper.deleteClassesByCondition(condition);
+        UpdateResult result=new UpdateResult(Constants.SUCCESS);
+        result.setDeleteCount(count);
+        return result;
     }
 }

@@ -17,15 +17,18 @@
 <div class="layui-form" lay-filter="layuiadmin-app-form-list" id="layuiadmin-app-form-list"
      style="padding: 20px 30px 0 0;">
     <div class="layui-form-item">
+        <input type="text" name="id" value="" style="display:none;" class="layui-input">
         <label class="layui-form-label">权限</label>
         <div class="layui-input-inline">
             <input type="text" name="perm" value="" class="layui-input" placeholder="请输入" lay-verType="tips" lay-verify="perm">
         </div>
+        <div class="layui-form-mid " style="color:red">*必填项</div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">角色</label>
         <div class="layui-input-block" id="role">
         </div>
+        <div class="layui-form-mid " style="color:red">*必填项</div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">备注</label>

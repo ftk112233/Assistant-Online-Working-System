@@ -58,7 +58,7 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
 
     private static final String REGISTER_TIME_COLUMN = ExcelConstants.REGISTER_TIME_COLUMN;
 
-    private static final String REMARK_COLUMN =ExcelConstants.REMARK_COLUMN_2;
+    private static final String REMARK_COLUMN = ExcelConstants.REMARK_COLUMN_2;
 
 
     /**
@@ -97,16 +97,17 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
 
     /**
      * 从学生花名册表中读取信息
-     *       学生Student对象直接读出，教师teacher对象也直接读出，班级信息整体和学生、助教、教师封装成StudentAndClassDto
+     *  学生Student对象直接读出，教师teacher对象也直接读出，班级信息整体和学生、助教、教师封装成StudentAndClassDto
+     *
+     * @return 返回表格有效数据的行数
+     * @throws ExcelColumnNotFoundException
      */
-    public void readStudentAndClassInfoFromExcel() throws ExcelColumnNotFoundException{
+    public int readStudentAndClassInfoFromExcel() throws ExcelColumnNotFoundException, ParseException {
         resetParam();
         int sheetIx = 0;
 
         // 先扫描第startRow行找到"学员号"、"姓名"、"手机"等信息所在列的位置
-        int columnIndexOfStudentId = -1, columnIndexOfStudentName = -2, columnIndexOfStudentPhone = -3
-                , columnIndexOfStudentPhoneBackup = -4, columnIndexOfClassId = -10
-                , columnIndexOfRegisterTime = -14,columnIndexOfRemark = -15;
+        int columnIndexOfStudentId = -1, columnIndexOfStudentName = -2, columnIndexOfStudentPhone = -3, columnIndexOfStudentPhoneBackup = -4, columnIndexOfClassId = -10, columnIndexOfRegisterTime = -14, columnIndexOfRemark = -15;
         int row0ColumnCount = this.getColumnCount(sheetIx, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
             String value = this.getValueAt(sheetIx, startRow, i);
@@ -141,12 +142,15 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
             throw new ExcelColumnNotFoundException("学生花名册列属性中有未匹配的属性名");
         }
 
+        int effectiveDataRowCount=0;
 
         int rowCount = this.getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
-            if (StringUtils.isEmpty(this.getValueAt(sheetIx, i, columnIndexOfStudentId))){
+            if (StringUtils.isEmpty(this.getValueAt(sheetIx, i, columnIndexOfStudentId))) {
                 //当前行学员号为空，跳过
                 continue;
+            }  else {
+                effectiveDataRowCount++;
             }
             String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId);
             String studentName = this.getValueAt(sheetIx, i, columnIndexOfStudentName);
@@ -157,37 +161,39 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
             String remark = this.getValueAt(sheetIx, i, columnIndexOfRemark);
 
             //先封装student
-            Student student=new Student();
+            Student student = new Student();
             student.setStudentId(studentId);
             student.setStudentName(studentName);
             student.setStudentPhone(studentPhone);
             student.setStudentPhoneBackup(studentPhoneBackup);
             students.add(student);
 
-            StudentAndClassDetailedDto studentAndClassDetailedDto=new StudentAndClassDetailedDto();
+            StudentAndClassDetailedDto studentAndClassDetailedDto = new StudentAndClassDetailedDto();
             studentAndClassDetailedDto.setStudentId(studentId);
             studentAndClassDetailedDto.setClassId(classId);
-            try {
-                studentAndClassDetailedDto.setRegisterTime(MyTimeUtils.cstToDate(registerTime));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+
+            studentAndClassDetailedDto.setRegisterTime(MyTimeUtils.cstToDate(registerTime));
+
             studentAndClassDetailedDto.setRemark(remark);
             studentAndClassDetailedDtos.add(studentAndClassDetailedDto);
         }
+
+        return effectiveDataRowCount;
     }
 
     /**
      * 从刚开班的时候带学生电话的学生花名册表中读取信息
-     *       学生Student对象直接读出
+     *   学生Student对象直接读出
+     *
+     * @return 返回表格有效数据的行数
+     * @throws ExcelColumnNotFoundException
      */
-    public void readStudentDetailInfoFromExcel() throws ExcelColumnNotFoundException{
+    public int readStudentDetailInfoFromExcel() throws ExcelColumnNotFoundException {
         resetParam();
         int sheetIx = 0;
 
         // 先扫描第startRow行找到"学员号"、"姓名"、"手机"等信息所在列的位置
-        int columnIndexOfStudentId = -1, columnIndexOfStudentName = -2, columnIndexOfStudentPhone = -3
-                , columnIndexOfStudentPhoneBackup = -4;
+        int columnIndexOfStudentId = -1, columnIndexOfStudentName = -2, columnIndexOfStudentPhone = -3, columnIndexOfStudentPhoneBackup = -4;
         int row0ColumnCount = this.getColumnCount(sheetIx, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
             String value = this.getValueAt(sheetIx, startRow, i);
@@ -213,12 +219,15 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
             throw new ExcelColumnNotFoundException("刚开班的时候带学生电话的学生花名册列属性中有未匹配的属性名");
         }
 
+        int effectiveDataRowCount=0;
 
         int rowCount = this.getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
-            if (StringUtils.isEmpty(this.getValueAt(sheetIx, i, columnIndexOfStudentId))){
+            if (StringUtils.isEmpty(this.getValueAt(sheetIx, i, columnIndexOfStudentId))) {
                 //当前行学员号为空，跳过
                 continue;
+            } else {
+                effectiveDataRowCount++;
             }
             String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId);
             String studentName = this.getValueAt(sheetIx, i, columnIndexOfStudentName);
@@ -226,13 +235,15 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
             String studentPhoneBackup = this.getValueAt(sheetIx, i, columnIndexOfStudentPhoneBackup);
 
             //封装student
-            Student student=new Student();
+            Student student = new Student();
             student.setStudentId(studentId);
             student.setStudentName(studentName);
             student.setStudentPhone(studentPhone);
             student.setStudentPhoneBackup(studentPhoneBackup);
             students.add(student);
         }
+
+        return effectiveDataRowCount;
     }
 
     @Override
@@ -241,13 +252,13 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
         studentAndClassDetailedDtos = new ArrayList<>();
     }
 
-    public static void main(String[] args) throws IOException {
-        StudentListImportToDatabaseExcel excel = new StudentListImportToDatabaseExcel("D:\\aows_resources\\toolbox\\example\\"+FileUtils.EXAMPLES.get(4));
+    public static void main(String[] args) throws IOException, ExcelColumnNotFoundException, InputFileTypeException {
+        StudentListImportToDatabaseExcel excel = new StudentListImportToDatabaseExcel("D:\\aows_resources\\toolbox\\example\\" + FileUtils.EXAMPLES.get(4));
         excel.readStudentDetailInfoFromExcel();
-        for (Student student:excel.getStudents()){
+        for (Student student : excel.getStudents()) {
             System.out.println(student);
         }
         System.out.println(excel.getStudents().size());
-        System.out.println(excel.getValueAt(0,0,-1));
+        System.out.println(excel.getValueAt(0, 0, -1));
     }
 }

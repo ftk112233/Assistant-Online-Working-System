@@ -3,6 +3,7 @@ package com.jzy.service;
 import com.github.pagehelper.PageInfo;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.TeacherSearchCondition;
+import com.jzy.model.dto.UpdateResult;
 import com.jzy.model.entity.Teacher;
 
 import java.util.List;
@@ -45,7 +46,7 @@ public interface TeacherService {
      * @param teacher 新添加教师的信息
      * @return
      */
-    String insertTeacher(Teacher teacher);
+    UpdateResult insertTeacher(Teacher teacher);
 
     /**
      * 修改教师信息由工号修改
@@ -59,38 +60,40 @@ public interface TeacherService {
      * 修改教师信息由工号修改
      *
      * @param originalTeacher 原来的教师信息
-     * @param newTeacher 修改教师信息由工号修改
+     * @param newTeacher      修改教师信息由工号修改
      * @return
      */
     String updateTeacherByWorkId(Teacher originalTeacher, Teacher newTeacher);
 
     /**
      * 根据从excel中读取到的teachers信息，更新插入多个。根据工号判断：
-     *      if 当前工号不存在
-     *          执行插入
-     *      else
-     *          根据工号更新
+     * if 当前工号不存在
+     * 执行插入
+     * else
+     * 根据工号更新
+     *
      * @param teachers
      * @return
      */
-    String insertAndUpdateTeachersFromExcel(List<Teacher> teachers) throws Exception;
+    UpdateResult insertAndUpdateTeachersFromExcel(List<Teacher> teachers) throws Exception;
 
     /**
      * 根据从excel中读取到的teachers信息，更新插入一个。根据工号判断：
-     *      if 当前工号不存在
-     *          执行插入
-     *      else
-     *          根据工号更新
+     * if 当前工号不存在
+     * 执行插入
+     * else
+     * 根据工号更新
+     *
      * @param teacher
      * @return
      */
-    String insertAndUpdateOneTeacherFromExcel(Teacher teacher) throws Exception;
+    UpdateResult insertAndUpdateOneTeacherFromExcel(Teacher teacher) throws Exception;
 
     /**
      * 返回符合条件的教师信息分页结果
      *
-     * @param myPage 分页{页号，每页数量}
-     * @param condition  查询条件入参
+     * @param myPage    分页{页号，每页数量}
+     * @param condition 查询条件入参
      * @return
      */
     PageInfo<Teacher> listTeachers(MyPage myPage, TeacherSearchCondition condition);
@@ -108,12 +111,20 @@ public interface TeacherService {
      *
      * @param id 教师id
      */
-    void deleteOneTeacherById(Long id);
+    long deleteOneTeacherById(Long id);
 
     /**
      * 根据id删除多个个教师
      *
      * @param ids 教师id的列表
      */
-    void deleteManyTeachersByIds(List<Long> ids);
+    long deleteManyTeachersByIds(List<Long> ids);
+
+    /**
+     * 根据输入条件删除指定的教师
+     *
+     * @param condition 输入条件封装
+     * @return
+     */
+    String deleteTeachersByCondition(TeacherSearchCondition condition);
 }

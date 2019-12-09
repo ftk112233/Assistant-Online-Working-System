@@ -4,20 +4,21 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.MissLessonStudentUtils;
 import com.jzy.model.dto.MissLessonStudentDetailedDto;
 import com.jzy.model.dto.MissLessonStudentSearchCondition;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.entity.User;
 import com.jzy.model.vo.ResultMap;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,8 +33,8 @@ import java.util.Map;
  **/
 @Controller
 @RequestMapping("/missLessonStudent/admin")
-public class MissLessonStudentAdminController extends AbstractController{
-    private final static Logger logger = Logger.getLogger(MissLessonStudentAdminController.class);
+public class MissLessonStudentAdminController extends AbstractController {
+    private final static Logger logger = LogManager.getLogger(MissLessonStudentAdminController.class);
 
     /**
      * 跳转学员上课信息管理页面
@@ -70,7 +71,7 @@ public class MissLessonStudentAdminController extends AbstractController{
     @RequestMapping("/getMissLessonStudentInfoFromMyClass")
     @ResponseBody
     public ResultMap<List<MissLessonStudentDetailedDto>> getMissLessonStudentInfoFromMyClass(MyPage myPage, MissLessonStudentSearchCondition condition) {
-        User user=userService.getSessionUserInfo();
+        User user = userService.getSessionUserInfo();
         condition.setOriginalAssistantWorkId(user.getUserWorkId());
         PageInfo<MissLessonStudentDetailedDto> pageInfo = missLessonStudentService.listMissLessonStudents(myPage, condition);
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
@@ -86,7 +87,7 @@ public class MissLessonStudentAdminController extends AbstractController{
     @RequestMapping("/getMissLessonStudentInfoToMyClass")
     @ResponseBody
     public ResultMap<List<MissLessonStudentDetailedDto>> getMissLessonStudentInfoToMyClass(MyPage myPage, MissLessonStudentSearchCondition condition) {
-        User user=userService.getSessionUserInfo();
+        User user = userService.getSessionUserInfo();
         condition.setCurrentAssistantWorkId(user.getUserWorkId());
         PageInfo<MissLessonStudentDetailedDto> pageInfo = missLessonStudentService.listMissLessonStudents(myPage, condition);
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
@@ -102,7 +103,7 @@ public class MissLessonStudentAdminController extends AbstractController{
     @RequestMapping("/updateForm")
     public String updateForm(Model model, MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
         model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
-        model.addAttribute(ModelConstants.MISS_LESSON_STUDENT_EDIT_MODEL_KEY,missLessonStudentDetailedDto);
+        model.addAttribute(ModelConstants.MISS_LESSON_STUDENT_EDIT_MODEL_KEY, missLessonStudentDetailedDto);
         return "student/missLesson/admin/missLessonStudentFormEdit";
     }
 
@@ -113,7 +114,7 @@ public class MissLessonStudentAdminController extends AbstractController{
      * @return
      */
     @RequestMapping("/insertForm")
-    public String updateForm2(Model model) {
+    public String insertForm(Model model) {
         model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
         return "student/missLesson/admin/missLessonStudentFormAdd";
     }
@@ -126,7 +127,7 @@ public class MissLessonStudentAdminController extends AbstractController{
      */
     @RequestMapping("/updateById")
     @ResponseBody
-    public Map<String, Object> updateById(MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
+    public Map<String, Object> updateById(MissLessonStudentDetailedDto missLessonStudentDetailedDto) throws InvalidParameterException {
         Map<String, Object> map = new HashMap<>(1);
 
 
@@ -148,7 +149,7 @@ public class MissLessonStudentAdminController extends AbstractController{
      */
     @RequestMapping("/insert")
     @ResponseBody
-    public Map<String, Object> insert(MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
+    public Map<String, Object> insert(MissLessonStudentDetailedDto missLessonStudentDetailedDto) throws InvalidParameterException {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!MissLessonStudentUtils.isValidMissLessonStudentUpdateInfo(missLessonStudentDetailedDto)) {
@@ -195,6 +196,20 @@ public class MissLessonStudentAdminController extends AbstractController{
         }
         missLessonStudentService.deleteManyMissLessonStudentsByIds(ids);
         map.put("data", Constants.SUCCESS);
+        return map;
+    }
+
+    /**
+     * 条件删除多个学生上课记录ajax交互
+     *
+     * @param condition 输入的查询条件
+     * @return
+     */
+    @RequestMapping("/deleteByCondition")
+    @ResponseBody
+    public Map<String, Object> deleteByCondition(MissLessonStudentSearchCondition condition) {
+        Map<String, Object> map = new HashMap(1);
+        map.put("data", missLessonStudentService.deleteMissLessonStudentsByCondition(condition));
         return map;
     }
 }

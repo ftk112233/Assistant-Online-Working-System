@@ -77,6 +77,7 @@ public class EmailVerifyCode implements Serializable {
      * @date 9:26 2019/9/9
      * @Param [validTime, timeUnit]
      **/
+    @Deprecated
     public static void resetValidTime(long validTime, TimeUnit timeUnit) {
         switch (timeUnit) {
             case MILLISECONDS:
@@ -112,9 +113,5 @@ public class EmailVerifyCode implements Serializable {
     @Deprecated
     public boolean isValid() {
         return MyTimeUtils.cmpTime(initTime, validTimeMilliseconds);
-    }
-
-    public static void main(String[] args) {
-        System.out.println("".equals(null));
     }
 }

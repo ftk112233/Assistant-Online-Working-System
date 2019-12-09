@@ -3,14 +3,15 @@ package com.jzy.web.controller;
 import com.alibaba.fastjson.JSON;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
-import com.jzy.manager.exception.InvalidParamterException;
-import com.jzy.manager.util.ClassUtils;
-import com.jzy.manager.util.FileUtils;
+import com.jzy.manager.exception.*;
+import com.jzy.manager.util.*;
 import com.jzy.model.CampusEnum;
 import com.jzy.model.dto.ClassDetailedDto;
 import com.jzy.model.dto.MissLessonStudentDetailedDto;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
 import com.jzy.model.entity.CampusAndClassroom;
+import com.jzy.model.entity.Class;
+import com.jzy.model.entity.UserMessage;
 import com.jzy.model.excel.Excel;
 import com.jzy.model.excel.ExcelVersionEnum;
 import com.jzy.model.excel.input.SeatTableTemplateInputExcel;
@@ -20,7 +21,8 @@ import com.jzy.model.excel.template.AssistantTutorialExcel;
 import com.jzy.model.excel.template.MissedLessonExcel;
 import com.jzy.model.excel.template.SeatTableTemplateExcel;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,11 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @ClassName ExcelController
@@ -49,7 +47,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/toolbox")
 public class ToolboxController extends AbstractController {
-    private final static Logger logger = Logger.getLogger(ToolboxController.class);
+    private final static Logger logger = LogManager.getLogger(ToolboxController.class);
 
     /**
      * 做助教工作手册时，用户手动上传的花名册缓存
@@ -60,7 +58,6 @@ public class ToolboxController extends AbstractController {
      * 单独做座位表时，用户手动上传的学生名单缓存
      */
     public static Map<Long, StudentListForSeatTableUploadByUserExcel> studentListForSeatTableUploadByUserCache = new HashMap<>();
-
 
 
     /**
@@ -87,7 +84,7 @@ public class ToolboxController extends AbstractController {
      */
     @RequestMapping("/assistant/uploadStudentList")
     @ResponseBody
-    public Map<String, Object> uploadStudentList(@RequestParam(value = "file", required = false) MultipartFile file) {
+    public Map<String, Object> uploadStudentList(@RequestParam(value = "file", required = false) MultipartFile file) throws InvalidParameterException {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>(3);
         //返回layui规定的文件上传模块JSON格式
@@ -112,16 +109,23 @@ public class ToolboxController extends AbstractController {
         try {
             excel = new StudentListUploadByUserExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
 
-            //try
+            //try用户上传文件是否规范
             excel.readStudentAndClassInfoByClassIdFromExcel("any input");
 
             //将当前用户上传的花名册put到cache中，以备输出文件时读取
-            Long id=userService.getSessionUserInfo().getId();
+            Long id = userService.getSessionUserInfo().getId();
             studentListUploadByUserCache.put(id, excel);
-            System.out.println("aaaa"+studentListUploadByUserCache);
-        } catch (Exception e) {
+        } catch (InputFileTypeException e) {
             e.printStackTrace();
             map.put("msg", Constants.FAILURE);
+            return map;
+        } catch (IOException e) {
+            e.printStackTrace();
+            map.put("msg", Constants.FAILURE);
+            return map;
+        } catch (ExcelColumnNotFoundException e) {
+            e.printStackTrace();
+            map.put("msg", "excelColumnNotFound");
             return map;
         }
 
@@ -137,7 +141,7 @@ public class ToolboxController extends AbstractController {
      */
     @RequestMapping("/assistant/exportAssistantTutorialWithoutSeatTable")
     public String exportAssistantTutorialWithoutSeatTable(HttpServletRequest request, HttpServletResponse response,
-                                         @RequestParam(value = "magic", required = false) String magic, ClassDetailedDto classDetailedDto) {
+                                                          @RequestParam(value = "magic", required = false) String magic, ClassDetailedDto classDetailedDto) {
         AssistantTutorialExcel excel = null;
         try {
             List<StudentAndClassDetailedWithSubjectsDto> results = new ArrayList<>();
@@ -176,6 +180,12 @@ public class ToolboxController extends AbstractController {
             excel.writeAssistantTutorialWithoutSeatTable(results);
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (ExcelColumnNotFoundException e) {
+            e.printStackTrace();
+        } catch (ClassTooManyStudentsException e) {
+            e.printStackTrace();
+        } catch (InputFileTypeException e) {
+            e.printStackTrace();
         }
 
         try {
@@ -199,7 +209,7 @@ public class ToolboxController extends AbstractController {
      */
     @RequestMapping("/assistant/exportAssistantTutorialAndSeatTable")
     public String exportAssistantTutorialAndSeatTable(HttpServletRequest request, HttpServletResponse response,
-                                         @RequestParam(value = "magic", required = false) String magic, ClassDetailedDto classDetailedDto) {
+                                                      @RequestParam(value = "magic", required = false) String magic, ClassDetailedDto classDetailedDto) {
         SeatTableTemplateExcel excel = null;
         try {
             List<StudentAndClassDetailedWithSubjectsDto> results = new ArrayList<>();
@@ -233,6 +243,10 @@ public class ToolboxController extends AbstractController {
             excel.writeSeatTable(results);
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (ExcelColumnNotFoundException e) {
+            e.printStackTrace();
+        } catch (InputFileTypeException e) {
+            e.printStackTrace();
         }
 
         try {
@@ -257,7 +271,7 @@ public class ToolboxController extends AbstractController {
      */
     @RequestMapping("/assistant/uploadStudentListForSeatTable")
     @ResponseBody
-    public Map<String, Object> uploadStudentListForSeatTable(@RequestParam(value = "file", required = false) MultipartFile file) {
+    public Map<String, Object> uploadStudentListForSeatTable(@RequestParam(value = "file", required = false) MultipartFile file) throws InvalidParameterException {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>(3);
         //返回layui规定的文件上传模块JSON格式
@@ -310,25 +324,25 @@ public class ToolboxController extends AbstractController {
 
             excel = new SeatTableTemplateExcel(filePathProperties.getToolboxSeatTableTemplatePathAndName(classDetailedDto.getClassCampus()));
 
-                Long id = userService.getSessionUserInfo().getId();
-                StudentListForSeatTableUploadByUserExcel excelCache = studentListForSeatTableUploadByUserCache.get(id);
+            Long id = userService.getSessionUserInfo().getId();
+            StudentListForSeatTableUploadByUserExcel excelCache = studentListForSeatTableUploadByUserCache.get(id);
 
-                if (excelCache != null) {
-                    //缓存中有文件，即用户上传过了
-                    List<String> studentNames= excelCache.getStudentNames();
+            if (excelCache != null) {
+                //缓存中有文件，即用户上传过了
+                List<String> studentNames = excelCache.getStudentNames();
 
-                    //将学生姓名列表和输入的教室封装成StudentAndClassDetailedWithSubjectsDto对象
-                    for (String studentName:studentNames) {
-                        StudentAndClassDetailedWithSubjectsDto tmp=new StudentAndClassDetailedWithSubjectsDto();
-                        tmp.setStudentName(studentName);
-                        tmp.setClassroom(classDetailedDto.getClassroom());
-                        results.add(tmp);
-                    }
-
-                    //下载完座位表，清除缓存
-//                    studentListForSeatTableUploadByUserCache.remove(id);
-                    //清除缓存交给springmvc拦截器
+                //将学生姓名列表和输入的教室封装成StudentAndClassDetailedWithSubjectsDto对象
+                for (String studentName : studentNames) {
+                    StudentAndClassDetailedWithSubjectsDto tmp = new StudentAndClassDetailedWithSubjectsDto();
+                    tmp.setStudentName(studentName);
+                    tmp.setClassroom(classDetailedDto.getClassroom());
+                    results.add(tmp);
                 }
+
+                //下载完座位表，清除缓存
+//                    studentListForSeatTableUploadByUserCache.remove(id);
+                //清除缓存交给springmvc拦截器
+            }
 
 
             //将读到的数据，修改到座位表模板表格中
@@ -368,19 +382,19 @@ public class ToolboxController extends AbstractController {
      *
      * @param request
      * @param response
-     * @param sync 是否开启同步数据库
-     * @param originalCampus 原校区
-     * @param currentCampus 补课校区
+     * @param sync                         是否开启同步数据库
+     * @param originalCampus               原校区
+     * @param currentCampus                补课校区
      * @param missLessonStudentDetailedDto 补课班号，原班号，学员姓名等封装
      * @return
      */
     @RequestMapping("/assistant/exportAssistantMissLessonTable")
     public String exportAssistantMissLessonTable(HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "sync", required = false) String sync
-            ,@RequestParam("originalCampus") String originalCampus,@RequestParam("currentCampus") String currentCampus, MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
+            , @RequestParam("originalCampus") String originalCampus, @RequestParam("currentCampus") String currentCampus, MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
 
-        ClassDetailedDto originalClass=classService.getClassDetailByClassId(missLessonStudentDetailedDto.getOriginalClassId());
+        ClassDetailedDto originalClass = classService.getClassDetailByClassId(missLessonStudentDetailedDto.getOriginalClassId());
 
-        ClassDetailedDto currentClass=classService.getClassDetailByClassId(missLessonStudentDetailedDto.getCurrentClassId());
+        ClassDetailedDto currentClass = classService.getClassDetailByClassId(missLessonStudentDetailedDto.getCurrentClassId());
 
         missLessonStudentDetailedDto.setCurrentClassGrade(currentClass.getClassGrade());
         missLessonStudentDetailedDto.setCurrentClassSubject(currentClass.getClassSubject());
@@ -394,13 +408,59 @@ public class ToolboxController extends AbstractController {
             excel = new MissedLessonExcel(filePathProperties.getToolboxMissLessonTemplatePathAndName(currentCampus));
 
             if (Constants.ON.equals(sync)) {
-                //若打开自定同步
+                //若打开自动同步
+                //数据添加补课学生记录
                 missLessonStudentService.insertMissLessonStudent(missLessonStudentDetailedDto);
+
+                //向原班助教和补课班助教发送消息
+                Long userFromId=userService.getSessionUserInfo().getId();
+
+                String originalAssistantWorkId=assistantService.getAssistantById(originalClass.getClassAssistantId()).getAssistantWorkId();
+                Long originalUserId=userService.getUserByWorkId(originalAssistantWorkId).getId();
+                UserMessage originalMessage=new UserMessage();
+                originalMessage.setUserId(originalUserId);
+                originalMessage.setUserFromId(userFromId);
+                originalMessage.setMessageTitle("你的班上有需要补课的学生");
+                StringBuffer originalMessageContent=new StringBuffer();
+                originalMessageContent.append("你的\"").append(originalClass.getClassName()).append("\"(上课时间：").append(originalClass.getClassSimplifiedTime()).append("，上课教室：").append(originalClass.getClassCampus()+originalClass.getClassroom()+"教").append(")上的学生<em>").append(missLessonStudentDetailedDto.getStudentName()).append("</em>需要补课。")
+                       .append("<br>"+"补课班号：").append(currentClass.getClassId())
+                        .append("<br>"+"补课班级名称：").append(currentClass.getClassName())
+                        .append("<br>"+"补课班级助教：").append(currentClass.getAssistantName())
+                        .append("<br>"+"补课班级任课教师：").append(currentClass.getTeacherName())
+                        .append("<br>"+"补课时间 ：").append(MyTimeUtils.dateToStrYMD(missLessonStudentDetailedDto.getDate()) + ", " + missLessonStudentDetailedDto.getCurrentClassSimplifiedTime())
+                        .append("<br>"+"补课班级上课教室：").append(currentClass.getClassCampus()+currentClass.getClassroom()+"教");
+                originalMessage.setMessageContent(originalMessageContent.toString());
+                originalMessage.setMessageTime(new Date());
+                if (UserMessageUtils.isValidUserMessageUpdateInfo(originalMessage)) {
+                    userMessageService.insertUserMessage(originalMessage);
+                }
+
+
+                String currentAssistantWorkId=assistantService.getAssistantById(currentClass.getClassAssistantId()).getAssistantWorkId();
+                Long currentUserId=userService.getUserByWorkId(currentAssistantWorkId).getId();
+                UserMessage currentMessage=new UserMessage();
+                currentMessage.setUserId(currentUserId);
+                currentMessage.setUserFromId(userFromId);
+                currentMessage.setMessageTitle("有学生补课到你的班上");
+                StringBuffer currentMessageContent=new StringBuffer();
+                currentMessageContent.append("学生<em>").append(missLessonStudentDetailedDto.getStudentName()).append("</em>补课到你的\"").append(currentClass.getClassName()).append("\"(上课时间：").append(currentClass.getClassSimplifiedTime()).append("，上课教室：").append(currentClass.getClassCampus()+currentClass.getClassroom()+"教)。")
+                        .append("<br>"+"补课日期：").append(MyTimeUtils.dateToStrYMD(missLessonStudentDetailedDto.getDate()))
+                        .append("<br>"+"原班号：").append(originalClass.getClassId())
+                        .append("<br>"+"原班级名称：").append(originalClass.getClassName())
+                        .append("<br>"+"原班级助教：").append(originalClass.getAssistantName())
+                        .append("<br>"+"原班级任课教师：").append(originalClass.getTeacherName());
+                currentMessage.setMessageContent(currentMessageContent.toString());
+                currentMessage.setMessageTime(new Date());
+                if (UserMessageUtils.isValidUserMessageUpdateInfo(currentMessage)) {
+                    userMessageService.insertUserMessage(currentMessage);
+                }
             }
 
             //将读到的数据，修改到补课单模板表格中
             excel.writeMissLesson(missLessonStudentDetailedDto);
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InputFileTypeException e) {
             e.printStackTrace();
         }
 
@@ -426,7 +486,7 @@ public class ToolboxController extends AbstractController {
     @RequestMapping("/assistantAdministrator/infoImport")
     public String infoImport(Model model) {
         model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
-        model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(ClassUtils.SEASONS));
+        model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(Class.SEASONS));
         return "toolbox/assistantAdministrator/infoImport";
     }
 
@@ -439,11 +499,11 @@ public class ToolboxController extends AbstractController {
      * @return
      */
     @RequestMapping("/assistantAdministrator/downloadExample/{type}")
-    public String downloadExample(HttpServletRequest request, HttpServletResponse response, @PathVariable Integer type) {
+    public String downloadExample(HttpServletRequest request, HttpServletResponse response, @PathVariable Integer type) throws InvalidParameterException {
         if (type <= 0) {
             String msg = "downloadExample方法入参错误!";
             logger.error(msg);
-            throw new InvalidParamterException(msg);
+            throw new InvalidParameterException(msg);
         }
 
         try {
@@ -480,7 +540,7 @@ public class ToolboxController extends AbstractController {
      */
     @RequestMapping("/assistantAdministrator/seatTableTemplateImport")
     @ResponseBody
-    public Map<String, Object> seatTableTemplateImport(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "classCampus",required = false)String classCampus) {
+    public Map<String, Object> seatTableTemplateImport(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "classCampus", required = false) String classCampus) throws InvalidParameterException {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>(3);
         //返回layui规定的文件上传模块JSON格式
@@ -510,22 +570,36 @@ public class ToolboxController extends AbstractController {
         try {
             excel = new SeatTableTemplateInputExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
             //读出教室
-            List<String> classrooms=excel.readSeatTable();
+            List<CampusAndClassroom> campusAndClassrooms = excel.readSeatTable();
 
-            //先删除当前校区的所有校区教师记录
+            //先删除当前校区的所有校区教室记录
             campusAndClassroomService.deleteCampusAndClassroomsByCampus(classCampus);
-            for (String classroom:classrooms){
-                CampusAndClassroom campusAndClassroom=new CampusAndClassroom(classCampus,classroom);
+            for (CampusAndClassroom campusAndClassroom : campusAndClassrooms) {
+                campusAndClassroom.setCampus(classCampus);
                 //插入数据库
-                campusAndClassroomService.insetCampusAndClassroom(campusAndClassroom);
+                if (CampusAndClassroomUtils.isValidCampusAndClassroomUpdateInfo(campusAndClassroom)) {
+                    campusAndClassroomService.insertCampusAndClassroom(campusAndClassroom);
+                } else {
+                    logger.error("上传模板失败");
+                    map.put("msg", Constants.FAILURE);
+                    return map;
+                }
             }
 
             String filePathAndName = filePathProperties.getToolboxSeatTableTemplatePathAndName(classCampus);
             File dest = new File(filePathAndName);
             file.transferTo(dest);
-        } catch (Exception e) {
+
+        } catch (ExcelSheetNameInvalidException e) {
             e.printStackTrace();
-            logger.error("上传模板失败");
+            map.put("msg", "sheetNameError");
+            return map;
+        } catch (InputFileTypeException e) {
+            e.printStackTrace();
+            map.put("msg", Constants.FAILURE);
+            return map;
+        } catch (IOException e) {
+            e.printStackTrace();
             map.put("msg", Constants.FAILURE);
             return map;
         }

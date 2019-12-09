@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jzy.dao.UserMessageMapper">
+    <!--resultMap和resultType不能同时使用-->
+    <resultMap id="BaseColumnResultMap" type="com.jzy.model.entity.BaseEntity">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap" type="com.jzy.model.entity.UserMessage" extends="BaseColumnResultMap">
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="user_from_id" property="userFromId" jdbcType="BIGINT"/>
+        <result column="message_title" property="messageTitle" jdbcType="VARCHAR"/>
+        <result column="message_content" property="messageContent" jdbcType="VARCHAR"/>
+        <result column="message_picture" property="messagePicture" jdbcType="VARCHAR"/>
+        <result column="message_time" property="messageTime" jdbcType="TIMESTAMP"/>
+        <result column="read" property="read" jdbcType="BOOLEAN"/>
+        <result column="message_remark" property="messageRemark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="UserMessageDtoResultMap" type="com.jzy.model.dto.UserMessageDto" extends="BaseResultMap">
+        <result column="user_from_role" property="userFromRole" jdbcType="VARCHAR"/>
+        <result column="user_from_real_name" property="userFromRealName" jdbcType="VARCHAR"/>
+        <result column="user_from_icon" property="userFromIcon" jdbcType="VARCHAR"/>
+        <result column="user_from" property="userFrom" jdbcType="VARCHAR"/>
+    </resultMap>
+    <insert id="insertUserMessage" parameterType="com.jzy.model.entity.UserMessage">
+        insert into user_message
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="userFromId != null" >
+                user_from_id,
+            </if>
+            <if test=" messageTitle!= null and messageTitle!=''">
+                message_title,
+            </if>
+            <if test="messageContent != null and messageContent!=''" >
+                message_content,
+            </if>
+            <if test="messagePicture != null and messagePicture!=''" >
+                message_picture,
+            </if>
+            <if test="messageTime != null" >
+                message_time,
+            </if>
+            <if test="messageRemark != null and messageRemark!=''" >
+                message_remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                #{userId},
+            </if>
+            <if test="userFromId != null" >
+                #{userFromId},
+            </if>
+            <if test=" messageTitle!= null and messageTitle!=''">
+                #{messageTitle},
+            </if>
+            <if test="messageContent != null and messageContent!=''" >
+                #{messageContent},
+            </if>
+            <if test="messagePicture != null and messagePicture!=''" >
+                #{messagePicture},
+            </if>
+            <if test="messageTime != null" >
+                #{messageTime},
+            </if>
+            <if test="messageRemark != null and messageRemark!=''" >
+                #{messageRemark},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateUserMessageReadById">
+        update user_message um set um.read='1' where um.id=#{id}
+    </update>
+    <update id="updateManyUserMessagesReadByIds">
+        update user_message um set um.read='1' where um.id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    <update id="updateManyUserMessagesReadByUserId">
+        update user_message um set um.read='1' where um.user_id=#{userId}
+    </update>
+    <delete id="deleteManyUserMessagesByIds">
+        delete um.* from user_message um where um.id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getUserMessageById" resultMap="BaseResultMap">
+        select * from user_message where id=#{id}
+    </select>
+    <select id="getUserMessageByUserId" resultMap="BaseResultMap">
+        select * from user_message where user_id=#{userId}
+    </select>
+    <select id="getUserMessageByUserFromId" resultMap="BaseResultMap">
+        select * from user_message where user_from_id=#{userFromId}
+    </select>
+
+    <select id="getUserMessageDtoById" resultMap="UserMessageDtoResultMap">
+        select um.*, u_from.user_role as user_from_role, u_from.user_real_name as user_from_real_name, u_from.user_icon as user_from_icon,
+        CONCAT_WS('-', u_from.user_role,u_from.user_real_name) as user_from
+         from user_message um left join user u_from on um.user_from_id=u_from.id
+         where um.id=#{id}
+    </select>
+    <select id="countUserMessagesByUserIdAndRead" resultType="long">
+        select count(*) from user_message um  where um.user_id=#{userId} and um.read=#{read}
+    </select>
+    <select id="listUserMessages" resultMap="UserMessageDtoResultMap"
+            parameterType="com.jzy.model.dto.UserMessageSearchCondition">
+        select um.*, u_from.user_role as user_from_role, u_from.user_real_name as user_from_real_name, u_from.user_icon as user_from_icon,
+        CONCAT_WS('-', u_from.user_role,u_from.user_real_name) as user_from
+        from user_message um left join user u_from on um.user_from_id=u_from.id
+        <where>
+            <if test="userId != null">
+                um.user_id=#{userId}
+            </if>
+        </where>
+        order by um.message_time desc
+    </select>
+    <select id="listUserMessagesByRead" resultMap="UserMessageDtoResultMap">
+        select um.*, u_from.user_role as user_from_role, u_from.user_real_name as user_from_real_name, u_from.user_icon as user_from_icon,
+        CONCAT_WS('-', u_from.user_role,u_from.user_real_name) as user_from
+        from user_message um left join user u_from on um.user_from_id=u_from.id
+        where um.user_id=#{userId} and um.read=#{read}
+        order by um.message_time desc
+    </select>
+
+</mapper>

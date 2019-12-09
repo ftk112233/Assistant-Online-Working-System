@@ -3,6 +3,9 @@ package com.jzy.dao;
 import com.jzy.model.dto.StudentAndClassDetailedDto;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
 import com.jzy.model.dto.StudentAndClassSearchCondition;
+import com.jzy.model.dto.echarts.GroupedByGradeObjectTotal;
+import com.jzy.model.dto.echarts.GroupedBySubjectObjectTotal;
+import com.jzy.model.dto.echarts.GroupedByTypeObjectTotal;
 import com.jzy.model.entity.StudentAndClass;
 import org.apache.ibatis.annotations.Param;
 
@@ -31,7 +34,7 @@ public interface StudentAndClassMapper {
      * @param studentAndClassDetailedDto
      * @return
      */
-    void insertStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto);
+    long insertStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto);
 
     /**
      * 根据当前学员号和报班班号更新，报班情况
@@ -39,7 +42,7 @@ public interface StudentAndClassMapper {
      * @param studentAndClassDetailedDto
      * @return
      */
-    void updateStudentAndClassByStudentIdAndClassId(StudentAndClassDetailedDto studentAndClassDetailedDto);
+    long updateStudentAndClassByStudentIdAndClassId(StudentAndClassDetailedDto studentAndClassDetailedDto);
 
     /**
      * 返回符合条件的学生上课信息分页结果
@@ -63,7 +66,7 @@ public interface StudentAndClassMapper {
      * @param studentAndClassDetailedDto 修改后的学员上课信息
      * @return
      */
-    void updateStudentAndClassInfo(StudentAndClassDetailedDto studentAndClassDetailedDto);
+    long updateStudentAndClassInfo(StudentAndClassDetailedDto studentAndClassDetailedDto);
 
     /**
      * 删除一个学员上课记录
@@ -71,14 +74,14 @@ public interface StudentAndClassMapper {
      * @param id 被删除学员上课的id
      * @return
      */
-    void deleteOneStudentAndClassById(Long id);
+    long deleteOneStudentAndClassById(Long id);
 
     /**
      * 根据id删除多个学员上课记录
      *
      * @param ids 学员上课记录id的列表
      */
-    void deleteManyStudentAndClassesByIds(List<Long> ids);
+    long deleteManyStudentAndClassesByIds(List<Long> ids);
 
     /**
      * 根据班级编码查询班级的所有学生及班级的详细信息
@@ -95,4 +98,36 @@ public interface StudentAndClassMapper {
      * @return
      */
     List<StudentAndClassDetailedDto> listStudentAndClassesWithSubjectsByStudentId(StudentAndClassSearchCondition condition);
+
+    /**
+     * 条件删除多个学生上课记录
+     *
+     * @param condition 输入的查询条件
+     * @return
+     */
+    long deleteStudentAndClassesByCondition(StudentAndClassSearchCondition condition);
+
+    /**
+     * 查询指定年级的学生人数
+     *
+     * @param condition 年份-季度-校区
+     * @return
+     */
+    List<GroupedByGradeObjectTotal> countStudentsGroupByClassGrade(StudentAndClassSearchCondition condition);
+
+    /**
+     * 查询指定年级的学生人数
+     *
+     * @param condition 年份-季度-校区
+     * @return
+     */
+    List<GroupedBySubjectObjectTotal> countStudentsGroupByClassSubject(StudentAndClassSearchCondition condition);
+
+    /**
+     * 查询指定班型的学生人数
+     *
+     * @param condition 年份-季度-校区-年级-学科
+     * @return
+     */
+    List<GroupedByTypeObjectTotal> countStudentsGroupByClassType(StudentAndClassSearchCondition condition);
 }

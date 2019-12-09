@@ -22,6 +22,16 @@
         <result column="user_remark" property="userRemark" jdbcType="VARCHAR"/>
     </resultMap>
 
+    <resultMap id="UserSendToResultMap" type="com.jzy.model.dto.UserSendTo">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="user_work_id" property="userWorkId" jdbcType="VARCHAR"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="user_real_name" property="userRealName" jdbcType="VARCHAR"/>
+        <result column="user_role" property="userRole" jdbcType="VARCHAR"/>
+        <result column="user_icon" property="userIcon" jdbcType="VARCHAR"/>
+        <result column="campus" property="campus" jdbcType="VARCHAR"/>
+    </resultMap>
+
     <insert id="insertUser" parameterType="com.jzy.model.entity.User">
         insert into user
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -195,6 +205,64 @@
     <select id="listAllUsers" resultMap="BaseResultMap">
         select * from user;
     </select>
+    <select id="listUsersSendTo" resultMap="UserSendToResultMap"
+            parameterType="com.jzy.model.dto.UserSendToSearchCondition">
+        select u.*, a.assistant_campus as campus from user u left join assistant a on u.user_work_id=a.assistant_work_id
+        <where>
+            <if test="userRole != null and userRole!=''">
+                and u.user_role=#{userRole}
+            </if>
+            <if test="campus != null and campus!=''">
+                and a.assistant_campus=#{campus}
+            </if>
+            <if test="commonSearch != null and commonSearch!=''">
+                <bind name="commonSearchLike" value=" '%' + commonSearch + '%' "/>
+                and (u.user_work_id like #{commonSearchLike}
+                or u.user_id_card like #{commonSearchLike}
+                or u.user_name like #{commonSearchLike}
+                or u.user_real_name like #{commonSearchLike}
+                or u.user_real_name like #{commonSearchLike}
+                or u.user_email like #{commonSearchLike}
+                or u.user_phone like #{commonSearchLike})
+            </if>
+        </where>
+        <if test="condition1 == 'userWorkId'">
+            order by u.user_work_id
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'userIdCard'">
+            order by u.user_id_card
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'userRealName'">
+            order by u.user_real_name
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'userRole'">
+            order by u.user_role
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+    </select>
 
     <update id="updatePasswordByEmail" parameterType="com.jzy.model.entity.User">
         UPDATE user
@@ -242,6 +310,7 @@
             <if test="userRole != null and userRole!=''">
                 user_role = #{userRole,jdbcType=VARCHAR},
             </if>
+            user_icon = #{userIcon,jdbcType=VARCHAR},
             user_email = #{userEmail,jdbcType=VARCHAR},
             user_phone = #{userPhone,jdbcType=VARCHAR},
             user_remark = #{userRemark,jdbcType=VARCHAR},

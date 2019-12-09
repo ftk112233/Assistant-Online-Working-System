@@ -33,12 +33,13 @@
         <!-- Shiro -->
         <project.build.shiro.version>1.4.0</project.build.shiro.version>
         <!-- Common util -->
+        <project.build.commons.io.version>2.4</project.build.commons.io.version>
         <project.build.commons.lang3.version>3.3.2</project.build.commons.lang3.version>
         <!-- Mail -->
         <project.build.javax.mail.version>1.4.7</project.build.javax.mail.version>
         <project.build.sun.mail.javax.version>1.6.2</project.build.sun.mail.javax.version>
         <!--poi-->
-        <project.build.org.apache.poi.version>3.17</project.build.org.apache.poi.version>
+        <project.build.org.apache.poi.version>3.15</project.build.org.apache.poi.version>
         <!--lombok-->
         <project.build.lombok.version>1.18.8</project.build.lombok.version>
         <!--kaptcha-->
@@ -75,11 +76,11 @@
             </exclusions>
         </dependency>
         <!-- Spring Boot log4j依赖 -->
-        <dependency>
+        <dependency> <!-- 引入log4j2依赖 -->
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-log4j</artifactId>
-            <version>1.3.8.RELEASE</version>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
+
         <!--aop-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -157,6 +158,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${project.build.commons.lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${project.build.commons.io.version}</version>
         </dependency>
 
         <dependency>

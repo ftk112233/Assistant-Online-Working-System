@@ -1,6 +1,5 @@
 package com.jzy.manager.util;
 
-import com.jzy.manager.constant.Constants;
 import com.jzy.model.entity.User;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,12 +17,12 @@ public class UserUtils {
     /**
      * 用户的所有角色
      */
-    public static List<String> USER_ROLES = Constants.ROLES;
+    private static List<String> USER_ROLES = User.ROLES;
 
     /**
      * 用户默认头像
      */
-    public static final String USER_ICON_DEFAULT = "user_icon_default.jpg";
+    private static final String USER_ICON_DEFAULT = User.USER_ICON_DEFAULT;
 
     private UserUtils() {
     }

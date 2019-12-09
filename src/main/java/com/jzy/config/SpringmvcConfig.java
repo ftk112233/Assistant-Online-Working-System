@@ -16,9 +16,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @Configuration
 public class SpringmvcConfig extends WebMvcConfigurerAdapter {
     @Bean
-    public UpdateSessionUserInfoInterceptor updateSessionUserInfoInterceptor(){
-        return new UpdateSessionUserInfoInterceptor();
-    }
+    public UpdateSessionUserInfoInterceptor updateSessionUserInfoInterceptor(){ return new UpdateSessionUserInfoInterceptor(); }
 
     @Bean
     public ToolboxUploadCacheInterceptor toolboxUploadCacheInterceptor(){

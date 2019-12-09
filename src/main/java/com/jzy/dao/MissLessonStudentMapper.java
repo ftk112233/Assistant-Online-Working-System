@@ -28,7 +28,7 @@ public interface MissLessonStudentMapper {
      * @param missLessonStudentDetailedDto 修改后的补课学生信息
      * @return
      */
-    void missLessonStudentDetailedDto(MissLessonStudentDetailedDto missLessonStudentDetailedDto);
+    long updateMissLessonStudentInfo(MissLessonStudentDetailedDto missLessonStudentDetailedDto);
 
     /**
      * 添加补课学生
@@ -36,7 +36,7 @@ public interface MissLessonStudentMapper {
      * @param missLessonStudentDetailedDto 新添加补课学生
      * @return
      */
-    void insertMissLessonStudent(MissLessonStudentDetailedDto missLessonStudentDetailedDto);
+    long insertMissLessonStudent(MissLessonStudentDetailedDto missLessonStudentDetailedDto);
 
     /**
      * 删除一个补课学生记录
@@ -44,12 +44,13 @@ public interface MissLessonStudentMapper {
      * @param id 被删除补课学生的id
      * @return
      */
-    void deleteOneMissLessonStudentById(@Param("id") Long id);
+    long deleteOneMissLessonStudentById(@Param("id") Long id);
 
     /**
      * 根据id删除多个补课学生记录
      *
      * @param ids 补课学生id的列表
      */
-    void deleteManyMissLessonStudentsByIds(List<Long> ids);
+    long deleteManyMissLessonStudentsByIds(List<Long> ids);
+
 }

@@ -76,17 +76,17 @@ public class StudentListUploadByUserExcel extends Excel implements Serializable 
      *
      * @param classId 编号
      */
-    public List<StudentAndClassDetailedWithSubjectsDto> readStudentAndClassInfoByClassIdFromExcel(String classId) {
+    public List<StudentAndClassDetailedWithSubjectsDto> readStudentAndClassInfoByClassIdFromExcel(String classId) throws ExcelColumnNotFoundException {
         resetParam();
 
-        if (StringUtils.isEmpty(classId)){
-         return output;
+        if (StringUtils.isEmpty(classId)) {
+            return output;
         }
 
         int sheetIx = 0;
 
         // 先扫描第startRow行找到"学员号"、"姓名"、"手机"等信息所在列的位置
-        int columnIndexOfStudentId = -1, columnIndexOfStudentName = -2, columnIndexOfStudentPhone = -3 , columnIndexOfClassId = -15, columnIndexOfClassName=-16;
+        int columnIndexOfStudentId = -1, columnIndexOfStudentName = -2, columnIndexOfStudentPhone = -3, columnIndexOfClassId = -15, columnIndexOfClassName = -16;
         int row0ColumnCount = this.getColumnCount(sheetIx, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
             String value = this.getValueAt(sheetIx, startRow, i);
@@ -116,9 +116,9 @@ public class StudentListUploadByUserExcel extends Excel implements Serializable 
         }
 
         int rowCount = this.getRowCount(sheetIx); // 表的总行数
-        for (int i = startRow+1; i < rowCount; i++) {
+        for (int i = startRow + 1; i < rowCount; i++) {
             if (classId.equals(this.getValueAt(sheetIx, i, columnIndexOfClassId))) { // 找到班级编码匹配的行
-                StudentAndClassDetailedWithSubjectsDto tmp=new StudentAndClassDetailedWithSubjectsDto();
+                StudentAndClassDetailedWithSubjectsDto tmp = new StudentAndClassDetailedWithSubjectsDto();
                 tmp.setClassId(classId);
                 tmp.setClassName(this.getValueAt(sheetIx, i, columnIndexOfClassName));
                 tmp.setStudentId(this.getValueAt(sheetIx, i, columnIndexOfStudentId));
@@ -133,13 +133,13 @@ public class StudentListUploadByUserExcel extends Excel implements Serializable 
 
     @Override
     public void resetParam() {
-        output=new ArrayList<>();
+        output = new ArrayList<>();
     }
 
     public static void main(String[] args) throws IOException {
-        Map<Integer,String> map=new HashMap<>();
-        map.put(1,"a");
-        map.put(1,"2");
+        Map<Integer, String> map = new HashMap<>();
+        map.put(1, "a");
+        map.put(1, "2");
         map.remove(1);
         System.out.println(map.get(1));
     }

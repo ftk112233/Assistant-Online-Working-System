@@ -7,7 +7,7 @@ package com.jzy.manager.exception;
  * @Date 2019/11/22 20:59
  * @Version 1.0
  **/
-public class ExcelColumnNotFoundException extends RuntimeException{
+public class ExcelColumnNotFoundException extends Exception {
     public ExcelColumnNotFoundException() {
     }
 

@@ -8,6 +8,8 @@ package com.jzy.web.interceptor;
  * @Version 1.0
  **/
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -17,14 +19,14 @@ import java.lang.reflect.Method;
 import java.util.UUID;
 
 public class TokenInterceptor extends HandlerInterceptorAdapter {
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TokenInterceptor.class);
+    private final static Logger logger = LogManager.getLogger(TokenInterceptor.class);
 
     /**
+     * @return boolean
      * @Author JinZhiyun
      * @Description 实现Token相应注解的功能
      * @Date 13:04 2019/5/12
      * @Param [request, response, handler]
-     * @return boolean
      **/
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -40,7 +42,7 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
                 boolean needRemoveSession = annotation.remove();
                 if (needRemoveSession) {
                     if (isRepeatSubmit(request)) {
-                        logger.warn(request.getSession().getAttribute("userId")+"重复提交了表单");
+                        logger.warn(request.getSession().getAttribute("userId") + "重复提交了表单");
                         response.sendRedirect(request.getContextPath() + "/formRepeatSubmit");
                         return false;
                     }
@@ -54,11 +56,11 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
     }
 
     /**
+     * @return boolean
      * @Author JinZhiyun
      * @Description 判断表单是否重复提交
      * @Date 13:05 2019/5/12
      * @Param [request]
-     * @return boolean
      **/
     private boolean isRepeatSubmit(HttpServletRequest request) {
         String serverToken = (String) request.getSession(false).getAttribute("token");

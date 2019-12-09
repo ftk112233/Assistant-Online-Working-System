@@ -1,11 +1,13 @@
 package com.jzy.model.entity;
 
 import com.jzy.manager.util.MyStringUtils;
-import com.jzy.model.CampusEnum;
+import com.jzy.model.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
 
 /**
  * @author JinZhiyun
@@ -19,6 +21,14 @@ import org.apache.commons.lang3.StringUtils;
 @Data
 public class Class extends BaseEntity {
     private static final long serialVersionUID = 2082795401009058210L;
+
+    public static final List<String> SEASONS = SeasonEnum.getSeasonsList();
+
+    public static final List<String> GRADES = GradeEnum.getGradesList();
+
+    public static final List<String> SUBJECTS = SubjectEnum.getSubjectsList();
+
+    public static final List<String> TYPES = TypeEnum.getTypesList();
 
     /**
      * 班级编码，唯一，非空，长度小于32，2019年新东方优能中学部的班级编码为12位，U6MCFB020001，
@@ -103,161 +113,83 @@ public class Class extends BaseEntity {
     private String classRemark;
 
     /**
+     * 将输入年份字段由yyyy-mm-dd转成yyyy
+     *
+     * @param year
+     * @return
+     */
+    public static String parseYear(String year) {
+        if (!StringUtils.isEmpty(year)) {
+            int idx = year.indexOf('-');
+            if (idx >= 0) {
+                String parsedYear = year.substring(0, year.indexOf('-'));
+                return parsedYear;
+            }
+        }
+        return year;
+    }
+
+    /**
      * 根据当前班级编码解析当前班级对象
      *
      * @param classId
-     * @return
      */
-    public Class setParsedClassId(String classId) {
+    public void setParsedClassId(String classId) {
         this.classId = classId;
-        if (StringUtils.isEmpty(classId) || classId.length() != 12) {
+        if (StringUtils.isEmpty(classId) || classId.length() < 12) {
             //不符合新东方2019年编码规范，不解析，直接常规setClassId
-            return this;
+            return;
         } else {
             //解析
             //年级
-            switch (classId.charAt(1)) {
-                case '6':
-                    this.classGrade = "小初衔接";
-                    break;
-                case '7':
-                    this.classGrade = "初一";
-                    break;
-                case '8':
-                    this.classGrade = "初二";
-                    break;
-                case '9':
-                    this.classGrade = "中考";
-                    break;
-                case 'A':
-                    this.classGrade = "高一";
-                    break;
-                case 'B':
-                    this.classGrade = "高二";
-                    break;
-                case 'C':
-                    this.classGrade = "高考";
-                    break;
-                default:
-            }
+            this.classGrade = GradeEnum.getGradeByCode(Character.toString(classId.charAt(1)));
 
             //科目
-            switch (classId.charAt(2)) {
-                case 'Y':
-                    this.classSubject = "语文";
-                    break;
-                case 'M':
-                    this.classSubject = "数学";
-                    break;
-                case 'E':
-                    this.classSubject = "英语";
-                    break;
-                case 'P':
-                    this.classSubject = "物理";
-                    break;
-                case 'C':
-                    this.classSubject = "化学";
-                    break;
-                case 'G':
-                    this.classSubject = "地理";
-                    break;
-                case 'B':
-                    this.classSubject = "生物";
-                    break;
-                case 'H':
-                    this.classSubject = "历史";
-                    break;
-                case 'S':
-                    this.classSubject = "科学";
-                    break;
-                case 'L':
-                    this.classSubject = "联报";
-                    break;
-                default:
-            }
+            this.classSubject = SubjectEnum.getSubjectByCode(Character.toString(classId.charAt(2)));
 
             //班型
-            switch (classId.charAt(3)) {
-                case 'A':
-                    this.classType = "好学";
-                    break;
-                case 'B':
-                    this.classType = "精进";
-                    break;
-                case 'C':
-                    this.classType = "志高";
-                    break;
-                case 'D':
-                    this.classType = "行远";
-                    break;
-                case 'E':
-                    this.classType = "壮志";
-                    break;
-                case 'F':
-                    this.classType = "凌云";
-                    break;
-                case 'G':
-                    this.classType = "星耀";
-                    break;
-                case 'Z':
-                    this.classType = "专项";
-                    break;
-                case 'X':
-                    this.classType = "虚拟";
-                    break;
-                default:
-            }
+            this.classType = TypeEnum.getTypeByCode(Character.toString(classId.charAt(3)));
+
+            //classId.charAt(4)：F-25人，I-50人；业务无关属性，不解析
 
             //季度
-            switch (classId.charAt(5)) {
-                case 'A':
-                    this.classSeason = "暑假";
-                    break;
-                case 'B':
-                    this.classSeason = "秋上";
-                    break;
-                case 'C':
-                    this.classSeason = "秋下";
-                    break;
-                case 'D':
-                    this.classSeason = "寒假";
-                    break;
-                case 'H':
-                    this.classSeason = "春季";
-                    break;
-                    //TODO 班级编码规则改变？
-                default:
-            }
+            //TODO 班级编码规则改变？
+            this.classSeason = SeasonEnum.getSeasonByCode(Character.toString(classId.charAt(5)));
 
             //校区
-            String no=classId.substring(6,8);
-            this.classCampus=CampusEnum.getCampusNameByCode(no);
+            String no = classId.substring(6, 8);
+            this.classCampus = CampusEnum.getCampusNameByCode(no);
         }
-        return this;
     }
 
     /**
      * 格式化地设置当前班级对象的上课教室, 如输入教室："YN 曹杨308教"；输出"308"
      *
      * @param classroom
-     * @return
      */
-    public Class setParsedClassroom(String classroom){
-        this.classroom=MyStringUtils.getMaxLengthNumberSubstring(classroom);
-        return this;
+    public void setParsedClassroom(String classroom) {
+        this.classroom = MyStringUtils.getMaxLengthNumberSubstring(classroom);
     }
 
     /**
      * 格式化地设置当前班级对象的上课时间和简化的上课时间,
-     *  如输入上课时间："(具体以课表为准)周六8:15-10:45(11.2,11.9休息,11.3,11.4上课)";
-     *  设置classTime="(具体以课表为准)周六8:15-10:45(11.2,11.9休息,11.3,11.4上课)"
-     *      classSimplifiedTime="8:15-10:45"
+     * 如输入上课时间："(具体以课表为准)周六8:15-10:45(11.2,11.9休息,11.3,11.4上课)";
+     * 设置classTime="(具体以课表为准)周六8:15-10:45(11.2,11.9休息,11.3,11.4上课)"
+     * classSimplifiedTime="8:15-10:45"
+     *
      * @param classTime
-     * @return
      */
-    public Class setParsedClassTime(String classTime){
-        this.classTime=classTime;
-        this.classSimplifiedTime=MyStringUtils.getParsedTime(classTime);
-        return this;
+    public void setParsedClassTime(String classTime) {
+        this.classTime = classTime;
+        this.classSimplifiedTime = MyStringUtils.getParsedTime(classTime);
+    }
+
+
+    /**
+     * 将输入对象的年份字段由yyyy-mm-dd转成yyyy
+     */
+    public void setParsedClassYear() {
+        String year = this.getClassYear();
+        this.setClassYear(parseYear(year));
     }
 }

@@ -7,7 +7,7 @@ package com.jzy.manager.exception;
  * @description 图形验证码错误的异常
  * @date 2019/11/15 9:35
  **/
-public class ImgCodeWrongException extends RuntimeException{
+public class ImgCodeWrongException extends Exception{
     public ImgCodeWrongException() {
     }
 

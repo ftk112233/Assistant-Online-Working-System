@@ -230,7 +230,7 @@
         //拖拽上传
         var uploadInst = upload.render({
             elem: '#headImg'
-            , url: '${ctx}/user/uploadUserIcon'
+            , url: '${ctx}/user/uploadPicture'
             , size: 1024 //KB
             , before: function (obj) {
                 //预读本地文件示例，不支持ie8

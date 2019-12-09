@@ -6,14 +6,16 @@ import com.jzy.dao.UserMapper;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.constant.SessionConstants;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.*;
-import com.jzy.model.dto.EmailVerifyCode;
-import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.UserSearchCondition;
+import com.jzy.model.RoleEnum;
+import com.jzy.model.dto.*;
 import com.jzy.model.entity.User;
+import com.jzy.model.entity.UserMessage;
 import com.jzy.service.UserService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -21,10 +23,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  **/
 @Service
 public class UserServiceImpl extends AbstractServiceImpl implements UserService {
-    private final static Logger logger = Logger.getLogger(UserServiceImpl.class);
+    private final static Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
     @Autowired
     private UserMapper userMapper;
@@ -105,7 +108,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     public User updateSessionUserInfo() {
         User originUser = getSessionUserInfo();
         if (originUser != null) {
-            if (!UserUtils.USER_ROLES.get(5).equals(originUser.getUserRole())) {
+            if (!RoleEnum.GUEST.equals(originUser.getUserRole())) {
                 //如果不是用游客号登陆的，根据id更新一下session中信息
                 User newUser = getUserById(originUser.getId());
                 ShiroUtils.getSession().setAttribute(SessionConstants.USER_INFO_SESSION_KEY, newUser);
@@ -119,7 +122,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     public EmailVerifyCode sendVerifyCodeToEmail(String userEmail) throws Exception {
         // 获取前端传入的参数
         String emailAddress = userEmail;
-        String verifyCode = CodeUtils.sixRandomCodes();
+        String verifyCode = CodeUtils.randomCodes();
         String emailMsg = "收到来自新东方优能中学助教工作平台的验证码：\n" + verifyCode + "\n有效时间: " + EmailVerifyCode.getValidTimeMinutes() + "分钟";
         try {
             // 邮件发送处理
@@ -157,15 +160,20 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     }
 
     @Override
-    public void updatePasswordByEmail(String userEmail, String userPassword) {
+    public long updatePasswordByEmail(String userEmail, String userPassword) {
         User user = userMapper.getUserByEmail(userEmail);
         userPassword = ShiroUtils.encryptUserPassword(userPassword, user.getUserSalt());
-        userMapper.updatePasswordByEmail(userEmail, userPassword);
+        return userMapper.updatePasswordByEmail(userEmail, userPassword);
     }
 
     @Override
-    public String uploadUserIcon(MultipartFile file) {
+    public String uploadUserIcon(MultipartFile file) throws InvalidParameterException {
         User user = userService.getSessionUserInfo();
+        return uploadUserIcon(file, user.getId().toString());
+    }
+
+    @Override
+    public String uploadUserIcon(MultipartFile file, String id) throws InvalidParameterException {
         if (file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
@@ -174,13 +182,20 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
 
         String originalFilename = file.getOriginalFilename();
-        String fileName = "user_icon_" + user.getId() + originalFilename.substring(originalFilename.lastIndexOf("."));
+        String idStr;
+        if (StringUtils.isEmpty(id)) {
+            //新用户设uuid作为头像名后缀
+            idStr = UUID.randomUUID().toString().replace("-", "_");
+        } else {
+            idStr = id;
+        }
+        String fileName = "user_icon_" + idStr + originalFilename.substring(originalFilename.lastIndexOf("."));
         String filePath = filePathProperties.getUploadUserIconPath();
         File dest = new File(filePath + fileName);
         try {
             file.transferTo(dest);
         } catch (IOException e) {
-            logger.error("id:" + user.getId() + "——用户头像上传失败");
+            logger.error("id:" + id + "——用户头像上传失败");
         }
         return fileName;
     }
@@ -216,7 +231,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
          */
         if (!StringUtils.isEmpty(user.getUserIcon())) {
             //如果用户上传了新头像
-            if (!originalUser.getUserIcon().equals(UserUtils.USER_ICON_DEFAULT)) {
+            if (!User.USER_ICON_DEFAULT.equals(originalUser.getUserIcon())) {
                 //如果用户原来的头像不是默认头像，需要将原来的头像删除
                 FileUtils.deleteFile(filePathProperties.getUploadUserIconPath() + originalUser.getUserIcon());
             }
@@ -235,19 +250,19 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     }
 
     @Override
-    public void updateEmailById(Long id, String userEmail) {
-        userMapper.updateEmailById(id, userEmail);
+    public long updateEmailById(Long id, String userEmail) {
+        return userMapper.updateEmailById(id, userEmail);
     }
 
     @Override
-    public void updatePhoneById(Long id, String userPhone) {
-        userMapper.updatePhoneById(id, userPhone);
+    public long updatePhoneById(Long id, String userPhone) {
+        return userMapper.updatePhoneById(id, userPhone);
     }
 
     @Override
-    public void updatePasswordById(Long id, String salt, String userPasswordNotEncrypted) {
+    public long updatePasswordById(Long id, String salt, String userPasswordNotEncrypted) {
         String userPasswordEncrypted = ShiroUtils.encryptUserPassword(userPasswordNotEncrypted, salt);
-        userMapper.updatePasswordById(id, userPasswordEncrypted);
+        return userMapper.updatePasswordById(id, userPasswordEncrypted);
     }
 
     @Override
@@ -322,23 +337,42 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             user.setUserPhone(null);
         }
 
+
+        /*
+         * 用户上传的头像的处理
+         */
+        if (!StringUtils.isEmpty(user.getUserIcon())) {
+            //如果用户上传了新头像
+            if (!User.USER_ICON_DEFAULT.equals(originalUser.getUserIcon())) {
+                //如果用户原来的头像不是默认头像，需要将原来的头像删除
+                FileUtils.deleteFile(filePathProperties.getUploadUserIconPath() + originalUser.getUserIcon());
+            }
+            //将上传的新头像文件重名为含日期时间的newUserIconName，该新文件名用来保存到数据库
+            String newUserIconName = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss").format(new Date()) + "_" + user.getUserIcon();
+            FileUtils.renameByName(filePathProperties.getUploadUserIconPath(), user.getUserIcon(), newUserIconName);
+            user.setUserIcon(newUserIconName);
+        } else {
+            //仍设置原头像
+            user.setUserIcon(originalUser.getUserIcon());
+        }
+
         userMapper.updateUserInfo(user);
         return Constants.SUCCESS;
     }
 
     @Override
-    public String insertUser(User user) {
+    public UpdateResult insertUser(User user) {
         if (!StringUtils.isEmpty(user.getUserWorkId())) {
             //新工号不为空
             if (getUserByWorkId(user.getUserWorkId()) != null) {
                 //添加的工号已存在
-                return "workIdRepeat";
+                return new UpdateResult("workIdRepeat");
             }
         } else {
             user.setUserWorkId(null);
         }
 
-        return insertUserWithUnrepeateWorkId(user);
+        return insertUserWithUnrepeatedWorkId(user);
     }
 
 
@@ -348,12 +382,12 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
      * @param user
      * @return
      */
-    private  String insertUserWithUnrepeateWorkId(User user) {
+    private UpdateResult insertUserWithUnrepeatedWorkId(User user) {
         if (!StringUtils.isEmpty(user.getUserIdCard())) {
             //新身份证不为空
             if (getUserByIdCard(user.getUserIdCard()) != null) {
                 //添加的身份证已存在
-                return "idCardRepeat";
+                return new UpdateResult("idCardRepeat");
             }
         } else {
             user.setUserIdCard(null);
@@ -362,14 +396,14 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         if (getUserByName(user.getUserName()) != null) {
             //添加的用户名已存在
-            return "nameRepeat";
+            return new UpdateResult("nameRepeat");
         }
 
         if (!StringUtils.isEmpty(user.getUserEmail())) {
             //新邮箱不为空
             if (getUserByEmail(user.getUserEmail()) != null) {
                 //添加的邮箱已存在
-                return "emailRepeat";
+                return new UpdateResult("emailRepeat");
             }
         } else {
             user.setUserEmail(null);
@@ -379,64 +413,131 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             //新手机不为空
             if (getUserByPhone(user.getUserPhone()) != null) {
                 //添加的电话已存在
-                return "phoneRepeat";
+                return new UpdateResult("phoneRepeat");
             }
         } else {
             user.setUserPhone(null);
         }
 
+        /*
+         * 用户密码，盐，用户头像等设置
+         */
+        user.setDefaultUserPasswordAndSalt();
+
+        user.setDefaultUserIcon();
+
+
+
+
+        UpdateResult result = new UpdateResult(Constants.SUCCESS);
         //执行插入
-        userMapper.insertUser(user);
-        return Constants.SUCCESS;
+        result.setInsertCount(userMapper.insertUser(user));
+
+
+        Long id=getUserByWorkId(user.getUserWorkId()).getId();
+        //向新用户发送欢迎消息
+        UserMessage message = new UserMessage();
+        message.setUserId(id);
+        message.setUserFromId(Constants.ADMIN_USER_ID);
+        message.setMessageTitle("欢迎使用AOWS-优能助教在线工作平台");
+        StringBuffer messageContent = new StringBuffer();
+        messageContent.append(user.getUserRole()+"-"+user.getUserRealName()).append("，欢迎使用AOWS-优能助教在线工作平台！")
+                .append("<br>为了您的账号安全，请尽快修改默认密码。也推荐绑定安全邮箱便于找回密码以及安全验证！")
+                .append("<br>常用功能：")
+                .append("<br>1. 我的班级信息：左边菜单栏>信息管理>班级信息，点击按钮\"查询我的班级\"。")
+                .append("<br>2. 做开班表格：完成1中的操作后，点击表格中的\"开班做表\"，跳转做表页面后，点击输出相应表格即可。")
+                .append("<br>3. 学生上课信息：左边菜单栏>信息管理>学员信息>上课信息，可以查询指定学生的上课记录。")
+                .append("<br>4. 登录方式之懒癌登录：懒癌登录方式的答案，可以在\"左边菜单栏>懒癌登录问题一览\"查询。你也可以将自己喜欢的问题添加到问题的随机池中！")
+                .append("<br>5. 用户角色权限说明：管理员>学管>助教长>助教=教师>游客。可在：用户>个人信息>基本资料，查看自己的角色。通过\"懒癌登录\"的用户角色是游客~");
+        message.setMessageContent(messageContent.toString());
+        message.setMessagePicture(UserMessage.WELCOME_PICTURE);
+        message.setMessageTime(new Date());
+        if (UserMessageUtils.isValidUserMessageUpdateInfo(message)) {
+            userMessageService.insertUserMessage(message);
+        }
+
+
+
+        return result;
+    }
+
+    /**
+     * 根据用户id删除用户头像文件
+     *
+     * @param id
+     */
+    private void deleteUserIconFileById(Long id) {
+        User user = getUserById(id);
+        if (user != null) {
+            /*
+             * 删除用户头像文件
+             */
+            if (!StringUtils.isEmpty(user.getUserIcon())) {
+                if (!user.getUserIcon().equals(User.USER_ICON_DEFAULT)) {
+                    //如果用户原来的头像不是默认头像，需要将原来的头像删除
+                    FileUtils.deleteFile(filePathProperties.getUploadUserIconPath() + user.getUserIcon());
+                }
+            }
+        }
+    }
+
+
+    @Override
+    public long deleteOneUserById(Long id) {
+        if (id == null) {
+            return 0;
+        }
+
+        deleteUserIconFileById(id);
+
+        return userMapper.deleteOneUserById(id);
     }
 
     @Override
-    public void deleteOneUserById(Long id) {
-        userMapper.deleteOneUserById(id);
+    public long deleteManyUsersByIds(List<Long> ids) {
+        if (ids == null || ids.size() == 0) {
+            return 0;
+        }
+
+        for (Long id : ids) {
+            deleteUserIconFileById(id);
+        }
+        return userMapper.deleteManyUsersByIds(ids);
     }
 
     @Override
-    public void deleteManyUsersByIds(List<Long> ids) {
-        userMapper.deleteManyUsersByIds(ids);
-    }
-
-    @Override
-    public String insertAndUpdateUsersFromExcel(List<User> users) throws Exception {
+    public UpdateResult insertAndUpdateUsersFromExcel(List<User> users) throws Exception {
+        UpdateResult result = new UpdateResult();
         for (User user : users) {
             if (UserUtils.isValidUserUpdateInfo(user)) {
-                insertAndUpdateOneUserFromExcel(user);
+                result.add(insertAndUpdateOneUserFromExcel(user));
             } else {
                 String msg = "表格输入用户user不合法!";
                 logger.error(msg);
                 throw new InvalidParameterException(msg);
             }
         }
-        return Constants.SUCCESS;
+        result.setResult(Constants.SUCCESS);
+        return result;
     }
 
     @Override
-    public String insertAndUpdateOneUserFromExcel(User user) throws Exception {
+    public UpdateResult insertAndUpdateOneUserFromExcel(User user) throws Exception {
         if (user == null) {
             String msg = "insertAndUpdateOneUserFromExcel方法输入用户user为null!";
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
 
-        User originalUser = getUserByWorkId(user.getUserWorkId());
-//        if (originalUser != null) {
-//            //工号已存在，更新
-//            if (!UserUtils.USER_ROLES.get(3).equals(originalUser.getUserRole())){
-//                //如果当前助教用户角色不是助教，设为null，这样在mapper中不会更新
-//                user.setUserRole(null);
-//            }
-//            updateUserByWorkId(originalUser, user);
-//        }
+        UpdateResult result = new UpdateResult();
 
+        User originalUser = getUserByWorkId(user.getUserWorkId());
         if (originalUser == null) {
             //插入
-            insertUserWithUnrepeateWorkId(user);
+            result.add(insertUserWithUnrepeatedWorkId(user));
         }
-        return Constants.SUCCESS;
+        result.setResult(Constants.SUCCESS);
+        return result;
     }
 
     @Override
@@ -496,5 +597,38 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         userMapper.updateUserByWorkId(newUser);
         return Constants.SUCCESS;
+    }
+
+    @Override
+    public String deleteUsersByCondition(UserSearchCondition condition) {
+        User userSession = getSessionUserInfo();
+
+        List<User> users = userMapper.listUsers(condition);
+        List<Long> ids = new ArrayList<>();
+        for (User user : users) {
+            if (user.getId().equals(userSession.getId())) {
+                //试图删除自己
+                return "noPermissionsToDeleteYourself";
+            }
+
+            if (RoleEnum.ASSISTANT_MANAGER.equals(userSession.getUserRole())) {
+                if (RoleEnum.ADMINISTRATOR.equals(user.getUserRole())) {
+                    //如果学管尝试删除管理员，无权限
+                    return "noPermissions";
+                }
+            }
+            ids.add(user.getId());
+        }
+
+        deleteManyUsersByIds(ids);
+        return Constants.SUCCESS;
+    }
+
+    @Override
+    public PageInfo<UserSendTo> listUsersSendTo(MyPage myPage, UserSendToSearchCondition condition) {
+        PageHelper.startPage(myPage.getPageNum(), myPage.getPageSize());
+        List<UserSendTo> users = (StringUtils.isEmpty(condition.getCommonSearch()) && StringUtils.isEmpty(condition.getUserRole()) && StringUtils.isEmpty(condition.getCampus()))
+                ? new ArrayList<>() : userMapper.listUsersSendTo(condition);
+        return new PageInfo<>(users);
     }
 }

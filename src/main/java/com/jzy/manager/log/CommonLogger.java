@@ -1,6 +1,7 @@
 package com.jzy.manager.log;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class CommonLogger {
-    private final static Logger logger = Logger.getLogger(CommonLogger.class);
+    private final static Logger logger = LogManager.getLogger(CommonLogger.class);
 
     private static final long METHOD_TIME = 3000;
 

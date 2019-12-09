@@ -44,6 +44,15 @@
                 </li>
             </ul>
             <ul class="layui-nav layui-layout-right" lay-filter="layadmin-layout-right">
+                <li class="layui-nav-item" lay-unselect>
+                    <a lay-href="${ctx}/user/message/page" layadmin-event="message" lay-text="我的消息">
+                        <i class="layui-icon layui-icon-notice"></i>
+                        <#if (countUnread>0) >
+                        <!-- 如果有新消息，则显示小圆点 -->
+                        <span class="layui-badge-dot"></span>
+                        </#if>
+                    </a>
+                </li>
                 <li class="layui-nav-item layui-hide-xs" lay-unselect>
                     <a href="javascript:;" layadmin-event="theme">
                         <i class="layui-icon layui-icon-theme"></i>
@@ -64,10 +73,10 @@
                         <dd><a lay-href="${ctx}/user/setPassword">修改密码</a></dd>
                         <dd><a lay-href="${ctx}/user/setEmail">修改绑定邮箱</a></dd>
                         <dd><a lay-href="${ctx}/user/setPhone">修改绑定手机</a></dd>
+                        <dd><a lay-href="${ctx}/user/message/page">消息中心</a></dd>
                         <dd style="text-align: center;"><a href="${ctx}/logout">退出</a></dd>
                     </dl>
                 </li>
-            <#--TODO-->
                 <li class="layui-nav-item layui-hide-xs" lay-unselect>
                     <a href="javascript:;" layadmin-event="about"><i
                             class="layui-icon layui-icon-more-vertical"></i></a>
@@ -94,9 +103,6 @@
                                 <a lay-href="${ctx}/console">控制台</a>
                             </dd>
                             <dd data-name="console">
-                                <a lay-href="${ctx}/comingSoon">可视化</a>
-                            </dd>
-                            <dd data-name="console">
                                 <a lay-href="${ctx}/problemCollection">问题收集</a>
                             </dd>
                         </dl>
@@ -107,6 +113,9 @@
                             <cite>信息管理</cite>
                         </a>
                         <dl class="layui-nav-child">
+                            <dd>
+                                <a lay-href="${ctx}/usefulInformation/admin/page">常用信息</a>
+                            </dd>
                             <dd data-name="content">
                                 <a href="javascript:;">学员信息</a>
                                 <dl class="layui-nav-child">
@@ -126,6 +135,9 @@
                             </dd>
                             <dd>
                                 <a lay-href="${ctx}/user/admin/page">用户信息</a>
+                            </dd>
+                            <dd>
+                                <a lay-href="${ctx}/question/admin/page">懒癌登录问题一览</a>
                             </dd>
                         </dl>
                     </li>
@@ -159,14 +171,40 @@
                             </dd>
                         </dl>
                     </li>
-                    <li data-name="set" class="layui-nav-item">
-                        <a href="javascript:;" lay-tips="设置" lay-direction="2">
-                            <i class="layui-icon layui-icon-set"></i>
-                            <cite>设置</cite>
+                    <li data-name="senior" class="layui-nav-item">
+                        <a href="javascript:;" lay-tips="高级应用" lay-direction="2">
+                            <i class="layui-icon layui-icon-senior"></i>
+                            <cite>高级应用</cite>
+                        </a>
+                        <dl class="layui-nav-child">
+                            <dd data-name="echarts">
+                                <a href="javascript:;">数据可视化</a>
+                                <dl class="layui-nav-child">
+                                    <dd><a lay-href="${ctx}/senior/echarts/stuNumPage">学生人数分析</a></dd>
+                                </dl>
+                                <dl class="layui-nav-child">
+                                    <dd><a lay-href="${ctx}/senior/echarts/stuNumSeniorPage">学生人数分析(高级)</a></dd>
+                                </dl>
+                            </dd>
+                            <dd data-name="echarts">
+                                <a href="javascript:;">排行榜</a>
+                                <dl class="layui-nav-child">
+                                    <dd><a lay-href="${ctx}/comingSoon">吃苦耐劳助教排行</a></dd>
+                                </dl>
+                                <dl class="layui-nav-child">
+                                    <dd><a lay-href="${ctx}/comingSoon">上课人数之最</a></dd>
+                                </dl>
+                            </dd>
+                        </dl>
+                    </li>
+                    <li data-name="user" class="layui-nav-item">
+                        <a href="javascript:;" lay-tips="用户" lay-direction="2">
+                            <i class="layui-icon layui-icon-user"></i>
+                            <cite>用户</cite>
                         </a>
                         <dl class="layui-nav-child">
                             <dd class="layui-nav-itemed">
-                                <a href="javascript:;">我的设置</a>
+                                <a href="javascript:;">个人信息</a>
                                 <dl class="layui-nav-child">
                                     <dd><a lay-href="${ctx}/user/setInfo">基本资料</a></dd>
                                     <dd><a lay-href="${ctx}/user/setPassword">修改密码</a></dd>
@@ -174,6 +212,21 @@
                                     <dd><a lay-href="${ctx}/user/setPhone">修改绑定手机</a></dd>
                                 </dl>
                             </dd>
+                            <dd class="layui-nav-itemed">
+                                <a href="javascript:;">消息中心</a>
+                                <dl class="layui-nav-child">
+                                    <dd><a lay-href="${ctx}/user/message/page">我的消息</a></dd>
+                                    <dd><a lay-href="${ctx}/user/message/send">发送消息</a></dd>
+                                </dl>
+                            </dd>
+                        </dl>
+                    </li>
+                    <li data-name="set" class="layui-nav-item">
+                        <a href="javascript:;" lay-tips="设置" lay-direction="2">
+                            <i class="layui-icon layui-icon-set"></i>
+                            <cite>设置</cite>
+                        </a>
+                        <dl class="layui-nav-child">
                             <dd class="layui-nav-itemed">
                                 <a href="javascript:;">系统设置</a>
                                 <dl class="layui-nav-child">

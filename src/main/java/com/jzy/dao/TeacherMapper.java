@@ -44,7 +44,7 @@ public interface TeacherMapper {
      * @param teacher 新添加教师的信息
      * @return
      */
-    void insertTeacher(Teacher teacher);
+    long insertTeacher(Teacher teacher);
 
     /**
      * 修改教师信息由工号修改
@@ -52,7 +52,7 @@ public interface TeacherMapper {
      * @param teacher 修改后的教师信息
      * @return
      */
-    void updateTeacherByWorkId(Teacher teacher);
+    long updateTeacherByWorkId(Teacher teacher);
 
     /**
      * 返回符合条件的教师信息分页结果
@@ -68,19 +68,27 @@ public interface TeacherMapper {
      * @param teacher 修改后的教师信息
      * @return
      */
-    void updateTeacherInfo(Teacher teacher);
+    long updateTeacherInfo(Teacher teacher);
 
     /**
      * 根据id删除一个教师
      *
      * @param id 教师id
      */
-    void deleteOneTeacherById(Long id);
+    long deleteOneTeacherById(Long id);
 
     /**
      * 根据id删除多个个教师
      *
      * @param ids 教师id的列表
      */
-    void deleteManyTeachersByIds(List<Long> ids);
+    long deleteManyTeachersByIds(List<Long> ids);
+
+    /**
+     * 根据输入条件删除指定的教师
+     *
+     * @param condition 输入条件封装
+     * @return
+     */
+    long deleteTeachersByCondition(TeacherSearchCondition condition);
 }

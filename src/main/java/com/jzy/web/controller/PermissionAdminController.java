@@ -4,21 +4,23 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.RoleAndPermissionUtils;
-import com.jzy.manager.util.UserUtils;
+import com.jzy.model.RoleEnum;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.RoleAndPermissionSearchCondition;
 import com.jzy.model.entity.RoleAndPermission;
+import com.jzy.model.entity.User;
 import com.jzy.model.vo.ResultMap;
 import com.jzy.model.vo.RoleCheckbox;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +36,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/permission/admin")
 public class PermissionAdminController extends AbstractController {
-    private final static Logger logger = Logger.getLogger(PermissionAdminController.class);
+    private final static Logger logger = LogManager.getLogger(PermissionAdminController.class);
 
     /**
      * 跳转权限管理页面
@@ -43,7 +45,7 @@ public class PermissionAdminController extends AbstractController {
      */
     @RequestMapping("/page")
     public String page(Model model) {
-        model.addAttribute(ModelConstants.ROLES_MODEL_KEY, JSON.toJSONString(UserUtils.USER_ROLES));
+        model.addAttribute(ModelConstants.ROLES_MODEL_KEY, JSON.toJSONString(User.ROLES));
         return "permission/admin/page";
     }
 
@@ -58,7 +60,7 @@ public class PermissionAdminController extends AbstractController {
     @RequestMapping("/getRoleAndPermission")
     @ResponseBody
     public ResultMap<List<RoleAndPermission>> getRoleAndPermission(MyPage myPage, RoleAndPermissionSearchCondition condition) {
-        PageInfo<RoleAndPermission> pageInfo = roleAndPermissionService.listRoleAndPerms(myPage,condition);
+        PageInfo<RoleAndPermission> pageInfo = roleAndPermissionService.listRoleAndPerms(myPage, condition);
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
     }
 
@@ -67,12 +69,12 @@ public class PermissionAdminController extends AbstractController {
      * 重定向到编辑角色权限iframe子页面并返回相应model
      *
      * @param model
-     * @param roleAndPermission  当前要被编辑的权限信息
+     * @param roleAndPermission 当前要被编辑的权限信息
      * @return
      */
     @RequestMapping("/updateForm")
     public String updateForm(Model model, RoleAndPermission roleAndPermission) {
-        model.addAttribute(ModelConstants.ROLES_MODEL_KEY, JSON.toJSONString(UserUtils.USER_ROLES));
+        model.addAttribute(ModelConstants.ROLES_MODEL_KEY, JSON.toJSONString(User.ROLES));
         model.addAttribute(ModelConstants.PERMISSION_EDIT_MODEL_KEY, roleAndPermission);
         return "permission/admin/permissionFormEdit";
     }
@@ -85,7 +87,7 @@ public class PermissionAdminController extends AbstractController {
      */
     @RequestMapping("/insertForm")
     public String addForm(Model model) {
-        model.addAttribute(ModelConstants.ROLES_MODEL_KEY, JSON.toJSONString(UserUtils.USER_ROLES));
+        model.addAttribute(ModelConstants.ROLES_MODEL_KEY, JSON.toJSONString(User.ROLES));
         return "permission/admin/permissionFormAdd";
     }
 
@@ -98,7 +100,7 @@ public class PermissionAdminController extends AbstractController {
      */
     @RequestMapping("/updateById")
     @ResponseBody
-    public Map<String, Object> updateById(RoleAndPermission roleAndPermission) {
+    public Map<String, Object> updateById(RoleAndPermission roleAndPermission) throws InvalidParameterException {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!RoleAndPermissionUtils.isValidRoleAndPermissionUpdateInfo(roleAndPermission)) {
@@ -114,69 +116,69 @@ public class PermissionAdminController extends AbstractController {
     /**
      * 角色权限管理中的添加角色权限请求
      *
-     * @param roleCheckbox 角色checkbox输入
+     * @param roleCheckbox      角色checkbox输入
      * @param roleAndPermission 新添加角色权限的信息
      * @return
      */
     @RequestMapping("/insert")
     @ResponseBody
-    public Map<String, Object> insert(RoleCheckbox roleCheckbox, RoleAndPermission roleAndPermission) {
+    public Map<String, Object> insert(RoleCheckbox roleCheckbox, RoleAndPermission roleAndPermission) throws InvalidParameterException {
         Map<String, Object> map = new HashMap<>(1);
 
-        List <RoleAndPermission> roleAndPermissions=new ArrayList<>();
+        List<RoleAndPermission> roleAndPermissions = new ArrayList<>();
 
-        if (roleCheckbox.isOnRole0()){
-            RoleAndPermission newRoleAndPermission=new RoleAndPermission();
-            newRoleAndPermission.setRole(UserUtils.USER_ROLES.get(0));
+        if (roleCheckbox.isOnRole0()) {
+            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
+            newRoleAndPermission.setRole(RoleEnum.ADMINISTRATOR.getRole());
             newRoleAndPermission.setPerm(roleAndPermission.getPerm());
             newRoleAndPermission.setRemark(roleAndPermission.getRemark());
             roleAndPermissions.add(newRoleAndPermission);
         }
-        if (roleCheckbox.isOnRole1()){
-            RoleAndPermission newRoleAndPermission=new RoleAndPermission();
-            newRoleAndPermission.setRole(UserUtils.USER_ROLES.get(1));
+        if (roleCheckbox.isOnRole1()) {
+            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
+            newRoleAndPermission.setRole(RoleEnum.ASSISTANT_MANAGER.getRole());
             newRoleAndPermission.setPerm(roleAndPermission.getPerm());
             newRoleAndPermission.setRemark(roleAndPermission.getRemark());
             roleAndPermissions.add(newRoleAndPermission);
         }
-        if (roleCheckbox.isOnRole2()){
-            RoleAndPermission newRoleAndPermission=new RoleAndPermission();
-            newRoleAndPermission.setRole(UserUtils.USER_ROLES.get(2));
+        if (roleCheckbox.isOnRole2()) {
+            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
+            newRoleAndPermission.setRole(RoleEnum.ASSISTANT_MASTER.getRole());
             newRoleAndPermission.setPerm(roleAndPermission.getPerm());
             newRoleAndPermission.setRemark(roleAndPermission.getRemark());
             roleAndPermissions.add(newRoleAndPermission);
         }
-        if (roleCheckbox.isOnRole3()){
-            RoleAndPermission newRoleAndPermission=new RoleAndPermission();
-            newRoleAndPermission.setRole(UserUtils.USER_ROLES.get(3));
+        if (roleCheckbox.isOnRole3()) {
+            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
+            newRoleAndPermission.setRole(RoleEnum.ASSISTANT.getRole());
             newRoleAndPermission.setPerm(roleAndPermission.getPerm());
             newRoleAndPermission.setRemark(roleAndPermission.getRemark());
             roleAndPermissions.add(newRoleAndPermission);
         }
-        if (roleCheckbox.isOnRole4()){
-            RoleAndPermission newRoleAndPermission=new RoleAndPermission();
-            newRoleAndPermission.setRole(UserUtils.USER_ROLES.get(4));
+        if (roleCheckbox.isOnRole4()) {
+            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
+            newRoleAndPermission.setRole(RoleEnum.TEACHER.getRole());
             newRoleAndPermission.setPerm(roleAndPermission.getPerm());
             newRoleAndPermission.setRemark(roleAndPermission.getRemark());
             roleAndPermissions.add(newRoleAndPermission);
         }
-        if (roleCheckbox.isOnRole5()){
-            RoleAndPermission newRoleAndPermission=new RoleAndPermission();
-            newRoleAndPermission.setRole(UserUtils.USER_ROLES.get(5));
+        if (roleCheckbox.isOnRole5()) {
+            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
+            newRoleAndPermission.setRole(RoleEnum.GUEST.getRole());
             newRoleAndPermission.setPerm(roleAndPermission.getPerm());
             newRoleAndPermission.setRemark(roleAndPermission.getRemark());
             roleAndPermissions.add(newRoleAndPermission);
         }
 
-        String result="";
+        String result = "";
         for (RoleAndPermission rap : roleAndPermissions) {
             if (!RoleAndPermissionUtils.isValidRoleAndPermissionInsertInfo(rap)) {
                 String msg = "insert方法错误入参";
                 logger.error(msg);
                 throw new InvalidParameterException(msg);
             }
-            result=roleAndPermissionService.insertRoleAndPermission(rap);
-            if ("roleAndPermRepeat".equals(result)){
+            result = roleAndPermissionService.insertRoleAndPermission(rap);
+            if ("roleAndPermRepeat".equals(result)) {
                 map.put("data", result);
                 return map;
             }
@@ -189,7 +191,7 @@ public class PermissionAdminController extends AbstractController {
     /**
      * 删除一个角色权限ajax交互
      *
-     * @param id  被删除角色权限的id
+     * @param id 被删除角色权限的id
      * @return
      */
     @RequestMapping("/deleteOne")

@@ -4,17 +4,19 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.StudentMapper;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.StudentUtils;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.StudentSearchCondition;
+import com.jzy.model.dto.UpdateResult;
 import com.jzy.model.entity.Student;
 import com.jzy.service.StudentService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.security.InvalidParameterException;
 import java.util.List;
 
 /**
@@ -26,7 +28,7 @@ import java.util.List;
  **/
 @Service
 public class StudentServiceImpl extends AbstractServiceImpl implements StudentService {
-    private final static Logger logger = Logger.getLogger(StudentServiceImpl.class);
+    private final static Logger logger = LogManager.getLogger(StudentServiceImpl.class);
 
     @Autowired
     private StudentMapper studentMapper;
@@ -38,23 +40,26 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
 
     @Override
     public Student getStudentByStudentId(String studentId) {
-        return StringUtils.isEmpty(studentId) ? null :studentMapper.getStudentByStudentId(studentId);
+        return StringUtils.isEmpty(studentId) ? null : studentMapper.getStudentByStudentId(studentId);
     }
 
     @Override
-    public String updateStudentByStudentId(Student student) {
-        if (StringUtils.isEmpty(student.getStudentSex())){
+    public UpdateResult updateStudentByStudentId(Student student) {
+        if (StringUtils.isEmpty(student.getStudentSex())) {
             student.setStudentSex(null);
         }
-        studentMapper.updateStudentByStudentId(student);
-        return Constants.SUCCESS;
+        long count=studentMapper.updateStudentByStudentId(student);
+        UpdateResult result=new UpdateResult();
+        result.setUpdateCount(count);
+        result.setResult(Constants.SUCCESS);
+        return result;
     }
 
     @Override
-    public String insertStudent(Student student) {
+    public UpdateResult insertStudent(Student student) {
         if (getStudentByStudentId(student.getStudentId()) != null) {
-            //添加的工号已存在
-            return "studentIdRepeat";
+            //添加的学号号已存在
+            return new UpdateResult("studentIdRepeat");
         }
 
         return insertStudentWithUnrepeatedStudentId(student);
@@ -66,78 +71,91 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
      * @param student
      * @return
      */
-    private  String insertStudentWithUnrepeatedStudentId(Student student) {
+    private UpdateResult insertStudentWithUnrepeatedStudentId(Student student) {
+        UpdateResult result=new UpdateResult();
         if (StringUtils.isEmpty(student.getStudentSex())) {
             student.setStudentSex(null);
         }
 
-        studentMapper.insertStudent(student);
-        return Constants.SUCCESS;
+        long count=studentMapper.insertStudent(student);
+        result.setInsertCount(count);
+        result.setResult(Constants.SUCCESS);
+        return result;
     }
 
     @Override
-    public String insertAndUpdateStudentsDetailedFromExcel(List<Student> students) throws Exception {
-        for (Student student:students){
-            if (StudentUtils.isValidStudentInfo(student)){
-                insertAndUpdateOneStudentDetailedFromExcel(student);
+    public UpdateResult insertAndUpdateStudentsDetailedFromExcel(List<Student> students) throws Exception {
+        UpdateResult result=new UpdateResult();
+        for (Student student : students) {
+            if (StudentUtils.isValidStudentInfo(student)) {
+                result.add(insertAndUpdateOneStudentDetailedFromExcel(student));
             } else {
                 String msg = "学生花名册读取到的student不合法!";
                 logger.error(msg);
                 throw new InvalidParameterException(msg);
             }
         }
-        return Constants.SUCCESS;
+        result.setResult(Constants.SUCCESS);
+        return result;
     }
 
     @Override
-    public String insertAndUpdateOneStudentDetailedFromExcel(Student student) throws Exception {
+    public UpdateResult insertAndUpdateOneStudentDetailedFromExcel(Student student) throws Exception {
         if (student == null) {
             String msg = "insertAndUpdateOneStudentFromExcel方法输入学生student为null!";
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
 
+        UpdateResult result=new UpdateResult(Constants.SUCCESS);
 
-        Student originalStudent=getStudentByStudentId(student.getStudentId());
+        Student originalStudent = getStudentByStudentId(student.getStudentId());
         if (originalStudent != null) {
             //学员编号已存在，更新
-            updateStudentByStudentId(student);
+            result.add(updateStudentByStudentId(student));
         } else {
-            insertStudentWithUnrepeatedStudentId(student);
+            result.add(insertStudentWithUnrepeatedStudentId(student));
         }
-        return Constants.SUCCESS;
+        return result;
     }
 
     @Override
-    public String insertAndUpdateStudentsFromExcel(List<Student> students) throws Exception {
-        for (Student student:students){
-            if (StudentUtils.isValidStudentInfo(student)){
-                insertAndUpdateOneStudentFromExcel(student);
+    public UpdateResult insertAndUpdateStudentsFromExcel(List<Student> students) throws Exception {
+        UpdateResult result=new UpdateResult();
+        for (Student student : students) {
+            if (StudentUtils.isValidStudentInfo(student)) {
+                UpdateResult resultTmp=insertAndUpdateOneStudentFromExcel(student);
+                result.add(resultTmp);
             } else {
                 String msg = "学生花名册读取到的student不合法!";
                 logger.error(msg);
                 throw new InvalidParameterException(msg);
             }
         }
-        return Constants.SUCCESS;
+        result.setResult(Constants.SUCCESS);
+        return result;
     }
 
     @Override
-    public String insertAndUpdateOneStudentFromExcel(Student student) throws Exception {
+    public UpdateResult insertAndUpdateOneStudentFromExcel(Student student) throws Exception {
         if (student == null) {
             String msg = "insertAndUpdateOneStudentFromExcel方法输入学生student为null!";
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
 
-        Student originalStudent=getStudentByStudentId(student.getStudentId());
+        UpdateResult result=new UpdateResult();
+
+        Student originalStudent = getStudentByStudentId(student.getStudentId());
         if (originalStudent != null) {
             //学员编号已存在，更新
-            studentMapper.updateStudentNameByStudentId(student);
+            long count=studentMapper.updateStudentNameByStudentId(student);
+            result.setUpdateCount(count);
         } else {
-            insertStudent(student);
+            result.add(insertStudentWithUnrepeatedStudentId(student));
         }
-        return Constants.SUCCESS;
+        result.setResult(Constants.SUCCESS);
+        return result;
     }
 
     @Override
@@ -168,13 +186,25 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
     }
 
     @Override
-    public void deleteOneStudentById(Long id) {
-        studentMapper.deleteOneStudentById(id);
+    public long deleteOneStudentById(Long id) {
+        if (id == null) {
+            return 0;
+        }
+        return studentMapper.deleteOneStudentById(id);
     }
 
     @Override
-    public void deleteManyStudentsByIds(List<Long> ids) {
-        studentMapper.deleteManyStudentsByIds(ids);
+    public long deleteManyStudentsByIds(List<Long> ids) {
+        if (ids == null ||ids.size() == 0){
+            return 0;
+        }
+        return studentMapper.deleteManyStudentsByIds(ids);
+    }
+
+    @Override
+    public String deleteStudentsByCondition(StudentSearchCondition condition) {
+        studentMapper.deleteStudentsByCondition(condition);
+        return Constants.SUCCESS;
     }
 
 }

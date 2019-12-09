@@ -97,7 +97,11 @@
                 type: "get",
                 url: "${ctx}/resetLoginQuestion",
                 success: function (res) {
-                    $("#question").html(res.question);
+                    if (res.msg === "noMoreQuestions") {
+                        return layer.msg("没有更多问题了!")
+                    } else {
+                        $("#question").html('Q: ' + res.question);
+                    }
                 },
                 dataType: "json"
             });
@@ -118,7 +122,7 @@
                 url: '${ctx}/loginTestByQuestion' //实际使用请改成服务端真实接口
                 , data: {"answer": field.answer}
                 , success: function (res) {
-                    if (res.data === "answerCorrect") {
+                    if (res.data === "success") {
                         //登入成功的提示与跳转
                         return layer.msg('登入成功', {
                             offset: '15px'
@@ -127,7 +131,7 @@
                         }, function () {
                             location.href = '${ctx}/index'; //后台主页
                         });
-                    } else if (res.data === "answerWrong") {
+                    } else if (res.data === "failure") {
                         layer.msg('回答错误', {
                             icon: 5,
                             anim: 6

@@ -15,7 +15,8 @@ import java.util.Properties;
  * @Version 1.0
  **/
 public class SendEmailUtils {
-    private SendEmailUtils(){}
+    private SendEmailUtils() {
+    }
 
     public static final String FROM = "929703621@qq.com"; // 谁发送
 
@@ -105,10 +106,11 @@ public class SendEmailUtils {
 
     /**
      * 使用加密的方式,利用465端口进行传输邮件,开启ssl
-     * @param emailAddressTo    为收件人邮箱
-     * @param emailMessage    发送的消息
+     *
+     * @param emailAddressTo 为收件人邮箱
+     * @param emailMessage   发送的消息
      */
-    public static void sendEncryptedEmail(String emailAddressTo,String emailSubject, String emailMessage) {
+    public static void sendEncryptedEmail(String emailAddressTo, String emailSubject, String emailMessage) {
         try {
             Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
             final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";

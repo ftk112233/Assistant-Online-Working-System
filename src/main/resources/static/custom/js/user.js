@@ -9,6 +9,7 @@ function isDigit(s) {
 function isUserIdCard(s) {
     return idCardNoUtil.checkIdCardNo(s);
 }
+
 //校验用户名：只能输入6-20个字母、数字、下划线，且字母开头
 function isUserName(s) {
     var patrn = /^[a-zA-Z](\w){5,19}$/;
@@ -89,10 +90,10 @@ var idCardNoUtil = {
     parityBit: ["1", "0", "X", "9", "8", "7", "6", "5", "4", "3", "2"],
 
     /*性别*/
-    genders: { male: "男", female: "女" },
+    genders: {male: "男", female: "女"},
 
     /*校验地址码*/
-    checkAddressCode: function(addressCode) {
+    checkAddressCode: function (addressCode) {
         var check = /^[1-9]\d{5}$/.test(addressCode);
         if (!check) return false;
         if (idCardNoUtil.provinceAndCitys[parseInt(addressCode.substring(0, 2))]) {
@@ -103,7 +104,7 @@ var idCardNoUtil = {
     },
 
     /*校验日期码*/
-    checkBirthDayCode: function(birDayCode) {
+    checkBirthDayCode: function (birDayCode) {
         var check = /^[1-9]\d{3}((0[1-9])|(1[0-2]))((0[1-9])|([1-2][0-9])|(3[0-1]))$/.test(birDayCode);
         if (!check) return false;
         var yyyy = parseInt(birDayCode.substring(0, 4), 10);
@@ -120,7 +121,7 @@ var idCardNoUtil = {
     },
 
     /*计算校检码*/
-    getParityBit: function(idCardNo) {
+    getParityBit: function (idCardNo) {
         var id17 = idCardNo.substring(0, 17);
         /*加权 */
         var power = 0;
@@ -133,7 +134,7 @@ var idCardNoUtil = {
     },
 
     /*验证校检码*/
-    checkParityBit: function(idCardNo) {
+    checkParityBit: function (idCardNo) {
         var parityBit = idCardNo.charAt(17).toUpperCase();
         if (idCardNoUtil.getParityBit(idCardNo) == parityBit) {
             return true;
@@ -143,7 +144,7 @@ var idCardNoUtil = {
     },
 
     /*校验15位或18位的身份证号码*/
-    checkIdCardNo: function(idCardNo) {
+    checkIdCardNo: function (idCardNo) {
         //15位和18位身份证号码的基本校验
         var check = /^\d{15}|(\d{17}(\d|x|X))$/.test(idCardNo);
         if (!check) return false;
@@ -158,7 +159,7 @@ var idCardNoUtil = {
     },
 
     //校验15位的身份证号码
-    check15IdCardNo: function(idCardNo) {
+    check15IdCardNo: function (idCardNo) {
         //15位身份证号码的基本校验
         var check = /^[1-9]\d{7}((0[1-9])|(1[0-2]))((0[1-9])|([1-2][0-9])|(3[0-1]))\d{3}$/.test(idCardNo);
         if (!check) return false;
@@ -172,7 +173,7 @@ var idCardNoUtil = {
     },
 
     //校验18位的身份证号码
-    check18IdCardNo: function(idCardNo) {
+    check18IdCardNo: function (idCardNo) {
         //18位身份证号码的基本格式校验
         var check = /^[1-9]\d{5}[1-9]\d{3}((0[1-9])|(1[0-2]))((0[1-9])|([1-2][0-9])|(3[0-1]))\d{3}(\d|x|X)$/.test(idCardNo);
         if (!check) return false;
@@ -188,7 +189,7 @@ var idCardNoUtil = {
         return idCardNoUtil.checkParityBit(idCardNo);
     },
 
-    formateDateCN: function(day) {
+    formateDateCN: function (day) {
         var yyyy = day.substring(0, 4);
         var mm = day.substring(4, 6);
         var dd = day.substring(6);
@@ -196,7 +197,7 @@ var idCardNoUtil = {
     },
 
     //获取信息
-    getIdCardInfo: function(idCardNo) {
+    getIdCardInfo: function (idCardNo) {
         var idCardInfo = {
             gender: "", //性别
             birthday: "" // 出生日期(yyyy-mm-dd)
@@ -223,7 +224,7 @@ var idCardNoUtil = {
     },
 
     /*18位转15位*/
-    getId15: function(idCardNo) {
+    getId15: function (idCardNo) {
         if (idCardNo.length == 15) {
             return idCardNo;
         } else if (idCardNo.length == 18) {
@@ -234,7 +235,7 @@ var idCardNoUtil = {
     },
 
     /*15位转18位*/
-    getId18: function(idCardNo) {
+    getId18: function (idCardNo) {
         if (idCardNo.length == 15) {
             var id17 = idCardNo.substring(0, 6) + '19' + idCardNo.substring(6);
             var parityBit = idCardNoUtil.getParityBit(id17);

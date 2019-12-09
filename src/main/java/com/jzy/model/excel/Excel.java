@@ -29,17 +29,20 @@ public class Excel implements Serializable, Resettable {
     /**
      * 工作簿对象
      */
-    @Getter protected Workbook workbook;
+    @Getter
+    protected Workbook workbook;
 
     /**
      * excel版本枚举对象
      */
-    @Getter protected ExcelVersionEnum version;
+    @Getter
+    protected ExcelVersionEnum version;
 
     /**
      * 输入文件路径
      */
-    @Getter private String inputFilePath;
+    @Getter
+    private String inputFilePath;
 
     /**
      * 输出流
@@ -49,16 +52,17 @@ public class Excel implements Serializable, Resettable {
     /**
      * 日期格式
      */
-    @Getter @Setter
+    @Getter
+    @Setter
     private String pattern;
 
-    public Excel() {}
+    public Excel() {
+    }
 
     /**
      * 由输入文件路径构造excel对象
      *
-     * @param inputFile
-     *            输入文件路径
+     * @param inputFile 输入文件路径
      * @throws IOException
      * @throws InputFileTypeException
      */
@@ -69,8 +73,7 @@ public class Excel implements Serializable, Resettable {
     /**
      * 由一个File构造excel对象
      *
-     * @param file
-     *            输入文件对象
+     * @param file 输入文件对象
      * @throws IOException
      * @throws InputFileTypeException
      */
@@ -91,10 +94,8 @@ public class Excel implements Serializable, Resettable {
     /**
      * 由一个输入流和版本枚举对象构造excel对象
      *
-     * @param inputStream
-     *            输入流对象
-     * @param version
-     *            excel版本的枚举对象
+     * @param inputStream 输入流对象
+     * @param version     excel版本的枚举对象
      * @throws IOException
      * @throws InputFileTypeException
      */
@@ -112,9 +113,8 @@ public class Excel implements Serializable, Resettable {
 
     /**
      * 由一个工作簿构造excel对象
-     * 
-     * @param workbook
-     *            工作簿对象
+     *
+     * @param workbook 工作簿对象
      */
     public Excel(Workbook workbook) {
         this.workbook = workbook;
@@ -132,8 +132,7 @@ public class Excel implements Serializable, Resettable {
     /**
      * 根据后缀判断是否为 Excel 文件，后缀匹配xls和xlsx
      *
-     * @param pathname
-     *            输入excel路径
+     * @param pathname 输入excel路径
      * @return
      */
     public static boolean isExcel(String pathname) {
@@ -156,8 +155,7 @@ public class Excel implements Serializable, Resettable {
     /**
      * 读取指定sheet 页所有数据
      *
-     * @param sheetIx
-     *            指定 sheet 页，从 0 开始
+     * @param sheetIx 指定 sheet 页，从 0 开始
      * @return
      * @throws Exception
      */
@@ -168,12 +166,9 @@ public class Excel implements Serializable, Resettable {
     /**
      * 读取指定sheet 页指定行数据
      *
-     * @param sheetIx
-     *            指定 sheet 页，从 0 开始
-     * @param start
-     *            指定开始行，从 0 开始
-     * @param end
-     *            指定结束行，从 0 开始
+     * @param sheetIx 指定 sheet 页，从 0 开始
+     * @param start   指定开始行，从 0 开始
+     * @param end     指定结束行，从 0 开始
      * @return
      * @throws Exception
      */
@@ -206,8 +201,7 @@ public class Excel implements Serializable, Resettable {
     /**
      * 将数据写入到 Excel 默认第一页中，从第1行开始写入
      *
-     * @param rowData
-     *            数据
+     * @param rowData 数据
      * @return
      * @throws IOException
      */
@@ -218,10 +212,8 @@ public class Excel implements Serializable, Resettable {
     /**
      * 将数据写入到 Excel 新创建的 Sheet 页
      *
-     * @param rowData
-     *            数据
-     * @param sheetName
-     *            长度为1-31，不能包含后面任一字符: ：\ / ? * [ ]
+     * @param rowData   数据
+     * @param sheetName 长度为1-31，不能包含后面任一字符: ：\ / ? * [ ]
      * @return
      * @throws IOException
      */
@@ -239,12 +231,9 @@ public class Excel implements Serializable, Resettable {
     /**
      * 将数据追加到sheet页最后
      *
-     * @param rowData
-     *            数据
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
-     * @param isAppend
-     *            是否追加,true 追加，false 重置sheet再添加
+     * @param rowData  数据
+     * @param sheetIx  指定 Sheet 页，从 0 开始
+     * @param isAppend 是否追加,true 追加，false 重置sheet再添加
      * @return
      * @throws IOException
      */
@@ -260,12 +249,9 @@ public class Excel implements Serializable, Resettable {
     /**
      * 将数据写入到 Excel 指定 Sheet 页指定开始行中,指定行后面数据向后移动
      *
-     * @param rowData
-     *            数据
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
-     * @param startRow
-     *            指定开始行，从 0 开始
+     * @param rowData  数据
+     * @param sheetIx  指定 Sheet 页，从 0 开始
+     * @param startRow 指定开始行，从 0 开始
      * @return
      * @throws IOException
      */
@@ -288,23 +274,17 @@ public class Excel implements Serializable, Resettable {
     /**
      * 将同一个值value设置在指定区域内的每一个单元格
      *
-     * @param sheetIx
-     *            sheet号
-     * @param value
-     *            值
-     * @param startColumn
-     *            起始列（含）
-     * @param endColumn
-     *            结束列（不含）
-     * @param startRow
-     *            起始行（含）
-     * @param endRow
-     *            结束行（不含）
+     * @param sheetIx     sheet号
+     * @param value       值
+     * @param startColumn 起始列（含）
+     * @param endColumn   结束列（不含）
+     * @param startRow    起始行（含）
+     * @param endRow      结束行（不含）
      * @return
      * @throws IOException
      */
     public boolean setRepeatValueAt(int sheetIx, String value, int startColumn, int endColumn, int startRow, int endRow)
-        throws IOException {
+            throws IOException {
         for (int i = startColumn; i < endColumn; i++) {
             for (int j = startRow; j < endRow; j++) {
                 this.setValueAt(sheetIx, j, i, value);
@@ -316,19 +296,15 @@ public class Excel implements Serializable, Resettable {
     /**
      * 将columnData中的列数据填充到指定位置
      *
-     * @param sheetIx
-     *            sheet号
-     * @param columnData
-     *            [[第一列数据], [第二列数据], [第三列数据], ....]
-     * @param startRow
-     *            起始的行位置
-     * @param startColumn
-     *            起始的列位置
+     * @param sheetIx     sheet号
+     * @param columnData  [[第一列数据], [第二列数据], [第三列数据], ....]
+     * @param startRow    起始的行位置
+     * @param startColumn 起始的列位置
      * @return
      * @throws IOException
      */
     public boolean modifyColumn(int sheetIx, List<List<String>> columnData, int startRow, int startColumn)
-        throws IOException {
+            throws IOException {
         int dataColumnCount = columnData.size();
         for (int i = startColumn; i < startColumn + dataColumnCount; i++) {
             int rowCount = columnData.get(i - startColumn).size();
@@ -343,10 +319,8 @@ public class Excel implements Serializable, Resettable {
     /**
      * 设置cell 样式
      *
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
-     * @param colIndex
-     *            指定列，从 0 开始
+     * @param sheetIx  指定 Sheet 页，从 0 开始
+     * @param colIndex 指定列，从 0 开始
      * @return
      * @throws IOException
      */
@@ -405,16 +379,11 @@ public class Excel implements Serializable, Resettable {
     /**
      * 合并单元格
      *
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
-     * @param firstRow
-     *            开始行
-     * @param lastRow
-     *            结束行
-     * @param firstCol
-     *            开始列
-     * @param lastCol
-     *            结束列
+     * @param sheetIx  指定 Sheet 页，从 0 开始
+     * @param firstRow 开始行
+     * @param lastRow  结束行
+     * @param firstCol 开始列
+     * @param lastCol  结束列
      */
     public void region(int sheetIx, int firstRow, int lastRow, int firstCol, int lastCol) {
         Sheet sheet = workbook.getSheetAt(sheetIx);
@@ -424,10 +393,8 @@ public class Excel implements Serializable, Resettable {
     /**
      * 指定行是否为空
      *
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
-     * @param rowIndex
-     *            指定开始行，从 0 开始
+     * @param sheetIx  指定 Sheet 页，从 0 开始
+     * @param rowIndex 指定开始行，从 0 开始
      * @return true 不为空，false 不行为空
      * @throws IOException
      */
@@ -439,10 +406,8 @@ public class Excel implements Serializable, Resettable {
     /**
      * 创建行，若行存在，则清空
      *
-     * @param sheetIx
-     *            指定 sheet 页，从 0 开始
-     * @param rowIndex
-     *            指定创建行，从 0 开始
+     * @param sheetIx  指定 sheet 页，从 0 开始
+     * @param rowIndex 指定创建行，从 0 开始
      * @return
      * @throws IOException
      */
@@ -455,12 +420,9 @@ public class Excel implements Serializable, Resettable {
     /**
      * 指定单元格是否为空
      *
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
-     * @param rowIndex
-     *            指定开始行，从 0 开始
-     * @param colIndex
-     *            指定开始列，从 0 开始
+     * @param sheetIx  指定 Sheet 页，从 0 开始
+     * @param rowIndex 指定开始行，从 0 开始
+     * @param colIndex 指定开始列，从 0 开始
      * @return true 行不为空，false 行为空
      * @throws IOException
      */
@@ -476,12 +438,9 @@ public class Excel implements Serializable, Resettable {
     /**
      * 创建单元格
      *
-     * @param sheetIx
-     *            指定 sheet 页，从 0 开始
-     * @param rowIndex
-     *            指定行，从 0 开始
-     * @param colIndex
-     *            指定创建列，从 0 开始
+     * @param sheetIx  指定 sheet 页，从 0 开始
+     * @param rowIndex 指定行，从 0 开始
+     * @param colIndex 指定创建列，从 0 开始
      * @return true 列为空，false 行不为空
      * @throws IOException
      */
@@ -495,8 +454,7 @@ public class Excel implements Serializable, Resettable {
     /**
      * 返回sheet 中的行数
      *
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
+     * @param sheetIx 指定 Sheet 页，从 0 开始
      * @return
      */
     public int getRowCount(int sheetIx) {
@@ -511,10 +469,8 @@ public class Excel implements Serializable, Resettable {
     /**
      * 返回所在行的列数
      *
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
-     * @param rowIndex
-     *            指定行，从0开始
+     * @param sheetIx  指定 Sheet 页，从 0 开始
+     * @param rowIndex 指定行，从0开始
      * @return 返回-1 表示所在行为空
      */
     public int getColumnCount(int sheetIx, int rowIndex) {
@@ -527,14 +483,10 @@ public class Excel implements Serializable, Resettable {
     /**
      * 设置row 和 column 位置的单元格值
      *
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
-     * @param rowIndex
-     *            指定行，从0开始
-     * @param colIndex
-     *            指定列，从0开始
-     * @param value
-     *            值
+     * @param sheetIx  指定 Sheet 页，从 0 开始
+     * @param rowIndex 指定行，从0开始
+     * @param colIndex 指定列，从0开始
+     * @param value    值
      * @return
      * @throws IOException
      */
@@ -547,16 +499,13 @@ public class Excel implements Serializable, Resettable {
     /**
      * 返回 row 和 column 位置的单元格值
      *
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
-     * @param rowIndex
-     *            指定行，从0开始
-     * @param colIndex
-     *            指定列，从0开始
+     * @param sheetIx  指定 Sheet 页，从 0 开始
+     * @param rowIndex 指定行，从0开始
+     * @param colIndex 指定列，从0开始
      * @return
      */
     public String getValueAt(int sheetIx, int rowIndex, int colIndex) {
-        if (rowIndex<0 || colIndex<0){
+        if (rowIndex < 0 || colIndex < 0) {
             return null;
         }
         Sheet sheet = workbook.getSheetAt(sheetIx);
@@ -566,12 +515,9 @@ public class Excel implements Serializable, Resettable {
     /**
      * 重置指定行的值
      *
-     * @param rowData
-     *            数据
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
-     * @param rowIndex
-     *            指定行，从0开始
+     * @param rowData  数据
+     * @param sheetIx  指定 Sheet 页，从 0 开始
+     * @param rowIndex 指定行，从0开始
      * @return
      * @throws IOException
      */
@@ -587,10 +533,8 @@ public class Excel implements Serializable, Resettable {
     /**
      * 返回指定行的值的集合
      *
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
-     * @param rowIndex
-     *            指定行，从0开始
+     * @param sheetIx  指定 Sheet 页，从 0 开始
+     * @param rowIndex 指定行，从0开始
      * @return
      */
     public List<String> getRowValue(int sheetIx, int rowIndex) {
@@ -610,12 +554,9 @@ public class Excel implements Serializable, Resettable {
     /**
      * 返回列的值的集合
      *
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
-     * @param rowIndex
-     *            指定行，从0开始
-     * @param colIndex
-     *            指定列，从0开始
+     * @param sheetIx  指定 Sheet 页，从 0 开始
+     * @param rowIndex 指定行，从0开始
+     * @param colIndex 指定列，从0开始
      * @return
      */
     public List<String> getColumnValue(int sheetIx, int rowIndex, int colIndex) {
@@ -652,8 +593,7 @@ public class Excel implements Serializable, Resettable {
     /**
      * 设置sheet名称，长度为1-31，不能包含后面任一字符: ：\ / ? * [ ]
      *
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始，//
+     * @param sheetIx 指定 Sheet 页，从 0 开始，//
      * @param name
      * @return
      * @throws IOException
@@ -666,8 +606,7 @@ public class Excel implements Serializable, Resettable {
     /**
      * 获取 sheet名称
      *
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
+     * @param sheetIx 指定 Sheet 页，从 0 开始
      * @return
      * @throws IOException
      */
@@ -679,8 +618,7 @@ public class Excel implements Serializable, Resettable {
     /**
      * 获取sheet的索引，从0开始
      *
-     * @param name
-     *            sheet 名称
+     * @param name sheet 名称
      * @return -1表示该未找到名称对应的sheet
      */
     public int getSheetIndex(String name) {
@@ -690,8 +628,7 @@ public class Excel implements Serializable, Resettable {
     /**
      * 删除指定sheet
      *
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
+     * @param sheetIx 指定 Sheet 页，从 0 开始
      * @return
      * @throws IOException
      */
@@ -701,11 +638,11 @@ public class Excel implements Serializable, Resettable {
     }
 
     /**
+     * @return boolean
      * @author JinZhiyun
      * @description 删除指定名称的sheet
      * @date 15:25 2019/10/30
      * @Param [sheetName]
-     * @return boolean
      **/
     public boolean removeSheetByName(String sheetName) throws IOException {
         workbook.removeSheetAt(getSheetIndex(sheetName));
@@ -715,10 +652,8 @@ public class Excel implements Serializable, Resettable {
     /**
      * 删除指定sheet中行，改变该行之后行的索引
      *
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
-     * @param rowIndex
-     *            指定行，从0开始
+     * @param sheetIx  指定 Sheet 页，从 0 开始
+     * @param rowIndex 指定行，从0开始
      * @return
      * @throws IOException
      */
@@ -740,12 +675,9 @@ public class Excel implements Serializable, Resettable {
     /**
      * 删除指定sheet中rowIndexStart（含）到rowIndexEnd（不含）的行，改变该行之后行的索引
      *
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
-     * @param rowIndexStart
-     *            起始行（含）
-     * @param rowIndexEnd
-     *            结束行（不含）
+     * @param sheetIx       指定 Sheet 页，从 0 开始
+     * @param rowIndexStart 起始行（含）
+     * @param rowIndexEnd   结束行（不含）
      * @return
      * @throws IOException
      */
@@ -759,10 +691,8 @@ public class Excel implements Serializable, Resettable {
     /**
      * 设置sheet 页的索引
      *
-     * @param sheetName
-     *            Sheet 名称
-     * @param sheetIx
-     *            Sheet 索引，从0开始
+     * @param sheetName Sheet 名称
+     * @param sheetIx   Sheet 索引，从0开始
      */
     public void setSheetOrder(String sheetName, int sheetIx) {
         workbook.setSheetOrder(sheetName, sheetIx);
@@ -771,8 +701,7 @@ public class Excel implements Serializable, Resettable {
     /**
      * 清空指定sheet页（先删除后添加并指定sheetIx）
      *
-     * @param sheetIx
-     *            指定 Sheet 页，从 0 开始
+     * @param sheetIx 指定 Sheet 页，从 0 开始
      * @return
      * @throws IOException
      */
@@ -800,19 +729,17 @@ public class Excel implements Serializable, Resettable {
     /**
      * 将当前修改保存到输出流
      *
-     * @param outputStream
-     *            输出流
+     * @param outputStream 输出流
      * @throws IOException
      */
     public void submitWrite(OutputStream outputStream) throws IOException {
-            this.workbook.write(outputStream);
+        this.workbook.write(outputStream);
     }
 
     /**
      * 将当前修改保存到outputPath对应的文件中
      *
-     * @param outputPath
-     *            输出文件的路径
+     * @param outputPath 输出文件的路径
      * @throws IOException
      */
     public void submitWrite(String outputPath) throws IOException {

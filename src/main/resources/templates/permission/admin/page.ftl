@@ -131,11 +131,11 @@
                 , {field: 'role', title: '角色' , width: 100,sort: true}
                 , {field: 'perm', title: '权限', sort: true}
                 , {field: 'remark', title: '备注', width: 600}
-                , {title: '操作', minWidth: 150, align: 'center', fixed: 'right', toolbar: '#table-content-list1'}
+                , {title: '操作', minWidth: 150, align: 'center', toolbar: '#table-content-list1'}
             ]]
             , page: true
             , limit: 10
-            , limits: [5, 10, 15, 20, 9999999]
+            , limits: [5, 10, 15, 20, 50]
             , request: {
                 pageName: 'pageNum',
                 limitName: 'pageSize'  //如不配置，默认为page=1&limit=10

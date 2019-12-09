@@ -1,8 +1,10 @@
 package com.jzy.web.controller;
 
 import com.google.code.kaptcha.Producer;
-import com.jzy.manager.util.ShiroUtils;
 import com.jzy.manager.constant.SessionConstants;
+import com.jzy.manager.util.ShiroUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.shiro.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,11 +21,13 @@ import java.awt.image.BufferedImage;
  * @version 1.0
  * @ClassName CodeController
  * @description 所有验证码相关服务（图形验证码、邮箱验证码。。。）的控制器
- *        这些请求应该在shiro中配置为匿名访问
+ * 这些请求应该在shiro中配置为匿名访问
  * @date 2019/11/14 14:35
  **/
 @Controller
-public class CodeController extends AbstractController{
+public class CodeController extends AbstractController {
+    private final static Logger logger = LogManager.getLogger(CodeController.class);
+
     @Autowired
     private Producer captchaProducer;
 

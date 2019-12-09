@@ -47,7 +47,16 @@ public abstract class AbstractController {
     protected MissLessonStudentService missLessonStudentService;
 
     @Autowired
-    protected RedisTemplate<String,Object> redisTemplate;
+    protected QuestionService questionService;
+
+    @Autowired
+    protected UsefulInformationService usefulInformationService;
+
+    @Autowired
+    protected UserMessageService userMessageService;
+
+    @Autowired
+    protected RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
     protected HashOperations<String, String, Object> hashOps;

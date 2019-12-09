@@ -10,9 +10,10 @@
     <resultMap id="BaseResultMap" type="com.jzy.model.entity.CampusAndClassroom" extends="BaseColumnResultMap">
         <result column="campus" property="campus" jdbcType="VARCHAR"/>
         <result column="classroom" property="classroom" jdbcType="VARCHAR"/>
+        <result column="classroom_capacity" property="classroomCapacity" jdbcType="INTEGER"/>
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
     </resultMap>
-    <insert id="insetCampusAndClassroom" parameterType="com.jzy.model.entity.CampusAndClassroom">
+    <insert id="insertCampusAndClassroom" parameterType="com.jzy.model.entity.CampusAndClassroom">
         insert into campus_classroom
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="campus != null and campus!=''">
@@ -20,6 +21,9 @@
             </if>
             <if test="classroom != null and classroom!=''" >
                 classroom,
+            </if>
+            <if test="classroomCapacity != null" >
+                classroom_capacity,
             </if>
             <if test="remark != null and remark!=''" >
                 remark,
@@ -31,6 +35,9 @@
             </if>
             <if test="classroom != null and classroom!=''" >
                 #{classroom},
+            </if>
+            <if test="classroomCapacity != null" >
+                #{classroomCapacity},
             </if>
             <if test="remark != null and remark!=''" >
                 #{remark},

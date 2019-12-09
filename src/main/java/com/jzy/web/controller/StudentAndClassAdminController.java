@@ -4,19 +4,23 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.ClassUtils;
 import com.jzy.manager.util.StudentAndClassUtils;
 import com.jzy.model.CampusEnum;
-import com.jzy.model.dto.*;
+import com.jzy.model.dto.MyPage;
+import com.jzy.model.dto.StudentAndClassDetailedDto;
+import com.jzy.model.dto.StudentAndClassSearchCondition;
+import com.jzy.model.entity.Class;
 import com.jzy.model.vo.ResultMap;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.security.InvalidParameterException;
 import java.util.*;
 
 /**
@@ -29,7 +33,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/studentAndClass/admin")
 public class StudentAndClassAdminController extends AbstractController {
-    private final static Logger logger = Logger.getLogger(StudentAndClassAdminController.class);
+    private final static Logger logger = LogManager.getLogger(StudentAndClassAdminController.class);
 
     /**
      * 跳转学员上课信息管理页面
@@ -42,11 +46,11 @@ public class StudentAndClassAdminController extends AbstractController {
         model.addAttribute(ModelConstants.CURRENT_SEASON_MODEL_KEY, ClassUtils.getCurrentSeason());
 
         model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
-        model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(ClassUtils.SEASONS));
+        model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(Class.SEASONS));
         model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
-        model.addAttribute(ModelConstants.GRADES_MODEL_KEY, JSON.toJSONString(ClassUtils.GRADES));
-        model.addAttribute(ModelConstants.SUBJECTS_MODEL_KEY, JSON.toJSONString(ClassUtils.SUBJECTS));
-        model.addAttribute(ModelConstants.TYPES_MODEL_KEY, JSON.toJSONString(ClassUtils.TYPES));
+        model.addAttribute(ModelConstants.GRADES_MODEL_KEY, JSON.toJSONString(Class.GRADES));
+        model.addAttribute(ModelConstants.SUBJECTS_MODEL_KEY, JSON.toJSONString(Class.SUBJECTS));
+        model.addAttribute(ModelConstants.TYPES_MODEL_KEY, JSON.toJSONString(Class.TYPES));
 
         model.addAttribute(ModelConstants.CLASS_ID_MODEL_KEY, classId);
         return "student/sc/admin/page";
@@ -90,9 +94,8 @@ public class StudentAndClassAdminController extends AbstractController {
      */
     @RequestMapping("/updateById")
     @ResponseBody
-    public Map<String, Object> updateById(@RequestParam(value = "currentTime",required = false) String currentTimeSwitch, StudentAndClassDetailedDto studentAndClassDetailedDto) {
+    public Map<String, Object> updateById(@RequestParam(value = "currentTime", required = false) String currentTimeSwitch, StudentAndClassDetailedDto studentAndClassDetailedDto) throws InvalidParameterException {
         Map<String, Object> map = new HashMap<>(1);
-
 
         if (!StudentAndClassUtils.isValidStudentAndClassUpdateDtoInfo(studentAndClassDetailedDto)) {
             String msg = "updateById方法错误入参";
@@ -100,7 +103,7 @@ public class StudentAndClassAdminController extends AbstractController {
             throw new InvalidParameterException(msg);
         }
 
-        if (Constants.ON.equals(currentTimeSwitch)){
+        if (Constants.ON.equals(currentTimeSwitch)) {
             //如果开启了使用当前时间作为进班时间
             studentAndClassDetailedDto.setRegisterTime(new Date());
         }
@@ -116,7 +119,7 @@ public class StudentAndClassAdminController extends AbstractController {
      * @return
      */
     @RequestMapping("/insertForm")
-    public String addForm(Model model) {
+    public String insertForm(Model model) {
         model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
         return "student/sc/admin/studentAndClassFormAdd";
     }
@@ -129,7 +132,7 @@ public class StudentAndClassAdminController extends AbstractController {
      */
     @RequestMapping("/insert")
     @ResponseBody
-    public Map<String, Object> insert(StudentAndClassDetailedDto studentAndClassDetailedDto) {
+    public Map<String, Object> insert(StudentAndClassDetailedDto studentAndClassDetailedDto) throws InvalidParameterException {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!StudentAndClassUtils.isValidStudentAndClassUpdateDtoInfo(studentAndClassDetailedDto)) {
@@ -138,7 +141,7 @@ public class StudentAndClassAdminController extends AbstractController {
             throw new InvalidParameterException(msg);
         }
 
-        map.put("data", studentAndClassService.insertStudentAndClass(studentAndClassDetailedDto));
+        map.put("data", studentAndClassService.insertStudentAndClass(studentAndClassDetailedDto).getResult());
 
         return map;
     }
@@ -177,6 +180,20 @@ public class StudentAndClassAdminController extends AbstractController {
         }
         studentAndClassService.deleteManyStudentAndClassesByIds(ids);
         map.put("data", Constants.SUCCESS);
+        return map;
+    }
+
+    /**
+     * 条件删除多个学生上课记录ajax交互
+     *
+     * @param condition 输入的查询条件
+     * @return
+     */
+    @RequestMapping("/deleteByCondition")
+    @ResponseBody
+    public Map<String, Object> deleteByCondition(StudentAndClassSearchCondition condition) {
+        Map<String, Object> map = new HashMap(1);
+        map.put("data", studentAndClassService.deleteStudentAndClassesByCondition(condition).getResult());
         return map;
     }
 }

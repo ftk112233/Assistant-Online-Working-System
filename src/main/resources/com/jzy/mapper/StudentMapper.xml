@@ -112,6 +112,30 @@
             #{id}
         </foreach>
     </delete>
+    <delete id="deleteStudentsByCondition" parameterType="com.jzy.model.dto.StudentSearchCondition">
+        delete s.* from student s
+        <where>
+            <if test="studentId != null and studentId!=''">
+                <bind name="studentIdLike" value=" '%' + studentId + '%' "/>
+                and s.student_id like #{studentIdLike}
+            </if>
+            <if test="studentName != null and studentName!=''">
+                <bind name="studentNameLike" value=" '%' + studentName + '%' "/>
+                and s.student_name like #{studentNameLike}
+            </if>
+            <if test="studentSex != null and studentSex!=''">
+                and s.student_sex=#{studentSex}
+            </if>
+            <if test="studentPhone != null and studentPhone!=''">
+                <bind name="studentPhoneLike" value=" '%' + studentPhone + '%' "/>
+                and s.student_phone like #{studentPhoneLike}
+            </if>
+            <if test="studentSchool != null and studentSchool!=''">
+                <bind name="studentSchoolLike" value=" '%' + studentSchool + '%' "/>
+                and s.student_school like #{studentSchoolLike}
+            </if>
+        </where>
+    </delete>
     <select id="getStudentById" resultMap="BaseResultMap">
         select * from student where id=#{id}
     </select>
@@ -170,6 +194,7 @@
             </if>
         </if>
     </select>
+
 
 
 </mapper>

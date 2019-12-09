@@ -138,6 +138,11 @@
                             lay-filter="query-my-missLessonStudent2-assistant"
                             lay-tips="在'查询补课到我班上的学生'的功能中，前面的所有查询条件都仍可使用~">查询补课到我班上的学生
                     </button>
+                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit
+                            lay-filter="deleteByCondition"
+                            id="deleteByCondition" lay-tips="'条件删除'将批量删除根据前面的查询条件查询出的所有记录，使用前请先查询预览这些记录是否正确！">
+                        条件删除
+                    </button>
                 </div>
             </div>
         </div>
@@ -238,7 +243,7 @@
                 , {field: 'currentTeacherName', title: '补课班任课教师', width: 150, sort: true}
                 , {field: 'date', title: '补课日期', width: 150, sort: true}
                 , {field: 'remark', title: '备注', hide: true}
-                , {title: '操作', minWidth: 150, align: 'center', fixed: 'right', toolbar: '#table-content-list1'}
+                , {title: '操作', minWidth: 150, align: 'center', toolbar: '#table-content-list1'}
             ]]
             , where: {
                 condition1: 'date',
@@ -246,7 +251,7 @@
             }
             , page: true
             , limit: 10
-            , limits: [5, 10, 15, 20, 9999999]
+            , limits: [5, 10, 15, 20, 50]
             , request: {
                 pageName: 'pageNum',
                 limitName: 'pageSize'  //如不配置，默认为page=1&limit=10
@@ -365,6 +370,50 @@
             });
         });
 
+        //监听搜索
+        form.on('submit(deleteByCondition)', function (data) {
+            var field = data.field;
+            console.log(field)
+            layer.confirm('确定要根据上述条件删除数据吗？', function (index) {
+                //执行 Ajax 后重载
+                $.ajax({
+                    type: 'post',
+                    data: {
+                        studentId : field.studentId
+                        , studentName : field.studentName
+                        , studentSex : field.sex
+                        , studentPhone : field.studentPhone
+                        , studentSchool : field.school
+                    },
+                    url: "${ctx}/missLessonStudent/admin/deleteByCondition",
+                    beforeSend: function (data) {
+                        layer.load(1, {shade: [0.1, '#fff']}); //上传loading
+                    }
+                    , success: function (data) {
+                        layer.closeAll('loading'); //关闭loading
+                        if (data.data === "success") {
+                            layer.msg('已删除');
+                            table.reload('missLessonStudentTable', {
+                                url: '${ctx}/missLessonStudent/admin/getMissLessonStudentInfo' //向后端默认传page和limit); //重载表格
+                                , request: {
+                                    pageName: 'pageNum',
+                                    limitName: 'pageSize'  //如不配置，默认为page=1&limit=10
+                                }
+                                , where: {
+                                }
+                                , page: {
+                                    curr: 1 //重新从第 1 页开始
+                                }
+                            });
+                        } else {
+                            layer.msg('无法完成操作');
+                        }
+                    }
+
+                });
+
+            });
+        });
 
         var $ = layui.$, active = {
             batchdel: function () {

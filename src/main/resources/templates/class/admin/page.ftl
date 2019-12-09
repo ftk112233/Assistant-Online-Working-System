@@ -51,9 +51,20 @@
                     </div>
                 </div>
                 <div class="layui-inline">
+                    <label class="layui-form-label">是否满班</label>
+                    <div class="layui-input-inline">
+                        <select name="isFull" id="isFull">
+                            <option value="">请选择班级状态</option>
+                            <option value="full">满班</option>
+                            <option value="notFull">未满</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
                     <label class="layui-form-label">助教</label>
                     <div class="layui-input-inline">
-                        <input type="text" name="assistantName" placeholder="请输入" autocomplete="off" class="layui-input">
+                        <input type="text" name="assistantName" placeholder="请输入" autocomplete="off"
+                               class="layui-input">
                     </div>
                 </div>
                 <div class="layui-inline">
@@ -65,7 +76,8 @@
                 <div class="layui-inline">
                     <label class="layui-form-label">上课时间</label>
                     <div class="layui-input-inline">
-                        <input type="text" name="classTime" placeholder="8:00-10:00" autocomplete="off" class="layui-input">
+                        <input type="text" name="classTime" placeholder="8:00-10:00" autocomplete="off"
+                               class="layui-input">
                     </div>
                 </div>
                 <div class="layui-inline">
@@ -131,9 +143,14 @@
                     </button>
                     <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #5FB878"
                             id="query-my-class-assistant" lay-submit
-                            lay-filter="query-my-class-assistant"  lay-tips="在'查询我的班级'的功能中，用到的查询条件只有：年份-季度、校区，确保这些条件正确即可~">查询我的班级
+                            lay-filter="query-my-class-assistant"
+                            lay-tips="在'查询我的班级'的功能中，用到的查询条件只有：年份-季度、校区，确保这些条件正确即可~">查询我的班级
                     </button>
-
+                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit
+                            lay-filter="deleteByCondition"
+                            id="deleteByCondition" lay-tips="'条件删除'将批量删除根据前面的查询条件查询出的所有记录，使用前请先查询预览这些记录是否正确！">
+                        条件删除
+                    </button>
                 </div>
             </div>
         </div>
@@ -152,6 +169,13 @@
                         class="layui-icon layui-icon-edit"></i>编辑</a>
                 <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i
                         class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>
+            <script type="text/html" id="buttonTpl">
+                {{#  if(d.full){ }}
+                <button class="layui-btn layui-btn-xs">满班</button>
+                {{#  } else { }}
+                <button class="layui-btn layui-btn-primary layui-btn-xs">未满</button>
+                {{#  } }}
             </script>
         </div>
     </div>
@@ -179,8 +203,8 @@
 
         laydate.render({
             elem: '#year'
-            ,type: 'year'
-            ,value: '${currentYear!""}'
+            , type: 'year'
+            , value: '${currentYear!""}'
         });
 
 
@@ -270,25 +294,27 @@
                 , {field: 'id', title: 'id', sort: true, hide: true}
                 , {field: 'createTime', title: '创建时间', sort: true, hide: true}
                 , {field: 'updateTime', title: '更新时间', sort: true, hide: true}
+                , {minWidth: 150, width: 200, align: 'center', title: '跳转', toolbar: '#test-table-operate-barDemo1'}
                 , {field: 'classId', title: '班级编码', width: 150, sort: true}
                 , {field: 'className', title: '班级名称', sort: true}
                 , {field: 'classCampus', title: '校区', width: 80, sort: true}
                 , {field: 'classGrade', title: '年级', width: 110, sort: true, hide: true}
                 , {field: 'classSubject', title: '学科', width: 80, sort: true, hide: true}
                 , {field: 'classType', title: '班型', width: 80, sort: true, hide: true}
-                , {field: 'classYear', title: '年份', width: 80, sort: true}
-                , {field: 'classSeason', title: '季度', width: 80, sort: true}
+                , {field: 'classYear', title: '年份', width: 80, sort: true, hide: true}
+                , {field: 'classSeason', title: '季度', width: 80, sort: true, hide: true}
                 , {field: 'classTime', title: '详细上课时间', hide: true}
                 , {field: 'classSimplifiedTime', title: '上课时间', width: 120}
-                , {field: 'classTimes', title: '上课次数', width: 110, hide: true}
+                , {field: 'classTimes', title: '上课次数', width: 100, hide: true}
                 , {field: 'assistantName', title: '助教', width: 110, sort: true}
                 , {field: 'teacherName', title: '任课教师', width: 110, sort: true}
                 , {field: 'classroom', title: '上课教室', width: 110}
                 , {field: 'classTeacherRequirement', title: '任课老师要求', hide: true}
                 , {field: 'classRemark', title: '备注', hide: true}
-                , {field: 'classStudentsCount', title: '班级人数', width: 110}
-                , {minWidth: 150, align: 'center', title: '跳转', toolbar: '#test-table-operate-barDemo1'}
-                , {title: '操作', minWidth: 150, align: 'center', fixed: 'right', toolbar: '#table-content-list1'}
+                , {field: 'classStudentsCount', title: '班级人数', width: 100}
+                , {field: 'classroomCapacity', title: '教室容量', width: 100}
+                ,{field: 'full', title: '班级状态', templet: '#buttonTpl', minWidth: 100, align: 'center'}
+                , {title: '操作', minWidth: 150, align: 'center', toolbar: '#table-content-list1'}
             ]]
             , where: {
                 classYear: '${currentYear!""}'
@@ -296,7 +322,7 @@
             }
             , page: true
             , limit: 10
-            , limits: [5, 10, 15, 20, 9999999]
+            , limits: [5, 10, 15, 20, 50]
             , request: {
                 pageName: 'pageNum',
                 limitName: 'pageSize'  //如不配置，默认为page=1&limit=10
@@ -344,6 +370,7 @@
         //监听查询我的班级
         form.on('submit(LAY-app-contcomm-search)', function (data) {
             var field = data.field;
+            console.log(field)
             //执行重载
             table.reload('classTables', {
                 url: '${ctx}/class/admin/getClassInfo' //向后端默认传page和limit
@@ -353,6 +380,7 @@
                     , classCampus: field.campus
                     , classId: field.classId
                     , className: field.className
+                    , isFull: field.isFull
                     , assistantName: field.assistantName
                     , teacherName: field.teacherName
                     , classTime: field.classTime
@@ -370,6 +398,61 @@
                 , page: {
                     curr: 1 //重新从第 1 页开始
                 }
+            });
+        });
+
+        //监听搜索
+        form.on('submit(deleteByCondition)', function (data) {
+            var field = data.field;
+            console.log(field)
+            layer.confirm('确定要根据上述条件删除数据吗？', function (index) {
+                //执行 Ajax 后重载
+                $.ajax({
+                    type: 'post',
+                    data: {
+                        classYear: field.year
+                        , classSeason: field.season
+                        , classCampus: field.campus
+                        , classId: field.classId
+                        , className: field.className
+                        , assistantName: field.assistantName
+                        , teacherName: field.teacherName
+                        , classTime: field.classTime
+                        , classGrade: field.grade
+                        , classSubject: field.subject
+                        , classType: field.type
+                        , classroom: field.classroom
+                    },
+                    url: "${ctx}/class/admin/deleteByCondition",
+                    beforeSend: function (data) {
+                        layer.load(1, {shade: [0.1, '#fff']}); //上传loading
+                    }
+                    , success: function (data) {
+                        layer.closeAll('loading'); //关闭loading
+                        if (data.data === "success") {
+                            layer.msg('已删除');
+                            table.reload('classTables', {
+                                url: '${ctx}/class/admin/getClassInfo' //向后端默认传page和limit); //重载表格
+                                , request: {
+                                    pageName: 'pageNum',
+                                    limitName: 'pageSize'  //如不配置，默认为page=1&limit=10
+                                }
+                                , where: { //设定异步数据接口的额外参数，任意设
+                                    classYear: field.year
+                                    , classSeason: field.season
+                                    , classCampus: field.campus
+                                }
+                                , page: {
+                                    curr: 1 //重新从第 1 页开始
+                                }
+                            });
+                        } else {
+                            layer.msg('无法完成操作');
+                        }
+                    }
+
+                });
+
             });
         });
 
@@ -503,10 +586,10 @@
         table.on('tool(LAY-app-content-comm)', function (obj) {
             var data = obj.data;
             if (obj.event === 'show-class-student') {
-                <#--location.href = '${ctx}/studentAndClass/admin/page';-->
+            <#--location.href = '${ctx}/studentAndClass/admin/page';-->
                 //打开一个新页面
                 var othis = $(this)
-                        , href = '${ctx}/studentAndClass/admin/page?classId='+data.classId
+                        , href = '${ctx}/studentAndClass/admin/page?classId=' + data.classId
                         , text = "上课信息"
                         , router = layui.router();
 
@@ -516,7 +599,8 @@
             } else if (obj.event === 'make-table') {
                 //打开一个新页面
                 var othis = $(this)
-                        , href = '${ctx}/toolbox/assistant/startClassExcel?classId='+data.classId+'&classCampus='+data.classCampus
+                        ,
+                        href = '${ctx}/toolbox/assistant/startClassExcel?classId=' + data.classId + '&classCampus=' + data.classCampus
                         , text = "开班做表魔法"
                         , router = layui.router();
 
@@ -556,9 +640,9 @@
                     ,
                     title: '编辑班级'
                     ,
-                    content: '${ctx}/class/admin/updateForm?id=' + data.id + '&classCampus=' + data.classCampus+ '&classGrade=' + data.classGrade
+                    content: '${ctx}/class/admin/updateForm?id=' + data.id + '&classCampus=' + data.classCampus + '&classGrade=' + data.classGrade
                     + '&classSubject=' + data.classSubject + '&classType=' + data.classType
-                    +'&classSeason=' + data.classSeason +'&classroom=' + data.classroom
+                    + '&classSeason=' + data.classSeason + '&classroom=' + data.classroom
                     ,
                     maxmin: true
                     ,

@@ -3,19 +3,20 @@ package com.jzy.web.controller;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.TeacherUtils;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.TeacherSearchCondition;
 import com.jzy.model.entity.Teacher;
 import com.jzy.model.vo.ResultMap;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,8 +31,8 @@ import java.util.Map;
  **/
 @Controller
 @RequestMapping("/teacher/admin")
-public class TeacherAdminController extends AbstractController{
-    private final static Logger logger = Logger.getLogger(TeacherAdminController.class);
+public class TeacherAdminController extends AbstractController {
+    private final static Logger logger = LogManager.getLogger(TeacherAdminController.class);
 
     /**
      * 跳转教师管理页面
@@ -78,7 +79,7 @@ public class TeacherAdminController extends AbstractController{
      */
     @RequestMapping("/updateById")
     @ResponseBody
-    public Map<String, Object> updateById( Teacher teacher) {
+    public Map<String, Object> updateById(Teacher teacher) throws InvalidParameterException {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!TeacherUtils.isValidTeacherUpdateInfo(teacher)) {
@@ -100,7 +101,7 @@ public class TeacherAdminController extends AbstractController{
      */
     @RequestMapping("/insert")
     @ResponseBody
-    public Map<String, Object> insert( Teacher teacher) {
+    public Map<String, Object> insert(Teacher teacher) throws InvalidParameterException {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!TeacherUtils.isValidTeacherUpdateInfo(teacher)) {
@@ -108,7 +109,7 @@ public class TeacherAdminController extends AbstractController{
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
-        map.put("data", teacherService.insertTeacher(teacher));
+        map.put("data", teacherService.insertTeacher(teacher).getResult());
 
         return map;
     }
@@ -147,6 +148,20 @@ public class TeacherAdminController extends AbstractController{
         }
         teacherService.deleteManyTeachersByIds(ids);
         map.put("data", Constants.SUCCESS);
+        return map;
+    }
+
+    /**
+     * 条件删除多个教师ajax交互
+     *
+     * @param condition 输入的查询条件
+     * @return
+     */
+    @RequestMapping("/deleteByCondition")
+    @ResponseBody
+    public Map<String, Object> deleteByCondition(TeacherSearchCondition condition) {
+        Map<String, Object> map = new HashMap(1);
+        map.put("data", teacherService.deleteTeachersByCondition(condition));
         return map;
     }
 }

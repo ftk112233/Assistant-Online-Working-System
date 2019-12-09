@@ -46,12 +46,20 @@ public interface MissLessonStudentService {
      * @param id 被删除补课学生的id
      * @return
      */
-    void deleteOneMissLessonStudentById(Long id);
+    long deleteOneMissLessonStudentById(Long id);
 
     /**
      * 根据id删除多个补课学生记录
      *
      * @param ids 补课学生id的列表
      */
-    void deleteManyMissLessonStudentsByIds(List<Long> ids);
+    long deleteManyMissLessonStudentsByIds(List<Long> ids);
+
+    /**
+     * 条件删除多个学补课生记录
+     *
+     * @param condition 输入的查询条件
+     * @return
+     */
+    String deleteMissLessonStudentsByCondition(MissLessonStudentSearchCondition condition);
 }

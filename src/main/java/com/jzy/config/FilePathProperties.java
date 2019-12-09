@@ -2,7 +2,6 @@ package com.jzy.config;
 
 import com.jzy.manager.util.FileUtils;
 import com.jzy.model.CampusEnum;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -16,11 +15,10 @@ import java.io.File;
  * @description 读取自定义资源文件FilePath.properties的配置类
  * @date 2019/11/18 10:37
  **/
-@Data
 @Configuration
 @PropertySource("classpath:myConfig/filePath.properties")
 public class FilePathProperties {
-    private static final String SEPARATOR =File.separator;
+    private static final String SEPARATOR = File.separator;
 
     @Value("${project.root.path}")
     private String root;
@@ -37,13 +35,19 @@ public class FilePathProperties {
     @Value("${toolbox.template.directory}")
     private String toolboxTemplateDirectory;
 
+    @Value("${upload.useful-information.image.directory}")
+    private String usefulInformationImageDirectory;
+
+    @Value("${user.message.picture.directory}")
+    private String userMessagePictureDirectory;
+
     /**
      * 返回用户上传头像所存储目录
      *
      * @return
      */
     public String getUploadUserIconPath() {
-        return root+ SEPARATOR +uploadUserIconDirectory+ SEPARATOR;
+        return root + SEPARATOR + uploadUserIconDirectory + SEPARATOR;
     }
 
     /**
@@ -52,7 +56,7 @@ public class FilePathProperties {
      * @return
      */
     public String getToolboxExamplePath() {
-        return root+ SEPARATOR +toolboxDirectory+ SEPARATOR +toolboxExampleDirectory+ SEPARATOR;
+        return root + SEPARATOR + toolboxDirectory + SEPARATOR + toolboxExampleDirectory + SEPARATOR;
     }
 
     /**
@@ -61,7 +65,7 @@ public class FilePathProperties {
      * @return
      */
     public String getToolboxExamplePathAndNameByKey(Integer key) {
-        return getToolboxExamplePath()+FileUtils.EXAMPLES.get(key);
+        return getToolboxExamplePath() + FileUtils.EXAMPLES.get(key);
     }
 
     /**
@@ -70,7 +74,7 @@ public class FilePathProperties {
      * @return
      */
     public String getToolboxTemplatePath() {
-        return root+ SEPARATOR +toolboxDirectory+ SEPARATOR +toolboxTemplateDirectory+ SEPARATOR;
+        return root + SEPARATOR + toolboxDirectory + SEPARATOR + toolboxTemplateDirectory + SEPARATOR;
     }
 
     /**
@@ -79,7 +83,7 @@ public class FilePathProperties {
      * @return
      */
     public String getToolboxAssistantTutorialTemplatePathAndName(String campus) {
-        return getToolboxTemplatePath()+CampusEnum.getCampusEnumByNameString(campus)+SEPARATOR+FileUtils.TEMPLATES.get(1);
+        return getToolboxTemplatePath() + CampusEnum.getCampusEnumByNameString(campus) + SEPARATOR + FileUtils.TEMPLATES.get(1);
     }
 
     /**
@@ -88,7 +92,7 @@ public class FilePathProperties {
      * @return
      */
     public String getToolboxSeatTableTemplatePathAndName(String campus) {
-        return getToolboxTemplatePath()+CampusEnum.getCampusEnumByNameString(campus)+SEPARATOR+FileUtils.TEMPLATES.get(2);
+        return getToolboxTemplatePath() + CampusEnum.getCampusEnumByNameString(campus) + SEPARATOR + FileUtils.TEMPLATES.get(2);
     }
 
     /**
@@ -97,6 +101,24 @@ public class FilePathProperties {
      * @return
      */
     public String getToolboxMissLessonTemplatePathAndName(String campus) {
-        return getToolboxTemplatePath()+CampusEnum.getCampusEnumByNameString(campus)+SEPARATOR+FileUtils.TEMPLATES.get(3);
+        return getToolboxTemplatePath() + CampusEnum.getCampusEnumByNameString(campus) + SEPARATOR + FileUtils.TEMPLATES.get(3);
+    }
+
+    /**
+     * 返回常用信息配图所存储目录
+     *
+     * @return
+     */
+    public String getUsefulInformationImageDirectory() {
+        return root + SEPARATOR + usefulInformationImageDirectory + SEPARATOR;
+    }
+
+    /**
+     * 返回用户消息配图所存储目录
+     *
+     * @return
+     */
+    public String getUserMessagePictureDirectory() {
+        return root + SEPARATOR + userMessagePictureDirectory + SEPARATOR;
     }
 }
