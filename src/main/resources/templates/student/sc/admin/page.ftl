@@ -27,6 +27,11 @@
                             <option value="">请选择季度</option>
                         </select>
                     </div>
+                    <div class="layui-input-inline">
+                        <select name="subSeason" id="subSeason">
+                            <option value="">请选择分期</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="layui-inline">
                     <label class="layui-form-label">校区</label>
@@ -191,7 +196,7 @@
         laydate.render({
             elem: '#year'
             ,type: 'year'
-            ,value: '${currentYear!""}'
+            ,value: '${currentClassSeason.classYear!""}'
         });
 
 
@@ -210,6 +215,15 @@
             str += '<option value="' + json + '">' + json + '</option>';
             $("#season").append(str);
         }
+
+        var subSeasons = eval('(' + '${subSeasons}' + ')');
+        for (var i = 0; i < subSeasons.length; i++) {
+            var json = subSeasons[i];
+            var str = "";
+            str += '<option value="' + json + '">' + json + '</option>';
+            $("#subSeason").append(str);
+        }
+
 
         var classIds = eval('(' + '${classIds}' + ')');
         for (var i = 0; i < classIds.length; i++) {
@@ -243,7 +257,8 @@
             $("#type").append(str);
         }
 
-        $("#season").val('${currentSeason!""}');
+        $("#season").val('${currentClassSeason.classSeason!""}');
+        $("#subSeason").val('${currentClassSeason.classSubSeason!""}');
 
         $("#condition1").val('registerTime');
         $("#condition2").val('asc');
@@ -287,7 +302,7 @@
                 , {field: 'updateTime', title: '更新时间', sort: true, hide: true}
                 , {field: 'studentId', title: '学员号', width: 150, sort: true}
                 , {field: 'studentName', title: '学员姓名', width: 120, sort: true}
-                , {field: 'classId', title: '班级编码', width: 150, hide: true, sort: true}
+                , {field: 'classId', title: '班级编码', width: 140, hide: true, sort: true}
                 , {field: 'className', title: '班级名称', sort: true}
                 , {field: 'classCampus', title: '校区', width: 80, sort: true}
                 , {field: 'classGrade', title: '年级', width: 110, sort: true, hide: true}
@@ -295,19 +310,21 @@
                 , {field: 'classType', title: '班型', width: 80, sort: true, hide: true}
                 , {field: 'classYear', title: '年份', width: 80, sort: true, hide: true}
                 , {field: 'classSeason', title: '季度', width: 80, sort: true, hide: true}
+                , {field: 'classSubSeason', title: '分期', width: 80, sort: true, hide: true}
                 , {field: 'classTime', title: '详细上课时间', hide: true}
-                , {field: 'classSimplifiedTime', title: '上课时间', width: 120}
+                , {field: 'classSimplifiedTime', title: '上课时间', width: 110}
                 , {field: 'classTimes', title: '上课次数', width: 110, hide: true}
                 , {field: 'assistantName', title: '助教', width: 110, sort: true}
                 , {field: 'teacherName', title: '任课教师', width: 110, sort: true}
-                , {field: 'classroom', title: '上课教室', width: 110}
+                , {field: 'classroom', title: '上课教室', width: 90}
                 , {field: 'registerTime', title: '进班时间', sort: true}
                 , {field: 'remark', title: '报班备注', hide: true}
                 , {title: '操作', minWidth: 150, align: 'center', toolbar: '#table-content-list1'}
             ]]
             , where: {
-                classYear: '${currentYear!""}'
-                , classSeason: '${currentSeason!""}'
+                classYear: $("#year").val()
+                , classSeason: $("#season").val()
+                , classSubSeason: $("#subSeason").val()
                 ,classId: '${classId!""}'
                 , condition1: 'registerTime'
                 , condition2: 'asc'
@@ -349,6 +366,7 @@
                     classYear: field.year
                     , classSeason: field.season
                     , classCampus: field.campus
+                    , classSubSeason: field.subSeason
                     , studentId : field.studentId
                     , studentName : field.studentName
                     , classId: field.classId
@@ -385,6 +403,7 @@
                     data: {
                         classYear: field.year
                         , classSeason: field.season
+                        , classSubSeason: field.subSeason
                         , classCampus: field.campus
                         , studentId : field.studentId
                         , studentName : field.studentName
@@ -465,9 +484,9 @@
                                         limitName: 'pageSize'  //如不配置，默认为page=1&limit=10
                                     }
                                     , where: {
-                                        classYear: '${currentYear!""}'
-                                        , classSeason: '${currentSeason!""}'
-                                        ,classId: '${classId!""}'
+                                        classYear: $("#year").val()
+                                        , classSeason: $("#season").val()
+                                        , classSubSeason: $("#subSeason").val()
                                         , condition1: 'registerTime'
                                         , condition2: 'asc'
                                     }

@@ -32,6 +32,11 @@ public class ModelConstants {
     public static final String SEASONS_MODEL_KEY = "seasons";
 
     /**
+     * 值为所有季度分期所对应的model键
+     */
+    public static final String SUB_SEASONS_MODEL_KEY = "subSeasons";
+
+    /**
      * 值为所有班级编码所对应的model键
      */
     public static final String CLASS_IDS_MODEL_KEY = "classIds";
@@ -53,13 +58,22 @@ public class ModelConstants {
 
     /**
      * 值为当前年份所对应的model键
+     *      改用对象{@link com.jzy.model.dto.CurrentClassSeason}包装
      */
+    @Deprecated
     public static final String CURRENT_YEAR_MODEL_KEY = "currentYear";
 
     /**
      * 值为当前季度所对应的model键
+     *      改用对象{@link com.jzy.model.dto.CurrentClassSeason}包装
      */
+    @Deprecated
     public static final String CURRENT_SEASON_MODEL_KEY = "currentSeason";
+
+    /**
+     * 值为当前开课年份季度分期所对应的model键
+     */
+    public static final String CURRENT_ClASS_SEASON_MODEL_KEY = "currentClassSeason";
 
     /**
      * 通过"查看该班学生"功能跳转学生插叙页面是，传递的班级编码的model键

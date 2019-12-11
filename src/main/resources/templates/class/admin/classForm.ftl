@@ -48,6 +48,12 @@
             </select>
         </div>
         <div class="layui-form-mid " style="color:#5FB878">*可解析</div>
+        <label class="layui-form-label">分期</label>
+        <div class="layui-input-inline">
+            <select name="subSeason" id="subSeason">
+                <option value="">请选择分期</option>
+            </select>
+        </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">曹杨</label>
@@ -168,6 +174,16 @@
             $("#season").append(str);
         }
         $("#season").val('${classEdit.classSeason!""}');
+
+
+        var subSeasons = eval('(' + '${subSeasons}' + ')');
+        for (var i = 0; i < subSeasons.length; i++) {
+            var json = subSeasons[i];
+            var str = "";
+            str += '<option value="' + json + '">' + json + '</option>';
+            $("#subSeason").append(str);
+        }
+        $("#subSeason").val('${classEdit.classSubSeason!""}');
 
         var grades = eval('(' + '${grades}' + ')');
         for (var i = 0; i < grades.length; i++) {

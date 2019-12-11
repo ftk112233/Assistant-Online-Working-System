@@ -13,6 +13,7 @@ import java.util.List;
 public enum SeasonEnum {
     SUMMER("暑假", "A"), AUTUMN_1("秋上", "B"),AUTUMN_2("秋下", "C"), WINTER("寒假", "D"), SPRING("春季", "H");
 
+
     private String season;
 
     /**
@@ -52,7 +53,7 @@ public enum SeasonEnum {
      * @param season 输入季度字串
      * @return
      */
-    public static boolean hasRole(String season) {
+    public static boolean hasSeason(String season) {
         for (SeasonEnum seasonEnum : SeasonEnum.values()) {
             if (seasonEnum.getSeason().equals(season)) {
                 return true;

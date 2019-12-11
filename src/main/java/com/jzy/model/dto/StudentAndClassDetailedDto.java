@@ -95,6 +95,11 @@ public class StudentAndClassDetailedDto extends BaseEntity {
     private String classSeason;
 
     /**
+     * 班级开设的季度的分期，如（暑假）一期、二期等等
+     */
+    private String classSubSeason;
+
+    /**
      * 班级上课时间详细描述，如周日8:00-10:：00
      */
     private String classTime;

@@ -33,6 +33,11 @@
                                         <option value="">请选择季度</option>
                                     </select>
                                 </div>
+                                <div class="layui-input-inline">
+                                    <select name="subSeason" id="subSeason">
+                                        <option value="">请选择分期</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="layui-inline">
                                 <label class="layui-form-label">校区</label>
@@ -104,7 +109,7 @@
         laydate.render({
             elem: '#year'
             , type: 'year'
-            , value: '${currentYear!""}'
+            , value: '${currentClassSeason.classYear!""}'
         });
 
 
@@ -123,7 +128,17 @@
             str += '<option value="' + json + '">' + json + '</option>';
             $("#season").append(str);
         }
-        $("#season").val('${currentSeason!""}');
+
+        var subSeasons = eval('(' + '${subSeasons}' + ')');
+        for (var i = 0; i < subSeasons.length; i++) {
+            var json = subSeasons[i];
+            var str = "";
+            str += '<option value="' + json + '">' + json + '</option>';
+            $("#subSeason").append(str);
+        }
+
+        $("#season").val('${currentClassSeason.classSeason!""}');
+        $("#subSeason").val('${currentClassSeason.classSubSeason!""}');
 
         form.render();
 
@@ -135,6 +150,7 @@
             data: {
                 classYear: $("#year").val()
                 ,classSeason:  $("#season").val()
+                ,classSubSeason:  $("#subSeason").val()
                 ,classCampus:  $("#campus").val()
             },
             url: "${ctx}/senior/getStudentTotalGroupByClassGradeAndType",
@@ -207,6 +223,7 @@
             data: {
                 classYear: $("#year").val()
                 ,classSeason:  $("#season").val()
+                ,classSubSeason:  $("#subSeason").val()
                 ,classCampus:  $("#campus").val()
             },
             url: "${ctx}/senior/getStudentTotalGroupByClassSubjectAndType",
@@ -283,6 +300,7 @@
                 data:{
                     classYear: field.year
                     ,classSeason:  field.season
+                    ,classSubSeason:  field.subSeason
                     ,classCampus:  field.campus
                 },
                 url: "${ctx}/senior/getStudentTotalGroupByClassGradeAndType",
@@ -301,6 +319,7 @@
                 data:{
                     classYear: field.year
                     ,classSeason:  field.season
+                    ,classSubSeason:  field.subSeason
                     ,classCampus:  field.campus
                 },
                 url: "${ctx}/senior/getStudentTotalGroupByClassSubjectAndType",

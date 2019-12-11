@@ -108,10 +108,10 @@
                             <i class="layui-icon layui-timeline-axis"></i>
                             <div class="layui-timeline-content layui-text">
                                 <h3 class="layui-timeline-title">STEP2: 导入排班表</h3>
-                                <p>这一步中，如果您是在原来的基础上更新排班表且有失效而取消的班级<b
+                                <p>这一步中，如果您是在原来的基础上更新排班表且有取消的班级<b
                                         style="color: red;">（如果有取消的班级必须进行以上操作，如原班级有4个：a、b、c、d，现在只有a、b、c；如果仅仅是修改或是新增，可以不用）</b>
                                     ，<b style="color: red;">必须先前往：信息管理>班级信息</b>，查询出当前<b
-                                        style="color: red;">年份-季度-校区</b>的班级记录，全部删除后，再执行以下步骤(<b style="color: red;">或勾选'先删后导'选项，推荐</b>)。为什么要这样做？
+                                        style="color: red;">年份-季度-校区</b>的班级记录，全部删除后，再执行以下步骤(<b style="color: red;">或勾选'先删后导'选项，推荐！</b>)。为什么要这样做？
                                     因为系统更新的原则：对于新的班级执行插入；对于修改过的班级执行更新；而对于已经不再有效的班级，系统无法从excel中悉知，因此需要先删除这些特例!<b style="color: red;">删除了班级后，其下的所有学生上课记录也将删除，因此如果执行了这一操作，必须再执行STEP3！</b>
                                 </p>
                                 <p>上传excel要求说明：<a
@@ -141,7 +141,7 @@
                             <div class="layui-form layui-form-item layui-timeline-content" style="margin-bottom: 20px;"
                                  id="div1-import-teacher-and-class" hidden="hidden">
                                 <label class="layui-form-label">自动解析&nbsp; <i class="layui-icon layui-icon-tips"
-                                                                              lay-tips="开启'自动解析'将自动根据2019年新东方班级编码规则从班级编码中解析出校区、季度、班型等信息。如果班号不符合此规则，可以关闭此选项，手动设置"></i></label>
+                                                                              lay-tips="开启'自动解析'将自动根据2019年新东方班级编码规则从班级编码中解析出校区、班型等信息。如果班号不符合此规则，可以关闭此选项，手动设置"></i></label>
                                 <div class="layui-input-inline">
                                     <input type="checkbox" name="parseClassId" id="parseClassId" lay-skin="switch"
                                            lay-text="ON|OFF"
@@ -154,6 +154,13 @@
                                            lay-text="ON|OFF"
                                            lay-filter="deleteFirst1">
                                 </div>
+                                <label class="layui-form-label">智能日历&nbsp; <i class="layui-icon layui-icon-tips"
+                                                                              lay-tips="开启'智能日历'将把当前选择导入的'年份-季度-分期'添加到缓存，在学生和班级信息查询时，系统将根据缓存智能勾选合适的'年份-季度-分期'"></i></label>
+                                <div class="layui-input-inline">
+                                    <input type="checkbox" name="chooseSeason" id="chooseSeason" lay-skin="switch"
+                                           lay-text="ON|OFF"
+                                           lay-filter="chooseSeason" checked>
+                                </div>
                             </div>
                             <div class="layui-form layui-form-item layui-timeline-content" style="margin-bottom: 20px;"
                                  id="div2-import-teacher-and-class" hidden="hidden">
@@ -163,10 +170,17 @@
                                            lay-verify="required">
                                 </div>
                                 <div class="layui-form-mid " style="color:red">*必填项</div>
-                                <label class="layui-form-label" id="season_l" hidden="hidden">季度</label>
-                                <div class="layui-input-inline" id="season_d" hidden="hidden">
-                                    <select name="season" id="season">
+                                <label class="layui-form-label" id="season_l">季度</label>
+                                <div class="layui-input-inline" id="season_d">
+                                    <select name="season" id="season" lay-verify="required">
                                         <option value="">请选择季度</option>
+                                    </select>
+                                </div>
+                                <div class="layui-form-mid " style="color:red">*必填项</div>
+                                <label class="layui-form-label" id="sub_season_l">分期</label>
+                                <div class="layui-input-inline" id="sub_season_d">
+                                    <select name="subSeason" id="subSeason">
+                                        <option value="">请选择分期</option>
                                     </select>
                                 </div>
                                 <label class="layui-form-label" id="campus_l" hidden="hidden">校区</label>
@@ -177,7 +191,6 @@
                                 </div>
                             </div>
                             <div class="layui-timeline-content layui-text" id="div-import-teacher-and-class"
-                            "
                             hidden="hidden">
                             <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel"
                                     style="background-color: #FFB800"
@@ -192,7 +205,7 @@
                         <h3 class="layui-timeline-title">STEP3: 导入学生花名册（从总部软件中导出的花名册）</h3>
                         <p>这一步中，如果您是在原来的基础上更新名单<b
                                 style="color: red;">（如果有退班的学生必须进行该操作；如果仅仅是转班或是新增，可以不用）</b>，<b style="color: red;">必须先前往：信息管理>学员信息>上课信息</b>，查询出当前<b
-                                style="color: red;">年份-季度-校区</b>的学生上课记录，全部删除后，再执行以下步骤(<b style="color: red;">或勾选'先删后导'选项，推荐</b>)。为什么要这样做？
+                                style="color: red;">年份-季度-校区</b>的学生上课记录，全部删除后，再执行以下步骤(<b style="color: red;">或勾选'先删后导'选项，推荐！</b>)。为什么要这样做？
                             因为系统更新的原则：对于新进班的学生执行插入；对于转班的学生执行更新；而对于退班的学生，系统无法从excel中悉知，因此需要先删除这些退班特例!</p>
                         <p>上传excel要求说明：<a
                                 href="${ctx}/toolbox/assistantAdministrator/downloadExample/3">查看范例</a></p>
@@ -361,8 +374,6 @@
             if (checked) {
                 $("#div1-import-teacher-and-class").show();
                 $("#div2-import-teacher-and-class").show();
-                $("#season_l").hide();
-                $("#season_d").hide();
                 $("#campus_l").hide();
                 $("#campus_d").hide();
                 $("#div-import-teacher-and-class").show();
@@ -378,14 +389,10 @@
             //开关是否开启，true或者false
             var checked = data.elem.checked;
             if (checked) {
-                $("#season_l").hide();
-                $("#season_d").hide();
                 $("#campus_l").hide();
                 $("#campus_d").hide();
 
             } else {
-                $("#season_l").show();
-                $("#season_d").show();
                 $("#campus_l").show();
                 $("#campus_d").show();
             }
@@ -403,7 +410,6 @@
             str += '<option value="' + json + '">' + json + '</option>';
             $("#campus").append(str);
         }
-        form.render('select');
 
         var seansons = eval('(' + '${seasons}' + ')');
         for (var i = 0; i < seansons.length; i++) {
@@ -411,6 +417,14 @@
             var str = "";
             str += '<option value="' + json + '">' + json + '</option>';
             $("#season").append(str);
+        }
+
+        var subSeasons = eval('(' + '${subSeasons}' + ')');
+        for (var i = 0; i < subSeasons.length; i++) {
+            var json = subSeasons[i];
+            var str = "";
+            str += '<option value="' + json + '">' + json + '</option>';
+            $("#subSeason").append(str);
         }
         form.render('select');
 
@@ -425,6 +439,9 @@
                 , classSeason: function () {
                     return $("#season").val();
                 }
+                , classSubSeason: function () {
+                    return $("#subSeason").val();
+                }
                 , classCampus: function () {
                     return $("#campus").val();
                 }
@@ -433,6 +450,9 @@
                 }
                 , deleteFirst: function () {
                     return  $("#deleteFirst1").prop("checked");
+                }
+                , chooseSeason: function () {
+                    return  $("#chooseSeason").prop("checked");
                 }
             }
             , accept: 'file' //普通文件
@@ -456,7 +476,12 @@
                         skin: 'layui-layer-lan'
                         ,closeBtn: 0
                     });
-                }else if (res.msg === "excelColumnNotFound") {
+                } else if (res.msg === "seasonInvalid") {
+                    return layer.alert('请选择正确的季度!', {
+                        skin: 'layui-layer-lan'
+                        ,closeBtn: 0
+                    });
+                } else if (res.msg === "excelColumnNotFound") {
                     return layer.alert('表格中有列属性名不符合规范!', {
                         skin: 'layui-layer-lan'
                         ,closeBtn: 0

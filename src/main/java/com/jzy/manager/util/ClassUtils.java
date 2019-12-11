@@ -1,7 +1,6 @@
 package com.jzy.manager.util;
 
-import com.jzy.model.CampusEnum;
-import com.jzy.model.SeasonEnum;
+import com.jzy.model.*;
 import com.jzy.model.dto.ClassDetailedDto;
 import com.jzy.model.entity.Class;
 import org.apache.commons.lang3.StringUtils;
@@ -32,15 +31,15 @@ public class ClassUtils {
     }
 
     public static boolean isValidClassGrade(String classGrade) {
-        return StringUtils.isEmpty(classGrade) || classGrade.length() <= 50;
+        return StringUtils.isEmpty(classGrade) || (GradeEnum.hasGrade(classGrade) && classGrade.length() <= 50);
     }
 
     public static boolean isValidClassSubject(String classSubject) {
-        return StringUtils.isEmpty(classSubject) || classSubject.length() <= 50;
+        return StringUtils.isEmpty(classSubject) || (SubjectEnum.hasSubject(classSubject) && classSubject.length() <= 50);
     }
 
     public static boolean isValidClassType(String classType) {
-        return StringUtils.isEmpty(classType) || classType.length() <= 20;
+        return StringUtils.isEmpty(classType) || (TypeEnum.hasType(classType) && classType.length() <= 20);
     }
 
     public static boolean isValidClassYear(String classYear) {
@@ -51,7 +50,11 @@ public class ClassUtils {
 //        return true;
 //    }
     public static boolean isValidClassSeason(String classSeason) {
-        return StringUtils.isEmpty(classSeason) || classSeason.length() <= 50;
+        return StringUtils.isEmpty(classSeason) || (SeasonEnum.hasSeason(classSeason) && classSeason.length() <= 50);
+    }
+
+    public static boolean isValidClassSubSeason(String classSubSeason) {
+        return StringUtils.isEmpty(classSubSeason) || (SubSeasonEnum.hasSubSeason(classSubSeason) && classSubSeason.length() <= 50);
     }
 
     public static boolean isValidClassTime(String classTime) {
@@ -96,7 +99,7 @@ public class ClassUtils {
         return clazz != null && isValidClassId(clazz.getClassId()) && isValidClassName(clazz.getClassName())
                 && isValidClassCampus(clazz.getClassCampus()) && isValidClassGrade(clazz.getClassGrade())
                 && isValidClassSubject(clazz.getClassSubject()) && isValidClassType(clazz.getClassType())
-                && isValidClassYear(clazz.getClassYear()) && isValidClassSeason(clazz.getClassSeason())
+                && isValidClassYear(clazz.getClassYear()) && isValidClassSeason(clazz.getClassSeason()) && isValidClassSubSeason(clazz.getClassSubSeason())
                 && isValidClassTime(clazz.getClassTime()) && isValidClassSimplifiedTime(clazz.getClassSimplifiedTime())
                 && isValidClassTimes(clazz.getClassTimes()) && isValidClassTeacherId(clazz.getClassTeacherId())
                 && isValidClassAssistantId(clazz.getClassAssistantId()) && isValidClassroom(clazz.getClassroom())

@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <label class="layui-form-label">原班级编码</label>
+                    <label class="layui-form-label">原班号</label>
                     <div class="layui-input-inline">
                         <select name="originalClassId" id="originalClassId" lay-search>
                             <option value="">请输入或选择班级编码</option>
@@ -58,14 +58,14 @@
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <label class="layui-form-label">原班上课教师</label>
+                    <label class="layui-form-label">原班教师</label>
                     <div class="layui-input-inline">
                         <input type="text" name="originalTeacherName" placeholder="请输入" autocomplete="off"
                                class="layui-input">
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <label class="layui-form-label">补课班级编码</label>
+                    <label class="layui-form-label">补课班号</label>
                     <div class="layui-input-inline">
                         <select name="currentClassId" id="currentClassId" lay-search>
                             <option value="">请输入或选择班级编码</option>
@@ -87,7 +87,7 @@
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <label class="layui-form-label">原班上课教师</label>
+                    <label class="layui-form-label">补课班教师</label>
                     <div class="layui-input-inline">
                         <input type="text" name="currentTeacherName" placeholder="请输入" autocomplete="off"
                                class="layui-input">
@@ -225,23 +225,23 @@
                 , {field: 'createTime', title: '创建时间', sort: true, hide: true}
                 , {field: 'updateTime', title: '更新时间', sort: true, hide: true}
                 , {field: 'studentId', title: '学员号', width: 180, sort: true, hide: true}
-                , {field: 'studentName', title: '学员姓名', width: 130, sort: true}
+                , {field: 'studentName', title: '学员姓名', width: 110, sort: true}
                 , {field: 'studentPhone', title: '手机', width: 120, hide: true}
                 , {field: 'originalClassId', title: '原班号', width: 150, sort: true, hide: true}
                 , {field: 'originalClassName', title: '原班级名称', sort: true}
                 , {field: 'originalClassTime', title: '原班详细上课时间', width: 150, hide: true}
                 , {field: 'originalClassSimplifiedTime', title: '原班上课时间', width: 120, hide: true}
-                , {field: 'originalClassroom', title: '原班上课教室', width: 150, hide: true}
-                , {field: 'originalAssistantName', title: '原班助教', width: 130, sort: true}
-                , {field: 'originalTeacherName', title: '原班任课教师', width: 150, sort: true}
+                , {field: 'originalClassroom', title: '原班教室', width: 90, hide: true}
+                , {field: 'originalAssistantName', title: '原班助教', width: 110, sort: true}
+                , {field: 'originalTeacherName', title: '原班教师', width: 110, sort: true}
                 , {field: 'currentClassId', title: '补课班号', width: 150, sort: true, hide: true}
                 , {field: 'currentClassName', title: '补课班级名称', sort: true}
                 , {field: 'currentClassTime', title: '补课班详细上课时间', width: 160}
                 , {field: 'currentClassSimplifiedTime', title: '补课班上课时间', width: 120, hide: true}
-                , {field: 'currentClassroom', title: '补课班上课教室', width: 150}
-                , {field: 'currentAssistantName', title: '补课班助教', width: 130, sort: true}
-                , {field: 'currentTeacherName', title: '补课班任课教师', width: 150, sort: true}
-                , {field: 'date', title: '补课日期', width: 150, sort: true}
+                , {field: 'currentClassroom', title: '补课班教室', width: 100}
+                , {field: 'currentAssistantName', title: '补课班助教', width: 120, sort: true}
+                , {field: 'currentTeacherName', title: '补课班教师', width: 120, sort: true}
+                , {field: 'date', title: '补课日期', width: 110, sort: true}
                 , {field: 'remark', title: '备注', hide: true}
                 , {title: '操作', minWidth: 150, align: 'center', toolbar: '#table-content-list1'}
             ]]

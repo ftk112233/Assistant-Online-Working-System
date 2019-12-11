@@ -4,12 +4,10 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.ClassMapper;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.ClassUtils;
-import com.jzy.model.dto.ClassDetailedDto;
-import com.jzy.model.dto.ClassSearchCondition;
-import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.UpdateResult;
+import com.jzy.model.dto.*;
 import com.jzy.model.entity.Class;
 import com.jzy.service.ClassService;
 import org.apache.commons.lang3.StringUtils;
@@ -159,8 +157,8 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
                 classDetailedDtos.set(i, classDetailedDto);
             }
 
-            if (classDetailedDto.getClassStudentsCount() >= classDetailedDto.getClassroomCapacity()){
-                //慢班判断
+            if (classDetailedDto.getClassroomCapacity() == null || classDetailedDto.getClassStudentsCount() >= classDetailedDto.getClassroomCapacity()){
+                //满班判断
                 classDetailedDto.setFull(true);
             }
         }
@@ -228,5 +226,20 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
         UpdateResult result=new UpdateResult(Constants.SUCCESS);
         result.setDeleteCount(count);
         return result;
+    }
+
+    @Override
+    public CurrentClassSeason getCurrentClassSeason() {
+        CurrentClassSeason currentClassSeason=new CurrentClassSeason();
+        String key=RedisConstants.CURRENT_SEASON_KEY;
+        if (redisTemplate.hasKey(key)) {
+            //缓存中有
+            currentClassSeason= (CurrentClassSeason) valueOps.get(key);
+            return currentClassSeason;
+        }
+        //缓存中无，采用默认策略
+        currentClassSeason.setClassYear(ClassUtils.getCurrentYear());
+        currentClassSeason.setClassSeason(ClassUtils.getCurrentSeason());
+        return currentClassSeason;
     }
 }

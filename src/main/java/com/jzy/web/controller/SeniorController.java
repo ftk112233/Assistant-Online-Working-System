@@ -2,7 +2,6 @@ package com.jzy.web.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.jzy.manager.constant.ModelConstants;
-import com.jzy.manager.util.ClassUtils;
 import com.jzy.manager.util.TypeComparator;
 import com.jzy.model.CampusEnum;
 import com.jzy.model.dto.StudentAndClassSearchCondition;
@@ -43,11 +42,11 @@ public class SeniorController extends AbstractController {
      */
     @RequestMapping("/echarts/stuNumPage")
     public String stuNumPage(Model model) {
-        model.addAttribute(ModelConstants.CURRENT_YEAR_MODEL_KEY, ClassUtils.getCurrentYear());
-        model.addAttribute(ModelConstants.CURRENT_SEASON_MODEL_KEY, ClassUtils.getCurrentSeason());
+        model.addAttribute(ModelConstants.CURRENT_ClASS_SEASON_MODEL_KEY, classService.getCurrentClassSeason());
 
         model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(Class.SEASONS));
         model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
+        model.addAttribute(ModelConstants.SUB_SEASONS_MODEL_KEY, JSON.toJSONString(Class.SUB_SEASONS));
         return "senior/echarts/stuNum";
     }
 
@@ -112,11 +111,11 @@ public class SeniorController extends AbstractController {
      */
     @RequestMapping("/echarts/stuNumSeniorPage")
     public String stuNumSeniorPage(Model model) {
-        model.addAttribute(ModelConstants.CURRENT_YEAR_MODEL_KEY, ClassUtils.getCurrentYear());
-        model.addAttribute(ModelConstants.CURRENT_SEASON_MODEL_KEY, ClassUtils.getCurrentSeason());
+        model.addAttribute(ModelConstants.CURRENT_ClASS_SEASON_MODEL_KEY, classService.getCurrentClassSeason());
 
         model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(Class.SEASONS));
         model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
+        model.addAttribute(ModelConstants.SUB_SEASONS_MODEL_KEY, JSON.toJSONString(Class.SUB_SEASONS));
         return "senior/echarts/stuNumSenior";
     }
 

@@ -123,6 +123,7 @@ public class StudentAdminController extends AbstractController {
                             StudentAndClassSearchCondition condition = new StudentAndClassSearchCondition();
                             condition.setClassYear(clazz.getClassYear());
                             condition.setClassSeason(clazz.getClassSeason());
+                            condition.setClassSubSeason(clazz.getClassSubSeason());
                             condition.setClassCampus(clazz.getClassCampus());
                             databaseDeleteRowCount += (int) studentAndClassService.deleteStudentAndClassesByCondition(condition).getDeleteCount();
                         }

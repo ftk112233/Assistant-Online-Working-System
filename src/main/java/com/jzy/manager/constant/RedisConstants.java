@@ -67,4 +67,9 @@ public class RedisConstants {
      * 常用信息的缓存额过期时间，21天
      */
     public static final long USEFUL_INFORMATION_EXPIRE = 21;
+
+    /**
+     * 当前季度的缓存的键
+     */
+    public static final String CURRENT_SEASON_KEY = ROOT_KEY + ":currentSeason";
 }

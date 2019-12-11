@@ -70,6 +70,11 @@ public class StudentAndClassSearchCondition extends SearchCondition {
     private String classSeason;
 
     /**
+     * 班级开设的季度的分期，如（暑假）一期、二期等等
+     */
+    private String classSubSeason;
+
+    /**
      * 班级上课时间
      */
     private String classTime;

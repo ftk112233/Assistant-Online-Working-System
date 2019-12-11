@@ -43,6 +43,12 @@
             </div>
         </div>
         <div class="layui-form-mid " style="color:#5FB878">*可解析</div>
+        <label class="layui-form-label">分期</label>
+        <div class="layui-input-inline">
+            <div class="layui-input-inline">
+                <input type="text" name="subSeason" autocomplete="off" class="layui-input" value="${classPreview.classSubSeason!""}" readonly>
+            </div>
+        </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">曹杨</label>

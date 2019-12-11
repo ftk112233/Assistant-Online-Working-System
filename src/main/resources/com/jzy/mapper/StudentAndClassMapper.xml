@@ -29,6 +29,7 @@
         <result column="class_type" property="classType" jdbcType="VARCHAR"/>
         <result column="class_year" property="classYear" jdbcType="VARCHAR"/>
         <result column="class_season" property="classSeason" jdbcType="VARCHAR"/>
+        <result column="class_sub_season" property="classSubSeason" jdbcType="VARCHAR"/>
         <result column="class_time" property="classTime" jdbcType="VARCHAR"/>
         <result column="class_simplified_time" property="classSimplifiedTime" jdbcType="VARCHAR"/>
         <result column="class_times" property="classTimes" jdbcType="INTEGER"/>
@@ -119,6 +120,9 @@
             <if test="classSeason != null and classSeason!=''">
                 and c.class_season=#{classSeason}
             </if>
+            <if test="classSubSeason != null and classSubSeason!=''">
+                and c.class_sub_season=#{classSubSeason}
+            </if>
             <if test="classCampus != null and classCampus!=''">
                 and c.class_campus=#{classCampus}
             </if>
@@ -187,7 +191,7 @@
         select sc.id, sc.create_time, sc.update_time,sc.register_time,sc.remark,
           s.student_id,s.student_name,s.student_sex,s.student_phone,s.student_phone_backup,s.student_school,
           class_tmp.class_id,class_tmp.class_name,class_tmp.class_campus,class_tmp.class_grade,class_tmp.class_subject,
-        class_tmp.class_type,class_tmp.class_year,class_tmp.class_season,class_tmp.class_time,class_tmp.class_simplified_time,
+        class_tmp.class_type,class_tmp.class_year,class_tmp.class_season,class_tmp.class_sub_season,class_tmp.class_time,class_tmp.class_simplified_time,
         class_tmp.class_times,class_tmp.assistant_name,class_tmp.teacher_name,class_tmp.classroom
         from (select c.*, a.assistant_name as assistant_name, t.teacher_name as teacher_name
         from class c left join assistant a on c.class_assistant_id = a.id left join teacher t on c.class_teacher_id = t.id
@@ -197,6 +201,9 @@
             </if>
             <if test="classSeason != null and classSeason!=''">
                 and c.class_season=#{classSeason}
+            </if>
+            <if test="classSubSeason != null and classSubSeason!=''">
+                and c.class_sub_season=#{classSubSeason}
             </if>
             <if test="classCampus != null and classCampus!=''">
                 and c.class_campus=#{classCampus}
@@ -326,7 +333,7 @@
         select sc.id, sc.create_time, sc.update_time,sc.register_time,sc.remark,
         s.student_id,s.student_name,s.student_sex,s.student_phone,s.student_phone_backup,s.student_school,
         class_tmp.class_id,class_tmp.class_name,class_tmp.class_campus,class_tmp.class_grade,class_tmp.class_subject,
-        class_tmp.class_type,class_tmp.class_year,class_tmp.class_season,class_tmp.class_time,class_tmp.class_simplified_time,
+        class_tmp.class_type,class_tmp.class_year,class_tmp.class_season,class_tmp.class_sub_season,class_tmp.class_time,class_tmp.class_simplified_time,
         class_tmp.class_times,class_tmp.assistant_name,class_tmp.teacher_name,class_tmp.classroom,class_tmp.class_teacher_requirement
         from (select c.*, a.assistant_name as assistant_name, t.teacher_name as teacher_name
         from class c left join assistant a on c.class_assistant_id = a.id left join teacher t on c.class_teacher_id = t.id
@@ -338,7 +345,7 @@
         select sc.id, sc.create_time, sc.update_time,sc.register_time,sc.remark,
         s.student_id,s.student_name,s.student_sex,s.student_phone,s.student_phone_backup,s.student_school,
         c.class_id,c.class_name,c.class_campus,c.class_grade,c.class_subject,
-        c.class_type,c.class_year,c.class_season,c.class_time,c.class_simplified_time,
+        c.class_type,c.class_year,c.class_season,c.class_sub_season,c.class_time,c.class_simplified_time,
         c.class_times,c.classroom,c.class_teacher_requirement
         from class c, student_class sc, student s
         <where>
@@ -356,6 +363,9 @@
             <if test="classSeason != null and classSeason!=''">
                 and c.class_season=#{classSeason}
             </if>
+            <if test="classSubSeason != null and classSubSeason!=''">
+                and c.class_sub_season=#{classSubSeason}
+            </if>
             <if test="classCampus != null and classCampus!=''">
                 and c.class_campus=#{classCampus}
             </if>
@@ -372,6 +382,9 @@
             <if test="classSeason != null and classSeason!=''">
                 and c.class_season=#{classSeason}
             </if>
+            <if test="classSubSeason != null and classSubSeason!=''">
+                and c.class_sub_season=#{classSubSeason}
+            </if>
             <if test="classCampus != null and classCampus!=''">
                 and c.class_campus=#{classCampus}
             </if>
@@ -387,6 +400,9 @@
             </if>
             <if test="classSeason != null and classSeason!=''">
                 and c.class_season=#{classSeason}
+            </if>
+            <if test="classSubSeason != null and classSubSeason!=''">
+                and c.class_sub_season=#{classSubSeason}
             </if>
             <if test="classCampus != null and classCampus!=''">
                 and c.class_campus=#{classCampus}

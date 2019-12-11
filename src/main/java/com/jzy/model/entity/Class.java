@@ -24,6 +24,8 @@ public class Class extends BaseEntity {
 
     public static final List<String> SEASONS = SeasonEnum.getSeasonsList();
 
+    public static final List<String> SUB_SEASONS = SubSeasonEnum.getSubSeasonsList();
+
     public static final List<String> GRADES = GradeEnum.getGradesList();
 
     public static final List<String> SUBJECTS = SubjectEnum.getSubjectsList();
@@ -71,6 +73,11 @@ public class Class extends BaseEntity {
      * 班级开设的季度，如春季，暑假等，可以为空，长度不超过50
      */
     private String classSeason;
+
+    /**
+     * 班级开设的季度的分期，如（暑假）一期、二期等等
+     */
+    private String classSubSeason;
 
     /**
      * 班级上课时间详细描述，如周日8:00-10:：00，可以为空，长度不超过50

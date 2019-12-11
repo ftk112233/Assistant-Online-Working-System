@@ -1,10 +1,7 @@
 package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jzy.model.dto.ClassDetailedDto;
-import com.jzy.model.dto.ClassSearchCondition;
-import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.UpdateResult;
+import com.jzy.model.dto.*;
 import com.jzy.model.entity.Class;
 
 import java.util.List;
@@ -127,4 +124,11 @@ public interface ClassService {
      * @return
      */
     UpdateResult deleteClassesByCondition(ClassSearchCondition condition);
+
+    /**
+     * 获得当前开课的年份-季度-分期
+     *      如有缓存，从缓存中取；无则返回默认的智能选择结果
+     * @return
+     */
+    CurrentClassSeason getCurrentClassSeason();
 }

@@ -4,16 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
+import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.exception.ExcelColumnNotFoundException;
 import com.jzy.manager.exception.InputFileTypeException;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.ClassUtils;
 import com.jzy.manager.util.UserMessageUtils;
 import com.jzy.model.CampusEnum;
-import com.jzy.model.dto.ClassDetailedDto;
-import com.jzy.model.dto.ClassSearchCondition;
-import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.UpdateResult;
+import com.jzy.model.dto.*;
 import com.jzy.model.entity.Assistant;
 import com.jzy.model.entity.Class;
 import com.jzy.model.entity.User;
@@ -60,7 +58,7 @@ public class ClassAdminController extends AbstractController {
     @RequestMapping("/import")
     @ResponseBody
     public Map<String, Object> importExcel(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam("parseClassId") boolean parseClassIdChecked,
-                                           @RequestParam("deleteFirst") boolean deleteFirstChecked, Class clazz) throws InvalidParameterException {
+                                           @RequestParam("deleteFirst") boolean deleteFirstChecked, @RequestParam("chooseSeason") boolean chooseSeason, Class clazz) throws InvalidParameterException {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>();
         //返回layui规定的文件上传模块JSON格式
@@ -70,6 +68,11 @@ public class ClassAdminController extends AbstractController {
 
         if (clazz == null || StringUtils.isEmpty(clazz.getClassYear()) || !ClassUtils.isValidClassYear(clazz.getClassYear())) {
             map.put("msg", "yearInvalid");
+            return map;
+        }
+
+        if (clazz == null || StringUtils.isEmpty(clazz.getClassSeason()) || !ClassUtils.isValidClassSeason(clazz.getClassSeason())) {
+            map.put("msg", "seasonInvalid");
             return map;
         }
 
@@ -123,11 +126,15 @@ public class ClassAdminController extends AbstractController {
             List<ClassDetailedDto> classDetailedDtos = excel.getClassDetailedDtos();
             for (ClassDetailedDto classDetailedDto : classDetailedDtos) {
                 classDetailedDto.setClassYear(clazz.getClassYear());
+                if (!StringUtils.isEmpty(clazz.getClassSeason())) {
+                    classDetailedDto.setClassSeason(clazz.getClassSeason());
+                }
+                if (!StringUtils.isEmpty(clazz.getClassSubSeason())) {
+                    classDetailedDto.setClassSubSeason(clazz.getClassSubSeason());
+                }
+
                 if (!parseClassIdChecked) {
                     //未开启自动解析
-                    if (!StringUtils.isEmpty(clazz.getClassSeason())) {
-                        classDetailedDto.setClassSeason(clazz.getClassSeason());
-                    }
                     if (!StringUtils.isEmpty(clazz.getClassCampus())) {
                         classDetailedDto.setClassCampus(clazz.getClassCampus());
                     }
@@ -141,6 +148,7 @@ public class ClassAdminController extends AbstractController {
                     ClassSearchCondition condition = new ClassSearchCondition();
                     condition.setClassYear(dto.getClassYear());
                     condition.setClassSeason(dto.getClassSeason());
+                    condition.setClassSubSeason(dto.getClassSubSeason());
                     condition.setClassCampus(dto.getClassCampus());
                     databaseDeleteRowCount += (int) classService.deleteClassesByCondition(condition).getDeleteCount();
                 }
@@ -186,6 +194,12 @@ public class ClassAdminController extends AbstractController {
                         }
                     }
                 }
+
+                if (chooseSeason) {
+                    //缓存当前的年份季度分期
+                    CurrentClassSeason currentClassSeason = new CurrentClassSeason(classDetailedDto.getClassYear(), classDetailedDto.getClassSeason(), classDetailedDto.getClassSubSeason());
+                    valueOps.set(RedisConstants.CURRENT_SEASON_KEY, currentClassSeason);
+                }
             }
 
 
@@ -206,11 +220,11 @@ public class ClassAdminController extends AbstractController {
      */
     @RequestMapping("/page")
     public String page(Model model) {
-        model.addAttribute(ModelConstants.CURRENT_YEAR_MODEL_KEY, ClassUtils.getCurrentYear());
-        model.addAttribute(ModelConstants.CURRENT_SEASON_MODEL_KEY, ClassUtils.getCurrentSeason());
+        model.addAttribute(ModelConstants.CURRENT_ClASS_SEASON_MODEL_KEY, classService.getCurrentClassSeason());
 
         model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
         model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(Class.SEASONS));
+        model.addAttribute(ModelConstants.SUB_SEASONS_MODEL_KEY, JSON.toJSONString(Class.SUB_SEASONS));
         model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
         model.addAttribute(ModelConstants.GRADES_MODEL_KEY, JSON.toJSONString(Class.GRADES));
         model.addAttribute(ModelConstants.SUBJECTS_MODEL_KEY, JSON.toJSONString(Class.SUBJECTS));
@@ -259,6 +273,7 @@ public class ClassAdminController extends AbstractController {
     public String updateForm(Model model, Class clazz) {
         model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
         model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(Class.SEASONS));
+        model.addAttribute(ModelConstants.SUB_SEASONS_MODEL_KEY, JSON.toJSONString(Class.SUB_SEASONS));
         model.addAttribute(ModelConstants.GRADES_MODEL_KEY, JSON.toJSONString(Class.GRADES));
         model.addAttribute(ModelConstants.SUBJECTS_MODEL_KEY, JSON.toJSONString(Class.SUBJECTS));
         model.addAttribute(ModelConstants.TYPES_MODEL_KEY, JSON.toJSONString(Class.TYPES));

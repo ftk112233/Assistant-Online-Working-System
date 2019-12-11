@@ -80,10 +80,16 @@
                         </div>
                         <div class="layui-form-item">
                             <label class="layui-form-label">自动同步&nbsp; <i class="layui-icon layui-icon-tips"
-                                                                          lay-tips="开启'自动同步后开的补课单将录入后台数据库，补课学生的原班助教和补课班级助教都将能看到该学生的补课信息！"></i></label>
+                                                                          lay-tips="开启'自动同步'后开的补课单将录入后台数据库，补课学生的原班助教和补课班级助教都将能看到该学生的补课信息！"></i></label>
                             <div class="layui-input-inline">
                                 <input type="checkbox" name="sync" lay-skin="switch" lay-text="ON|OFF"
                                        lay-filter="sync" checked>
+                            </div>
+                            <label class="layui-form-label">邮件提醒&nbsp; <i class="layui-icon layui-icon-tips"
+                                                                          lay-tips="开启'邮件提醒'后补课信息将以邮件形式发送到原班助教和补课班助教邮箱，如果助教的账号绑定了邮箱的话！"></i></label>
+                            <div class="layui-input-inline">
+                                <input type="checkbox" name="emailTip" lay-skin="switch" lay-text="ON|OFF"
+                                       lay-filter="emailTip" checked>
                             </div>
                         </div>
                         <div class="layui-form-item">
@@ -205,15 +211,14 @@
         form.on('submit(download)', function (obj) {
             var field = obj.field;
 
-            if (field.originalClassId == field.currentClassId){
+            if (field.originalClassId === field.currentClassId){
                 return layer.msg("原班号不能与补课班号相同!");
             }
 
             layer.load(1, {shade: [0.1, '#fff']}); //上传loading
 
-            location.href='${ctx}/toolbox/assistant/exportAssistantMissLessonTable?sync='+field.sync + '&studentName='+field.studentName+'&originalCampus='+field.originalCampus
-                    +'&currentCampus='+ field.currentCampus+'&originalClassId='+ field.originalClassId+'&currentClassId='+ field.currentClassId+'&date='+ field.date
-            ;
+            location.href='${ctx}/toolbox/assistant/exportAssistantMissLessonTable?sync='+field.sync +'&emailTip='+field.emailTip+ '&studentName='+field.studentName+'&originalCampus='+field.originalCampus
+                    +'&currentCampus='+ field.currentCampus+'&originalClassId='+ field.originalClassId+'&currentClassId='+ field.currentClassId+'&date='+ field.date;
             layer.closeAll('loading'); //关闭loading
 
         });

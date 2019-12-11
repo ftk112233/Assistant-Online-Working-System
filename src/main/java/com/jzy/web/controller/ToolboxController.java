@@ -11,6 +11,7 @@ import com.jzy.model.dto.MissLessonStudentDetailedDto;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
 import com.jzy.model.entity.CampusAndClassroom;
 import com.jzy.model.entity.Class;
+import com.jzy.model.entity.User;
 import com.jzy.model.entity.UserMessage;
 import com.jzy.model.excel.Excel;
 import com.jzy.model.excel.ExcelVersionEnum;
@@ -383,13 +384,14 @@ public class ToolboxController extends AbstractController {
      * @param request
      * @param response
      * @param sync                         是否开启同步数据库
+     * @param emailTip                     是否开启邮件提醒
      * @param originalCampus               原校区
      * @param currentCampus                补课校区
      * @param missLessonStudentDetailedDto 补课班号，原班号，学员姓名等封装
      * @return
      */
     @RequestMapping("/assistant/exportAssistantMissLessonTable")
-    public String exportAssistantMissLessonTable(HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "sync", required = false) String sync
+    public String exportAssistantMissLessonTable(HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "sync", required = false) String sync, @RequestParam(value = "emailTip", required = false) String emailTip
             , @RequestParam("originalCampus") String originalCampus, @RequestParam("currentCampus") String currentCampus, MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
 
         ClassDetailedDto originalClass = classService.getClassDetailByClassId(missLessonStudentDetailedDto.getOriginalClassId());
@@ -413,22 +415,23 @@ public class ToolboxController extends AbstractController {
                 missLessonStudentService.insertMissLessonStudent(missLessonStudentDetailedDto);
 
                 //向原班助教和补课班助教发送消息
-                Long userFromId=userService.getSessionUserInfo().getId();
+                Long userFromId = userService.getSessionUserInfo().getId();
 
-                String originalAssistantWorkId=assistantService.getAssistantById(originalClass.getClassAssistantId()).getAssistantWorkId();
-                Long originalUserId=userService.getUserByWorkId(originalAssistantWorkId).getId();
-                UserMessage originalMessage=new UserMessage();
+                String originalAssistantWorkId = assistantService.getAssistantById(originalClass.getClassAssistantId()).getAssistantWorkId();
+                User originalUser = userService.getUserByWorkId(originalAssistantWorkId);
+                Long originalUserId = originalUser.getId();
+                UserMessage originalMessage = new UserMessage();
                 originalMessage.setUserId(originalUserId);
                 originalMessage.setUserFromId(userFromId);
                 originalMessage.setMessageTitle("你的班上有需要补课的学生");
-                StringBuffer originalMessageContent=new StringBuffer();
-                originalMessageContent.append("你的\"").append(originalClass.getClassName()).append("\"(上课时间：").append(originalClass.getClassSimplifiedTime()).append("，上课教室：").append(originalClass.getClassCampus()+originalClass.getClassroom()+"教").append(")上的学生<em>").append(missLessonStudentDetailedDto.getStudentName()).append("</em>需要补课。")
-                       .append("<br>"+"补课班号：").append(currentClass.getClassId())
-                        .append("<br>"+"补课班级名称：").append(currentClass.getClassName())
-                        .append("<br>"+"补课班级助教：").append(currentClass.getAssistantName())
-                        .append("<br>"+"补课班级任课教师：").append(currentClass.getTeacherName())
-                        .append("<br>"+"补课时间 ：").append(MyTimeUtils.dateToStrYMD(missLessonStudentDetailedDto.getDate()) + ", " + missLessonStudentDetailedDto.getCurrentClassSimplifiedTime())
-                        .append("<br>"+"补课班级上课教室：").append(currentClass.getClassCampus()+currentClass.getClassroom()+"教");
+                StringBuffer originalMessageContent = new StringBuffer();
+                originalMessageContent.append("你的\"").append(originalClass.getClassName()).append("\"(上课时间：").append(originalClass.getClassSimplifiedTime()).append("，上课教室：").append(originalClass.getClassCampus() + originalClass.getClassroom() + "教").append(")上的学生<em>").append(missLessonStudentDetailedDto.getStudentName()).append("</em>需要补课。")
+                        .append("<br>" + "补课班号：").append(currentClass.getClassId())
+                        .append("<br>" + "补课班级名称：").append(currentClass.getClassName())
+                        .append("<br>" + "补课班级助教：").append(currentClass.getAssistantName())
+                        .append("<br>" + "补课班级任课教师：").append(currentClass.getTeacherName())
+                        .append("<br>" + "补课时间 ：").append(MyTimeUtils.dateToStrYMD(missLessonStudentDetailedDto.getDate()) + ", " + missLessonStudentDetailedDto.getCurrentClassSimplifiedTime())
+                        .append("<br>" + "补课班级上课教室：").append(currentClass.getClassCampus() + currentClass.getClassroom() + "教");
                 originalMessage.setMessageContent(originalMessageContent.toString());
                 originalMessage.setMessageTime(new Date());
                 if (UserMessageUtils.isValidUserMessageUpdateInfo(originalMessage)) {
@@ -436,23 +439,38 @@ public class ToolboxController extends AbstractController {
                 }
 
 
-                String currentAssistantWorkId=assistantService.getAssistantById(currentClass.getClassAssistantId()).getAssistantWorkId();
-                Long currentUserId=userService.getUserByWorkId(currentAssistantWorkId).getId();
-                UserMessage currentMessage=new UserMessage();
+                String currentAssistantWorkId = assistantService.getAssistantById(currentClass.getClassAssistantId()).getAssistantWorkId();
+                User currentUser = userService.getUserByWorkId(currentAssistantWorkId);
+                Long currentUserId = currentUser.getId();
+                UserMessage currentMessage = new UserMessage();
                 currentMessage.setUserId(currentUserId);
                 currentMessage.setUserFromId(userFromId);
                 currentMessage.setMessageTitle("有学生补课到你的班上");
-                StringBuffer currentMessageContent=new StringBuffer();
-                currentMessageContent.append("学生<em>").append(missLessonStudentDetailedDto.getStudentName()).append("</em>补课到你的\"").append(currentClass.getClassName()).append("\"(上课时间：").append(currentClass.getClassSimplifiedTime()).append("，上课教室：").append(currentClass.getClassCampus()+currentClass.getClassroom()+"教)。")
-                        .append("<br>"+"补课日期：").append(MyTimeUtils.dateToStrYMD(missLessonStudentDetailedDto.getDate()))
-                        .append("<br>"+"原班号：").append(originalClass.getClassId())
-                        .append("<br>"+"原班级名称：").append(originalClass.getClassName())
-                        .append("<br>"+"原班级助教：").append(originalClass.getAssistantName())
-                        .append("<br>"+"原班级任课教师：").append(originalClass.getTeacherName());
+                StringBuffer currentMessageContent = new StringBuffer();
+                currentMessageContent.append("学生<em>").append(missLessonStudentDetailedDto.getStudentName()).append("</em>补课到你的\"").append(currentClass.getClassName()).append("\"(上课时间：").append(currentClass.getClassSimplifiedTime()).append("，上课教室：").append(currentClass.getClassCampus() + currentClass.getClassroom() + "教)。")
+                        .append("<br>" + "补课日期：").append(MyTimeUtils.dateToStrYMD(missLessonStudentDetailedDto.getDate()))
+                        .append("<br>" + "原班号：").append(originalClass.getClassId())
+                        .append("<br>" + "原班级名称：").append(originalClass.getClassName())
+                        .append("<br>" + "原班级助教：").append(originalClass.getAssistantName())
+                        .append("<br>" + "原班级任课教师：").append(originalClass.getTeacherName());
                 currentMessage.setMessageContent(currentMessageContent.toString());
                 currentMessage.setMessageTime(new Date());
                 if (UserMessageUtils.isValidUserMessageUpdateInfo(currentMessage)) {
                     userMessageService.insertUserMessage(currentMessage);
+                }
+
+
+                if (Constants.ON.equals(emailTip)) {
+                    //如果打开邮件提醒
+                    String title = "AOWS-重要提醒";
+                    if (!StringUtils.isEmpty(originalUser.getUserEmail())) {
+                        String content1 = "你的班上有需要补课的学生！前往查看http://xdf.kurochan.top/。";
+                        SendEmailUtils.sendEncryptedEmail(originalUser.getUserEmail(), title, content1);
+                    }
+                    if (!StringUtils.isEmpty(currentUser.getUserEmail())) {
+                        String content2 = "有学生补课到你的班上！前往查看http://xdf.kurochan.top/。";
+                        SendEmailUtils.sendEncryptedEmail(currentUser.getUserEmail(), title, content2);
+                    }
                 }
             }
 
@@ -487,6 +505,7 @@ public class ToolboxController extends AbstractController {
     public String infoImport(Model model) {
         model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
         model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(Class.SEASONS));
+        model.addAttribute(ModelConstants.SUB_SEASONS_MODEL_KEY, JSON.toJSONString(Class.SUB_SEASONS));
         return "toolbox/assistantAdministrator/infoImport";
     }
 

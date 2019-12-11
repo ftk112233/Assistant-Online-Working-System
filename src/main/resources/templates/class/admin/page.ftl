@@ -27,6 +27,11 @@
                             <option value="">请选择季度</option>
                         </select>
                     </div>
+                    <div class="layui-input-inline">
+                        <select name="subSeason" id="subSeason">
+                            <option value="">请选择分期</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="layui-inline">
                     <label class="layui-form-label">校区</label>
@@ -204,7 +209,7 @@
         laydate.render({
             elem: '#year'
             , type: 'year'
-            , value: '${currentYear!""}'
+            , value: '${currentClassSeason.classYear!""}'
         });
 
 
@@ -222,6 +227,14 @@
             var str = "";
             str += '<option value="' + json + '">' + json + '</option>';
             $("#season").append(str);
+        }
+
+        var subSeasons = eval('(' + '${subSeasons}' + ')');
+        for (var i = 0; i < subSeasons.length; i++) {
+            var json = subSeasons[i];
+            var str = "";
+            str += '<option value="' + json + '">' + json + '</option>';
+            $("#subSeason").append(str);
         }
 
         var classIds = eval('(' + '${classIds}' + ')');
@@ -256,7 +269,9 @@
             $("#type").append(str);
         }
 
-        $("#season").val('${currentSeason!""}');
+        $("#season").val('${currentClassSeason.classSeason!""}');
+        $("#subSeason").val('${currentClassSeason.classSubSeason!""}');
+
 
         form.render();
 
@@ -294,8 +309,8 @@
                 , {field: 'id', title: 'id', sort: true, hide: true}
                 , {field: 'createTime', title: '创建时间', sort: true, hide: true}
                 , {field: 'updateTime', title: '更新时间', sort: true, hide: true}
-                , {minWidth: 150, width: 200, align: 'center', title: '跳转', toolbar: '#test-table-operate-barDemo1'}
-                , {field: 'classId', title: '班级编码', width: 150, sort: true}
+                , {minWidth: 150, width: 190, align: 'center', title: '跳转', toolbar: '#test-table-operate-barDemo1'}
+                , {field: 'classId', title: '班级编码', width: 140, sort: true}
                 , {field: 'className', title: '班级名称', sort: true}
                 , {field: 'classCampus', title: '校区', width: 80, sort: true}
                 , {field: 'classGrade', title: '年级', width: 110, sort: true, hide: true}
@@ -303,22 +318,24 @@
                 , {field: 'classType', title: '班型', width: 80, sort: true, hide: true}
                 , {field: 'classYear', title: '年份', width: 80, sort: true, hide: true}
                 , {field: 'classSeason', title: '季度', width: 80, sort: true, hide: true}
+                , {field: 'classSubSeason', title: '分期', width: 80, sort: true, hide: true}
                 , {field: 'classTime', title: '详细上课时间', hide: true}
-                , {field: 'classSimplifiedTime', title: '上课时间', width: 120}
+                , {field: 'classSimplifiedTime', title: '上课时间', width: 110}
                 , {field: 'classTimes', title: '上课次数', width: 100, hide: true}
-                , {field: 'assistantName', title: '助教', width: 110, sort: true}
+                , {field: 'assistantName', title: '助教', width: 80, sort: true}
                 , {field: 'teacherName', title: '任课教师', width: 110, sort: true}
-                , {field: 'classroom', title: '上课教室', width: 110}
+                , {field: 'classroom', title: '上课教室', width: 90}
                 , {field: 'classTeacherRequirement', title: '任课老师要求', hide: true}
                 , {field: 'classRemark', title: '备注', hide: true}
-                , {field: 'classStudentsCount', title: '班级人数', width: 100}
-                , {field: 'classroomCapacity', title: '教室容量', width: 100}
-                ,{field: 'full', title: '班级状态', templet: '#buttonTpl', minWidth: 100, align: 'center'}
+                , {field: 'classStudentsCount', title: '班级人数', width: 90}
+                , {field: 'classroomCapacity', title: '教室容量', width: 90}
+                ,{field: 'full', title: '班级状态', templet: '#buttonTpl', minWidth: 90, align: 'center'}
                 , {title: '操作', minWidth: 150, align: 'center', toolbar: '#table-content-list1'}
             ]]
             , where: {
-                classYear: '${currentYear!""}'
-                , classSeason: '${currentSeason!""}'
+                classYear: $("#year").val()
+                , classSeason: $("#season").val()
+                , classSubSeason: $("#subSeason").val()
             }
             , page: true
             , limit: 10
@@ -355,6 +372,7 @@
                 , where: { //设定异步数据接口的额外参数，任意设
                     classYear: field.year
                     , classSeason: field.season
+                    , classSubSeason: field.subSeason
                     , classCampus: field.campus
                 }
                 , request: {
@@ -377,6 +395,7 @@
                 , where: { //设定异步数据接口的额外参数，任意设
                     classYear: field.year
                     , classSeason: field.season
+                    , classSubSeason: field.subSeason
                     , classCampus: field.campus
                     , classId: field.classId
                     , className: field.className
@@ -412,6 +431,7 @@
                     data: {
                         classYear: field.year
                         , classSeason: field.season
+                        , classSubSeason: field.subSeason
                         , classCampus: field.campus
                         , classId: field.classId
                         , className: field.className
@@ -529,6 +549,7 @@
                                 , classType: field.type
                                 , classYear: field.year
                                 , classSeason: field.season
+                                , classSubSeason: field.subSeason
                                 , classTime: field.classTime
                                 , classTimes: field.classTimes
                                 , classroom: field.classroom
@@ -642,7 +663,7 @@
                     ,
                     content: '${ctx}/class/admin/updateForm?id=' + data.id + '&classCampus=' + data.classCampus + '&classGrade=' + data.classGrade
                     + '&classSubject=' + data.classSubject + '&classType=' + data.classType
-                    + '&classSeason=' + data.classSeason + '&classroom=' + data.classroom
+                    + '&classSeason=' + data.classSeason +'&classSubSeason=' + data.classSubSeason + '&classroom=' + data.classroom
                     ,
                     maxmin: true
                     ,
@@ -665,6 +686,7 @@
                                 , classType: field.type
                                 , classYear: field.year
                                 , classSeason: field.season
+                                , classSubSeason: field.subSeason
                                 , classTime: field.classTime
                                 , classTimes: field.classTimes
                                 , classroom: field.classroom
