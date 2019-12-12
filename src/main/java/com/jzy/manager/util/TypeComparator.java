@@ -9,8 +9,10 @@ import java.util.Comparator;
  * @version 1.0
  * @ClassName TypeComparator
  * @description 自定义的班型比较器, 好学<精进<志高<行远<壮志<凌云<星耀<专项<虚拟
+ *              使用枚举类的单例Comparator对象{@link TypeEnum}
  * @date 2019/12/4 20:49
  **/
+@Deprecated
 public class TypeComparator implements Comparator<String> {
     @Override
     public int compare(String o1, String o2) {

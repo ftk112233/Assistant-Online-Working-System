@@ -2,8 +2,8 @@ package com.jzy.web.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.jzy.manager.constant.ModelConstants;
-import com.jzy.manager.util.TypeComparator;
 import com.jzy.model.CampusEnum;
+import com.jzy.model.TypeEnum;
 import com.jzy.model.dto.StudentAndClassSearchCondition;
 import com.jzy.model.dto.echarts.GroupedByGradeAndTypeObjectTotal;
 import com.jzy.model.dto.echarts.GroupedBySubjectAndTypeObjectTotal;
@@ -159,7 +159,7 @@ public class SeniorController extends AbstractController {
         }
 
         //班型排序
-        legendData.sort(new TypeComparator());
+        legendData.sort(TypeEnum.TYPE_COMPARATOR);
 
         //为存放series的data列表建立一个Map类型中间变量，方便后面读写处理
         Map<String, List<Long>> seriesDataTmp = new HashMap<>(legendData.size());
@@ -237,7 +237,7 @@ public class SeniorController extends AbstractController {
         }
 
         //班型排序
-        legendData.sort(new TypeComparator());
+        legendData.sort(TypeEnum.TYPE_COMPARATOR);
 
         //为存放series的data列表建立一个Map类型中间变量，方便后面读写处理
         Map<String, List<Long>> seriesDataTmp = new HashMap<>(legendData.size());

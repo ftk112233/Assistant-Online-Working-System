@@ -1,6 +1,7 @@
 package com.jzy.model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -42,6 +43,17 @@ public enum  TypeEnum {
         this.type=type;
         this.code=code;
         this.weight=weight;
+    }
+
+    public static final Comparator<String> TYPE_COMPARATOR=new TypeComparator();
+    /**
+     * 自定义的年级比较器(小初衔接<初一<初二<中考<高一<高二<高考)
+     */
+    private static class TypeComparator implements Comparator<String> {
+        @Override
+        public int compare(String o1, String o2) {
+            return TypeEnum.getWeightByType(o1) - TypeEnum.getWeightByType(o2);
+        }
     }
 
     /**
