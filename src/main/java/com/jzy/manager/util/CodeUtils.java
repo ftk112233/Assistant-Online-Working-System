@@ -49,16 +49,16 @@ public class CodeUtils {
      * @return
      */
     public static String randomCodes(int len) {
-        String code = "";
+        StringBuilder code = new StringBuilder();
         Random random = new Random();
         for (int i = 0; i < len; i++) {
 
             int r = random.nextInt(10); //每次随机出一个数字（0-9）
 
-            code = code + r;  //把每次随机出的数字拼在一起
+            code.append(r);  //把每次随机出的数字拼在一起
 
         }
-        return code;
+        return code.toString();
     }
 
     /**

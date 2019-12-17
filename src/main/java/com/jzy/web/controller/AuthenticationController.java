@@ -6,7 +6,10 @@ import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.constant.SessionConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.exception.NoMoreQuestionsException;
-import com.jzy.manager.util.*;
+import com.jzy.manager.util.CodeUtils;
+import com.jzy.manager.util.CookieUtils;
+import com.jzy.manager.util.MyStringUtils;
+import com.jzy.manager.util.ShiroUtils;
 import com.jzy.model.RoleEnum;
 import com.jzy.model.dto.EmailVerifyCode;
 import com.jzy.model.entity.Question;
@@ -145,7 +148,7 @@ public class AuthenticationController extends AbstractController {
         model.addAttribute(ModelConstants.ANNOUNCEMENT_MODEL_KEY, announcement);
 
         //判断是否有新消息
-        model.addAttribute(ModelConstants.UNREAD_USER_MESSAGE_COUNT_MODEL_KEY, userMessageService.countUserMessagesByUserIdAndRead(user.getId(),false));
+        model.addAttribute(ModelConstants.UNREAD_USER_MESSAGE_COUNT_MODEL_KEY, userMessageService.countUserMessagesByUserIdAndRead(user.getId(), false));
 
 
         if (SecurityUtils.getSubject().isAuthenticated() || SecurityUtils.getSubject().isRemembered()) {
@@ -156,6 +159,49 @@ public class AuthenticationController extends AbstractController {
     }
 
     /**
+     * 判断当前用户名尝试登录的主机ip是否与上次的登录ip相同
+     *
+     * @param userName 用户名
+     * @param request
+     * @return
+     */
+    private boolean isUsualIpAddressForUserName(String userName, HttpServletRequest request) {
+        String ipKey = RedisConstants.USER_LOGIN_IP_KEY;
+        if (hashOps.hasKey(ipKey, userName)) {
+            //如果缓存中有上次登录成功的ip
+            String originalIp = (String) hashOps.get(ipKey, userName);
+            String currentIp = ShiroUtils.getClientIpAddress(request);
+            if (currentIp == null || !currentIp.equals(originalIp)) {
+                return false;
+            }
+        }
+        return true;
+
+    }
+
+    /**
+     * 测试ip是否可疑的ajax交互
+     *
+     * @param userName
+     * @return
+     */
+    @RequestMapping("/testIp")
+    @ResponseBody
+    public Map<String, Object> testIp(@RequestParam(value = "userName", required = false) String userName, HttpServletRequest request) {
+        Map<String, Object> map = new HashMap(1);
+        if (!isUsualIpAddressForUserName(userName, request)) {
+            //比较缓存中当前用户名上次登录成功的ip是否相同，判断ip是否可疑
+            ShiroUtils.getSession().setAttribute(SessionConstants.REQUIRE_SLIDER_AUTH_SESSION_KEY, Constants.YES);
+            map.put("data", "suspicious");
+            return map;
+        }
+
+
+        map.put("data", Constants.SUCCESS);
+        return map;
+    }
+
+    /**
      * 登录交互
      *
      * @param input 登录请求的入参封装--用户名&密码&图形验证码&是否记住密码
@@ -163,16 +209,23 @@ public class AuthenticationController extends AbstractController {
      */
     @RequestMapping("/loginTest")
     @ResponseBody
-    public Map<String, Object> loginTest(UserLoginInput input) {
+    public Map<String, Object> loginTest(UserLoginInput input, HttpServletRequest request) {
         Map<String, Object> map = new HashMap<>(1);
         UserLoginResult result = new UserLoginResult();
 
         Subject subject = SecurityUtils.getSubject();
         Session session = subject.getSession();
-        //图形验证码判断
-        String trueImgCode = (String) session.getAttribute(SessionConstants.KAPTCHA_SESSION_KEY);
-        if (!CodeUtils.equals(input.getImgCode(), trueImgCode)) {
-            result.setImgCodeWrong(true);
+        //图形验证码判断，改用滑块验证
+//        String trueImgCode = (String) session.getAttribute(SessionConstants.KAPTCHA_SESSION_KEY);
+//        if (!CodeUtils.equals(input.getImgCode(), trueImgCode)) {
+//            result.setImgCodeWrong(true);
+//            map.put("data", result);
+//            return map;
+//        }
+        String requiredSliderAuth= (String) session.getAttribute(SessionConstants.REQUIRE_SLIDER_AUTH_SESSION_KEY);
+        if (!isUsualIpAddressForUserName(input.getUserName(), request) && !Constants.YES.equals(requiredSliderAuth)){
+            //未经过testIp请求的可疑ip异常，可能是机器爆破等攻击方式
+            logger.error("绕过滑块验证的可疑登录请求!");
             map.put("data", result);
             return map;
         }
@@ -200,6 +253,12 @@ public class AuthenticationController extends AbstractController {
                 //登录成功，让当前登录失败次数的缓存过期
                 redisTemplate.expire(key, 0, TimeUnit.MINUTES);
             }
+
+            //登录成功ip缓存
+            hashOps.put(RedisConstants.USER_LOGIN_IP_KEY, input.getUserName(), ShiroUtils.getClientIpAddress(request));
+            redisTemplate.expire(RedisConstants.USER_LOGIN_IP_KEY, RedisConstants.USER_LOGIN_IP_EXPIRE, TimeUnit.DAYS);
+
+            session.removeAttribute(SessionConstants.REQUIRE_SLIDER_AUTH_SESSION_KEY);
         } catch (UnknownAccountException e) {
             //用户名不存在
             result.setUnknownAccount(true);
@@ -346,6 +405,7 @@ public class AuthenticationController extends AbstractController {
                 subject.login(token);
                 //登录成功，设置用户信息到session
                 session.setAttribute(SessionConstants.USER_INFO_SESSION_KEY, userGetByEmail);
+
                 map.put("data", "verifyCodeCorrect");
             } catch (AuthenticationException e) {
                 //其他异常

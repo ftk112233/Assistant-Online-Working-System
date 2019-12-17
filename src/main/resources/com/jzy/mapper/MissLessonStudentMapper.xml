@@ -137,7 +137,7 @@
             m_l_s.original_class_id=c1.id and m_l_s.current_class_id=c2.id
             <if test="studentId != null and studentId!=''">
                 <bind name="studentIdLike" value=" '%' + studentId + '%' "/>
-                and m_l_s.studnent_id like #{studentIdLike}
+                and m_l_s.student_id like #{studentIdLike}
             </if>
             <if test="studentName != null and studentName!=''">
                 <bind name="studentNameLike" value=" '%' + studentName + '%' "/>

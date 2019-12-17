@@ -70,11 +70,11 @@ public class SeatTableTemplateInputExcel extends Excel implements Serializable {
                 //如果sheet名（教室门牌号）不是纯数字
                 throw new ExcelSheetNameInvalidException("教室门牌号不是纯数字!");
             }
-            CampusAndClassroom campusAndClassroom=new CampusAndClassroom();
+            CampusAndClassroom campusAndClassroom = new CampusAndClassroom();
             campusAndClassroom.setClassroom(classroom);
 
             int rowCount = this.getRowCount(i);
-            Integer maxCapacity =null;
+            Integer maxCapacity = null;
             for (int j = 0; j < rowCount; j++) {
                 for (int k = 0; k < this.getColumnCount(i, j); k++) {
                     //遍历表格所有行
@@ -82,8 +82,8 @@ public class SeatTableTemplateInputExcel extends Excel implements Serializable {
                     if (StringUtils.isNumeric(value)) {
                         //对所有为数字的单元格找到最大的作为当前教室容量
                         Integer cap = Integer.parseInt(value);
-                        if (maxCapacity == null || cap>maxCapacity){
-                            maxCapacity=cap;
+                        if (maxCapacity == null || cap > maxCapacity) {
+                            maxCapacity = cap;
                         }
                     }
                 }

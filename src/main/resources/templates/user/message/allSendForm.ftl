@@ -41,7 +41,7 @@
                             <label class="layui-form-label">主题</label>
                             <div class="layui-input-block">
                                 <input type="text" name="title" id="title" value="" placeholder="关于代班"
-                                       autocomplete="off" class="layui-input" lay-verType="tips"
+                                       class="layui-input" lay-verType="tips"
                                        lay-verify="titleOfUsefulInformation">
                             </div>
                         </div>

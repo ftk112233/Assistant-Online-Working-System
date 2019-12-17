@@ -8,6 +8,7 @@ import com.jzy.manager.util.*;
 import com.jzy.model.CampusEnum;
 import com.jzy.model.dto.ClassDetailedDto;
 import com.jzy.model.dto.MissLessonStudentDetailedDto;
+import com.jzy.model.dto.StudentAndClassDetailedDto;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
 import com.jzy.model.entity.CampusAndClassroom;
 import com.jzy.model.entity.Class;
@@ -70,7 +71,6 @@ public class ToolboxController extends AbstractController {
     @RequestMapping("/assistant/startClassExcel")
     public String startClassExcel(Model model, ClassDetailedDto classDetailedDto) {
         model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
-        model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
 
         model.addAttribute(ModelConstants.CLASS_ID_MODEL_KEY, classDetailedDto.getClassId());
         model.addAttribute(ModelConstants.CLASS_CAMPUS_MODEL_KEY, classDetailedDto.getClassCampus());
@@ -372,9 +372,10 @@ public class ToolboxController extends AbstractController {
      * @return
      */
     @RequestMapping("/assistant/missLessonStudentExcel")
-    public String missLessonStudentExcel(Model model) {
+    public String missLessonStudentExcel(Model model, StudentAndClassDetailedDto dto) {
         model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
-        model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
+
+        model.addAttribute(ModelConstants.STUDENT_AND_CLASS_MODEL_KEY, dto);
         return "toolbox/assistant/missLessonStudentExcel";
     }
 
@@ -412,7 +413,9 @@ public class ToolboxController extends AbstractController {
             if (Constants.ON.equals(sync)) {
                 //若打开自动同步
                 //数据添加补课学生记录
-                missLessonStudentService.insertMissLessonStudent(missLessonStudentDetailedDto);
+                if (MissLessonStudentUtils.isValidMissLessonStudentUpdateInfo(missLessonStudentDetailedDto)) {
+                    missLessonStudentService.insertMissLessonStudent(missLessonStudentDetailedDto);
+                }
 
                 //向原班助教和补课班助教发送消息
                 Long userFromId = userService.getSessionUserInfo().getId();
@@ -465,11 +468,11 @@ public class ToolboxController extends AbstractController {
                     String title = "AOWS-重要提醒";
                     if (!StringUtils.isEmpty(originalUser.getUserEmail())) {
                         String content1 = "你的班上有需要补课的学生！前往查看http://xdf.kurochan.top/。";
-                        SendEmailUtils.sendEncryptedEmail(originalUser.getUserEmail(), title, content1);
+                        SendEmailUtils.sendConcurrentEncryptedEmail(originalUser.getUserEmail(), title, content1);
                     }
                     if (!StringUtils.isEmpty(currentUser.getUserEmail())) {
                         String content2 = "有学生补课到你的班上！前往查看http://xdf.kurochan.top/。";
-                        SendEmailUtils.sendEncryptedEmail(currentUser.getUserEmail(), title, content2);
+                        SendEmailUtils.sendConcurrentEncryptedEmail(currentUser.getUserEmail(), title, content2);
                     }
                 }
             }

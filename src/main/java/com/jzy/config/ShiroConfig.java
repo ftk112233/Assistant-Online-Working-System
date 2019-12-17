@@ -85,6 +85,8 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/noPermissions","anon"); //用户无权限提示页面
 
         filterChainDefinitionMap.put("/kaptcha","anon"); //图形验证码
+        filterChainDefinitionMap.put("/testIp","anon"); //可疑ip检测
+//        filterChainDefinitionMap.put("/sliderTest","anon"); //滑块验证iframe
         filterChainDefinitionMap.put("/", "anon"); //登录页面
         filterChainDefinitionMap.put("/login", "anon"); //登录页面
         filterChainDefinitionMap.put("/loginTest", "anon"); //登录请求ajax交互

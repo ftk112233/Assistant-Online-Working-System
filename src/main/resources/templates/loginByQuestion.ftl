@@ -30,7 +30,7 @@
                         <label class="layadmin-user-login-icon layui-icon layui-icon-rate"
                                for="LAY-user-login-smscode"></label>
                         <input type="text" name="answer" lay-verify="required" lay-verType="tips" placeholder="请输入答案"
-                               id="LAY-user-login-smscode" class="layui-input">
+                               id="LAY-user-login-smscode" class="layui-input" autocomplete="off">
                     </div>
                     <div class="layui-col-xs5">
                         <div style="margin-left: 10px;">
@@ -109,7 +109,13 @@
         /*****************************************************/
 
 
-        form.render();
+        $('#LAY-user-login-smscode').on('keydown', function (event) {
+            if (event.keyCode == 13) {
+                $("#my_button").trigger("click");
+
+                return false
+            }
+        });
         //验证码的正确与否决定登入？
         form.on('submit(LAY-user-login-submit)', function (obj) {
 

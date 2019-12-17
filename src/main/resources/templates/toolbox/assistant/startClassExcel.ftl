@@ -33,9 +33,9 @@
                             <div class="layui-form-mid " style="color:red">*必填项</div>
                             <label class="layui-form-label">班级编码</label>
                             <div class="layui-input-inline">
-                                <select name="classId" id="classId"  lay-verify="classId" lay-verType="tips" lay-search>
-                                    <option value="">请输入或选择班级编码</option>
-                                </select>
+                                <input name="classId" id="classId" lay-verify="classId" lay-verType="tips"
+                                       autocomplete="off" class="layui-input"
+                                       placeholder="U6MCFC020001">
                             </div>
                             <div class="layui-form-mid " style="color:red">*必填项</div>
                         </div>
@@ -59,7 +59,7 @@
                             <label class="layui-form-label">上课时间</label>
                             <div class="layui-input-inline">
                                 <input name="classTime" lay-verify="classTime" lay-verType="tips"
-                                       autocomplete="off" class="layui-input"
+                                       class="layui-input"
                                        placeholder="8:00-10:00">
                             </div>
                         </div>
@@ -67,13 +67,13 @@
                             <label class="layui-form-label">教师姓名</label>
                             <div class="layui-input-inline">
                                 <input name="teacherName" lay-verify="realNamePermNull" lay-verType="tips"
-                                       autocomplete="off" class="layui-input"
+                                       class="layui-input"
                                        placeholder="魔仙女王">
                             </div>
                             <label class="layui-form-label">助教姓名</label>
                             <div class="layui-input-inline">
                                 <input name="assistantName" lay-verify="realNamePermNull" lay-verType="tips"
-                                       autocomplete="off" class="layui-input"
+                                       class="layui-input"
                                        placeholder="游乐王子">
                             </div>
                         </div>
@@ -174,14 +174,15 @@
         base: '${ctx}/plugins/layuiadmin/' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use(['index', 'set', 'element'], function () {
+    }).use(['index', 'set', 'element', 'autocomplete'], function () {
         var $ = layui.$
                 , setter = layui.setter
                 , admin = layui.admin
                 , form = layui.form
                 , element = layui.element
                 , router = layui.router()
-                , upload = layui.upload;
+                , upload = layui.upload
+                , autocomplete = layui.autocomplete;
 
         //=======================第一区域===========================//
         var campusNames = eval('(' + '${campusNames}' + ')');
@@ -192,13 +193,18 @@
             $("#campus").append(str);
         }
 
-        var classIds = eval('(' + '${classIds}' + ')');
-        for (var i = 0; i < classIds.length; i++) {
-            var json = classIds[i];
-            var str = "";
-            str += '<option value="' + json + '">' + json + '</option>';
-            $("#classId").append(str);
-        }
+        layui.link('${ctx}/custom/css/autocomplete.css');
+        autocomplete.render({
+            elem: $('#classId')[0],
+            cache: true,
+            url: '${ctx}/class/getClassesLikeClassId',
+            response: {code: 'code', data: 'data'},
+            template_val: '{{d.classId}}',
+            template_txt: '{{d.classId}} <span class=\'layui-badge layui-bg-gray\'>{{d.classGeneralName}}</span>',
+            onselect: function (resp) {
+
+            }
+        });
 
         $("#campus").val('${classCampus!""}');
         $("#classId").val('${classId!""}');

@@ -42,9 +42,9 @@
     <div class="layui-form-item">
         <label class="layui-form-label">原班班号</label>
         <div class="layui-input-inline">
-            <select name="originalClassId" id="originalClassId"  lay-verify="classId" lay-verType="tips" lay-search>
-                <option value="">请输入或选择班级编码</option>
-            </select>
+            <input name="originalClassId" id="originalClassId"  lay-verify="classId" lay-verType="tips"
+                   autocomplete="off" class="layui-input"
+                   placeholder="U6MCFC020001">
         </div>
         <div class="layui-form-mid " style="color:red">*必填项</div>
         <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #1E9FFF"
@@ -54,9 +54,9 @@
     <div class="layui-form-item">
         <label class="layui-form-label">补课班班号</label>
         <div class="layui-input-inline">
-            <select name="currentClassId" id="currentClassId"  lay-verify="classId" lay-verType="tips" lay-search>
-                <option value="">请输入或选择班级编码</option>
-            </select>
+            <input name="currentClassId" id="currentClassId"  lay-verify="classId" lay-verType="tips"
+                   autocomplete="off" class="layui-input"
+                   placeholder="U6MCFC020002">
         </div>
         <div class="layui-form-mid " style="color:red">*必填项</div>
         <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #1E9FFF"
@@ -66,7 +66,7 @@
     <div class="layui-form-item">
         <label class="layui-form-label">补课日期</label>
         <div class="layui-input-inline">
-            <input type="text" class="layui-input" placeholder="yyyy-MM-dd" id="date" name="date">
+            <input type="text" class="layui-input" placeholder="yyyy-MM-dd" autocomplete="off" id="date" name="date">
         </div>
     </div>
     <div class="layui-form-item">
@@ -95,10 +95,11 @@
         base: '${ctx}/plugins/layuiadmin/' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use(['index', 'user', 'laydate'], function () {
+    }).use(['index', 'user', 'laydate', 'autocomplete'], function () {
         var $ = layui.$
                 , form = layui.form
-                , laydate = layui.laydate;
+                , laydate = layui.laydate
+                , autocomplete = layui.autocomplete;
 
         laydate.render({
             elem: '#date'
@@ -106,24 +107,32 @@
         });
 
 
-        var classIds = eval('(' + '${classIds}' + ')');
-        for (var i = 0; i < classIds.length; i++) {
-            var json = classIds[i];
-            var str = "";
-            str += '<option value="' + json + '">' + json + '</option>';
-            $("#originalClassId").append(str);
-        }
-        $("#originalClassId").val('${missLessonStudentEdit.originalClassId}');
+        layui.link('${ctx}/custom/css/autocomplete.css');
+        autocomplete.render({
+            elem: $('#originalClassId')[0],
+            cache: true,
+            url: '${ctx}/class/getClassesLikeClassId',
+            response: {code: 'code', data: 'data'},
+            template_val: '{{d.classId}}',
+            template_txt: '{{d.classId}} <span class=\'layui-badge layui-bg-gray\'>{{d.classGeneralName}}</span>',
+            onselect: function (resp) {
 
-        for (var i = 0; i < classIds.length; i++) {
-            var json = classIds[i];
-            var str = "";
-            str += '<option value="' + json + '">' + json + '</option>';
-            $("#currentClassId").append(str);
-        }
-        $("#currentClassId").val('${missLessonStudentEdit.currentClassId}');
+            }
+        });
+        autocomplete.render({
+            elem: $('#currentClassId')[0],
+            cache: true,
+            url: '${ctx}/class/getClassesLikeClassId',
+            response: {code: 'code', data: 'data'},
+            template_val: '{{d.classId}}',
+            template_txt: '{{d.classId}} <span class=\'layui-badge layui-bg-gray\'>{{d.classGeneralName}}</span>',
+            onselect: function (resp) {
 
-        form.render('select');
+            }
+        });
+
+        form.render();
+
 
         //解析班级编码
         $("#preview-class").click(function () {

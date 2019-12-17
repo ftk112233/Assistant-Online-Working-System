@@ -34,22 +34,28 @@
                 <input type="password" name="password" id="LAY-user-login-password" lay-verify="required" lay-verType="tips"
                        placeholder="密码" class="layui-input">
             </div>
-            <div class="layui-form-item">
-                <div class="layui-row">
-                    <div class="layui-col-xs7">
-                        <label class="layadmin-user-login-icon layui-icon layui-icon-vercode"
-                               for="LAY-user-login-vercode"></label>
-                        <input type="text" name="vercode" id="LAY-user-login-vercode" lay-verify="required" lay-verType="tips"
-                               placeholder="图形验证码" class="layui-input">
-                    </div>
-                    <div class="layui-col-xs5">
-                        <div style="margin-left: 20px;">
-                            <img id="captcha_img" alt="点击更换" title="点击更换"
-                                 onclick="refresh()" src="${ctx}/kaptcha"/>
-                        </div>
-                    </div>
-                </div>
+            <div class="layui-form-item" id="div-slider" hidden="hidden">
+
+                <label class="layadmin-user-login-icon layui-icon layui-icon-password"
+                       for="LAY-user-login-password"></label>
+                <div id="slider"></div>
             </div>
+            <#--<div class="layui-form-item">-->
+                <#--<div class="layui-row">-->
+                    <#--<div class="layui-col-xs7">-->
+                        <#--<label class="layadmin-user-login-icon layui-icon layui-icon-vercode"-->
+                               <#--for="LAY-user-login-vercode"></label>-->
+                        <#--<input type="text" name="vercode" id="LAY-user-login-vercode" lay-verify="required" lay-verType="tips"-->
+                               <#--placeholder="图形验证码" class="layui-input">-->
+                    <#--</div>-->
+                    <#--<div class="layui-col-xs5">-->
+                        <#--<div style="margin-left: 20px;">-->
+                            <#--<img id="captcha_img" alt="点击更换" title="点击更换"-->
+                                 <#--onclick="refresh()" src="${ctx}/kaptcha"/>-->
+                        <#--</div>-->
+                    <#--</div>-->
+                <#--</div>-->
+            <#--</div>-->
             <div class="layui-form-item" style="margin-bottom: 20px;">
                 <input type="checkbox" name="rememberMe" id="rememberMe" lay-skin="primary" title="记住密码">
                 <a href="${ctx}/forget" class="layadmin-user-jump-change layadmin-link"
@@ -88,19 +94,46 @@
         base: '${ctx}/plugins/layuiadmin/' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use(['index', 'user'], function () {
+    }).use(['index', 'user','sliderVerify'], function () {
         var $ = layui.$
                 , setter = layui.setter
                 , admin = layui.admin
                 , form = layui.form
                 , router = layui.router()
+                , sliderVerify = layui.sliderVerify
                 , search = router.search;
 
+        $('#LAY-user-login-password').on('keydown', function (event) {
+            if (event.keyCode == 13) {
+                $("#my_button").trigger("click");
 
-        //提交
-        form.on('submit(LAY-user-login-submit)', function (obj) {
-            var field = obj.field;
+                return false
+            }
+        });
 
+        $('#LAY-user-login-vercode').on('keydown', function (event) {
+            if (event.keyCode == 13) {
+                $("#my_button").trigger("click");
+
+                return false
+            }
+        });
+
+
+
+        var slider=sliderVerify.render({
+            elem: '#slider'
+            ,bg : 'layui-bg-green'//自定义背景样式名
+            ,isAutoVerify:false//关闭自动验证
+            ,onOk: function(){//当验证通过回调
+                layer.msg('滑块验证通过', {
+                    icon: 1
+                    , time: 1000
+                });
+            }
+        });
+
+        function testLogin(field){
             //禁用5秒
             disabledSubmitButtonWithTime('my_button', '登 入', 5);
 
@@ -113,16 +146,12 @@
                 data: {
                     'userName': field.username,
                     'userPassword': field.password,
-                    'imgCode': field.vercode,
+                    // 'imgCode': field.vercode,
                     'rememberMe': field.rememberMe
                 }
                 ,
                 success: function (res) {
-                    // //请求成功后，写入 access_token
-                    // layui.data(setter.tableName, {
-                    //     key: setter.request.tokenName
-                    //     ,value: res.data.access_token
-                    // });
+
                     if (res.data.success) {
                         //登入成功的提示与跳转
                         return layer.msg('登入成功', {
@@ -133,7 +162,8 @@
                             location.href = '${ctx}/index'; //后台主页
                         });
                     } else {
-                        refresh();
+                        // refresh();
+                        slider.reset();
 
                         if (res.data.imgCodeWrong) {
                             return layer.msg("验证码错误！");
@@ -172,6 +202,41 @@
                     }
                 }
             });
+        }
+        //提交
+        form.on('submit(LAY-user-login-submit)', function (obj) {
+            var field = obj.field;
+
+            if (!$("#div-slider").is(":hidden")) {
+                if (!slider.isOk()) {//用于表单验证是否已经滑动成功
+                    return layer.msg("请先通过滑块验证", {time:1500});
+                } else {
+                    testLogin(field);
+                }
+            } else {
+                //请求登入接口
+                $.ajax({
+                    type: 'post'
+                    ,
+                    url: '${ctx}/testIp' //实际使用请改成服务端真实接口
+                    ,
+                    data: {
+                        'userName': field.username
+                    }
+                    ,
+                    success: function (res) {
+                        if (res.data === 'suspicious') {
+                            $("#div-slider").show();
+                            slider.reset();
+                            return layer.msg("请先通过滑块验证", {time:1500});
+                        } else {
+                            testLogin(field);
+                        }
+
+                    }
+                });
+            }
+
 
         });
     });

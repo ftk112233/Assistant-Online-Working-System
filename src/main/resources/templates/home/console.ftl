@@ -512,7 +512,12 @@
                     $("#info-body").empty();
                     for (var i = 0; i < data.length; i++) {
                         var object = data[i];
-                        $("#info-body").append('<tr><td>' + object.title + '</td><td>' + object.content + '</td></tr>');
+
+                        var imgTip = '';
+                        if (object.image != '' && object.image != null) {
+                            imgTip = '（<a href = "javascript:void(0);" onclick =\'var ss="' + object.image + '";show_img(ss)\'>有图，点击查看</a>）';
+                        }
+                        $("#info-body").append('<tr><td>' + object.title + '</td><td>' + object.content+ imgTip + '</td></tr>');
                     }
                 }
             });

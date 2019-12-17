@@ -232,6 +232,7 @@ public class StudentAdminController extends AbstractController {
     @RequestMapping("/getStudentInfo")
     @ResponseBody
     public ResultMap<List<Student>> getStudentInfo(MyPage myPage, StudentSearchCondition condition) {
+        condition.setStudentId(condition.getStudentId() == null ? null : condition.getStudentId().toUpperCase());
         PageInfo<Student> pageInfo = studentService.listStudents(myPage, condition);
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
     }

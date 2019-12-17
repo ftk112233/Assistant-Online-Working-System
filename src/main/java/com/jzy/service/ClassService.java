@@ -31,6 +31,14 @@ public interface ClassService {
     Class getClassByClassId(String classId);
 
     /**
+     * 根据班级编码模糊查询班级,注意这里classId不是主键id
+     *
+     * @param classId 班级编码
+     * @return
+     */
+    List<Class> listClassesLikeClassId(String classId);
+
+    /**
      * 根据班级编码查询班级详细信息，注意这里classId不是主键id
      *
      * @param classId 班级编码
@@ -94,6 +102,14 @@ public interface ClassService {
      * @return
      */
     List<String> listAllClassIds();
+
+    /**
+     * 根据班级编码模糊查询返回匹配的班级编码,注意这里classId不是主键id
+     *
+     * @param classId 班级编码
+     * @return
+     */
+    List<String> listClassIdsLikeClassId(String classId);
 
     /**
      * 修改班级信息请求，由id修改

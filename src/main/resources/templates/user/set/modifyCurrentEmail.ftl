@@ -25,7 +25,7 @@
                             <label class="layui-form-label">当前邮箱</label>
                             <div class="layui-input-inline">
                                 <input type="text" name="oldEmail" id="oldEmail" value="${userInfo.userEmail!""}" readonly
-                                       class="layui-input" lay-verify="email" lay-verType="tips">
+                                       class="layui-input" autocomplete="off" lay-verify="email" lay-verType="tips">
                             </div>
                             <div class="layui-form-mid layui-word-aux">此项为已绑定邮箱，点击获取验证码发送至此邮箱，输入正确的验证码即可完成修改绑定！</div>
                         </div>

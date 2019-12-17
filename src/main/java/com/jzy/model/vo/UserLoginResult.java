@@ -21,7 +21,7 @@ public class UserLoginResult implements Serializable {
     public static int DEFAULT_WRONG_TIMES = 5;
 
     //默认连续输错达到阈值次数后，触发的下次可尝试登录的操作时间间隔，单位：分钟
-    public static int DEFAULT_BASE_DELAY_TIME = 1;
+    public static int DEFAULT_BASE_DELAY_TIME = 15;
 
     //是否登录成功标志
     private boolean success;

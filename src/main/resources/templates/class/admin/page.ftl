@@ -44,9 +44,9 @@
                 <div class="layui-inline">
                     <label class="layui-form-label">班级编码</label>
                     <div class="layui-input-inline">
-                        <select name="classId" id="classId" lay-search>
-                            <option value="">请输入或选择班级编码</option>
-                        </select>
+                        <input name="classId" id="classId"
+                               autocomplete="off" class="layui-input"
+                               placeholder="U6MCFC020001">
                     </div>
                 </div>
                 <div class="layui-inline">
@@ -138,7 +138,7 @@
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit
+                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit id="my_button"
                             lay-filter="LAY-app-contcomm-search">
                         <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
                     </button>
@@ -196,7 +196,7 @@
         base: '${ctx}/plugins/layuiadmin/' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use(['index', 'user', 'upload', 'laydate'], function () {
+    }).use(['index', 'user', 'upload', 'laydate', 'autocomplete'], function () {
         var $ = layui.$
                 , admin = layui.admin
                 , form = layui.form
@@ -204,7 +204,8 @@
                 , laypage = layui.laypage
                 , laytpl = layui.laytpl
                 , upload = layui.upload
-                , laydate = layui.laydate;
+                , laydate = layui.laydate
+                , autocomplete = layui.autocomplete;
 
         laydate.render({
             elem: '#year'
@@ -237,13 +238,18 @@
             $("#subSeason").append(str);
         }
 
-        var classIds = eval('(' + '${classIds}' + ')');
-        for (var i = 0; i < classIds.length; i++) {
-            var json = classIds[i];
-            var str = "";
-            str += '<option value="' + json + '">' + json + '</option>';
-            $("#classId").append(str);
-        }
+        layui.link('${ctx}/custom/css/autocomplete.css');
+        autocomplete.render({
+            elem: $('#classId')[0],
+            cache: true,
+            url: '${ctx}/class/getClassesLikeClassId',
+            response: {code: 'code', data: 'data'},
+            template_val: '{{d.classId}}',
+            template_txt: '{{d.classId}} <span class=\'layui-badge layui-bg-gray\'>{{d.classGeneralName}}</span>',
+            onselect: function (resp) {
+
+            }
+        });
 
         var grades = eval('(' + '${grades}' + ')');
         for (var i = 0; i < grades.length; i++) {
@@ -361,6 +367,14 @@
         $("#clear").click(function () {
             $("#form input").val("");
             $("#form select").val("");
+        });
+
+        $('#form input').on('keydown', function (event) {
+            if (event.keyCode == 13) {
+                $("#my_button").trigger("click");
+
+                return false
+            }
         });
 
         //监听搜索

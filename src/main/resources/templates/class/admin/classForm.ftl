@@ -97,21 +97,21 @@
     <div class="layui-form-item">
         <label class="layui-form-label">上课时间</label>
         <div class="layui-input-inline">
-            <input type="text" name="classTime" lay-verType="tips" lay-verify="classTime" placeholder="周六8:00-10:00" autocomplete="off" class="layui-input">
+            <input type="text" name="classTime" lay-verType="tips" lay-verify="classTime" placeholder="周六8:00-10:00" class="layui-input">
         </div>
         <label class="layui-form-label">上课次数</label>
         <div class="layui-input-inline">
-            <input type="text" name="classTimes"  lay-verType="tips" lay-verify="classTimes" placeholder="16" autocomplete="off" class="layui-input">
+            <input type="text" name="classTimes"  lay-verType="tips" lay-verify="classTimes" placeholder="16" class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">上课教师</label>
         <div class="layui-input-inline">
-            <input type="text" name="teacherName" placeholder="请输入" autocomplete="off" class="layui-input">
+            <input type="text" name="teacherName" placeholder="请输入" class="layui-input">
         </div>
         <label class="layui-form-label">助教</label>
         <div class="layui-input-inline">
-            <input type="text" name="assistantName" placeholder="请输入" autocomplete="off" class="layui-input">
+            <input type="text" name="assistantName" placeholder="请输入" class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">

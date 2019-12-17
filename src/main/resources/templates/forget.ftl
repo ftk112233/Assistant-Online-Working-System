@@ -38,7 +38,7 @@
                 </div>
                 <input name="token" type="hidden" value="${token}"/>
                 <div class="layui-form-item">
-                    <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-forget-resetpass">重置新密码
+                    <button class="layui-btn layui-btn-fluid" id="my_button2" lay-submit lay-filter="LAY-user-forget-resetpass">重置新密码
                     </button>
                 </div>
                 {{# } else { }}
@@ -66,7 +66,7 @@
                     </div>
                 </div>
                 <div class="layui-form-item">
-                    <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-forget-submit">找回密码
+                    <button class="layui-btn layui-btn-fluid" id="my_button1" lay-submit lay-filter="LAY-user-forget-submit">找回密码
                     </button>
                 </div>
                 {{# } }}
@@ -128,7 +128,14 @@
         /*****************************************************/
 
 
-        form.render();
+        $('#LAY-user-login-smscode').on('keydown', function (event) {
+            if (event.keyCode == 13) {
+                $("#my_button1").trigger("click");
+
+                return false
+            }
+        });
+
         //找回密码下一步
         form.on('submit(LAY-user-forget-submit)', function (obj) {
             var field = obj.field;
@@ -164,6 +171,14 @@
 
         });
 
+
+        $('#LAY-user-login-repass').on('keydown', function (event) {
+            if (event.keyCode == 13) {
+                $("#my_button2").trigger("click");
+
+                return false
+            }
+        });
 
         //重置密码
         form.on('submit(LAY-user-forget-resetpass)', function (obj) {

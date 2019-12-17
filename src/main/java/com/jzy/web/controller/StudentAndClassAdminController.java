@@ -46,7 +46,6 @@ public class StudentAndClassAdminController extends AbstractController {
         model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
         model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(Class.SEASONS));
         model.addAttribute(ModelConstants.SUB_SEASONS_MODEL_KEY, JSON.toJSONString(Class.SUB_SEASONS));
-        model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
         model.addAttribute(ModelConstants.GRADES_MODEL_KEY, JSON.toJSONString(Class.GRADES));
         model.addAttribute(ModelConstants.SUBJECTS_MODEL_KEY, JSON.toJSONString(Class.SUBJECTS));
         model.addAttribute(ModelConstants.TYPES_MODEL_KEY, JSON.toJSONString(Class.TYPES));
@@ -65,6 +64,8 @@ public class StudentAndClassAdminController extends AbstractController {
     @RequestMapping("/getStudentAndClassInfo")
     @ResponseBody
     public ResultMap<List<StudentAndClassDetailedDto>> getStudentAndClassInfo(MyPage myPage, StudentAndClassSearchCondition condition) {
+        condition.setStudentId(condition.getStudentId() == null ? null : condition.getStudentId().toUpperCase());
+        condition.setClassId(condition.getClassId() == null ? null : condition.getClassId().toUpperCase());
         PageInfo<StudentAndClassDetailedDto> pageInfo = studentAndClassService.listStudentAndClasses(myPage, condition);
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
     }
@@ -79,9 +80,6 @@ public class StudentAndClassAdminController extends AbstractController {
      */
     @RequestMapping("/updateForm")
     public String updateForm(Model model, StudentAndClassDetailedDto studentAndClassDetailedDto) {
-        model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
-
-        model.addAttribute(ModelConstants.STUDENT_AND_CLASS_EDIT_MODEL_KEY, studentAndClassDetailedDto);
         return "student/sc/admin/studentAndClassFormEdit";
     }
 
@@ -119,7 +117,6 @@ public class StudentAndClassAdminController extends AbstractController {
      */
     @RequestMapping("/insertForm")
     public String insertForm(Model model) {
-        model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
         return "student/sc/admin/studentAndClassFormAdd";
     }
 

@@ -377,6 +377,26 @@
         from class c left join assistant a on c.class_assistant_id = a.id left join teacher t on c.class_teacher_id = t.id
         where c.class_id=#{classId}
     </select>
+    <select id="listClassesLikeClassId" resultMap="BaseResultMap">
+        select c.* from class c
+        <where>
+            <if test="classId != null and classId!=''">
+                <bind name="classIdLike" value=" '%' + classId + '%' "/>
+                c.class_id like #{classIdLike}
+            </if>
+        </where>
+        order by c.class_id
+    </select>
+    <select id="listClassIdsLikeClassId" resultType="string">
+        select c.class_id from class c
+        <where>
+            <if test="classId != null and classId!=''">
+                <bind name="classIdLike" value=" '%' + classId + '%' "/>
+                c.class_id like #{classIdLike}
+            </if>
+        </where>
+        order by c.class_id
+    </select>
 
 
 </mapper>

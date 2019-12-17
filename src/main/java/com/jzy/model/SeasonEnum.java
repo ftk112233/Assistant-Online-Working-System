@@ -1,6 +1,7 @@
 package com.jzy.model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -11,8 +12,18 @@ import java.util.List;
  * @date 2019/12/1 9:55
  **/
 public enum SeasonEnum {
-    SUMMER("暑假", "A"), AUTUMN_1("秋上", "B"),AUTUMN_2("秋下", "C"), WINTER("寒假", "D"), SPRING("春季", "H");
+    SUMMER("暑假", "A", 10), AUTUMN_1("秋上", "B", 15),AUTUMN_2("秋下", "C", 20), WINTER("寒假", "D", 0), SPRING("春季", "H", 5);
 
+    public static final Comparator<String> SEASON_COMPARATOR =new SeasonComparator();
+    /**
+     * 自定义的季度比较器(寒假<春季<暑假<秋季)
+     */
+    private static class SeasonComparator implements Comparator<String> {
+        @Override
+        public int compare(String o1, String o2) {
+            return SeasonEnum.getTimeWeightBySeason(o1)-SeasonEnum.getTimeWeightBySeason(o2);
+        }
+    }
 
     private String season;
 
@@ -20,6 +31,11 @@ public enum SeasonEnum {
      * 班号中对应的代码，与名称一一对应
      */
     private String code;
+
+    /**
+     * 时间上排序的权重，寒假<春季<暑假<秋季
+     */
+    private int timeWeight;
 
     public String getCode() {
         return code;
@@ -29,9 +45,14 @@ public enum SeasonEnum {
         return season;
     }
 
-    SeasonEnum(String season, String code) {
+    public int getTimeWeight() {
+        return timeWeight;
+    }
+
+    SeasonEnum(String season, String code, int timeWeight) {
         this.season=season;
         this.code=code;
+        this.timeWeight=timeWeight;
     }
 
     /**
@@ -103,5 +124,35 @@ public enum SeasonEnum {
             return seasonEnum.getSeason();
         }
         return null;
+    }
+
+
+    /**
+     * 根据季度名称返回季度枚举
+     *
+     * @param season 季度
+     * @return
+     */
+    public static SeasonEnum getSeasonEnumBySeason(String season){
+        for (SeasonEnum seasonEnum : SeasonEnum.values()) {
+            if (seasonEnum.getSeason().equals(season)) {
+                return seasonEnum;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 根据季度名称返回季度的时间权重
+     *
+     * @param season 季度
+     * @return
+     */
+    public static int getTimeWeightBySeason(String season){
+        SeasonEnum seasonEnum=getSeasonEnumBySeason(season);
+        if (seasonEnum != null) {
+            return seasonEnum.getTimeWeight();
+        }
+        return -1;
     }
 }

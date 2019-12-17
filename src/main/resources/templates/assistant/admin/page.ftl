@@ -72,7 +72,7 @@
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit
+                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit id="my_button"
                             lay-filter="LAY-app-contcomm-search">
                         <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
                     </button>
@@ -238,6 +238,15 @@
             $("#form input").val("");
             $("#form select").val("");
         });
+
+        $('#form input').on('keydown', function (event) {
+            if (event.keyCode == 13) {
+                $("#my_button").trigger("click");
+
+                return false
+            }
+        });
+
 
         //监听搜索
         form.on('submit(LAY-app-contcomm-search)', function (data) {

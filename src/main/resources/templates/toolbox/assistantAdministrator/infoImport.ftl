@@ -166,7 +166,7 @@
                                  id="div2-import-teacher-and-class" hidden="hidden">
                                 <label class="layui-form-label">开课学期所在年份</label>
                                 <div class="layui-input-inline">
-                                    <input type="text" class="layui-input" placeholder="yyyy" id="year" name="year"
+                                    <input type="text" class="layui-input" autocomplete="off" placeholder="yyyy" id="year" name="year"
                                            lay-verify="required">
                                 </div>
                                 <div class="layui-form-mid " style="color:red">*必填项</div>

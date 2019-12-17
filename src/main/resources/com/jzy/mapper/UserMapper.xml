@@ -217,13 +217,12 @@
             </if>
             <if test="commonSearch != null and commonSearch!=''">
                 <bind name="commonSearchLike" value=" '%' + commonSearch + '%' "/>
-                and (u.user_work_id like #{commonSearchLike}
-                or u.user_id_card like #{commonSearchLike}
-                or u.user_name like #{commonSearchLike}
-                or u.user_real_name like #{commonSearchLike}
-                or u.user_real_name like #{commonSearchLike}
-                or u.user_email like #{commonSearchLike}
-                or u.user_phone like #{commonSearchLike})
+                and (u.user_work_id COLLATE utf8_general_ci like #{commonSearchLike}
+                or u.user_id_card COLLATE utf8_general_ci like #{commonSearchLike}
+                or u.user_name COLLATE utf8_general_ci like #{commonSearchLike}
+                or u.user_real_name COLLATE utf8_general_ci like #{commonSearchLike}
+                or u.user_email COLLATE utf8_general_ci like #{commonSearchLike}
+                or u.user_phone COLLATE utf8_general_ci like #{commonSearchLike})
             </if>
         </where>
         <if test="condition1 == 'userWorkId'">

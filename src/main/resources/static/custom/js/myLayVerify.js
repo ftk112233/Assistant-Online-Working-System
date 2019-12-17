@@ -84,11 +84,7 @@ layui.define(['table', 'form'], function (exports) {
                 return '任课教师要求长度不能超过200个字符';
             }
         }
-        , classTime: function (value) {
-            if (value.length > 50) {
-                return '上课时间不能超过50个字符';
-            }
-        }, classTimes: function (value) {
+        , classTimes: function (value) {
             if (!(value === '' || isDigit(value) && value <= 100)) {
                 return '班级上课次数不合法';
             }

@@ -36,7 +36,7 @@
                         <div class="layui-form-item">
                             <label class="layui-form-label">标题</label>
                             <div class="layui-input-block">
-                                <input type="text" name="title" id="title" value="${announcementEdit.title!""}" placeholder="请输入" autocomplete="off" class="layui-input" lay-verType="tips" lay-verify="required">
+                                <input type="text" name="title" id="title" value="${announcementEdit.title!""}" placeholder="请输入" class="layui-input" lay-verType="tips" lay-verify="required">
                             </div>
                         </div>
 

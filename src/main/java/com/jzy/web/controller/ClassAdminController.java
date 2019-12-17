@@ -225,7 +225,6 @@ public class ClassAdminController extends AbstractController {
         model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
         model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(Class.SEASONS));
         model.addAttribute(ModelConstants.SUB_SEASONS_MODEL_KEY, JSON.toJSONString(Class.SUB_SEASONS));
-        model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
         model.addAttribute(ModelConstants.GRADES_MODEL_KEY, JSON.toJSONString(Class.GRADES));
         model.addAttribute(ModelConstants.SUBJECTS_MODEL_KEY, JSON.toJSONString(Class.SUBJECTS));
         model.addAttribute(ModelConstants.TYPES_MODEL_KEY, JSON.toJSONString(Class.TYPES));
@@ -242,6 +241,7 @@ public class ClassAdminController extends AbstractController {
     @RequestMapping("/getClassInfo")
     @ResponseBody
     public ResultMap<List<ClassDetailedDto>> getClassInfo(MyPage myPage, ClassSearchCondition condition) {
+        condition.setClassId(condition.getClassId() == null ? null : condition.getClassId().toUpperCase());
         PageInfo<ClassDetailedDto> pageInfo = classService.listClasses(myPage, condition);
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
     }

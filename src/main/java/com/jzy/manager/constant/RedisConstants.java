@@ -23,9 +23,16 @@ public class RedisConstants {
 
     public static final String USER_LOGIN_KEY = USER_KEY + ":login";
 
+    /**
+     * 用户上次登录成功ip地址缓存
+     */
+    public static final String USER_LOGIN_IP_KEY = USER_LOGIN_KEY + ":ip";
+
+    /**
+     * 用户登录失败错误次数缓存
+     */
     public static final String USER_LOGIN_FAIL_KEY = USER_LOGIN_KEY + ":fail";
 
-    public static final String KEY_USER_LOGIN_NAMEANDPASSWORD = USER_LOGIN_KEY + ":nameAndPassword";
 
     /**
      * 用户的验证码根键
@@ -64,9 +71,14 @@ public class RedisConstants {
     public static final String USEFUL_INFORMATION_KEY = ROOT_KEY + ":usefulInformation";
 
     /**
-     * 常用信息的缓存额过期时间，21天
+     * 常用信息的缓存的过期时间，21天
      */
     public static final long USEFUL_INFORMATION_EXPIRE = 21;
+
+    /**
+     * 用户登陆成功ip的缓存的过期时间，60天
+     */
+    public static final long USER_LOGIN_IP_EXPIRE = 60;
 
     /**
      * 当前季度的缓存的键

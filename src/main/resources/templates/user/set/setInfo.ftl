@@ -49,7 +49,7 @@
                             <label class="layui-form-label">工号</label>
                             <div class="layui-input-inline">
                                 <input type="text" name="workId" value="${userInfo.userWorkId!""}"
-                                       class="layui-input" lay-verify="workId" lay-verType="tips" readonly>
+                                       class="layui-input" lay-verify="workId" lay-verType="tips" autocomplete="off" readonly>
                             </div>
                             <div class="layui-form-mid layui-word-aux" id="workId-flag">工号不可修改</div>
                         </div>
@@ -57,7 +57,7 @@
                             <label class="layui-form-label">用户名</label>
                             <div class="layui-input-inline">
                                 <input type="text" name="username" value="${userInfo.userName!""}"
-                                       class="layui-input" lay-verify="userName" lay-verType="tips">
+                                       class="layui-input" autocomplete="off" lay-verify="userName" lay-verType="tips">
                             </div>
                             <div class="layui-form-mid layui-word-aux" id="username-flag">必须是6-20个字符(字母、数字、下划线)，且以字母开头
                             </div>
@@ -66,7 +66,7 @@
                             <label class="layui-form-label">姓名</label>
                             <div class="layui-input-inline">
                                 <input type="text" name="realName" value="${userInfo.userRealName!""}"
-                                       class="layui-input" lay-verify="realName" lay-verType="tips">
+                                       class="layui-input" autocomplete="off" lay-verify="realName" lay-verType="tips">
                             </div>
                             <div class="layui-form-mid layui-word-aux" id="idCard-flag">推荐使用真实姓名，请谨慎修改哦</div>
                         </div>
@@ -74,7 +74,7 @@
                             <label class="layui-form-label">身份证</label>
                             <div class="layui-input-inline">
                                 <input type="text" name="idCard" value="${userInfo.userIdCard!""}"
-                                       class="layui-input" lay-verify="idCard" lay-verType="tips">
+                                       class="layui-input" autocomplete="off" lay-verify="idCard" lay-verType="tips">
                             </div>
                             <div class="layui-form-mid layui-word-aux" id="idCard-flag">请谨慎修改哦</div>
                         </div>
@@ -118,7 +118,7 @@
                             <label class="layui-form-label">邮箱</label>
                             <div class="layui-input-inline">
                                 <input type="text" name="email" id="hiddenUserEmail" value="${userInfo.userEmail!""}"
-                                       readonly
+                                       readonly autocomplete="off"
                                        class="layui-input" lay-verify="myemail" lay-verType="tips">
                             </div>
                             <div class="layui-form-mid layui-word-aux">
@@ -179,14 +179,12 @@
                 , upload = layui.upload;
 
         var secure = ['${userInfo.userIdCard!""}', '${userInfo.userEmail!""}', '${userInfo.userPhone!""}'];
-        console.log(secure);
         var secureParam = 0;
         for (var j = 0; j < secure.length; j++) {
             if (secure[j] !== '') {
                 secureParam++
             }
         }
-        console.log(secureParam);
         if (secureParam === 0) {
             $("#p0").attr("style", "display:block;");
             $("#p1").attr("style", "display:none;");

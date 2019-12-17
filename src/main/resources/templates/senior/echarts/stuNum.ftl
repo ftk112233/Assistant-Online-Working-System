@@ -26,7 +26,7 @@
                             <div class="layui-inline">
                                 <label class="layui-form-label">年份-季度</label>
                                 <div class="layui-input-inline">
-                                    <input type="text" class="layui-input" placeholder="yyyy" id="year" name="year">
+                                    <input autocomplete="off" type="text" class="layui-input" placeholder="yyyy" id="year" name="year">
                                 </div>
                                 <div class="layui-input-inline">
                                     <select name="season" id="season">

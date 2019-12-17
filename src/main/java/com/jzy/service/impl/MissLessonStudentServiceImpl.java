@@ -39,11 +39,6 @@ public class MissLessonStudentServiceImpl extends AbstractServiceImpl implements
 
     @Override
     public String updateMissLessonStudentInfo(MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
-        if (missLessonStudentDetailedDto.getCurrentClassId().equals(missLessonStudentDetailedDto.getOriginalClassId())) {
-            //原班级和补课班级相同
-            return "theSameClass";
-        }
-
         if (classService.getClassByClassId(missLessonStudentDetailedDto.getOriginalClassId()) == null) {
             //原班号不存在
             return "originalClassNotExist";
@@ -60,11 +55,6 @@ public class MissLessonStudentServiceImpl extends AbstractServiceImpl implements
 
     @Override
     public String insertMissLessonStudent(MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
-        if (missLessonStudentDetailedDto.getCurrentClassId().equals(missLessonStudentDetailedDto.getOriginalClassId())) {
-            //原班级和补课班级相同
-            return "theSameClass";
-        }
-
         if (classService.getClassByClassId(missLessonStudentDetailedDto.getOriginalClassId()) == null) {
             //原班号不存在
             return "originalClassNotExist";

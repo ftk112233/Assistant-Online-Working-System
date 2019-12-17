@@ -38,7 +38,9 @@ public class ModelConstants {
 
     /**
      * 值为所有班级编码所对应的model键
+     *     舍弃下拉select中渲染全部班级编码的方式，使用input后端搜索渲染。2019/12/16
      */
+    @Deprecated
     public static final String CLASS_IDS_MODEL_KEY = "classIds";
 
     /**
@@ -76,14 +78,19 @@ public class ModelConstants {
     public static final String CURRENT_ClASS_SEASON_MODEL_KEY = "currentClassSeason";
 
     /**
-     * 通过"查看该班学生"功能跳转学生插叙页面是，传递的班级编码的model键
+     * 通过"查看该班学生"功能跳转学生查询页面时，传递的班级编码的model键
      */
     public static final String CLASS_ID_MODEL_KEY = "classId";
 
     /**
-     * 通过"开班做表"功能跳转做表页面是，传递的班级校区的model键
+     * 通过"开班做表"功能跳转做表页面时，传递的班级校区的model键
      */
     public static final String CLASS_CAMPUS_MODEL_KEY = "classCampus";
+
+    /**
+     * 通过"开补课单"功能跳转做表页面时，存放的学生上课信息的model键
+     */
+    public static final String STUDENT_AND_CLASS_MODEL_KEY = "studentAndClass";
 
     /**
      * 跳转编辑用户iframe页面时，存放的model键

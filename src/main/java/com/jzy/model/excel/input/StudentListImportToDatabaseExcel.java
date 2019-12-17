@@ -152,11 +152,11 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
             }  else {
                 effectiveDataRowCount++;
             }
-            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId);
+            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId).toUpperCase();
             String studentName = this.getValueAt(sheetIx, i, columnIndexOfStudentName);
             String studentPhone = this.getValueAt(sheetIx, i, columnIndexOfStudentPhone);
             String studentPhoneBackup = this.getValueAt(sheetIx, i, columnIndexOfStudentPhoneBackup);
-            String classId = this.getValueAt(sheetIx, i, columnIndexOfClassId);
+            String classId = this.getValueAt(sheetIx, i, columnIndexOfClassId).toUpperCase();
             String registerTime = this.getValueAt(sheetIx, i, columnIndexOfRegisterTime);
             String remark = this.getValueAt(sheetIx, i, columnIndexOfRemark);
 
@@ -230,6 +230,7 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
                 effectiveDataRowCount++;
             }
             String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId);
+            studentId = studentId == null ? null : studentId.toUpperCase();
             String studentName = this.getValueAt(sheetIx, i, columnIndexOfStudentName);
             String studentPhone = this.getValueAt(sheetIx, i, columnIndexOfStudentPhone);
             String studentPhoneBackup = this.getValueAt(sheetIx, i, columnIndexOfStudentPhoneBackup);

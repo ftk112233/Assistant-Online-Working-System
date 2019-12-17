@@ -20,13 +20,13 @@
                 <div class="layui-inline">
                     <label class="layui-form-label">学员号</label>
                     <div class="layui-input-inline">
-                        <input type="text" class="layui-input" placeholder="请输入" name="studentId">
+                        <input type="text" class="layui-input" placeholder="请输入" name="studentId" autocomplete="off">
                     </div>
                 </div>
                 <div class="layui-inline">
                     <label class="layui-form-label">学员姓名</label>
                     <div class="layui-input-inline">
-                        <input type="text" class="layui-input" placeholder="请输入" name="studentName">
+                        <input type="text" class="layui-input" placeholder="请输入" name="studentName" autocomplete="off">
                     </div>
                 </div>
                 <div class="layui-inline">
@@ -70,7 +70,7 @@
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit
+                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit id="my_button"
                             lay-filter="LAY-app-contcomm-search">
                         <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
                     </button>
@@ -175,6 +175,13 @@
             $("#form select").val("");
         });
 
+        $('#form input').on('keydown', function (event) {
+            if (event.keyCode == 13) {
+                $("#my_button").trigger("click");
+
+                return false
+            }
+        });
 
         //监听查询我的班级
         form.on('submit(LAY-app-contcomm-search)', function (data) {

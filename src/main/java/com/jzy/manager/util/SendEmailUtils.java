@@ -1,5 +1,7 @@
 package com.jzy.manager.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -24,17 +26,9 @@ public class SendEmailUtils {
     private static final String USERNAME = "929703621"; // 此处填写发送的邮箱名
     private static final String PASSWORD = "bpofvasqxhjlbchg"; // 此处填写登录的邮箱密码（授权码！非密码）
 
-    private static String subject = "AOWS验证码"; //邮件主题
+    private static String subject = "AOWS验证码"; //邮件默认主题
 
     private static final String HOST = "smtp.qq.com"; //邮件服务器
-
-    public static String getSubject() {
-        return subject;
-    }
-
-    public static void setSubject(String subject) {
-        SendEmailUtils.subject = subject;
-    }
 
     public static boolean sendMail(String emailAddress, String emailMsg) {
         return sendMail(emailAddress, emailMsg, subject);
@@ -153,5 +147,115 @@ public class SendEmailUtils {
         } catch (MessagingException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 创建发送加密邮件线程
+     *
+     * @param addressTo
+     * @param subject
+     * @param message
+     * @return
+     */
+    private static Thread createSendEncryptedEmailThread(String addressTo, String subject, String message) {
+        return new SendEncryptedEmailThread(addressTo, subject, message);
+    }
+
+    /**
+     * 以线程的方式发送加密邮件
+     *
+     * @param addressTo
+     * @param subject
+     * @param message
+     */
+    public static void sendConcurrentEncryptedEmail(String addressTo, String subject, String message) {
+        createSendEncryptedEmailThread(addressTo, subject, message).start();
+    }
+
+    /**
+     * 以线程的方式发送加密邮件
+     *
+     * @param addressTo
+     * @param message
+     */
+    public static void sendConcurrentEncryptedEmail(String addressTo, String message) {
+        createSendEncryptedEmailThread(addressTo, subject, message).start();
+    }
+
+    /**
+     * 发送加密邮件线程
+     */
+    private static class SendEncryptedEmailThread extends Thread {
+        private String addressTo;
+
+        private String subject;
+
+        private String message;
+
+        SendEncryptedEmailThread(String addressTo, String subject, String message) {
+            this.addressTo = addressTo;
+            this.subject = subject;
+            this.message = message;
+        }
+
+        @Override
+        public void run() {
+            if (!StringUtils.isEmpty(addressTo)) {
+                SendEmailUtils.sendEncryptedEmail(addressTo, subject, message);
+            }
+        }
+
+    }
+
+    /**
+     * 创建发送普通邮件线程
+     *
+     * @param addressTo
+     * @param subject
+     * @param message
+     * @return
+     */
+    private static Thread createSendEmailThread(String addressTo, String subject, String message) {
+        return new SendEmailThread(addressTo, subject, message);
+    }
+
+    /**
+     * 以线程的方式发送普通邮件
+     *
+     * @param addressTo
+     * @param subject
+     * @param message
+     */
+    public static void sendConcurrentEmail(String addressTo, String subject, String message) {
+        createSendEmailThread(addressTo, subject, message).start();
+    }
+
+    /**
+     * 发送普通邮件线程
+     */
+    private static class SendEmailThread extends Thread {
+        private String addressTo;
+
+        private String subject;
+
+        private String message;
+
+        SendEmailThread(String addressTo, String subject, String message) {
+            this.addressTo = addressTo;
+            this.subject = subject;
+            this.message = message;
+        }
+
+        @Override
+        public void run() {
+            if (!StringUtils.isEmpty(addressTo)) {
+                SendEmailUtils.sendMail(addressTo, subject, message);
+            }
+        }
+
+    }
+
+    public static void main(String[] args) {
+        sendConcurrentEncryptedEmail("929703621@qq.com", "1", "222");
     }
 }

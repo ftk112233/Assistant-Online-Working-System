@@ -56,9 +56,9 @@
                 <div class="layui-inline">
                     <label class="layui-form-label">班级编码</label>
                     <div class="layui-input-inline">
-                        <select name="classId" id="classId" lay-search>
-                            <option value="">请输入或选择班级编码</option>
-                        </select>
+                        <input name="classId" id="classId"
+                               autocomplete="off" class="layui-input"
+                               placeholder="U6MCFC020001">
                     </div>
                 </div>
                 <div class="layui-inline">
@@ -141,7 +141,7 @@
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit
+                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit id="my_button"
                             lay-filter="LAY-app-contcomm-search">
                         <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
                     </button>
@@ -164,6 +164,7 @@
             </div>
             <table id="scTables" lay-filter="LAY-app-content-comm"></table>
             <script type="text/html" id="table-content-list1">
+                <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="make-missLesson-table">开补课单</a>
                 <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i
                         class="layui-icon layui-icon-edit"></i>转班</a>
                 <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i
@@ -183,7 +184,7 @@
         base: '${ctx}/plugins/layuiadmin/' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use(['index', 'user', 'upload', 'laydate'], function () {
+    }).use(['index', 'user', 'upload', 'laydate', 'autocomplete'], function () {
         var $ = layui.$
                 , admin = layui.admin
                 , form = layui.form
@@ -191,7 +192,8 @@
                 , laypage = layui.laypage
                 , laytpl = layui.laytpl
                 , upload = layui.upload
-                , laydate = layui.laydate;
+                , laydate = layui.laydate
+                , autocomplete = layui.autocomplete;
 
         laydate.render({
             elem: '#year'
@@ -224,14 +226,18 @@
             $("#subSeason").append(str);
         }
 
+        layui.link('${ctx}/custom/css/autocomplete.css');
+        autocomplete.render({
+            elem: $('#classId')[0],
+            cache: true,
+            url: '${ctx}/class/getClassesLikeClassId',
+            response: {code: 'code', data: 'data'},
+            template_val: '{{d.classId}}',
+            template_txt: '{{d.classId}} <span class=\'layui-badge layui-bg-gray\'>{{d.classGeneralName}}</span>',
+            onselect: function (resp) {
 
-        var classIds = eval('(' + '${classIds}' + ')');
-        for (var i = 0; i < classIds.length; i++) {
-            var json = classIds[i];
-            var str = "";
-            str += '<option value="' + json + '">' + json + '</option>';
-            $("#classId").append(str);
-        }
+            }
+        });
 
         var grades = eval('(' + '${grades}' + ')');
         for (var i = 0; i < grades.length; i++) {
@@ -279,7 +285,7 @@
                         var json = data[i];
                         $("#classroom").append('<option value="' + json + '">' + json + '</option>');
                     }
-                    form.render('select');
+                    form.render();
                 }
             });
         });
@@ -302,6 +308,7 @@
                 , {field: 'updateTime', title: '更新时间', sort: true, hide: true}
                 , {field: 'studentId', title: '学员号', width: 150, sort: true}
                 , {field: 'studentName', title: '学员姓名', width: 120, sort: true}
+                , {field: 'studentPhone', title: '手机', width: 120, hide: true}
                 , {field: 'classId', title: '班级编码', width: 140, hide: true, sort: true}
                 , {field: 'className', title: '班级名称', sort: true}
                 , {field: 'classCampus', title: '校区', width: 80, sort: true}
@@ -319,7 +326,7 @@
                 , {field: 'classroom', title: '上课教室', width: 90}
                 , {field: 'registerTime', title: '进班时间', sort: true}
                 , {field: 'remark', title: '报班备注', hide: true}
-                , {title: '操作', minWidth: 150, align: 'center', toolbar: '#table-content-list1'}
+                , {title: '操作', minWidth: 220, align: 'center', toolbar: '#table-content-list1'}
             ]]
             , where: {
                 classYear: $("#year").val()
@@ -355,6 +362,13 @@
             $("#form select").val("");
         });
 
+        $('#form input').on('keydown', function (event) {
+            if (event.keyCode == 13) {
+                $("#my_button").trigger("click");
+
+                return false
+            }
+        });
 
         //监听查询我的班级
         form.on('submit(LAY-app-contcomm-search)', function (data) {
@@ -573,7 +587,19 @@
         //监听工具条
         table.on('tool(LAY-app-content-comm)', function (obj) {
             var data = obj.data;
-            if (obj.event === 'del') {
+            if (obj.event === 'make-missLesson-table') {
+                //打开一个新页面
+                var othis = $(this)
+                        ,
+                        href = '${ctx}/toolbox/assistant/missLessonStudentExcel?studentId=' + data.studentId +'&studentName=' + data.studentName+'&studentPhone=' + data.studentPhone+
+                                '&classId=' + data.classId+ '&classCampus=' + data.classCampus
+                        , text = "开补课单魔法"
+                        , router = layui.router();
+
+
+                var topLayui = parent === self ? layui : top.layui;
+                topLayui.index.openTabsPage(href, text || othis.text());
+            } else if (obj.event === 'del') {
                 layer.confirm('确定删除此学员上课记录吗？', function (index) {
                     //提交删除ajax
                     $.ajax({
@@ -673,6 +699,7 @@
                         othis.find('input[name="id"]').val(data.id);
                         othis.find('input[name="studentId"]').val(data.studentId);
                         othis.find('input[name="studentName"]').val(data.studentName);
+                        othis.find('input[name="classId"]').val(data.classId);
                         othis.find('input[name="registerTime"]').val(data.registerTime);
                         othis.find('textarea[name="remark"]').val(data.remark);
                     }

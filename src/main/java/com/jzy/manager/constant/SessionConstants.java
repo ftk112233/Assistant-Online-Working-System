@@ -37,4 +37,9 @@ public class SessionConstants {
      * 通过小问题免密登录的键
      */
     public static final String LOGIN_QUESTION_SESSION_KEY = "loginQuestion";
+
+    /**
+     * 是否需要滑块验证的键
+     */
+    public static final String REQUIRE_SLIDER_AUTH_SESSION_KEY = "requireSlider";
 }

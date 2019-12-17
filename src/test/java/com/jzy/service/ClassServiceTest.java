@@ -15,4 +15,15 @@ public class ClassServiceTest extends BaseTest {
         excel.readClassDetailFromExcel();
         classService.insertAndUpdateClassesFromExcel(excel.getClassDetailedDtos());
     }
+
+    @Test
+    public void listClassesLikeClassId() {
+        System.out.println(classService.listClassesLikeClassId("U6MC"));
+    }
+
+    @Test
+    public void listClassIdsLikeClassId() {
+        System.out.println(classService.listClassIdsLikeClassId("U6MC"));
+    }
+
 }

@@ -153,6 +153,7 @@ public class UserAdminController extends AbstractController {
     @RequestMapping("/getUserInfo")
     @ResponseBody
     public ResultMap<List<User>> getUserInfo(MyPage myPage, UserSearchCondition condition) {
+        condition.setUserIdCard(condition.getUserIdCard() == null ? null : condition.getUserIdCard().toUpperCase());
         PageInfo<User> pageInfo = userService.listUsers(myPage, condition);
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
     }

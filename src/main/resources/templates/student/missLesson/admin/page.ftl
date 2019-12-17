@@ -20,27 +20,27 @@
                 <div class="layui-inline">
                     <label class="layui-form-label">补课日期</label>
                     <div class="layui-input-inline">
-                        <input type="text" class="layui-input" placeholder="yyyy-MM-dd" id="date" name="date">
+                        <input type="text" class="layui-input" placeholder="yyyy-MM-dd" id="date" name="date" autocomplete="off">
                     </div>
                 </div>
                 <div class="layui-inline">
                     <label class="layui-form-label">学员号</label>
                     <div class="layui-input-inline">
-                        <input type="text" class="layui-input" placeholder="请输入" name="studentId">
+                        <input type="text" class="layui-input" placeholder="请输入" name="studentId" autocomplete="off">
                     </div>
                 </div>
                 <div class="layui-inline">
                     <label class="layui-form-label">学员姓名</label>
                     <div class="layui-input-inline">
-                        <input type="text" class="layui-input" placeholder="请输入" name="studentName">
+                        <input type="text" class="layui-input" placeholder="请输入" name="studentName" autocomplete="off">
                     </div>
                 </div>
                 <div class="layui-inline">
                     <label class="layui-form-label">原班号</label>
                     <div class="layui-input-inline">
-                        <select name="originalClassId" id="originalClassId" lay-search>
-                            <option value="">请输入或选择班级编码</option>
-                        </select>
+                        <input name="originalClassId" id="originalClassId"
+                               autocomplete="off" class="layui-input"
+                               placeholder="U6MCFC020002">
                     </div>
                 </div>
                 <div class="layui-inline">
@@ -67,9 +67,9 @@
                 <div class="layui-inline">
                     <label class="layui-form-label">补课班号</label>
                     <div class="layui-input-inline">
-                        <select name="currentClassId" id="currentClassId" lay-search>
-                            <option value="">请输入或选择班级编码</option>
-                        </select>
+                        <input name="currentClassId" id="currentClassId"
+                               autocomplete="off" class="layui-input"
+                               placeholder="U6MCFC020001">
                     </div>
                 </div>
                 <div class="layui-inline">
@@ -120,7 +120,7 @@
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit
+                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit id="my_button"
                             lay-filter="LAY-app-contcomm-search">
                         <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
                     </button>
@@ -172,7 +172,7 @@
         base: '${ctx}/plugins/layuiadmin/' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use(['index', 'user', 'upload', 'laydate'], function () {
+    }).use(['index', 'user', 'upload', 'laydate', 'autocomplete'], function () {
         var $ = layui.$
                 , admin = layui.admin
                 , form = layui.form
@@ -180,7 +180,8 @@
                 , laypage = layui.laypage
                 , laytpl = layui.laytpl
                 , upload = layui.upload
-                , laydate = layui.laydate;
+                , laydate = layui.laydate
+                , autocomplete = layui.autocomplete;
 
 
         laydate.render({
@@ -188,20 +189,29 @@
             , type: 'date'
         });
 
-        var classIds = eval('(' + '${classIds}' + ')');
-        for (var i = 0; i < classIds.length; i++) {
-            var json = classIds[i];
-            var str = "";
-            str += '<option value="' + json + '">' + json + '</option>';
-            $("#originalClassId").append(str);
-        }
+        layui.link('${ctx}/custom/css/autocomplete.css');
+        autocomplete.render({
+            elem: $('#originalClassId')[0],
+            cache: true,
+            url: '${ctx}/class/getClassesLikeClassId',
+            response: {code: 'code', data: 'data'},
+            template_val: '{{d.classId}}',
+            template_txt: '{{d.classId}} <span class=\'layui-badge layui-bg-gray\'>{{d.classGeneralName}}</span>',
+            onselect: function (resp) {
 
-        for (var i = 0; i < classIds.length; i++) {
-            var json = classIds[i];
-            var str = "";
-            str += '<option value="' + json + '">' + json + '</option>';
-            $("#currentClassId").append(str);
-        }
+            }
+        });
+        autocomplete.render({
+            elem: $('#currentClassId')[0],
+            cache: true,
+            url: '${ctx}/class/getClassesLikeClassId',
+            response: {code: 'code', data: 'data'},
+            template_val: '{{d.classId}}',
+            template_txt: '{{d.classId}} <span class=\'layui-badge layui-bg-gray\'>{{d.classGeneralName}}</span>',
+            onselect: function (resp) {
+
+            }
+        });
 
         $("#condition1").val('date');
         $("#condition2").val('desc');
@@ -275,6 +285,14 @@
             $("#form select").val("");
         });
 
+
+        $('#form input').on('keydown', function (event) {
+            if (event.keyCode == 13) {
+                $("#my_button").trigger("click");
+
+                return false
+            }
+        });
 
         //监听查询
         form.on('submit(LAY-app-contcomm-search)', function (data) {
@@ -637,6 +655,8 @@
                         othis.find('input[name="studentId"]').val(data.studentId);
                         othis.find('input[name="studentName"]').val(data.studentName);
                         othis.find('input[name="studentPhone"]').val(data.studentPhone);
+                        othis.find('input[name="originalClassId"]').val(data.originalClassId);
+                        othis.find('input[name="currentClassId"]').val(data.currentClassId);
                         othis.find('input[name="date"]').val(data.date);
                         othis.find('textarea[name="remark"]').val(data.remark);
                     }

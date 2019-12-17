@@ -3,7 +3,6 @@ package com.jzy.web.controller;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jzy.manager.constant.Constants;
-import com.jzy.manager.constant.ModelConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.MissLessonStudentUtils;
 import com.jzy.model.dto.MissLessonStudentDetailedDto;
@@ -43,7 +42,6 @@ public class MissLessonStudentAdminController extends AbstractController {
      */
     @RequestMapping("/page")
     public String page(Model model) {
-        model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
         return "student/missLesson/admin/page";
     }
 
@@ -57,6 +55,9 @@ public class MissLessonStudentAdminController extends AbstractController {
     @RequestMapping("/getMissLessonStudentInfo")
     @ResponseBody
     public ResultMap<List<MissLessonStudentDetailedDto>> getMissLessonStudentInfo(MyPage myPage, MissLessonStudentSearchCondition condition) {
+        condition.setStudentId(condition.getStudentId() == null ? null : condition.getStudentId().toUpperCase());
+        condition.setOriginalClassId(condition.getOriginalClassId() == null ? null : condition.getOriginalClassId().toUpperCase());
+        condition.setCurrentClassId(condition.getCurrentClassId() == null ? null : condition.getCurrentClassId().toUpperCase());
         PageInfo<MissLessonStudentDetailedDto> pageInfo = missLessonStudentService.listMissLessonStudents(myPage, condition);
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
     }
@@ -102,8 +103,7 @@ public class MissLessonStudentAdminController extends AbstractController {
      */
     @RequestMapping("/updateForm")
     public String updateForm(Model model, MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
-        model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
-        model.addAttribute(ModelConstants.MISS_LESSON_STUDENT_EDIT_MODEL_KEY, missLessonStudentDetailedDto);
+//        model.addAttribute(ModelConstants.MISS_LESSON_STUDENT_EDIT_MODEL_KEY, missLessonStudentDetailedDto);
         return "student/missLesson/admin/missLessonStudentFormEdit";
     }
 
@@ -115,7 +115,6 @@ public class MissLessonStudentAdminController extends AbstractController {
      */
     @RequestMapping("/insertForm")
     public String insertForm(Model model) {
-        model.addAttribute(ModelConstants.CLASS_IDS_MODEL_KEY, JSON.toJSONString(classService.listAllClassIds()));
         return "student/missLesson/admin/missLessonStudentFormAdd";
     }
 

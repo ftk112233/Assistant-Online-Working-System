@@ -100,4 +100,20 @@ public interface ClassMapper {
      * @return
      */
     long deleteClassesByCondition(ClassSearchCondition condition);
+
+    /**
+     * 根据班级编码模糊查询班级,注意这里classId不是主键id
+     *
+     * @param classId 班级编码
+     * @return
+     */
+    List<Class> listClassesLikeClassId(@Param("classId") String classId);
+
+    /**
+     * 根据班级编码模糊查询返回匹配的班级编码,注意这里classId不是主键id
+     *
+     * @param classId 班级编码
+     * @return
+     */
+    List<String> listClassIdsLikeClassId(@Param("classId") String classId);
 }

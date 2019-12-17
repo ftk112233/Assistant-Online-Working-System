@@ -20,7 +20,7 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">综合搜索</label>
                     <div class="layui-input-block">
-                        <input type="text" name="commonSearch" placeholder="搜索你想发送消息的用户：姓名/用户名/工号/身份证/手机号/邮箱" autocomplete="off" class="layui-input">
+                        <input type="text" name="commonSearch" placeholder="搜索你想发送消息的用户：姓名/用户名/工号/身份证/手机号/邮箱" class="layui-input">
                     </div>
                 </div>
                 <div class="layui-inline">
@@ -59,7 +59,7 @@
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit
+                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit id="my_button"
                             lay-filter="LAY-app-contcomm-search">
                         <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
                     </button>
@@ -196,6 +196,14 @@
         $("#clear").click(function () {
             $("#form input").val("");
             $("#form select").val("");
+        });
+
+        $('#form input').on('keydown', function (event) {
+            if (event.keyCode == 13) {
+                $("#my_button").trigger("click");
+
+                return false
+            }
         });
 
         //监听搜索

@@ -42,6 +42,7 @@ public enum  GradeEnum {
     }
 
     GradeEnum(String grade, String code, int weight) {
+
         this.grade=grade;
         this.code=code;
         this.weight=weight;

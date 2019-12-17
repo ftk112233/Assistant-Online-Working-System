@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,6 +41,11 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     @Override
     public Class getClassByClassId(String classId) {
         return StringUtils.isEmpty(classId) ? null : classMapper.getClassByClassId(classId);
+    }
+
+    @Override
+    public List<Class> listClassesLikeClassId(String classId) {
+        return StringUtils.isEmpty(classId) ? new ArrayList<>() : classMapper.listClassesLikeClassId(classId);
     }
 
     @Override
@@ -168,6 +174,11 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     @Override
     public List<String> listAllClassIds() {
         return classMapper.listAllClassIds();
+    }
+
+    @Override
+    public List<String> listClassIdsLikeClassId(String classId) {
+        return StringUtils.isEmpty(classId) ? new ArrayList<>() : classMapper.listClassIdsLikeClassId(classId);
     }
 
     @Override

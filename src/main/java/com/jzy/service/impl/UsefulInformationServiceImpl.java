@@ -213,7 +213,7 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
 
         //清缓存
         String key = RedisConstants.USEFUL_INFORMATION_KEY;
-        hashOps.delete(key, information.getBelongTo());
+        redisTemplate.expire(key, 0, TimeUnit.MINUTES);
 
         usefulInformationMapper.insertUsefulInformation(information);
         return Constants.SUCCESS;

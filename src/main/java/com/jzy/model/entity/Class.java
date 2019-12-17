@@ -7,6 +7,9 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -21,6 +24,39 @@ import java.util.List;
 @Data
 public class Class extends BaseEntity {
     private static final long serialVersionUID = 2082795401009058210L;
+
+    public static final Comparator<Class> CLASS_YEAR_SEASON_SUB_SEASON_COMPARATOR = new ClassYearSeasonSubSeasonComparator();
+
+    /**
+     * 自定义的班级上课年份季度比较器，先按年份从高到低排序，后按季度由高到低排序，再按分期由高到低排序
+     */
+    private static class ClassYearSeasonSubSeasonComparator implements Comparator<Class> {
+        @Override
+        public int compare(Class o1, Class o2) {
+            if (o1.getClassYear() != null && o2.getClassYear() != null) {
+                int i = 0 - String.CASE_INSENSITIVE_ORDER.compare(o1.getClassYear(), o2.getClassYear());
+                if (i != 0) {
+                    return i;
+                }
+            }
+
+            if (o1.getClassSeason() != null && o2.getClassSeason() != null) {
+                int i = 0 - SeasonEnum.SEASON_COMPARATOR.compare(o1.getClassSeason(), o2.getClassSeason());
+                if (i != 0) {
+                    return i;
+                }
+            }
+
+            if (o1.getClassSubSeason() != null && o2.getClassSubSeason() != null) {
+                int i = 0 - SubSeasonEnum.SUB_SEASON_COMPARATOR.compare(o1.getClassSubSeason(), o2.getClassSubSeason());
+                if (i != 0) {
+                    return i;
+                }
+            }
+
+            return 0;
+        }
+    }
 
     public static final List<String> SEASONS = SeasonEnum.getSeasonsList();
 
@@ -198,5 +234,45 @@ public class Class extends BaseEntity {
     public void setParsedClassYear() {
         String year = this.getClassYear();
         this.setClassYear(parseYear(year));
+    }
+
+    public Class(String classId) {
+        this.classId = classId;
+    }
+
+    public Class() {
+    }
+
+    public static void main(String[] args) {
+        List<Class> classes = new ArrayList<>();
+        Class c1 = new Class("1");
+        c1.setClassYear("2019");
+        c1.setClassSeason("秋上");
+        c1.setClassSubSeason("一期");
+        classes.add(c1);
+
+        Class c2 = new Class("2");
+        c2.setClassYear("2019");
+        c2.setClassSeason("暑假");
+        c2.setClassSubSeason("二期");
+        classes.add(c2);
+
+        Class c3 = new Class("3");
+        c3.setClassYear("2020");
+        c3.setClassSeason("暑假");
+        c3.setClassSubSeason("二期");
+        classes.add(c3);
+
+        Class c4 = new Class("4");
+        c4.setClassYear("2020");
+        c4.setClassSeason("寒假");
+        c4.setClassSubSeason(null);
+        classes.add(c4);
+
+        Collections.sort(classes, Class.CLASS_YEAR_SEASON_SUB_SEASON_COMPARATOR);
+
+        for (Class clazz : classes) {
+            System.out.println(clazz);
+        }
     }
 }

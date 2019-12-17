@@ -20,17 +20,44 @@
             <div class="layui-card">
                 <div class="layui-card-header">制作补课单</div>
                 <div class="layui-card-body" pad15>
-
                     <div class="layui-form" lay-filter="">
-                        <div class="layui-form-item" id="div-classroom">
+                        <#--<div class="layui-form-item">-->
+                            <#--<label class="layui-form-label">学员号</label>-->
+                            <#--<div class="layui-input-inline">-->
+                                <#--<input name="studentId" id="studentId"-->
+                                       <#--autocomplete="off" class="layui-input"-->
+                                       <#--placeholder="SH01001">-->
+                            <#--</div>-->
+                        <#--</div>-->
+                        <div class="layui-form-item">
                             <label class="layui-form-label">学员姓名</label>
                             <div class="layui-input-inline">
-                                <input name="studentName" lay-verify="realName" lay-verType="tips"
+                                <input name="studentName" id="studentName" lay-verify="realName" lay-verType="tips"
                                        autocomplete="off" class="layui-input"
                                        placeholder="魔仙小蓝">
                             </div>
                             <div class="layui-form-mid " style="color:red">*必填项</div>
+                            <label class="layui-form-label">学员号</label>
+                            <div class="layui-input-inline">
+                                <input name="studentId" id="studentId" lay-verify="missLessonStudentId" lay-verType="tips"
+                                       autocomplete="off" class="layui-input"
+                                       placeholder="SH2179540">
+                            </div>
+                            <label class="layui-form-label">学员电话</label>
+                            <div class="layui-input-inline">
+                                <input name="studentPhone" id="studentPhone"
+                                       autocomplete="off" class="layui-input"
+                                       placeholder="10086" lay-verify="studentPhone" lay-verType="tips">
+                            </div>
                         </div>
+                        <#--<div class="layui-form-item">-->
+                            <#--<label class="layui-form-label">学员电话</label>-->
+                            <#--<div class="layui-input-inline">-->
+                                <#--<input name="studentPhone" id="studentPhone"-->
+                                       <#--autocomplete="off" class="layui-input"-->
+                                       <#--placeholder="10086">-->
+                            <#--</div>-->
+                        <#--</div>-->
                         <div class="layui-form-item">
                             <label class="layui-form-label">原班校区</label>
                             <div class="layui-input-inline">
@@ -42,9 +69,9 @@
                             <div class="layui-form-mid " style="color:red">*必填项</div>
                             <label class="layui-form-label">原班号</label>
                             <div class="layui-input-inline">
-                                <select name="originalClassId" id="originalClassId" lay-verify="classId" lay-verType="tips" lay-search>
-                                    <option value="">请输入或选择班级编码</option>
-                                </select>
+                                    <input name="originalClassId" id="originalClassId" lay-verify="classId" lay-verType="tips"
+                                           autocomplete="off" class="layui-input"
+                                           placeholder="U6MCFC020001">
                             </div>
                             <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #1E9FFF"
                                     id="preview-class">预览班级信息
@@ -62,9 +89,9 @@
                             <div class="layui-form-mid " style="color:red">*必填项</div>
                             <label class="layui-form-label">补课班号</label>
                             <div class="layui-input-inline">
-                                <select name="currentClassId" id="currentClassId" lay-verify="classId" lay-verType="tips" lay-search>
-                                    <option value="">请输入或选择班级编码</option>
-                                </select>
+                                <input name="currentClassId" id="currentClassId" lay-verify="classId" lay-verType="tips"
+                                       autocomplete="off" class="layui-input"
+                                       placeholder="U6MCFC020001">
                             </div>
                             <div class="layui-form-mid " style="color:red">*必填项</div>
                             <div class="layui-input-inline">
@@ -74,7 +101,7 @@
                             </div>
                             <label class="layui-form-label">补课日期</label>
                             <div class="layui-input-inline">
-                                <input type="text" class="layui-input" placeholder="yyyy-MM-dd" id="date" name="date" lay-verify="required" lay-verType="tips">
+                                <input type="text" class="layui-input" placeholder="yyyy-MM-dd" id="date" name="date" lay-verify="required" lay-verType="tips" autocomplete="off">
                             </div>
                             <div class="layui-form-mid " style="color:red">*必填项</div>
                         </div>
@@ -118,7 +145,7 @@
         base: '${ctx}/plugins/layuiadmin/' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use(['index', 'set', 'element','laydate'], function () {
+    }).use(['index', 'set', 'element','laydate', 'autocomplete'], function () {
         var $ = layui.$
                 , setter = layui.setter
                 , admin = layui.admin
@@ -126,7 +153,32 @@
                 , element = layui.element
                 , router = layui.router()
                 , upload = layui.upload
-                , laydate = layui.laydate;
+                , laydate = layui.laydate
+                , autocomplete = layui.autocomplete;
+
+        layui.link('${ctx}/custom/css/autocomplete.css');
+        autocomplete.render({
+            elem: $('#originalClassId')[0],
+            cache: true,
+            url: '${ctx}/class/getClassesLikeClassId',
+            response: {code: 'code', data: 'data'},
+            template_val: '{{d.classId}}',
+            template_txt: '{{d.classId}} <span class=\'layui-badge layui-bg-gray\'>{{d.classGeneralName}}</span>',
+            onselect: function (resp) {
+
+            }
+        });
+        autocomplete.render({
+            elem: $('#currentClassId')[0],
+            cache: true,
+            url: '${ctx}/class/getClassesLikeClassId',
+            response: {code: 'code', data: 'data'},
+            template_val: '{{d.classId}}',
+            template_txt: '{{d.classId}} <span class=\'layui-badge layui-bg-gray\'>{{d.classGeneralName}}</span>',
+            onselect: function (resp) {
+
+            }
+        });
 
         var campusNames = eval('(' + '${campusNames}' + ')');
         for (var i = 0; i < campusNames.length; i++) {
@@ -144,24 +196,16 @@
             form.render('select');
         });
 
-        var classIds = eval('(' + '${classIds}' + ')');
-        for (var i = 0; i < classIds.length; i++) {
-            var json = classIds[i];
-            var str = "";
-            str += '<option value="' + json + '">' + json + '</option>';
-            $("#originalClassId").append(str);
-        }
-
-        for (var i = 0; i < classIds.length; i++) {
-            var json = classIds[i];
-            var str = "";
-            str += '<option value="' + json + '">' + json + '</option>';
-            $("#currentClassId").append(str);
-        }
-
         laydate.render({
             elem: '#date' //指定元素
         });
+
+        $("#originalCampus").val('${studentAndClass.classCampus!""}');
+        $("#currentCampus").val('${studentAndClass.classCampus!""}');
+        $("#studentId").val('${studentAndClass.studentId!""}');
+        $("#studentName").val('${studentAndClass.studentName!""}');
+        $("#studentPhone").val('${studentAndClass.studentPhone!""}');
+        $("#originalClassId").val('${studentAndClass.classId!""}');
 
         form.render();
 
@@ -190,34 +234,15 @@
         });
 
 
-        //监听自动解析开关
-        form.on('switch(parseClassId)', function (data) {
-            //开关是否开启，true或者false
-            var checked = data.elem.checked;
-            if (checked) {
-                $("#div-classroom").hide();
-                $("#classroom").attr('lay-verify', '');
-                $("#div-name").hide();
-                $("#div-button-upload").hide();
-            } else {
-                $("#div-classroom").show();
-                $("#classroom").attr('lay-verify', 'required');
-                $("#div-name").show();
-                $("#div-button-upload").show();
-            }
-        });
 
         //提交
         form.on('submit(download)', function (obj) {
             var field = obj.field;
 
-            if (field.originalClassId === field.currentClassId){
-                return layer.msg("原班号不能与补课班号相同!");
-            }
-
             layer.load(1, {shade: [0.1, '#fff']}); //上传loading
 
-            location.href='${ctx}/toolbox/assistant/exportAssistantMissLessonTable?sync='+field.sync +'&emailTip='+field.emailTip+ '&studentName='+field.studentName+'&originalCampus='+field.originalCampus
+            location.href='${ctx}/toolbox/assistant/exportAssistantMissLessonTable?sync='+field.sync +'&emailTip='+field.emailTip
+                    + '&studentId='+field.studentId+ '&studentPhone='+field.studentPhone+ '&studentName='+field.studentName+'&originalCampus='+field.originalCampus
                     +'&currentCampus='+ field.currentCampus+'&originalClassId='+ field.originalClassId+'&currentClassId='+ field.currentClassId+'&date='+ field.date;
             layer.closeAll('loading'); //关闭loading
 

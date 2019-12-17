@@ -56,6 +56,8 @@ public class Constants {
 
     public static final String ON = "on";
 
+    public static final String YES = "yes";
+
     public static final Long ZERO = 0L;
 
     public static final Long MINUS_ONE = -1L;

@@ -104,12 +104,12 @@ public class HomeController extends AbstractController {
         if (!StringUtils.isEmpty(problemCollection.getContent())) {
             String msgToSend = problemCollection.getContent() + "\n\n姓名: " + problemCollection.getRealName() + "\n邮箱: " + problemCollection.getEmail();
 
-            SendEmailUtils.sendEncryptedEmail(SendEmailUtils.FROM, problemCollection.getTitle(), msgToSend);
+            SendEmailUtils.sendConcurrentEncryptedEmail(SendEmailUtils.FROM, problemCollection.getTitle(), msgToSend);
 
             //回访邮件
             if (MyStringUtils.isEmail(problemCollection.getEmail())) {
                 String msgToSendBack = "感谢您的问题反馈，以及长期以来对AWOS-优能助教在线工作平台的支持!酷乐会尽快处理您的问题的~";
-                SendEmailUtils.sendEncryptedEmail(problemCollection.getEmail(), "AOWS-回访", msgToSendBack);
+                SendEmailUtils.sendConcurrentEncryptedEmail(problemCollection.getEmail(), "AOWS-回访", msgToSendBack);
             }
         } else {
             String msg = "sendProblem方法错误入参";
