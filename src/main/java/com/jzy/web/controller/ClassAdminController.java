@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
-import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.exception.ExcelColumnNotFoundException;
 import com.jzy.manager.exception.InputFileTypeException;
 import com.jzy.manager.exception.InvalidParameterException;
@@ -198,7 +197,7 @@ public class ClassAdminController extends AbstractController {
                 if (chooseSeason) {
                     //缓存当前的年份季度分期
                     CurrentClassSeason currentClassSeason = new CurrentClassSeason(classDetailedDto.getClassYear(), classDetailedDto.getClassSeason(), classDetailedDto.getClassSubSeason());
-                    valueOps.set(RedisConstants.CURRENT_SEASON_KEY, currentClassSeason);
+                    classService.updateCurrentClassSeason(currentClassSeason);
                 }
             }
 

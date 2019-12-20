@@ -108,7 +108,7 @@ public interface UserService {
      * @return 发送的邮箱验证码的信息封装对象
      * @throws Exception
      */
-    EmailVerifyCode sendVerifyCodeToEmail(String userEmail) throws Exception;
+    EmailVerifyCode sendVerifyCodeToEmail(String userEmail) throws InvalidParameterException;
 
     /**
      * 验证邮箱验证码正确与否，是否失效

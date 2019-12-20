@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @ClassName RoleAndPermissionServiceImpl
@@ -69,7 +68,14 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
 
     @Override
     public String updateRoleAndPermissionInfo(RoleAndPermission roleAndPermission) {
+        if (roleAndPermission == null) {
+            return Constants.FAILURE;
+        }
         RoleAndPermission originalRoleAndPermission = getRoleAndPermById(roleAndPermission.getId());
+        if (originalRoleAndPermission == null) {
+            return Constants.FAILURE;
+        }
+
         if (!roleAndPermission.getRole().equals(originalRoleAndPermission.getRole())
                 || !roleAndPermission.getPerm().equals(originalRoleAndPermission.getPerm())) {
             //角色或权限修改过了，判断是否与已存在的记录冲突
@@ -79,9 +85,11 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
             }
         }
 
-        //清缓存
-        String key=RedisConstants.ROLE_AND_PERMS_KEY;
-        redisTemplate.expire(key, 0 ,TimeUnit.MINUTES);
+        if (roleAndPermission.equalsExceptBaseParams(originalRoleAndPermission)){
+            //未修改
+            return Constants.UNCHANGED;
+        }
+
         //执行更新
         roleAndPermissionMapper.updateRoleAndPermissionInfo(roleAndPermission);
         return Constants.SUCCESS;
@@ -94,17 +102,14 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
 
     @Override
     public String insertRoleAndPermission(RoleAndPermission roleAndPermission) {
+        if (roleAndPermission == null) {
+            return Constants.FAILURE;
+        }
         if (getByRoleAndPerm(roleAndPermission.getRole(), roleAndPermission.getPerm()) != null) {
             //角色和权限已存在
             return "roleAndPermRepeat";
         }
 
-        //清缓存
-        String key=RedisConstants.ROLE_AND_PERMS_KEY;
-        if (hashOps.hasKey(key, roleAndPermission.getRole())) {
-            //缓存中有
-            hashOps.delete(key, roleAndPermission.getRole());
-        }
         roleAndPermissionMapper.insertRoleAndPermission(roleAndPermission);
         return Constants.SUCCESS;
     }
@@ -115,9 +120,6 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
             return 0;
         }
 
-        //清缓存
-        String key=RedisConstants.ROLE_AND_PERMS_KEY;
-        redisTemplate.expire(key, 0 ,TimeUnit.MINUTES);
         return roleAndPermissionMapper.deleteOneRoleAndPermissionById(id);
     }
 
@@ -127,9 +129,6 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
             return 0;
         }
 
-        //清缓存
-        String key=RedisConstants.ROLE_AND_PERMS_KEY;
-        redisTemplate.expire(key, 0 ,TimeUnit.MINUTES);
         return roleAndPermissionMapper.deleteManyRoleAndPermissionsByIds(ids);
     }
 }

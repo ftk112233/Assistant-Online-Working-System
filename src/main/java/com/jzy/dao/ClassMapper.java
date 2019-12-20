@@ -116,4 +116,12 @@ public interface ClassMapper {
      * @return
      */
     List<String> listClassIdsLikeClassId(@Param("classId") String classId);
+
+    /**
+     * 根据班级id查询班级详细信息，注意这里是主键id
+     *
+     * @param id 班级id
+     * @return
+     */
+    ClassDetailedDto getClassDetailById(@Param("id") Long id);
 }

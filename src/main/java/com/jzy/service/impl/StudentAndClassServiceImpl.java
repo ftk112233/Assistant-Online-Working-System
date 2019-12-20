@@ -49,12 +49,15 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
 
     @Override
     public UpdateResult insertStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto) {
+        if (studentAndClassDetailedDto == null) {
+            return new UpdateResult(Constants.FAILURE);
+        }
         if (countStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto.getStudentId(), studentAndClassDetailedDto.getClassId()) > 0) {
             //重复报班
             return new UpdateResult("studentAndClassExist");
         }
 
-        return insertNewStudentAndClass(studentAndClassDetailedDto);
+        return insertUnrepeatedStudentAndClass(studentAndClassDetailedDto);
     }
 
     /**
@@ -63,7 +66,10 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
      * @param studentAndClassDetailedDto
      * @return
      */
-    private UpdateResult insertNewStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto) {
+    private UpdateResult insertUnrepeatedStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto) {
+        if (studentAndClassDetailedDto == null) {
+            return new UpdateResult(Constants.FAILURE);
+        }
         Student student = studentService.getStudentByStudentId(studentAndClassDetailedDto.getStudentId());
         if (student == null) {
             //学员号不存在
@@ -85,6 +91,9 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
 
     @Override
     public UpdateResult updateStudentAndClassByStudentIdAndClassId(StudentAndClassDetailedDto studentAndClassDetailedDto) {
+        if (studentAndClassDetailedDto == null) {
+            return new UpdateResult(Constants.FAILURE);
+        }
         UpdateResult result = new UpdateResult(Constants.SUCCESS);
         long count = studentAndClassMapper.updateStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto);
         result.setUpdateCount(count);
@@ -93,6 +102,11 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
 
     @Override
     public UpdateResult insertAndUpdateStudentAndClassesFromExcel(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos) throws Exception {
+        if (studentAndClassDetailedDtos == null) {
+            String msg = "insertAndUpdateStudentAndClassesFromExcel方法输入studentAndClassDetailedDtos为null!";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
         UpdateResult result = new UpdateResult();
 
         for (StudentAndClassDetailedDto studentAndClassDetailedDto : studentAndClassDetailedDtos) {
@@ -122,10 +136,14 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
         Long count = countStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto.getStudentId(), studentAndClassDetailedDto.getClassId());
         if (count > 0) {
             //记录已存在，更新
+            /*
+            不做是否修改过判断，规范是死的，人是活的。
+            不是说偷懒，而是常见业务场景中，都会开启先删后导，这样的判断也没有太大必要
+             */
             result.add(updateStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto));
         } else {
             //插入
-            result.add(insertNewStudentAndClass(studentAndClassDetailedDto));
+            result.add(insertUnrepeatedStudentAndClass(studentAndClassDetailedDto));
         }
         result.setResult(Constants.SUCCESS);
         return result;
@@ -147,6 +165,9 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
 
     @Override
     public String updateStudentAndClassInfo(StudentAndClassDetailedDto studentAndClassDetailedDto) {
+        if (studentAndClassDetailedDto == null) {
+            return Constants.FAILURE;
+        }
         StudentAndClass originalDto = getStudentAndClassById(studentAndClassDetailedDto.getId());
 
         //原来的学员编号
@@ -214,6 +235,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
             condition.setStudentId(dto.getStudentId());
             condition.setClassYear(dto.getClassYear());
             condition.setClassSeason(dto.getClassSeason());
+            condition.setClassSubSeason(dto.getClassSubSeason());
             //查出当前年份-季度下该学生的所有上课记录
             List<StudentAndClassDetailedDto> tmps = studentAndClassMapper.listStudentAndClassesWithSubjectsByStudentId(condition);
 
@@ -231,6 +253,9 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
 
     @Override
     public UpdateResult deleteStudentAndClassesByCondition(StudentAndClassSearchCondition condition) {
+        if (condition == null) {
+            return new UpdateResult(Constants.FAILURE);
+        }
         long count = studentAndClassMapper.deleteStudentAndClassesByCondition(condition);
         UpdateResult result = new UpdateResult(Constants.SUCCESS);
         result.setDeleteCount(count);
@@ -240,6 +265,9 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
     @Override
     public NamesAndValues countStudentsGroupByClassGrade(StudentAndClassSearchCondition condition) {
         NamesAndValues namesAndValues = new NamesAndValues();
+        if (condition == null) {
+            return namesAndValues;
+        }
         List<GroupedByGradeObjectTotal> objectTotals = studentAndClassMapper.countStudentsGroupByClassGrade(condition);
         namesAndValues.addAll(objectTotals);
         return namesAndValues;
@@ -248,6 +276,9 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
     @Override
     public NamesAndValues countStudentsGroupByClassSubject(StudentAndClassSearchCondition condition) {
         NamesAndValues namesAndValues = new NamesAndValues();
+        if (condition == null) {
+            return namesAndValues;
+        }
         List<GroupedBySubjectObjectTotal> objectTotals = studentAndClassMapper.countStudentsGroupByClassSubject(condition);
         namesAndValues.addAll(objectTotals);
         return namesAndValues;
@@ -255,11 +286,17 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
 
     @Override
     public List<GroupedByTypeObjectTotal> countStudentsGroupByClassType(StudentAndClassSearchCondition condition) {
+        if (condition == null) {
+            return new ArrayList<>();
+        }
         return studentAndClassMapper.countStudentsGroupByClassType(condition);
     }
 
     @Override
     public List<GroupedByGradeAndTypeObjectTotal> countStudentsGroupByClassGradeAndType(StudentAndClassSearchCondition condition) {
+        if (condition == null) {
+            return new ArrayList<>();
+        }
         //先查出各年级对应人数
         List<GroupedByGradeObjectTotal> objectTotals = studentAndClassMapper.countStudentsGroupByClassGrade(condition);
         Collections.sort(objectTotals);
@@ -282,6 +319,9 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
 
     @Override
     public List<GroupedBySubjectAndTypeObjectTotal> countStudentsGroupByClassSubjectAndType(StudentAndClassSearchCondition condition) {
+        if (condition == null) {
+            return new ArrayList<>();
+        }
         //先查出各学科对应人数
         List<GroupedBySubjectObjectTotal> objectTotals = studentAndClassMapper.countStudentsGroupByClassSubject(condition);
         Collections.sort(objectTotals);

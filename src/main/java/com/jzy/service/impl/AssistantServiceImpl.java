@@ -51,7 +51,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
 
     @Override
     public List<Assistant> listAssistantsByCampus(String campus) {
-        if (StringUtils.isEmpty(campus)){
+        if (StringUtils.isEmpty(campus)) {
             return new ArrayList<>();
         } else {
             return assistantMapper.listAssistantsByCampus(campus);
@@ -61,6 +61,9 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
 
     @Override
     public UpdateResult insertAssistant(Assistant assistant) {
+        if (assistant == null) {
+            return new UpdateResult(Constants.FAILURE);
+        }
         //新工号不为空
         if (getAssistantByWorkId(assistant.getAssistantWorkId()) != null) {
             //添加的工号已存在
@@ -77,6 +80,9 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
      * @return
      */
     private UpdateResult insertAssistantWithUnrepeatedWorkId(Assistant assistant) {
+        if (assistant == null) {
+            return new UpdateResult(Constants.FAILURE);
+        }
         if (getAssistantByName(assistant.getAssistantName()) != null) {
             //添加的姓名已存在
             return new UpdateResult("nameRepeat");
@@ -86,14 +92,20 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
             assistant.setAssistantSex(null);
         }
 
-        UpdateResult result=new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(Constants.SUCCESS);
         result.setInsertCount(assistantMapper.insertAssistant(assistant));
         return result;
     }
 
     @Override
     public String updateAssistantInfo(Assistant assistant) {
+        if (assistant == null) {
+            return Constants.FAILURE;
+        }
         Assistant originalAssistant = getAssistantById(assistant.getId());
+        if (originalAssistant == null) {
+            return Constants.FAILURE;
+        }
 
         if (!StringUtils.isEmpty(assistant.getAssistantWorkId())) {
             //新工号不为空
@@ -120,18 +132,30 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
             assistant.setAssistantSex(null);
         }
 
+        if (assistant.equalsExceptBaseParams(originalAssistant)) {
+            //判断输入对象的对应字段是否未做任何修改
+            return Constants.UNCHANGED;
+        }
+
         assistantMapper.updateAssistantInfo(assistant);
         return Constants.SUCCESS;
     }
 
     @Override
     public UpdateResult updateAssistantByWorkId(Assistant assistant) {
+        if (assistant == null) {
+            return new UpdateResult(Constants.FAILURE);
+        }
         Assistant originalAssistant = getAssistantByWorkId(assistant.getAssistantWorkId());
         return updateAssistantByWorkId(originalAssistant, assistant);
     }
 
     @Override
     public UpdateResult updateAssistantByWorkId(Assistant originalAssistant, Assistant newAssistant) {
+        if (originalAssistant == null || newAssistant == null) {
+            return new UpdateResult(Constants.FAILURE);
+        }
+
         if (!newAssistant.getAssistantName().equals(originalAssistant.getAssistantName())) {
             //姓名修改过了，判断是否与已存在的姓名冲突
             if (getAssistantByName(newAssistant.getAssistantName()) != null) {
@@ -140,14 +164,19 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
             }
         }
 
-        UpdateResult result=new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(Constants.SUCCESS);
         result.setUpdateCount(assistantMapper.updateAssistantByWorkId(newAssistant));
         return result;
     }
 
     @Override
     public UpdateResult insertAndUpdateAssistantsFromExcel(List<Assistant> assistants) throws InvalidParameterException {
-        UpdateResult result=new UpdateResult();
+        if (assistants == null) {
+            String msg = "insertAndUpdateAssistantsFromExcel方法输入助教assistant为null!";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+        UpdateResult result = new UpdateResult();
         for (Assistant assistant : assistants) {
             if (AssistantUtils.isValidAssistantInfo(assistant)) {
                 result.add(insertAndUpdateOneAssistantFromExcel(assistant));
@@ -169,12 +198,15 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
             throw new InvalidParameterException(msg);
         }
 
-        UpdateResult result=new UpdateResult();
+        UpdateResult result = new UpdateResult();
 
         Assistant originalAssistant = getAssistantByWorkId(assistant.getAssistantWorkId());
         if (originalAssistant != null) {
             //工号已存在，更新
-            result.add(updateAssistantByWorkId(originalAssistant, assistant));
+            if (!originalAssistant.equalsExceptBaseParams(assistant)) {
+                //相比原来记录有字段更新
+                result.add(updateAssistantByWorkId(originalAssistant, assistant));
+            }
         } else {
             //插入
             Assistant tmp = getAssistantByName(assistant.getAssistantName());
@@ -198,7 +230,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
 
     @Override
     public long deleteOneAssistantById(Long id) {
-        if (id == null){
+        if (id == null) {
             return 0;
         }
         return assistantMapper.deleteOneAssistantById(id);
@@ -206,7 +238,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
 
     @Override
     public long deleteManyAssistantsByIds(List<Long> ids) {
-        if (ids == null ||ids.size() == 0){
+        if (ids == null || ids.size() == 0) {
             return 0;
         }
         return assistantMapper.deleteManyAssistantsByIds(ids);
@@ -214,6 +246,9 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
 
     @Override
     public String deleteAssistantsByCondition(AssistantSearchCondition condition) {
+        if (condition == null) {
+            return Constants.FAILURE;
+        }
         assistantMapper.deleteAssistantsByCondition(condition);
         return Constants.SUCCESS;
     }

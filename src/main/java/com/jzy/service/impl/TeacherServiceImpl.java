@@ -82,12 +82,18 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
 
     @Override
     public String updateTeacherByWorkId(Teacher teacher) {
+        if (teacher == null){
+            return Constants.FAILURE;
+        }
         Teacher originalTeacher = getTeacherByWorkId(teacher.getTeacherWorkId());
         return updateTeacherByWorkId(originalTeacher, teacher);
     }
 
     @Override
     public String updateTeacherByWorkId(Teacher originalTeacher, Teacher newTeacher) {
+        if (originalTeacher == null || newTeacher == null){
+            return Constants.FAILURE;
+        }
         if (!originalTeacher.getTeacherName().equals(newTeacher.getTeacherName())) {
             //姓名修改过了，判断是否与已存在的姓名冲突
             if (getTeacherByName(newTeacher.getTeacherName()) != null) {
@@ -96,6 +102,10 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
             }
         }
 
+        if (newTeacher.equalsExceptBaseParams(originalTeacher)){
+            //判断输入对象的对应字段是否未做任何修改
+            return Constants.UNCHANGED;
+        }
         teacherMapper.updateTeacherByWorkId(newTeacher);
         return Constants.SUCCESS;
     }
@@ -147,7 +157,13 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
 
     @Override
     public String updateTeacherInfo(Teacher teacher) {
+        if (teacher == null) {
+            return Constants.FAILURE;
+        }
         Teacher originalTeacher = getTeacherById(teacher.getId());
+        if (originalTeacher == null) {
+            return Constants.FAILURE;
+        }
 
         if (!StringUtils.isEmpty(teacher.getTeacherWorkId())) {
             //新工号不为空
@@ -172,6 +188,11 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
 
         if (StringUtils.isEmpty(teacher.getTeacherSex())) {
             teacher.setTeacherSex(null);
+        }
+
+        if (teacher.equalsExceptBaseParams(originalTeacher)){
+            //判断输入对象的对应字段是否未做任何修改
+            return Constants.UNCHANGED;
         }
 
         teacherMapper.updateTeacherInfo(teacher);

@@ -129,7 +129,6 @@ public class MissLessonStudentAdminController extends AbstractController {
     public Map<String, Object> updateById(MissLessonStudentDetailedDto missLessonStudentDetailedDto) throws InvalidParameterException {
         Map<String, Object> map = new HashMap<>(1);
 
-
         if (!MissLessonStudentUtils.isValidMissLessonStudentUpdateInfo(missLessonStudentDetailedDto)) {
             String msg = "updateById方法错误入参";
             logger.error(msg);

@@ -23,7 +23,7 @@ import java.util.List;
  * @author zhangyi
  * @version 1.0 2016/01/27
  */
-public class Excel implements Serializable, Resettable {
+public class Excel implements Serializable, Resettable, ExcelValidity {
     private static final long serialVersionUID = 5628415838137969509L;
 
     /**
@@ -492,7 +492,12 @@ public class Excel implements Serializable, Resettable {
      */
     public boolean setValueAt(int sheetIx, int rowIndex, int colIndex, String value) throws IOException {
         Sheet sheet = workbook.getSheetAt(sheetIx);
-        sheet.getRow(rowIndex).getCell(colIndex).setCellValue(value);
+        Cell cell=sheet.getRow(rowIndex).getCell(colIndex);
+        if (cell == null){
+            this.createCell(sheetIx,rowIndex,colIndex);
+            cell=sheet.getRow(rowIndex).getCell(colIndex);
+        }
+        cell.setCellValue(value);
         return true;
     }
 
@@ -799,5 +804,4 @@ public class Excel implements Serializable, Resettable {
         }
         return strCell;
     }
-
 }

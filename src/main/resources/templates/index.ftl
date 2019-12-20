@@ -169,6 +169,13 @@
                                     </dd>
                                 </dl>
                             </dd>
+                            <dd data-name="grid">
+                                <a href="javascript:;">通用</a>
+                                <dl class="layui-nav-child">
+                                    <dd data-name="mobile"><a
+                                            lay-href="${ctx}/toolbox/common/studentSchoolExport">学校统计</a></dd>
+                                </dl>
+                            </dd>
                         </dl>
                     </li>
                     <li data-name="senior" class="layui-nav-item">
@@ -186,15 +193,15 @@
                                     <dd><a lay-href="${ctx}/senior/echarts/stuNumSeniorPage">学生人数分析(高级)</a></dd>
                                 </dl>
                             </dd>
-                            <dd data-name="echarts">
-                                <a href="javascript:;">排行榜</a>
-                                <dl class="layui-nav-child">
-                                    <dd><a lay-href="${ctx}/comingSoon">吃苦耐劳助教排行</a></dd>
-                                </dl>
-                                <dl class="layui-nav-child">
-                                    <dd><a lay-href="${ctx}/comingSoon">上课人数之最</a></dd>
-                                </dl>
-                            </dd>
+                            <#--<dd data-name="echarts">-->
+                                <#--<a href="javascript:;">排行榜</a>-->
+                                <#--<dl class="layui-nav-child">-->
+                                    <#--<dd><a lay-href="${ctx}/comingSoon">吃苦耐劳助教排行</a></dd>-->
+                                <#--</dl>-->
+                                <#--<dl class="layui-nav-child">-->
+                                    <#--<dd><a lay-href="${ctx}/comingSoon">上课人数之最</a></dd>-->
+                                <#--</dl>-->
+                            <#--</dd>-->
                         </dl>
                     </li>
                     <li data-name="user" class="layui-nav-item">
@@ -229,6 +236,9 @@
                         <dl class="layui-nav-child">
                             <dd class="layui-nav-itemed">
                                 <a href="javascript:;">系统设置</a>
+                                <dl class="layui-nav-child">
+                                    <dd><a lay-href="${ctx}/system/intelliClassSeason/page">智能校历</a></dd>
+                                </dl>
                                 <dl class="layui-nav-child">
                                     <dd><a lay-href="${ctx}/permission/admin/page">权限管理</a></dd>
                                 </dl>

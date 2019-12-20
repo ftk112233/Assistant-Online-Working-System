@@ -253,7 +253,7 @@
                 , {field: 'currentTeacherName', title: '补课班教师', width: 120, sort: true}
                 , {field: 'date', title: '补课日期', width: 110, sort: true}
                 , {field: 'remark', title: '备注', hide: true}
-                , {title: '操作', minWidth: 150, align: 'center', toolbar: '#table-content-list1'}
+                , {field: 'oper',title: '操作', minWidth: 150, align: 'center', toolbar: '#table-content-list1',hide: true}
             ]]
             , where: {
                 condition1: 'date',

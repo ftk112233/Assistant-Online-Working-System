@@ -147,7 +147,7 @@
                     return $("#id").val();
                 }
             }
-            , url: '${ctx}/user/admin/uploadPicture'
+            , url: '${ctx}/user/admin/uploadUserIcon'
             , size: 1024 //KB
             , before: function (obj) {
                 //预读本地文件示例，不支持ie8

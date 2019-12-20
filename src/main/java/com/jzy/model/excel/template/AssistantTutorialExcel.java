@@ -41,6 +41,8 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
 
     private static final String TEACHER_REQUIREMENT_COLUMN = ExcelConstants.TEACHER_REQUIREMENT_COLUMN;
 
+    public static final String STUDENT_SCHOOL_COLUMN = ExcelConstants.STUDENT_SCHOOL_COLUMN_2;
+
     private static final String SUBJECTS_COLUMN = ExcelConstants.SUBJECTS_COLUMN;
 
     /**
@@ -104,7 +106,7 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
 
         int startRow = 0;
         // 先扫描第startRow行找到"校区"、"班号"、"教师姓名"等信息所在列的位置
-        int columnIndexOfCampus = -1, columnIndexOfClassId = -2, columnIndexOfTeacherName = -3, columnIndexOfAssistantName = -4, columnIndexOfStudentId = -7, columnIndexOfStudentName = -9, columnIndexOfStudentPhone = -10, columnIndexOfTeacherRequirement = -11, columnIndexOfSubjects = -12;
+        int columnIndexOfCampus = -1, columnIndexOfClassId = -2, columnIndexOfTeacherName = -3, columnIndexOfAssistantName = -4, columnIndexOfStudentId = -7, columnIndexOfStudentName = -9, columnIndexOfStudentPhone = -10, columnIndexOfTeacherRequirement = -11,columnIndexOfStudentSchool = -11, columnIndexOfSubjects = -12;
         int row0ColumnCount = this.getColumnCount(CLASS_START_SHEET_INDEX, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
             String value = this.getValueAt(CLASS_START_SHEET_INDEX, startRow, i);
@@ -133,6 +135,9 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
                 case TEACHER_REQUIREMENT_COLUMN:
                     columnIndexOfTeacherRequirement = i;
                     break;
+                case STUDENT_SCHOOL_COLUMN:
+                    columnIndexOfStudentSchool = i;
+                    break;
                 case SUBJECTS_COLUMN:
                     columnIndexOfSubjects = i;
                     break;
@@ -142,7 +147,7 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
 
         if (columnIndexOfCampus < 0 || columnIndexOfClassId < 0 || columnIndexOfTeacherName < 0 || columnIndexOfAssistantName < 0
                 || columnIndexOfStudentId < 0 || columnIndexOfStudentName < 0 || columnIndexOfStudentPhone < 0
-                || columnIndexOfTeacherRequirement < 0 || columnIndexOfSubjects < 0) {
+                || columnIndexOfTeacherRequirement < 0 || columnIndexOfStudentSchool < 0 || columnIndexOfSubjects < 0) {
             //列属性中有未匹配的属性名
             throw new ExcelColumnNotFoundException("助教工作手册-开班电话表sheet列属性中有未匹配的属性名");
         }
@@ -167,6 +172,8 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
             this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentPhone, object.getStudentPhone());
             // 填任课教师要求
             this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfTeacherRequirement, object.getClassTeacherRequirement());
+            // 填学校
+            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentSchool, object.getStudentSchool());
             // 填所有在读学科
             String subjectsToString = object.getSubjects() == null ? "" : object.getSubjects().toString();
             this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfSubjects, subjectsToString);

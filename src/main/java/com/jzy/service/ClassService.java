@@ -47,6 +47,14 @@ public interface ClassService {
     ClassDetailedDto getClassDetailByClassId(String classId);
 
     /**
+     * 根据班级id查询班级详细信息，注意这里是主键id
+     *
+     * @param id 班级id
+     * @return
+     */
+    ClassDetailedDto getClassDetailById(Long id);
+
+    /**
      * 修改班级信息由班级编码修改，注意这里classId不是主键id
      *
      * @param classDetailedDto 修改后的班级信息
@@ -147,4 +155,18 @@ public interface ClassService {
      * @return
      */
     CurrentClassSeason getCurrentClassSeason();
+
+    /**
+     * 修改当前校历
+     *
+     * @return
+     */
+    void updateCurrentClassSeason(CurrentClassSeason classSeason);
+
+    /**
+     * 清除当前校历
+     *
+     * @return
+     */
+    void deleteCurrentClassSeason();
 }

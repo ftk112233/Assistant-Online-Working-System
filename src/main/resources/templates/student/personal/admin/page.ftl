@@ -447,6 +447,8 @@
                                         layer.close(index); //关闭弹层
                                     } else if (data.data === "studentIdRepeat") {
                                         return layer.msg('该学员号已存在！');
+                                    } else if (data.data === "unchanged") {
+                                        return layer.msg('未做任何修改');
                                     } else {
                                         return layer.msg('无法完成操作');
                                     }
@@ -459,7 +461,6 @@
                     }
                     ,
                     success: function (layero, index) {
-                        console.log(data.assistantSex)
                         //给iframe元素赋值
                         var othis = layero.find('iframe').contents().find("#layuiadmin-app-form-list").click();
                         othis.find('input[name="id"]').val(data.id);

@@ -10,15 +10,14 @@ import com.jzy.model.dto.ClassDetailedDto;
 import com.jzy.model.dto.MissLessonStudentDetailedDto;
 import com.jzy.model.dto.StudentAndClassDetailedDto;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
-import com.jzy.model.entity.CampusAndClassroom;
+import com.jzy.model.entity.*;
 import com.jzy.model.entity.Class;
-import com.jzy.model.entity.User;
-import com.jzy.model.entity.UserMessage;
 import com.jzy.model.excel.Excel;
 import com.jzy.model.excel.ExcelVersionEnum;
 import com.jzy.model.excel.input.SeatTableTemplateInputExcel;
 import com.jzy.model.excel.input.StudentListForSeatTableUploadByUserExcel;
 import com.jzy.model.excel.input.StudentListUploadByUserExcel;
+import com.jzy.model.excel.input.StudentSchoolExcel;
 import com.jzy.model.excel.template.AssistantTutorialExcel;
 import com.jzy.model.excel.template.MissedLessonExcel;
 import com.jzy.model.excel.template.SeatTableTemplateExcel;
@@ -54,13 +53,48 @@ public class ToolboxController extends AbstractController {
     /**
      * 做助教工作手册时，用户手动上传的花名册缓存
      */
-    public static Map<Long, StudentListUploadByUserExcel> studentListUploadByUserCache = new HashMap<>();
+    private static Map<Long, StudentListUploadByUserExcel> studentListUploadByUserCache = new HashMap<>();
 
     /**
      * 单独做座位表时，用户手动上传的学生名单缓存
      */
-    public static Map<Long, StudentListForSeatTableUploadByUserExcel> studentListForSeatTableUploadByUserCache = new HashMap<>();
+    private static Map<Long, StudentListForSeatTableUploadByUserExcel> studentListForSeatTableUploadByUserCache = new HashMap<>();
 
+    /**
+     * 上传学校统计空表的缓存
+     */
+    private static Map<Long, StudentSchoolExcel> studentSchoolUploadCache = new HashMap<>();
+
+    static {
+        //每天定时清理cache
+        TimerManager.startDailyTask(new TimerTask() {
+            @Override
+            public void run() {
+                ToolboxController.clearCache();
+                logger.info("定时清理ToolboxController的cache执行！");
+            }
+        });
+    }
+
+    /**
+     * 清除指定用户id的文件cache
+     *
+     * @param id 用户id
+     */
+    public static void clearCache(Long id) {
+        studentListUploadByUserCache.remove(id);
+        studentListForSeatTableUploadByUserCache.remove(id);
+        studentSchoolUploadCache.remove(id);
+    }
+
+    /**
+     * 清除全部缓存
+     */
+    public static void clearCache() {
+        studentListUploadByUserCache = new HashMap<>();
+        studentListForSeatTableUploadByUserCache = new HashMap<>();
+        studentSchoolUploadCache = new HashMap<>();
+    }
 
     /**
      * 跳转助教制作开班多件套页面
@@ -521,16 +555,17 @@ public class ToolboxController extends AbstractController {
      * @return
      */
     @RequestMapping("/assistantAdministrator/downloadExample/{type}")
-    public String downloadExample(HttpServletRequest request, HttpServletResponse response, @PathVariable Integer type) throws InvalidParameterException {
-        if (type <= 0) {
+    public String downloadExample(HttpServletRequest request, HttpServletResponse response, @PathVariable String type) throws InvalidParameterException {
+        int typeVal = Integer.parseInt(type);
+        if (typeVal <= 0) {
             String msg = "downloadExample方法入参错误!";
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
 
         try {
-            String filePathAndNameToRead = filePathProperties.getToolboxExamplePathAndNameByKey(type);
-            String downloadFileName = FileUtils.EXAMPLES.get(type);
+            String filePathAndNameToRead = filePathProperties.getToolboxExamplePathAndNameByKey(typeVal);
+            String downloadFileName = FileUtils.EXAMPLES.get(typeVal);
             //下载文件
             FileUtils.downloadFile(request, response, filePathAndNameToRead, downloadFileName);
         } catch (Exception e) {
@@ -628,5 +663,119 @@ public class ToolboxController extends AbstractController {
 
         map.put("msg", Constants.SUCCESS);
         return map;
+    }
+
+    /**
+     * 跳转学校统计页面
+     *
+     * @param model
+     * @return
+     */
+    @RequestMapping("/common/studentSchoolExport")
+    public String studentSchoolExport(Model model) {
+        return "toolbox/common/studentSchoolExport";
+    }
+
+
+    /**
+     * 上传学校统计空表
+     *
+     * @param file 上传的表格
+     * @return
+     */
+    @RequestMapping("/common/uploadStudentSchool")
+    @ResponseBody
+    public Map<String, Object> uploadStudentSchool(@RequestParam(value = "file", required = false) MultipartFile file) throws InvalidParameterException {
+        Map<String, Object> map2 = new HashMap<>(1);
+        Map<String, Object> map = new HashMap<>(3);
+        //返回layui规定的文件上传模块JSON格式
+        map.put("code", 0);
+        map2.put("src", "");
+        map.put("data", map2);
+
+        if (file.isEmpty()) {
+            String msg = "上传文件为空";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+
+
+        if (!Excel.isExcel(file.getOriginalFilename())) {
+            String msg = "上传文件不是excel";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+
+        StudentSchoolExcel excel = null;
+
+        try {
+            excel = new StudentSchoolExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
+
+            //缓存中有文件，即用户上传过了
+            excel.readStudentIdsFromExcel();
+            Set<String> studentIds = excel.getStudentIds();
+
+            Map<String, Student> studentMap = new HashMap<>();
+            for (String studentId : studentIds) {
+                Student student = studentService.getStudentByStudentId(studentId);
+                if (student != null) {
+                    studentMap.put(studentId, student);
+                }
+            }
+
+            excel.setStudentCache(studentMap);
+            //文件放缓存待下载处理
+            studentSchoolUploadCache.put(userService.getSessionUserInfo().getId(), excel);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            map.put("msg", Constants.FAILURE);
+            return map;
+        } catch (InputFileTypeException e) {
+            e.printStackTrace();
+            map.put("msg", Constants.FAILURE);
+            return map;
+        } catch (ExcelColumnNotFoundException e) {
+            e.printStackTrace();
+            map.put("msg", "excelColumnNotFound");
+            return map;
+        }
+
+        map.put("msg", Constants.SUCCESS);
+        return map;
+    }
+
+    /**
+     * 下载读取好的学校统计表
+     *
+     * @return
+     */
+    @RequestMapping("/common/downloadStudentSchool")
+    public String exportSeatTable(HttpServletRequest request, HttpServletResponse response) {
+        StudentSchoolExcel excelCache = studentSchoolUploadCache.get(userService.getSessionUserInfo().getId());
+        //下载完学校统计表，清除缓存
+        studentSchoolUploadCache.remove(userService.getSessionUserInfo().getId());
+        try {
+            if (excelCache != null) {
+                //将读到的数据，修改到座位表模板表格中
+                excelCache.writeStudentsSchools();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            //下载处理好的文件
+            FileUtils.downloadFile(request, response, excelCache, "学校统计_" + UUID.randomUUID().toString() + ExcelVersionEnum.VERSION_2007.getSuffix());
+        } catch (IOException e) {
+            e.printStackTrace();
+            String msg = "downloadStudentSchool下载文件失败";
+            logger.error(msg);
+            return Constants.FAILURE;
+        }
+
+
+        return Constants.SUCCESS;
     }
 }

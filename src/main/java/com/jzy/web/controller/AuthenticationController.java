@@ -18,7 +18,6 @@ import com.jzy.model.vo.Announcement;
 import com.jzy.model.vo.EmailVerifyCodeSession;
 import com.jzy.model.vo.UserLoginInput;
 import com.jzy.model.vo.UserLoginResult;
-import com.jzy.web.interceptor.Token;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
@@ -96,7 +95,6 @@ public class AuthenticationController extends AbstractController {
     }
 
     @RequestMapping("/forget")
-    @Token(save = true)
     public String forget() {
         return "forget";
     }
@@ -360,7 +358,6 @@ public class AuthenticationController extends AbstractController {
      * @return
      */
     @RequestMapping("/resetPassword")
-    @Token(remove = true)
     @ResponseBody
     public Map<String, Object> resetPassword(User user) throws InvalidParameterException {
         Map<String, Object> map = new HashMap(1);

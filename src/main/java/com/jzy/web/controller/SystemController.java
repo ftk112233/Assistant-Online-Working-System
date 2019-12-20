@@ -1,8 +1,12 @@
 package com.jzy.web.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
 import com.jzy.manager.constant.RedisConstants;
+import com.jzy.model.CampusEnum;
+import com.jzy.model.dto.CurrentClassSeason;
+import com.jzy.model.entity.Class;
 import com.jzy.model.entity.User;
 import com.jzy.model.vo.Announcement;
 import org.apache.logging.log4j.LogManager;
@@ -88,6 +92,54 @@ public class SystemController extends AbstractController {
         for (User user : users) {
             hashOps.delete(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, user.getId().toString());
         }
+
+        map.put("data", Constants.SUCCESS);
+        return map;
+    }
+
+    /**
+     * 跳转智能校历
+     *
+     * @return
+     */
+    @RequestMapping("/intelliClassSeason/page")
+    public String intelliClassSeason(Model model) {
+        model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
+        model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(Class.SEASONS));
+        model.addAttribute(ModelConstants.SUB_SEASONS_MODEL_KEY, JSON.toJSONString(Class.SUB_SEASONS));
+
+        model.addAttribute(ModelConstants.CURRENT_ClASS_SEASON_MODEL_KEY, classService.getCurrentClassSeason());
+        return "system/intelliClassSeason";
+    }
+
+    /**
+     * 修改智能校历
+     *
+     * @param classSeason 修改后的校历信息
+     * @return
+     */
+    @RequestMapping("/intelliClassSeason/update")
+    @ResponseBody
+    public Map<String, Object> updateIntelliClassSeason(CurrentClassSeason classSeason) {
+        Map<String, Object> map = new HashMap<>(1);
+
+        classService.updateCurrentClassSeason(classSeason);
+
+        map.put("data", Constants.SUCCESS);
+        return map;
+    }
+
+    /**
+     * 清除智能校历
+     *
+     * @return
+     */
+    @RequestMapping("/intelliClassSeason/delete")
+    @ResponseBody
+    public Map<String, Object> deleteIntelliClassSeason() {
+        Map<String, Object> map = new HashMap<>(1);
+
+        classService.deleteCurrentClassSeason();
 
         map.put("data", Constants.SUCCESS);
         return map;

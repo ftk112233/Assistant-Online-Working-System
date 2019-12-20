@@ -58,7 +58,7 @@ public abstract class Time implements Serializable {
      * @param d
      * @return
      */
-    private static double format(double d){
+    private static double format(double d) {
         BigDecimal bg = new BigDecimal(d);
         return bg.setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
@@ -78,13 +78,15 @@ public abstract class Time implements Serializable {
             second = totalSeconds % 60;
 
             if (hour > 0) {
-                parsedTime = hour + HOUR + minute + MINUTE + (int)second + SECOND;
+                parsedTime = hour + HOUR + minute + MINUTE + (int) second + SECOND;
             } else if (minute > 0) {
-                parsedTime = minute + MINUTE + (int)second + SECOND;
+                parsedTime = minute + MINUTE + (int) second + SECOND;
             } else {
                 parsedTime = format(second) + SECOND;
             }
 
+        } else {
+            parsedTime = 0 + SECOND;
         }
         return parsedTime;
     }

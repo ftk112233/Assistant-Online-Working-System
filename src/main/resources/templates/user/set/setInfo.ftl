@@ -228,7 +228,7 @@
         //拖拽上传
         var uploadInst = upload.render({
             elem: '#headImg'
-            , url: '${ctx}/user/uploadPicture'
+            , url: '${ctx}/user/uploadUserIcon'
             , size: 1024 //KB
             , before: function (obj) {
                 //预读本地文件示例，不支持ie8
@@ -295,6 +295,11 @@
                         });
                     } else if (res2.data === "userIdCardExist") {
                         layer.msg('该身份证已被注册', {
+                            icon: 5,
+                            anim: 6
+                        });
+                    } else if (res2.data === "unchanged") {
+                        layer.msg('未做任何修改', {
                             icon: 5,
                             anim: 6
                         });

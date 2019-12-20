@@ -75,7 +75,7 @@ public class RedisConstants {
      */
     public static final long USEFUL_INFORMATION_EXPIRE = 21;
 
-    /**
+        /**
      * 用户登陆成功ip的缓存的过期时间，60天
      */
     public static final long USER_LOGIN_IP_EXPIRE = 60;
@@ -84,4 +84,14 @@ public class RedisConstants {
      * 当前季度的缓存的键
      */
     public static final String CURRENT_SEASON_KEY = ROOT_KEY + ":currentSeason";
+
+    /**
+     * 季度年份智能日历缓存的过期时间，180天
+     */
+    public static final long CURRENT_SEASON_EXPIRE = 180;
+
+    /**
+     * 当前季度的缓存的键
+     */
+    public static final String QUESTION_KEY = ROOT_KEY + ":question";
 }

@@ -36,7 +36,7 @@
                     <input type="password" name="repass" id="LAY-user-login-repass" lay-verify="required" lay-verType="tips"
                            placeholder="确认密码" class="layui-input">
                 </div>
-                <input name="token" type="hidden" value="${token}"/>
+                <input name="token" type="hidden" value="${token!""}"/>
                 <div class="layui-form-item">
                     <button class="layui-btn layui-btn-fluid" id="my_button2" lay-submit lay-filter="LAY-user-forget-resetpass">重置新密码
                     </button>

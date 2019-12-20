@@ -15,9 +15,11 @@ import javax.servlet.http.HttpServletResponse;
  * @ClassName ToolboxUploadCacheInterceptor
  * @Author JinZhiyun
  * @Description 工具箱用户上传文件缓存的清理，每次访问index时清理
+ *        改用Timer定时任务每天凌晨定时清理cache，{@link com.jzy.manager.util.TimerManager}
  * @Date 2019/11/28 9:48
  * @Version 1.0
  **/
+@Deprecated
 public class ToolboxUploadCacheInterceptor implements HandlerInterceptor {
     private final static Logger logger = LogManager.getLogger(ToolboxUploadCacheInterceptor.class);
 
@@ -27,8 +29,7 @@ public class ToolboxUploadCacheInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         Long id = userService.getSessionUserInfo().getId();
-        ToolboxController.studentListUploadByUserCache.remove(id);
-        ToolboxController.studentListForSeatTableUploadByUserCache.remove(id);
+        ToolboxController.clearCache(id);
         return true;
     }
 

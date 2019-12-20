@@ -243,6 +243,29 @@ public class Class extends BaseEntity {
     public Class() {
     }
 
+    /**
+     * 除了教师id和助教id、以及父类BaseEntity的字段外，其他字段是否相同
+     *
+     * @param o
+     * @return
+     */
+    public boolean equalsExceptBaseParamsAndAssistantIdAndTeacherId(Class o) {
+        Long teacherId = null;
+        Long assistantId = null;
+        if (o != null) {
+            teacherId = o.getClassTeacherId();
+            assistantId = o.getClassAssistantId();
+            o.setClassTeacherId(this.getClassTeacherId());
+            o.setClassAssistantId(this.getClassAssistantId());
+        }
+        boolean result = super.equalsExceptBaseParams(o);
+        if (o != null) {
+            o.setClassTeacherId(teacherId);
+            o.setClassAssistantId(assistantId);
+        }
+        return result;
+    }
+
     public static void main(String[] args) {
         List<Class> classes = new ArrayList<>();
         Class c1 = new Class("1");

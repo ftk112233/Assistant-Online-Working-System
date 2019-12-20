@@ -1,7 +1,5 @@
 package com.jzy.manager.util;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.jzy.model.excel.Excel;
 import org.apache.commons.lang3.StringUtils;
 
@@ -9,9 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,6 +34,8 @@ public class FileUtils {
         EXAMPLES.put(3, "秋下花名册.xls");
         EXAMPLES.put(4, "秋季花名册_开班.xlsx");
         EXAMPLES.put(5, "座位表.xlsx");
+        EXAMPLES.put(6, "学校统计.xlsx");
+        EXAMPLES.put(7, "学校统计_空.xlsx");
 
         TEMPLATES.put(1, "教师和助教工作表5.0.xlsx");
         TEMPLATES.put(2, "座位表.xlsx");
@@ -287,9 +285,7 @@ public class FileUtils {
         org.apache.commons.io.FileUtils.copyFile(new File(srcPath), new File(targetPath));
     }
 
-    public static void main(String[] args) {
-        System.out.println(JSON.toJSONString(Arrays.asList("1", "2", "a")));
-        List<String> strings=JSONArray.parseArray(JSON.toJSONString(Arrays.asList("1", "2", "a")), String.class);
-        System.out.println(strings);
+    public static void main(String[] args) throws Exception {
+        copyFile("C:\\Users\\92970\\Desktop\\助教信息.xlsx", ".\\a.xlsx");
     }
 }

@@ -309,6 +309,7 @@
                 , {field: 'studentId', title: '学员号', width: 150, sort: true}
                 , {field: 'studentName', title: '学员姓名', width: 120, sort: true}
                 , {field: 'studentPhone', title: '手机', width: 120, hide: true}
+                , {field: 'studentSchool', title: '学校', sort: true, hide: true}
                 , {field: 'classId', title: '班级编码', width: 140, hide: true, sort: true}
                 , {field: 'className', title: '班级名称', sort: true}
                 , {field: 'classCampus', title: '校区', width: 80, sort: true}

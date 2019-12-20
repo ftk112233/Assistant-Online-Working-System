@@ -65,4 +65,27 @@ public class Question extends BaseEntity {
         this.answer = answer;
         this.answer2 = answer2;
     }
+
+    /**
+     * 判断除了基本BaseEntity字段和万能答案字段，其他是否相同
+     *
+     * @param o
+     * @return
+     */
+    public boolean equalsExceptBaseParamsAndTrueAnswerAndCreatorId(Question o) {
+        String tmpTrueAnswer = null;
+        Long tmpCreatorId = null;
+        if (o != null) {
+            tmpTrueAnswer = o.getTrueAnswer();
+            tmpCreatorId = o.getCreatorId();
+            o.setTrueAnswer(this.getTrueAnswer());
+            o.setCreatorId(this.getCreatorId());
+        }
+        boolean result = super.equalsExceptBaseParams(o);
+        if (o != null) {
+            o.setTrueAnswer(tmpTrueAnswer);
+            o.setCreatorId(tmpCreatorId);
+        }
+        return result;
+    }
 }

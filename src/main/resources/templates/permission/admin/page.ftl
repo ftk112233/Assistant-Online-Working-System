@@ -55,7 +55,7 @@
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit
+                    <button class="layui-btn layuiadmin-btn-comm" data-type="reload" lay-submit id="my_button"
                             lay-filter="LAY-app-contcomm-search">
                         <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
                     </button>
@@ -157,6 +157,14 @@
         $("#clear").click(function () {
             $("#form input").val("");
             $("#form select").val("");
+        });
+
+        $('#form input').on('keydown', function (event) {
+            if (event.keyCode == 13) {
+                $("#my_button").trigger("click");
+
+                return false
+            }
         });
 
         //监听搜索
@@ -372,6 +380,8 @@
                                         layer.close(index); //关闭弹层
                                     } else if (data.data === "roleAndPermRepeat") {
                                         return layer.msg('对不起，该(角色, 权限)组合已存在！');
+                                    } else if (data.data === "unchanged") {
+                                        return layer.msg('未做任何修改');
                                     } else {
                                         return layer.msg('未知错误');
                                     }

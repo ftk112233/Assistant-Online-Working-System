@@ -91,4 +91,20 @@ public interface StudentMapper {
      * @return
      */
     long deleteStudentsByCondition(StudentSearchCondition condition);
+
+    /**
+     * 修改学生学校由学员编号修改
+     *
+     * @param student 修改后的学生信息
+     * @return
+     */
+    long updateStudentSchoolByStudentId(Student student);
+
+    /**
+     * 修改学生姓名、手机、备用手机由学员编号修改
+     *
+     * @param student 修改后的学生信息
+     * @return
+     */
+    long updateStudentNameAndPhoneByStudentId(Student student);
 }

@@ -65,6 +65,10 @@ public class ExcelConstants {
 
     public static final String REMARK_COLUMN_2 = "业务备注";
 
+    /*===================学生学校统计表列属性名===================*/
+    public static final String STUDENT_ID_COLUMN_3 = "学员编号";
+
+    public static final String STUDENT_SCHOOL_COLUMN = "在读学校";
 
     /*===================助教工作手册表列属性名===================*/
     public static final String CAMPUS_COLUMN_2 = "校区";
@@ -82,6 +86,8 @@ public class ExcelConstants {
     public static final String STUDENT_PHONE_COLUMN_2 = "家长联系方式";
 
     public static final String TEACHER_REQUIREMENT_COLUMN = "任课教师的要求";
+
+    public static final String STUDENT_SCHOOL_COLUMN_2 = "学校";
 
     public static final String SUBJECTS_COLUMN = "所有在读学科※";
 

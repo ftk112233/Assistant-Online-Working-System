@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author JinZhiyun
@@ -54,21 +55,42 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
             return null;
         } else {
             ClassDetailedDto classDetailedDto = classMapper.getClassDetailByClassId(classId);
-            classDetailedDto.setParsedClassYear();
+            if (classDetailedDto != null) {
+                classDetailedDto.setParsedClassYear();
+            }
+            return classDetailedDto;
+        }
+    }
+
+    @Override
+    public ClassDetailedDto getClassDetailById(Long id) {
+        if (id == null) {
+            return null;
+        } else {
+            ClassDetailedDto classDetailedDto = classMapper.getClassDetailById(id);
+            if (classDetailedDto != null) {
+                classDetailedDto.setParsedClassYear();
+            }
             return classDetailedDto;
         }
     }
 
     @Override
     public UpdateResult updateClassByClassId(ClassDetailedDto classDetailedDto) {
-        long count=classMapper.updateClassByClassId(classDetailedDto);
-        UpdateResult result=new UpdateResult(Constants.SUCCESS);
+        if (classDetailedDto == null){
+            return new UpdateResult(Constants.FAILURE);
+        }
+        long count = classMapper.updateClassByClassId(classDetailedDto);
+        UpdateResult result = new UpdateResult(Constants.SUCCESS);
         result.setUpdateCount(count);
         return result;
     }
 
     @Override
     public UpdateResult insertClass(ClassDetailedDto classDetailedDto) {
+        if (classDetailedDto == null) {
+            return new UpdateResult(Constants.FAILURE);
+        }
         //新班号不为空
         if (getClassByClassId(classDetailedDto.getClassId()) != null) {
             //添加的班号已存在
@@ -86,6 +108,9 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
      * @return
      */
     private UpdateResult insertClassWithUnrepeatedClassId(ClassDetailedDto classDetailedDto) {
+        if (classDetailedDto == null) {
+            return new UpdateResult(Constants.FAILURE);
+        }
         if (!StringUtils.isEmpty(classDetailedDto.getTeacherName())) {
             //修改后的教师姓名不为空
             if (teacherService.getTeacherByName(classDetailedDto.getTeacherName()) == null) {
@@ -105,18 +130,24 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
 
         classDetailedDto.setParsedClassTime(classDetailedDto.getClassTime());
 
-        long count=classMapper.insertClass(classDetailedDto);
-        UpdateResult result=new UpdateResult(Constants.SUCCESS);
+        long count = classMapper.insertClass(classDetailedDto);
+        UpdateResult result = new UpdateResult(Constants.SUCCESS);
         result.setInsertCount(count);
         return result;
     }
 
     @Override
     public UpdateResult insertAndUpdateClassesFromExcel(List<ClassDetailedDto> classDetailedDtos) throws Exception {
-        UpdateResult result=new UpdateResult();
+        if (classDetailedDtos == null) {
+            String msg = "insertAndUpdateClassesFromExcel方法输入classDetailedDto为null!";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+
+        UpdateResult result = new UpdateResult();
         for (ClassDetailedDto classDetailedDto : classDetailedDtos) {
             if (ClassUtils.isValidClassInfo(classDetailedDto)) {
-                UpdateResult resultTmp=insertAndUpdateOneClassFromExcel(classDetailedDto);
+                UpdateResult resultTmp = insertAndUpdateOneClassFromExcel(classDetailedDto);
                 result.add(resultTmp);
             } else {
                 String msg = "输入助教排班表中读取到的classDetailedDtos不合法！";
@@ -136,16 +167,18 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
             throw new InvalidParameterException(msg);
         }
 
-        UpdateResult result=new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(Constants.SUCCESS);
 
-        Class originalClasses = getClassByClassId(classDetailedDto.getClassId());
-        if (originalClasses != null) {
+        ClassDetailedDto originalClass = getClassDetailByClassId(classDetailedDto.getClassId());
+        if (originalClass != null) {
             //班号已存在，更新
-            long updateCount=updateClassByClassId(classDetailedDto).getUpdateCount();
-            result.setUpdateCount(updateCount);
+            if (!originalClass.equalsExceptBaseParamsAndAssistantIdAndTeacherId(classDetailedDto)) {
+                long updateCount = updateClassByClassId(classDetailedDto).getUpdateCount();
+                result.setUpdateCount(updateCount);
+            }
         } else {
             //插入
-            long insertCount=insertClassWithUnrepeatedClassId(classDetailedDto).getInsertCount();
+            long insertCount = insertClassWithUnrepeatedClassId(classDetailedDto).getInsertCount();
             result.setInsertCount(insertCount);
         }
 
@@ -156,16 +189,32 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     public PageInfo<ClassDetailedDto> listClasses(MyPage myPage, ClassSearchCondition condition) {
         PageHelper.startPage(myPage.getPageNum(), myPage.getPageSize());
         List<ClassDetailedDto> classDetailedDtos = classMapper.listClasses(condition);
+
+        CurrentClassSeason classSeason = getCurrentClassSeason();
+        Class current = new Class();
+        current.setClassYear(classSeason.getClassYear());
+        current.setClassSeason(classSeason.getClassSeason());
+        current.setClassSubSeason(classSeason.getClassSubSeason());
+        System.out.println(current);
+
         for (int i = 0; i < classDetailedDtos.size(); i++) {
             ClassDetailedDto classDetailedDto = classDetailedDtos.get(i);
+
             if (!StringUtils.isEmpty(classDetailedDto.getClassYear())) {
                 classDetailedDto.setParsedClassYear();
                 classDetailedDtos.set(i, classDetailedDto);
             }
 
-            if (classDetailedDto.getClassroomCapacity() == null || classDetailedDto.getClassStudentsCount() >= classDetailedDto.getClassroomCapacity()){
+            if (classDetailedDto.getClassroomCapacity() == null || classDetailedDto.getClassStudentsCount() >= classDetailedDto.getClassroomCapacity()) {
                 //满班判断
                 classDetailedDto.setFull(true);
+            }
+
+            System.out.println(classDetailedDto);
+            System.out.println(Class.CLASS_YEAR_SEASON_SUB_SEASON_COMPARATOR.compare(classDetailedDto, current));
+            if (Class.CLASS_YEAR_SEASON_SUB_SEASON_COMPARATOR.compare(classDetailedDto, current) > 0) {
+                //结课判断
+                classDetailedDto.setOver(true);
             }
         }
         return new PageInfo<>(classDetailedDtos);
@@ -183,7 +232,13 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
 
     @Override
     public String updateClassInfo(ClassDetailedDto classDetailedDto) {
-        Class originalClass = getClassById(classDetailedDto.getId());
+        if (classDetailedDto == null) {
+            return Constants.FAILURE;
+        }
+        ClassDetailedDto originalClass = getClassDetailById(classDetailedDto.getId());
+        if (originalClass == null){
+            return Constants.FAILURE;
+        }
 
         //班号不为空
         if (!classDetailedDto.getClassId().equals(originalClass.getClassId())) {
@@ -211,6 +266,13 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
         }
 
         classDetailedDto.setParsedClassTime(classDetailedDto.getClassTime());
+
+
+        if (originalClass.equalsExceptBaseParamsAndAssistantIdAndTeacherId(classDetailedDto)) {
+            //判断输入对象的对应字段是否未做任何修改
+            return Constants.UNCHANGED;
+        }
+
         classMapper.updateClassInfo(classDetailedDto);
         return Constants.SUCCESS;
     }
@@ -225,7 +287,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
 
     @Override
     public long deleteManyClassesByIds(List<Long> ids) {
-        if (ids == null ||ids.size() == 0){
+        if (ids == null || ids.size() == 0) {
             return 0;
         }
         return classMapper.deleteManyClassesByIds(ids);
@@ -233,24 +295,37 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
 
     @Override
     public UpdateResult deleteClassesByCondition(ClassSearchCondition condition) {
-        long count=classMapper.deleteClassesByCondition(condition);
-        UpdateResult result=new UpdateResult(Constants.SUCCESS);
+        long count = classMapper.deleteClassesByCondition(condition);
+        UpdateResult result = new UpdateResult(Constants.SUCCESS);
         result.setDeleteCount(count);
         return result;
     }
 
     @Override
     public CurrentClassSeason getCurrentClassSeason() {
-        CurrentClassSeason currentClassSeason=new CurrentClassSeason();
-        String key=RedisConstants.CURRENT_SEASON_KEY;
+        CurrentClassSeason currentClassSeason = new CurrentClassSeason();
+        String key = RedisConstants.CURRENT_SEASON_KEY;
         if (redisTemplate.hasKey(key)) {
             //缓存中有
-            currentClassSeason= (CurrentClassSeason) valueOps.get(key);
-            return currentClassSeason;
+            return (CurrentClassSeason) valueOps.get(key);
         }
         //缓存中无，采用默认策略
         currentClassSeason.setClassYear(ClassUtils.getCurrentYear());
         currentClassSeason.setClassSeason(ClassUtils.getCurrentSeason());
         return currentClassSeason;
+    }
+
+    @Override
+    public void updateCurrentClassSeason(CurrentClassSeason classSeason) {
+        if (classSeason == null){
+            return;
+        }
+        valueOps.set(RedisConstants.CURRENT_SEASON_KEY, classSeason);
+        redisTemplate.expire(RedisConstants.CURRENT_SEASON_KEY, RedisConstants.CURRENT_SEASON_EXPIRE, TimeUnit.DAYS);
+    }
+
+    @Override
+    public void deleteCurrentClassSeason() {
+        expireKey(RedisConstants.CURRENT_SEASON_KEY);
     }
 }

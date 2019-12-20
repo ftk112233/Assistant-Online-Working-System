@@ -36,4 +36,31 @@ public abstract class BaseEntity implements Serializable {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     protected Date updateTime;
+
+    /**
+     * 判断一个BaseEntity的子类对象，除了BaseEntity中的字段外，对象的其他信息是否相同
+     *
+     * @param o
+     * @return
+     */
+    public boolean equalsExceptBaseParams(BaseEntity o){
+        Long tmpId = null;
+        Date tmpCreateTime=null;
+        Date tmpUpdateTime=null;
+        if (o != null){
+            tmpId=o.getId();
+            tmpCreateTime=o.getCreateTime();
+            tmpUpdateTime=o.getUpdateTime();
+            o.setId(this.getId());
+            o.setCreateTime(this.getCreateTime());
+            o.setUpdateTime(this.getUpdateTime());
+        }
+        boolean result=this.equals(o);
+        if (o != null){
+            o.setId(tmpId);
+            o.setCreateTime(tmpCreateTime);
+            o.setUpdateTime(tmpUpdateTime);
+        }
+        return result;
+    }
 }

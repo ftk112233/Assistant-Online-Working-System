@@ -97,12 +97,12 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
 
     /**
      * 从学生花名册表中读取信息
-     *  学生Student对象直接读出，教师teacher对象也直接读出，班级信息整体和学生、助教、教师封装成StudentAndClassDto
+     * 学生Student对象直接读出，教师teacher对象也直接读出，班级信息整体和学生、助教、教师封装成StudentAndClassDto
      *
      * @return 返回表格有效数据的行数
      * @throws ExcelColumnNotFoundException
      */
-    public int readStudentAndClassInfoFromExcel() throws ExcelColumnNotFoundException, ParseException {
+    public int readStudentAndClassInfoFromExcel() throws ExcelColumnNotFoundException {
         resetParam();
         int sheetIx = 0;
 
@@ -142,21 +142,22 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
             throw new ExcelColumnNotFoundException("学生花名册列属性中有未匹配的属性名");
         }
 
-        int effectiveDataRowCount=0;
+        int effectiveDataRowCount = 0;
 
         int rowCount = this.getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
             if (StringUtils.isEmpty(this.getValueAt(sheetIx, i, columnIndexOfStudentId))) {
                 //当前行学员号为空，跳过
                 continue;
-            }  else {
+            } else {
                 effectiveDataRowCount++;
             }
             String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId).toUpperCase();
             String studentName = this.getValueAt(sheetIx, i, columnIndexOfStudentName);
             String studentPhone = this.getValueAt(sheetIx, i, columnIndexOfStudentPhone);
             String studentPhoneBackup = this.getValueAt(sheetIx, i, columnIndexOfStudentPhoneBackup);
-            String classId = this.getValueAt(sheetIx, i, columnIndexOfClassId).toUpperCase();
+            String classId = this.getValueAt(sheetIx, i, columnIndexOfClassId);
+            classId = classId == null ? null : classId.toUpperCase();
             String registerTime = this.getValueAt(sheetIx, i, columnIndexOfRegisterTime);
             String remark = this.getValueAt(sheetIx, i, columnIndexOfRemark);
 
@@ -172,7 +173,11 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
             studentAndClassDetailedDto.setStudentId(studentId);
             studentAndClassDetailedDto.setClassId(classId);
 
-            studentAndClassDetailedDto.setRegisterTime(MyTimeUtils.cstToDate(registerTime));
+            try {
+                studentAndClassDetailedDto.setRegisterTime(MyTimeUtils.cstToDate(registerTime));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
             studentAndClassDetailedDto.setRemark(remark);
             studentAndClassDetailedDtos.add(studentAndClassDetailedDto);
@@ -183,7 +188,7 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
 
     /**
      * 从刚开班的时候带学生电话的学生花名册表中读取信息
-     *   学生Student对象直接读出
+     * 学生Student对象直接读出
      *
      * @return 返回表格有效数据的行数
      * @throws ExcelColumnNotFoundException
@@ -219,7 +224,7 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
             throw new ExcelColumnNotFoundException("刚开班的时候带学生电话的学生花名册列属性中有未匹配的属性名");
         }
 
-        int effectiveDataRowCount=0;
+        int effectiveDataRowCount = 0;
 
         int rowCount = this.getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
@@ -229,8 +234,7 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
             } else {
                 effectiveDataRowCount++;
             }
-            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId);
-            studentId = studentId == null ? null : studentId.toUpperCase();
+            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId).toUpperCase();
             String studentName = this.getValueAt(sheetIx, i, columnIndexOfStudentName);
             String studentPhone = this.getValueAt(sheetIx, i, columnIndexOfStudentPhone);
             String studentPhoneBackup = this.getValueAt(sheetIx, i, columnIndexOfStudentPhoneBackup);

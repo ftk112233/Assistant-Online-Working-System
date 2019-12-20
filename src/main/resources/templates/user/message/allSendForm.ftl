@@ -181,7 +181,7 @@
                             , icon: 1
                             , time: 1000
                         }, function () {
-                            location.href = '${ctx}/user/message/page';
+                            location.href = '${ctx}/user/message/send';
                         });
                     } else {
                         layer.msg('发送失败');

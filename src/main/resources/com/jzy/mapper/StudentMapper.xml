@@ -103,6 +103,16 @@
         </set>
         where id = #{id}
     </update>
+    <update id="updateStudentSchoolByStudentId" parameterType="com.jzy.model.entity.Student">
+        update student set student_school=#{studentSchool} where student_id=#{studentId}
+    </update>
+    <update id="updateStudentNameAndPhoneByStudentId" parameterType="com.jzy.model.entity.Student">
+        update student set
+        student_name=#{studentName},
+        student_phone=#{studentPhone},
+        student_phone_backup=#{studentPhoneBackup}
+        where student_id=#{studentId}
+    </update>
     <delete id="deleteOneStudentById">
         delete from student where id=#{id}
     </delete>

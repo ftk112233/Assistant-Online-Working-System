@@ -37,22 +37,21 @@ public class CampusAndClassroomServiceImpl extends AbstractServiceImpl implement
 
     @Override
     public List<String> listClassroomsByCampus(String campus) {
-        if (StringUtils.isEmpty(campus)){
+        if (StringUtils.isEmpty(campus)) {
             return new ArrayList<>();
         }
 
-        String key=RedisConstants.CLASSROOMS_KEY;
+        String key = RedisConstants.CLASSROOMS_KEY;
         if (hashOps.hasKey(key, campus)) {
             //缓存中有
-            String classroomsJSON= (String) hashOps.get(key, campus);
+            String classroomsJSON = (String) hashOps.get(key, campus);
             return JSONArray.parseArray(classroomsJSON, String.class);
-        } else {
-            //缓存中无，从数据库查
-            List<String> classrooms=campusAndClassroomMapper.listClassroomsByCampus(campus);
-            //添加缓存
-            hashOps.put(key, campus, JSON.toJSONString(classrooms));
-            return classrooms;
         }
+        //缓存中无，从数据库查
+        List<String> classrooms = campusAndClassroomMapper.listClassroomsByCampus(campus);
+        //添加缓存
+        hashOps.put(key, campus, JSON.toJSONString(classrooms));
+        return classrooms;
     }
 
     @Override
@@ -60,33 +59,27 @@ public class CampusAndClassroomServiceImpl extends AbstractServiceImpl implement
         return (StringUtils.isEmpty(campus) || StringUtils.isEmpty(classroom)) ? null : campusAndClassroomMapper.getByCampusAndClassroom(campus, classroom);
     }
 
+
+
     @Override
     public long deleteCampusAndClassroomsByCampus(String campus) {
-        if (StringUtils.isEmpty(campus)){
+        if (StringUtils.isEmpty(campus)) {
             return 0;
         }
-        //清缓存
-        String key=RedisConstants.CLASSROOMS_KEY;
-        if (hashOps.hasKey(key, campus)) {
-            //缓存中有
-            hashOps.delete(key, campus);
-        }
+
         return campusAndClassroomMapper.deleteCampusAndClassroomsByCampus(campus);
     }
 
     @Override
     public String insertCampusAndClassroom(CampusAndClassroom campusAndClassroom) {
+        if (campusAndClassroom == null) {
+            return Constants.FAILURE;
+        }
         if (getByCampusAndClassroom(campusAndClassroom.getCampus(), campusAndClassroom.getClassroom()) != null) {
             //已存在
             return "campusAndClassroomRepeat";
         }
 
-        //清缓存
-        String key=RedisConstants.CLASSROOMS_KEY;
-        if (hashOps.hasKey(key, campusAndClassroom.getCampus())) {
-            //缓存中有
-            hashOps.delete(key, campusAndClassroom.getCampus());
-        }
         campusAndClassroomMapper.insertCampusAndClassroom(campusAndClassroom);
         return Constants.SUCCESS;
     }

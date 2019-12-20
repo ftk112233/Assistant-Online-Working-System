@@ -54,6 +54,8 @@ public class Constants {
 
     public static final String UNKNOWN_ERROR = "unknownError";
 
+    public static final String UNCHANGED = "unchanged";
+
     public static final String ON = "on";
 
     public static final String YES = "yes";

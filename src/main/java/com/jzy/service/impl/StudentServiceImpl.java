@@ -45,11 +45,38 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
 
     @Override
     public UpdateResult updateStudentByStudentId(Student student) {
+        if (student == null){
+            return new UpdateResult(Constants.FAILURE);
+        }
         if (StringUtils.isEmpty(student.getStudentSex())) {
             student.setStudentSex(null);
         }
-        long count=studentMapper.updateStudentByStudentId(student);
-        UpdateResult result=new UpdateResult();
+        long count = studentMapper.updateStudentByStudentId(student);
+        UpdateResult result = new UpdateResult();
+        result.setUpdateCount(count);
+        result.setResult(Constants.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public UpdateResult updateStudentNameAndPhoneByStudentId(Student student) {
+        if (student == null){
+            return new UpdateResult(Constants.FAILURE);
+        }
+        long count = studentMapper.updateStudentNameAndPhoneByStudentId(student);
+        UpdateResult result = new UpdateResult();
+        result.setUpdateCount(count);
+        result.setResult(Constants.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public UpdateResult updateStudentSchoolByStudentId(Student student) {
+        if (student == null){
+            return new UpdateResult(Constants.FAILURE);
+        }
+        long count = studentMapper.updateStudentSchoolByStudentId(student);
+        UpdateResult result = new UpdateResult();
         result.setUpdateCount(count);
         result.setResult(Constants.SUCCESS);
         return result;
@@ -57,6 +84,9 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
 
     @Override
     public UpdateResult insertStudent(Student student) {
+        if (student == null){
+            return new UpdateResult(Constants.FAILURE);
+        }
         if (getStudentByStudentId(student.getStudentId()) != null) {
             //添加的学号号已存在
             return new UpdateResult("studentIdRepeat");
@@ -72,12 +102,15 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
      * @return
      */
     private UpdateResult insertStudentWithUnrepeatedStudentId(Student student) {
-        UpdateResult result=new UpdateResult();
+        if (student == null){
+            return new UpdateResult(Constants.FAILURE);
+        }
+        UpdateResult result = new UpdateResult();
         if (StringUtils.isEmpty(student.getStudentSex())) {
             student.setStudentSex(null);
         }
 
-        long count=studentMapper.insertStudent(student);
+        long count = studentMapper.insertStudent(student);
         result.setInsertCount(count);
         result.setResult(Constants.SUCCESS);
         return result;
@@ -85,7 +118,7 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
 
     @Override
     public UpdateResult insertAndUpdateStudentsDetailedFromExcel(List<Student> students) throws Exception {
-        UpdateResult result=new UpdateResult();
+        UpdateResult result = new UpdateResult();
         for (Student student : students) {
             if (StudentUtils.isValidStudentInfo(student)) {
                 result.add(insertAndUpdateOneStudentDetailedFromExcel(student));
@@ -107,12 +140,17 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
             throw new InvalidParameterException(msg);
         }
 
-        UpdateResult result=new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(Constants.SUCCESS);
 
         Student originalStudent = getStudentByStudentId(student.getStudentId());
         if (originalStudent != null) {
             //学员编号已存在，更新
-            result.add(updateStudentByStudentId(student));
+            if (!StringUtils.equals(originalStudent.getStudentName(), student.getStudentName())
+                    || !StringUtils.equals(originalStudent.getStudentPhone(), student.getStudentPhone())
+                    || !StringUtils.equals(originalStudent.getStudentPhoneBackup(), student.getStudentPhoneBackup())) {
+                //有修改
+                result.add(updateStudentNameAndPhoneByStudentId(student));
+            }
         } else {
             result.add(insertStudentWithUnrepeatedStudentId(student));
         }
@@ -121,10 +159,10 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
 
     @Override
     public UpdateResult insertAndUpdateStudentsFromExcel(List<Student> students) throws Exception {
-        UpdateResult result=new UpdateResult();
+        UpdateResult result = new UpdateResult();
         for (Student student : students) {
             if (StudentUtils.isValidStudentInfo(student)) {
-                UpdateResult resultTmp=insertAndUpdateOneStudentFromExcel(student);
+                UpdateResult resultTmp = insertAndUpdateOneStudentFromExcel(student);
                 result.add(resultTmp);
             } else {
                 String msg = "学生花名册读取到的student不合法!";
@@ -144,15 +182,63 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
             throw new InvalidParameterException(msg);
         }
 
-        UpdateResult result=new UpdateResult();
+        UpdateResult result = new UpdateResult();
 
         Student originalStudent = getStudentByStudentId(student.getStudentId());
         if (originalStudent != null) {
             //学员编号已存在，更新
-            long count=studentMapper.updateStudentNameByStudentId(student);
-            result.setUpdateCount(count);
+            if (!StringUtils.equals(originalStudent.getStudentName(), student.getStudentName())) {
+                //姓名有变化
+                long count = studentMapper.updateStudentNameByStudentId(student);
+                result.setUpdateCount(count);
+            }
         } else {
             result.add(insertStudentWithUnrepeatedStudentId(student));
+        }
+        result.setResult(Constants.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public UpdateResult insertAndUpdateOneStudentSchoolFromExcel(Student student) throws Exception {
+        if (student == null) {
+            String msg = "updateOneStudentSchoolFromExcel方法输入学生student为null!";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+
+        UpdateResult result = new UpdateResult();
+
+        Student originalStudent = getStudentByStudentId(student.getStudentId());
+        if (originalStudent != null) {
+            //学员编号已存在，更新
+            if (!StringUtils.equals(originalStudent.getStudentSchool(), student.getStudentSchool())) {
+                //有修改, 更新
+                long count = studentMapper.updateStudentSchoolByStudentId(student);
+                result.setUpdateCount(count);
+            }
+        } else {
+            //由于学校统计不扫姓名，但数据库姓名字段约束为非空，所以给学号作为默认值
+            student.setStudentName(student.getStudentId());
+            result.add(insertStudentWithUnrepeatedStudentId(student));
+        }
+
+        result.setResult(Constants.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public UpdateResult insertAndUpdateStudentsSchoolsFromExcel(List<Student> students) throws Exception {
+        UpdateResult result = new UpdateResult();
+        for (Student student : students) {
+            if (StudentUtils.isValidStudentInfo(student)) {
+                UpdateResult resultTmp = insertAndUpdateOneStudentSchoolFromExcel(student);
+                result.add(resultTmp);
+            } else {
+                String msg = "学生花名册读取到的student学校不合法!";
+                logger.error(msg);
+                throw new InvalidParameterException(msg);
+            }
         }
         result.setResult(Constants.SUCCESS);
         return result;
@@ -167,7 +253,13 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
 
     @Override
     public String updateStudentInfo(Student student) {
+        if (student == null){
+            return Constants.FAILURE;
+        }
         Student originalStudent = getStudentById(student.getId());
+        if (originalStudent == null){
+            return Constants.FAILURE;
+        }
 
         if (!student.getStudentId().equals(originalStudent.getStudentId())) {
             //学员号修改过了，判断是否与已存在的学员号冲突
@@ -179,6 +271,11 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
 
         if (StringUtils.isEmpty(student.getStudentSex())) {
             student.setStudentSex(null);
+        }
+
+        if (originalStudent.equalsExceptBaseParams(student)){
+            //未修改
+            return Constants.UNCHANGED;
         }
 
         studentMapper.updateStudentInfo(student);
@@ -195,7 +292,7 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
 
     @Override
     public long deleteManyStudentsByIds(List<Long> ids) {
-        if (ids == null ||ids.size() == 0){
+        if (ids == null || ids.size() == 0) {
             return 0;
         }
         return studentMapper.deleteManyStudentsByIds(ids);
@@ -203,6 +300,9 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
 
     @Override
     public String deleteStudentsByCondition(StudentSearchCondition condition) {
+        if (condition == null){
+            return Constants.FAILURE;
+        }
         studentMapper.deleteStudentsByCondition(condition);
         return Constants.SUCCESS;
     }

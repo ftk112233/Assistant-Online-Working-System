@@ -2,8 +2,11 @@ package com.jzy.service.impl;
 
 import com.jzy.config.FilePathProperties;
 import com.jzy.service.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author JinZhiyun
@@ -70,4 +73,26 @@ public abstract class AbstractServiceImpl {
     @Autowired
     protected FilePathProperties filePathProperties;
 
+    /**
+     * 清除redis指定key的缓存
+     *
+     * @param key redis缓存的键
+     */
+    protected void expireKey(String key) {
+        if (!StringUtils.isEmpty(key)) {
+            redisTemplate.expire(key, 0, TimeUnit.SECONDS);
+        }
+    }
+
+    /**
+     * 清除redis指定key的hash
+     *
+     * @param key redis缓存的键
+     */
+    protected void deleteHashByKey(String key, String hashKey) {
+        if (hashOps.hasKey(key, hashKey)) {
+            //缓存中有
+            hashOps.delete(key, hashKey);
+        }
+    }
 }

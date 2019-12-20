@@ -274,6 +274,32 @@
                 <li class="layui-timeline-item">
                     <i class="layui-icon layui-timeline-axis"></i>
                     <div class="layui-timeline-content layui-text">
+                        <h3 class="layui-timeline-title">STEP4.5: 导入学生学校统计</h3>
+                        <p>上传excel要求说明：<a
+                                href="${ctx}/toolbox/assistantAdministrator/downloadExample/6">查看范例</a></p>
+                        <ul>
+                            <li>第1行为列名属性。所有列名属性中系统将读取以下名称的列导入数据库，这些列的先后顺序无关，但列名称必须与要求相符（如下所示）！！<br>
+                                __________________<br>
+                                | 学员编号 | 在读学校 |<br>
+                                __________________
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="layui-form layui-timeline-content" style="margin-bottom: 20px;">
+                        <input type="checkbox" name="read_step45" id="read_step45" lay-skin="primary"
+                               lay-filter="read_step45" title=""><b style="color: red;">我已认真阅读以上内容</b>
+                    </div>
+                    <div class="layui-timeline-content layui-text" id="div-import-student-school"
+                         hidden="hidden">
+                        <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel"
+                                style="background-color: #FFB800"
+                                id="import-student-school" lay-filter="import-student-school"><i
+                                class="layui-icon">&#xe67c;</i>导入学校统计
+                    </div>
+                </li>
+                <li class="layui-timeline-item">
+                    <i class="layui-icon layui-timeline-axis"></i>
+                    <div class="layui-timeline-content layui-text">
                         <div class="layui-timeline-title">大功告成！</div>
                     </div>
                 </li>
@@ -552,7 +578,7 @@
                         skin: 'layui-layer-lan'
                         ,closeBtn: 0
                     });
-                }else {
+                } else {
                     return layer.alert('导入失败!', {
                         skin: 'layui-layer-lan'
                         ,closeBtn: 0
@@ -569,7 +595,6 @@
         });
 
         /*====================STEP4=======================*/
-        //监听自动解析开关
         form.on('checkbox(read_step4)', function (data) {
             //开关是否开启，true或者false
             var checked = data.elem.checked;
@@ -623,6 +648,61 @@
                 });
             }
         });
+
+
+        /*====================STEP4.5=======================*/
+        form.on('checkbox(read_step45)', function (data) {
+            //开关是否开启，true或者false
+            var checked = data.elem.checked;
+            if (checked) {
+                $("#div-import-student-school").show();
+            } else {
+                $("#div-import-student-school").hide();
+            }
+        });
+
+        upload.render({
+            elem: '#import-student-school'
+            , url: '${ctx}/student/admin/importSchool'
+            , data: {
+            }
+            , accept: 'file' //普通文件
+            , exts: 'xls|xlsx' //允许上传的文件后缀
+            , before: function (obj) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+                layer.load(1, {shade: [0.1, '#fff']}); //上传loading
+            }
+            , done: function (res) {//返回值接收
+                layer.closeAll('loading'); //关闭loading
+                if (res.msg === "success") {
+                    return layer.alert('导入成功！' +'<br>'+
+                            '总耗时：'+res.excelSpeed.parsedTime+'<br>'+
+                            '导入表格记录数：'+res.excelSpeed.count+'条；平均速度：'+res.excelSpeed.parsedSpeed+'。<br>'+
+                            '变更数据库记录数：删除'+res.databaseSpeed.deleteCount+'条；插入'+res.databaseSpeed.insertCount
+                            +'条；更新'+res.databaseSpeed.updateCount+'条；平均速度：'+res.databaseSpeed.parsedSpeed+'。', {
+                        skin: 'layui-layer-molv' //样式类名
+                        ,closeBtn: 0
+                    });
+                } else if (res.msg === "excelColumnNotFound") {
+                    return layer.alert('表格中有列属性名不符合规范!', {
+                        skin: 'layui-layer-lan'
+                        ,closeBtn: 0
+                    });
+                } else {
+                    return layer.alert('导入失败!', {
+                        skin: 'layui-layer-lan'
+                        ,closeBtn: 0
+                    });
+                }
+            }
+            , error: function () {
+                layer.closeAll('loading'); //关闭loading
+                return layer.alert('导入失败!', {
+                    skin: 'layui-layer-lan'
+                    ,closeBtn: 0
+                });
+            }
+        });
+
     });
 </script>
 </body>

@@ -426,6 +426,8 @@
                                         return layer.msg('对不起，该工号已存在！');
                                     } else if (data.data === "nameRepeat") {
                                         return layer.msg('对不起，该教师姓名已存在！');
+                                    } else if (data.data === "unchanged") {
+                                        return layer.msg('未做任何修改');
                                     } else {
                                         return layer.msg('未知错误');
                                     }

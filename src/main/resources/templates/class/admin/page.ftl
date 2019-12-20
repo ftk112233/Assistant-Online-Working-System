@@ -181,6 +181,11 @@
                 {{#  } else { }}
                 <button class="layui-btn layui-btn-primary layui-btn-xs">未满</button>
                 {{#  } }}
+                {{#  if(d.over){ }}
+                <button class="layui-btn layui-btn-xs">已结课</button>
+                {{#  } else { }}
+                <button class="layui-btn layui-btn-primary layui-btn-xs">开课中</button>
+                {{#  } }}
             </script>
         </div>
     </div>
@@ -315,7 +320,7 @@
                 , {field: 'id', title: 'id', sort: true, hide: true}
                 , {field: 'createTime', title: '创建时间', sort: true, hide: true}
                 , {field: 'updateTime', title: '更新时间', sort: true, hide: true}
-                , {minWidth: 150, width: 190, align: 'center', title: '跳转', toolbar: '#test-table-operate-barDemo1'}
+                , {width: 190, align: 'center', title: '跳转', toolbar: '#test-table-operate-barDemo1'}
                 , {field: 'classId', title: '班级编码', width: 140, sort: true}
                 , {field: 'className', title: '班级名称', sort: true}
                 , {field: 'classCampus', title: '校区', width: 80, sort: true}
@@ -335,8 +340,15 @@
                 , {field: 'classRemark', title: '备注', hide: true}
                 , {field: 'classStudentsCount', title: '班级人数', width: 90}
                 , {field: 'classroomCapacity', title: '教室容量', width: 90}
-                ,{field: 'full', title: '班级状态', templet: '#buttonTpl', minWidth: 90, align: 'center'}
-                , {title: '操作', minWidth: 150, align: 'center', toolbar: '#table-content-list1'}
+                , {field: 'status', title: '班级状态', templet: '#buttonTpl', width: 130, align: 'center'}
+                , {
+                    field: 'oper',
+                    title: '操作',
+                    minWidth: 150,
+                    align: 'center',
+                    toolbar: '#table-content-list1',
+                    hide: true
+                }
             ]]
             , where: {
                 classYear: $("#year").val()
@@ -677,7 +689,7 @@
                     ,
                     content: '${ctx}/class/admin/updateForm?id=' + data.id + '&classCampus=' + data.classCampus + '&classGrade=' + data.classGrade
                     + '&classSubject=' + data.classSubject + '&classType=' + data.classType
-                    + '&classSeason=' + data.classSeason +'&classSubSeason=' + data.classSubSeason + '&classroom=' + data.classroom
+                    + '&classSeason=' + data.classSeason + '&classSubSeason=' + data.classSubSeason + '&classroom=' + data.classroom
                     ,
                     maxmin: true
                     ,
@@ -736,6 +748,8 @@
                                         return layer.msg('对不起，该助教不存在！');
                                     } else if (data.data === "teacherNotExist") {
                                         return layer.msg('对不起，该教师不存在！');
+                                    } else if (data.data === "unchanged") {
+                                        return layer.msg('未做任何修改');
                                     } else {
                                         return layer.msg('无法完成操作');
                                     }

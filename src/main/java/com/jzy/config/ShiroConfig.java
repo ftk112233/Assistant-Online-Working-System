@@ -135,9 +135,11 @@ public class ShiroConfig {
         permissions.put("/usefulInformation/admin/insert*", "perms[usefulInformation:admin:insert]"); //添加常用信息的权限，助教长以上级别才有
         permissions.put("/usefulInformation/admin/delete*", "perms[usefulInformation:admin:delete]"); //删除常用信息的权限，助教长以上级别才有
 
+        permissions.put("/toolbox/common/**", "perms[toolbox:common]"); //百宝箱通用区的权限，教师助教以上级别才有
         permissions.put("/toolbox/assistant/**", "perms[toolbox:assistant]"); //百宝箱助教区的权限，教师助教以上级别才有
         permissions.put("/toolbox/assistantAdministrator/**", "perms[toolbox:assistantAdministrator]"); //百宝箱学管区的权限，助教长以上级别才有
 
+        permissions.put("/system/intelliClassSeason/**", "perms[system:intelliClassSeason]"); //智能校历设置，助教长以上
         permissions.put("/system/**", "perms[system:admin]"); //推送公告等系统设置，只能管理员
 
         filterChainDefinitionMap.putAll(permissions);

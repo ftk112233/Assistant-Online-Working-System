@@ -43,4 +43,9 @@ public class ClassDetailedDto extends Class {
      * 是否慢班
      */
     boolean full;
+
+    /**
+     * 是否结课
+     */
+    boolean over;
 }

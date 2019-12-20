@@ -16,6 +16,7 @@ import com.jzy.model.entity.UserMessage;
 import com.jzy.model.excel.Excel;
 import com.jzy.model.excel.ExcelVersionEnum;
 import com.jzy.model.excel.input.StudentListImportToDatabaseExcel;
+import com.jzy.model.excel.input.StudentSchoolExcel;
 import com.jzy.model.vo.ResultMap;
 import com.jzy.model.vo.Speed;
 import com.jzy.model.vo.SqlProceedSpeed;
@@ -30,7 +31,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -103,10 +103,6 @@ public class StudentAdminController extends AbstractController {
                 } catch (InputFileTypeException e) {
                     e.printStackTrace();
                     map.put("msg", Constants.FAILURE);
-                    return map;
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                    map.put("msg", "unEnableToParseRegisterTime");
                     return map;
                 }
 
@@ -210,6 +206,84 @@ public class StudentAdminController extends AbstractController {
 
         return map;
     }
+
+    /**
+     * 导入学校统计
+     *
+     * @param file
+     * @return
+     * @throws InvalidParameterException
+     */
+    @RequestMapping("/importSchool")
+    @ResponseBody
+    public Map<String, Object> importSchool(@RequestParam(value = "file", required = false) MultipartFile file) throws InvalidParameterException {
+        Map<String, Object> map2 = new HashMap<>(1);
+        Map<String, Object> map = new HashMap<>();
+        //返回layui规定的文件上传模块JSON格式
+        map.put("code", 0);
+        map2.put("src", "");
+        map.put("data", map2);
+
+        if (file.isEmpty()) {
+            String msg = "上传文件为空";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+
+
+        if (!Excel.isExcel(file.getOriginalFilename())) {
+            String msg = "上传文件不是excel";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+
+        long startTime = System.currentTimeMillis();   //获取开始时间
+        int excelEffectiveDataRowCount = 0; //表格有效数据行数
+        int databaseUpdateRowCount = 0; //数据库更新记录数
+        int databaseInsertRowCount = 0; //数据库插入记录数
+        int databaseDeleteRowCount = 0; //数据库删除记录数
+
+        StudentSchoolExcel excel = null;
+        try {
+            excel = new StudentSchoolExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
+            excelEffectiveDataRowCount = excel.readStudentsSchoolsFromExcel();
+        } catch (IOException e) {
+            e.printStackTrace();
+            map.put("msg", Constants.FAILURE);
+            return map;
+        } catch (ExcelColumnNotFoundException e) {
+            e.printStackTrace();
+            map.put("msg", "excelColumnNotFound");
+            return map;
+        } catch (InputFileTypeException e) {
+            e.printStackTrace();
+            map.put("msg", Constants.FAILURE);
+            return map;
+        }
+
+        try {
+            UpdateResult result = studentService.insertAndUpdateStudentsSchoolsFromExcel(excel.getStudents());
+            databaseInsertRowCount += (int) result.getInsertCount();
+            databaseUpdateRowCount += (int) result.getUpdateCount();
+
+            long endTime = System.currentTimeMillis(); //获取结束时间
+            Speed speedOfExcelImport = new Speed(excelEffectiveDataRowCount, endTime - startTime);
+            SqlProceedSpeed speedOfDatabaseImport = new SqlProceedSpeed(databaseUpdateRowCount, databaseInsertRowCount, databaseDeleteRowCount, endTime - startTime);
+            speedOfExcelImport.parseSpeed();
+            speedOfDatabaseImport.parseSpeed();
+            map.put("excelSpeed", speedOfExcelImport);
+            map.put("databaseSpeed", speedOfDatabaseImport);
+
+            map.put("msg", Constants.SUCCESS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("msg", Constants.FAILURE);
+            return map;
+        }
+
+        return map;
+    }
+
 
     /**
      * 跳转学员个人信息管理页面

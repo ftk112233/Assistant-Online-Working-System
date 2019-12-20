@@ -55,7 +55,7 @@ public class Speed extends Time {
     @Override
     public String parseSpeed() {
         super.parseTime();
-        if (count>0) {
+        if (count > 0) {
             if (totalHour > 0) {
                 speedPerHour = (long) (count / totalHour);
             }
@@ -80,6 +80,8 @@ public class Speed extends Time {
 
             //秒级别耗时，大于等于两秒，输出xx条/秒
             parsedSpeed = speedPerSecond + PER_SECOND;
+        } else {
+            parsedSpeed = 0 + PER_SECOND;
         }
         return parsedSpeed;
     }

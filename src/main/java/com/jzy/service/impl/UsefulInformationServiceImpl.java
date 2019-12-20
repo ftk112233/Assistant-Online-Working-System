@@ -61,7 +61,6 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
             return new ArrayList<>();
         }
 
-
         String key = RedisConstants.USEFUL_INFORMATION_KEY;
         if (hashOps.hasKey(key, belongTo)) {
             //缓存中有
@@ -110,6 +109,9 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
 
     @Override
     public Long getRecommendedSequence(String belongTo) {
+        if (StringUtils.isEmpty(belongTo)){
+            return null;
+        }
         Long currentMaxSequence = usefulInformationMapper.getRecommendedSequence(belongTo);
         if (currentMaxSequence == null) {
             //如果当前类别没有任何记录
@@ -126,7 +128,7 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
 
     @Override
     public String uploadImage(MultipartFile file, String id) throws InvalidParameterException {
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
             throw new InvalidParameterException(msg);
@@ -154,7 +156,13 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
 
     @Override
     public String updateUsefulInformationInfo(UsefulInformation information) {
+        if (information == null) {
+            return Constants.FAILURE;
+        }
         UsefulInformation originalInformation = getUsefulInformationById(information.getId());
+        if (originalInformation == null) {
+            return Constants.FAILURE;
+        }
         if (!originalInformation.getBelongTo().equals(information.getBelongTo())
                 || !originalInformation.getSequence().equals(information.getSequence())) {
             //所属类别或序号修改过了，判断是否与已存在的记录冲突
@@ -182,9 +190,10 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
             information.setImage(originalInformation.getImage());
         }
 
-        //清缓存
-        String key = RedisConstants.USEFUL_INFORMATION_KEY;
-        redisTemplate.expire(key, 0, TimeUnit.MINUTES);
+        if (originalInformation.equalsExceptBaseParams(information)){
+            //未修改
+            return Constants.UNCHANGED;
+        }
 
         usefulInformationMapper.updateUsefulInformationInfo(information);
         return Constants.SUCCESS;
@@ -192,6 +201,10 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
 
     @Override
     public String insertUsefulInformation(UsefulInformation information) {
+        if (information == null) {
+            return Constants.FAILURE;
+        }
+
         //所属类别或序号修改过了，判断是否与已存在的记录冲突
         if (getUsefulInformationByBelongToAndSequence(information.getBelongTo(), information.getSequence()) != null) {
             //修改后的类别或序号已存在
@@ -211,10 +224,6 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
             information.setImage(null);
         }
 
-        //清缓存
-        String key = RedisConstants.USEFUL_INFORMATION_KEY;
-        redisTemplate.expire(key, 0, TimeUnit.MINUTES);
-
         usefulInformationMapper.insertUsefulInformation(information);
         return Constants.SUCCESS;
     }
@@ -227,10 +236,6 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
 
         //删除本地配图文件
         deleteImageById(id);
-
-        //清缓存
-        String key = RedisConstants.USEFUL_INFORMATION_KEY;
-        redisTemplate.expire(key, 0, TimeUnit.MINUTES);
 
         return usefulInformationMapper.deleteOneUsefulInformationById(id);
     }
@@ -246,9 +251,6 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
             deleteImageById(id);
         }
 
-        //清缓存
-        String key = RedisConstants.USEFUL_INFORMATION_KEY;
-        redisTemplate.expire(key, 0, TimeUnit.MINUTES);
         return usefulInformationMapper.deleteManyUsefulInformationByIds(ids);
     }
 

@@ -397,6 +397,11 @@
         </where>
         order by c.class_id
     </select>
+    <select id="getClassDetailById" resultMap="ClassDetailedResultMap">
+      select c.*, a.assistant_name as assistant_name, t.teacher_name as teacher_name
+        from class c left join assistant a on c.class_assistant_id = a.id left join teacher t on c.class_teacher_id = t.id
+        where c.id=#{id}
+  </select>
 
 
 </mapper>

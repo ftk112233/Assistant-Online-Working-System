@@ -11,7 +11,7 @@
         <result column="teacher_work_id" property="teacherWorkId" jdbcType="VARCHAR"/>
         <result column="teacher_name" property="teacherName" jdbcType="VARCHAR"/>
         <result column="teacher_sex" property="teacherSex" jdbcType="VARCHAR"/>
-        <result column="teacher_phone" property="teacherRemark" jdbcType="VARCHAR"/>
+        <result column="teacher_phone" property="teacherPhone" jdbcType="VARCHAR"/>
         <result column="teacher_remark" property="teacherRemark" jdbcType="VARCHAR"/>
     </resultMap>
     <insert id="insertTeacher" parameterType="com.jzy.model.entity.Teacher">

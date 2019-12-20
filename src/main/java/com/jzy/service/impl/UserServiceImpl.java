@@ -119,23 +119,24 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     }
 
     @Override
-    public EmailVerifyCode sendVerifyCodeToEmail(String userEmail) throws Exception {
+    public EmailVerifyCode sendVerifyCodeToEmail(String userEmail) throws InvalidParameterException {
+        if (StringUtils.isEmpty(userEmail)) {
+            throw new InvalidParameterException("发送的用户邮箱为空");
+        }
         // 获取前端传入的参数
         String emailAddress = userEmail;
         String verifyCode = CodeUtils.randomCodes();
         String emailMsg = "收到来自新东方优能中学助教工作平台的验证码：\n" + verifyCode + "\n有效时间: " + EmailVerifyCode.getValidTimeMinutes() + "分钟";
-        try {
-            // 邮件发送处理
-            SendEmailUtils.sendEncryptedEmail(emailAddress, emailMsg);
-            //设置redis缓存
-            ValueOperations<String, Object> vOps = redisTemplate.opsForValue();
-            final String baseKey = RedisConstants.USER_VERIFYCODE_EMAIL_KEY;
-            String key = baseKey + ":" + userEmail;
-            vOps.set(key, verifyCode);
-            redisTemplate.expire(key, EmailVerifyCode.getValidTimeMinutes(), TimeUnit.MINUTES);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        // 邮件发送处理
+        SendEmailUtils.sendEncryptedEmail(emailAddress, emailMsg);
+        //设置redis缓存
+        ValueOperations<String, Object> vOps = redisTemplate.opsForValue();
+        final String baseKey = RedisConstants.USER_VERIFYCODE_EMAIL_KEY;
+        String key = baseKey + ":" + userEmail;
+        vOps.set(key, verifyCode);
+        redisTemplate.expire(key, EmailVerifyCode.getValidTimeMinutes(), TimeUnit.MINUTES);
+
         return new EmailVerifyCode(userEmail, verifyCode);
     }
 
@@ -155,13 +156,21 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         }
 
         //验证通过即让当前key过期
-        redisTemplate.expire(key, 0, TimeUnit.MINUTES);
+        expireKey(key);
         return true;
     }
 
     @Override
     public long updatePasswordByEmail(String userEmail, String userPassword) {
+        if (StringUtils.isEmpty(userEmail) || StringUtils.isEmpty(userPassword)) {
+            logger.error("由邮箱更改密码时，邮箱或密码入参为空");
+            return 0;
+        }
         User user = userMapper.getUserByEmail(userEmail);
+        if (user == null) {
+            logger.error("由邮箱更改密码时，查找不到指定邮箱的用户。疑似绕过了前端请求。");
+            return 0;
+        }
         userPassword = ShiroUtils.encryptUserPassword(userPassword, user.getUserSalt());
         return userMapper.updatePasswordByEmail(userEmail, userPassword);
     }
@@ -174,7 +183,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
     @Override
     public String uploadUserIcon(MultipartFile file, String id) throws InvalidParameterException {
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
             throw new InvalidParameterException(msg);
@@ -203,9 +212,12 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     @Override
     public String updateOwnInfo(User user) {
         User originalUser = getSessionUserInfo();
+        if (user == null) {
+            return Constants.FAILURE;
+        }
         if (originalUser == null) {
             logger.error("updateOwnInfo方法中获取不到用户session");
-            return "unknownError";
+            return Constants.UNKNOWN_ERROR;
         }
 
         if (!StringUtils.isEmpty(originalUser.getUserIdCard())) {
@@ -244,6 +256,12 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             user.setUserIcon(originalUser.getUserIcon());
         }
 
+        if (StringUtils.equals(user.getUserName(), originalUser.getUserName()) && StringUtils.equals(user.getUserRealName(), originalUser.getUserRealName())
+                && StringUtils.equals(user.getUserIdCard(), originalUser.getUserIdCard()) && StringUtils.equals(user.getUserIcon(), originalUser.getUserIcon())) {
+            //判断输入对象的对应字段是否未做任何修改
+            return Constants.UNCHANGED;
+        }
+
         //执行更新
         userMapper.updateOwnInfo(user);
         return Constants.SUCCESS;
@@ -251,16 +269,25 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
     @Override
     public long updateEmailById(Long id, String userEmail) {
+        if (id == null) {
+            return 0;
+        }
         return userMapper.updateEmailById(id, userEmail);
     }
 
     @Override
     public long updatePhoneById(Long id, String userPhone) {
+        if (id == null) {
+            return 0;
+        }
         return userMapper.updatePhoneById(id, userPhone);
     }
 
     @Override
     public long updatePasswordById(Long id, String salt, String userPasswordNotEncrypted) {
+        if (id == null || StringUtils.isEmpty(salt) || StringUtils.isEmpty(userPasswordNotEncrypted)) {
+            return 0;
+        }
         String userPasswordEncrypted = ShiroUtils.encryptUserPassword(userPasswordNotEncrypted, salt);
         return userMapper.updatePasswordById(id, userPasswordEncrypted);
     }
@@ -274,7 +301,15 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
     @Override
     public String updateUserInfo(User user) {
+        if (user == null) {
+            return Constants.FAILURE;
+        }
+
         User originalUser = getUserById(user.getId());
+
+        if (originalUser == null) {
+            return Constants.FAILURE;
+        }
 
         if (!StringUtils.isEmpty(user.getUserWorkId())) {
             //新工号不为空
@@ -337,7 +372,6 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             user.setUserPhone(null);
         }
 
-
         /*
          * 用户上传的头像的处理
          */
@@ -356,12 +390,23 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             user.setUserIcon(originalUser.getUserIcon());
         }
 
+        if (StringUtils.equals(user.getUserWorkId(), originalUser.getUserWorkId()) && StringUtils.equals(user.getUserName(), originalUser.getUserName()) && StringUtils.equals(user.getUserRealName(), originalUser.getUserRealName())
+                && StringUtils.equals(user.getUserIdCard(), originalUser.getUserIdCard()) && StringUtils.equals(user.getUserRole(), originalUser.getUserRole()) && StringUtils.equals(user.getUserIcon(), originalUser.getUserIcon())
+                && StringUtils.equals(user.getUserEmail(), originalUser.getUserEmail()) && StringUtils.equals(user.getUserPhone(), originalUser.getUserPhone())
+                && StringUtils.equals(user.getUserRemark(), originalUser.getUserRemark())) {
+            //判断输入对象的对应字段是否未做任何修改
+            return Constants.UNCHANGED;
+        }
+
         userMapper.updateUserInfo(user);
         return Constants.SUCCESS;
     }
 
     @Override
     public UpdateResult insertUser(User user) {
+        if (user == null) {
+            return new UpdateResult(Constants.FAILURE);
+        }
         if (!StringUtils.isEmpty(user.getUserWorkId())) {
             //新工号不为空
             if (getUserByWorkId(user.getUserWorkId()) != null) {
@@ -383,6 +428,9 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
      * @return
      */
     private UpdateResult insertUserWithUnrepeatedWorkId(User user) {
+        if (user == null) {
+            return new UpdateResult(Constants.FAILURE);
+        }
         if (!StringUtils.isEmpty(user.getUserIdCard())) {
             //新身份证不为空
             if (getUserByIdCard(user.getUserIdCard()) != null) {
@@ -427,21 +475,19 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         user.setDefaultUserIcon();
 
 
-
-
         UpdateResult result = new UpdateResult(Constants.SUCCESS);
         //执行插入
         result.setInsertCount(userMapper.insertUser(user));
 
 
-        Long id=getUserByWorkId(user.getUserWorkId()).getId();
+        Long id = getUserByWorkId(user.getUserWorkId()).getId();
         //向新用户发送欢迎消息
         UserMessage message = new UserMessage();
         message.setUserId(id);
         message.setUserFromId(Constants.ADMIN_USER_ID);
         message.setMessageTitle("欢迎使用AOWS-优能助教在线工作平台");
         StringBuffer messageContent = new StringBuffer();
-        messageContent.append(user.getUserRole()+"-"+user.getUserRealName()).append("，欢迎使用AOWS-优能助教在线工作平台！")
+        messageContent.append(user.getUserRole() + "-" + user.getUserRealName()).append("，欢迎使用AOWS-优能助教在线工作平台！")
                 .append("<br>为了您的账号安全，请尽快修改默认密码。也推荐绑定安全邮箱便于找回密码以及安全验证！")
                 .append("<br>常用功能：")
                 .append("<br>1. 我的班级信息：左边菜单栏>信息管理>班级信息，点击按钮\"查询我的班级\"。")
@@ -455,8 +501,6 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         if (UserMessageUtils.isValidUserMessageUpdateInfo(message)) {
             userMessageService.insertUserMessage(message);
         }
-
-
 
         return result;
     }
@@ -507,6 +551,11 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
     @Override
     public UpdateResult insertAndUpdateUsersFromExcel(List<User> users) throws Exception {
+        if (users == null) {
+            String msg = "insertAndUpdateUsersFromExcel方法输入用户users为null!";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
         UpdateResult result = new UpdateResult();
         for (User user : users) {
             if (UserUtils.isValidUserUpdateInfo(user)) {
@@ -542,12 +591,19 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
     @Override
     public String updateUserByWorkId(User user) {
+        if (user == null) {
+            return Constants.FAILURE;
+        }
         User originalUser = getUserByWorkId(user.getUserWorkId());
         return updateUserByWorkId(originalUser, user);
     }
 
     @Override
     public String updateUserByWorkId(User originalUser, User newUser) {
+        if (originalUser == null || newUser == null) {
+            return Constants.FAILURE;
+        }
+
         if (!StringUtils.isEmpty(newUser.getUserIdCard())) {
             //新身份证不为空
             if (!newUser.getUserIdCard().equals(originalUser.getUserIdCard())) {
@@ -595,12 +651,22 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             newUser.setUserPhone(null);
         }
 
+        //TODO
+//        if (StringUtils.equals(originalUser.getUserName(), originalUser.getUserName()) && StringUtils.equals(originalUser.getUserRealName(), originalUser.getUserRealName())
+//                && StringUtils.equals(user.getUserIdCard(), originalUser.getUserIdCard()) && StringUtils.equals(user.getUserIcon(), originalUser.getUserIcon())){
+//            //判断输入对象的对应字段是否未做任何修改
+//            return Constants.UNCHANGED;
+//        }
+
         userMapper.updateUserByWorkId(newUser);
         return Constants.SUCCESS;
     }
 
     @Override
     public String deleteUsersByCondition(UserSearchCondition condition) {
+        if (condition == null) {
+            return Constants.FAILURE;
+        }
         User userSession = getSessionUserInfo();
 
         List<User> users = userMapper.listUsers(condition);

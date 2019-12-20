@@ -39,6 +39,10 @@ public class MissLessonStudentServiceImpl extends AbstractServiceImpl implements
 
     @Override
     public String updateMissLessonStudentInfo(MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
+        if (missLessonStudentDetailedDto == null){
+            return Constants.FAILURE;
+        }
+
         if (classService.getClassByClassId(missLessonStudentDetailedDto.getOriginalClassId()) == null) {
             //原班号不存在
             return "originalClassNotExist";
@@ -55,6 +59,10 @@ public class MissLessonStudentServiceImpl extends AbstractServiceImpl implements
 
     @Override
     public String insertMissLessonStudent(MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
+        if (missLessonStudentDetailedDto == null){
+            return Constants.FAILURE;
+        }
+
         if (classService.getClassByClassId(missLessonStudentDetailedDto.getOriginalClassId()) == null) {
             //原班号不存在
             return "originalClassNotExist";
@@ -87,6 +95,9 @@ public class MissLessonStudentServiceImpl extends AbstractServiceImpl implements
 
     @Override
     public String deleteMissLessonStudentsByCondition(MissLessonStudentSearchCondition condition) {
+        if (condition == null) {
+            return Constants.FAILURE;
+        }
         List<MissLessonStudentDetailedDto> dtos=missLessonStudentMapper.listMissLessonStudents(condition);
         List<Long> ids=new ArrayList<>();
         for (MissLessonStudentDetailedDto dto:dtos){

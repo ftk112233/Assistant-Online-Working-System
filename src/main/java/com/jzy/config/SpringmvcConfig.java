@@ -24,11 +24,6 @@ public class SpringmvcConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public TokenInterceptor tokenInterceptor(){
-        return new TokenInterceptor();
-    }
-
-    @Bean
     public CsrfInterceptor csrfInterceptor(){
         return new CsrfInterceptor();
     }
@@ -45,13 +40,6 @@ public class SpringmvcConfig extends WebMvcConfigurerAdapter {
                 .addPathPatterns("/index").addPathPatterns("/user/setInfo").addPathPatterns("/user/setEmail")
                 .addPathPatterns("/user/setPhone").addPathPatterns("/user/setPassword").addPathPatterns("/user/admin/page"); //拦截项目中的哪些请求
 
-        //ToolboxUploadCacheInterceptor
-        registry.addInterceptor(toolboxUploadCacheInterceptor())
-                .addPathPatterns("/index"); //拦截项目中的哪些请求
-
-        //TokenInterceptor
-        registry.addInterceptor(tokenInterceptor())
-                .addPathPatterns("/**"); //拦截项目中的哪些请求
 
 //        CsrfInterceptor
         registry.addInterceptor(csrfInterceptor())

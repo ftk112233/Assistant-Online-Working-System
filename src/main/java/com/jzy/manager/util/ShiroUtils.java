@@ -44,7 +44,7 @@ public class ShiroUtils {
      * @return
      */
     public static Session getSession() {
-        return SecurityUtils.getSubject().getSession();
+        return SecurityUtils.getSubject().getSession(true);
     }
 
 

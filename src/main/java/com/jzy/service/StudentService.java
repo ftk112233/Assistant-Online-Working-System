@@ -41,6 +41,22 @@ public interface StudentService {
     UpdateResult updateStudentByStudentId(Student student);
 
     /**
+     * 修改学生姓名、手机、备用手机由学员编号修改
+     *
+     * @param student 修改后的学生信息
+     * @return
+     */
+    UpdateResult updateStudentNameAndPhoneByStudentId(Student student);
+
+    /**
+     * 修改学生学校由学员编号修改
+     *
+     * @param student 修改后的学生信息
+     * @return
+     */
+    UpdateResult updateStudentSchoolByStudentId(Student student);
+
+    /**
      * 添加学生
      *
      * @param student 添加学生的信息
@@ -95,6 +111,24 @@ public interface StudentService {
      * @return
      */
     UpdateResult insertAndUpdateOneStudentFromExcel(Student student) throws Exception;
+
+    /**
+     * 根据从excel中读取到的student学校信息，更新一个。根据学员编号判断：
+     * 仅执行更新
+     *
+     * @param student
+     * @return
+     */
+    UpdateResult insertAndUpdateOneStudentSchoolFromExcel(Student student) throws Exception;
+
+    /**
+     * 根据从excel中读取到的students学校信息，更新多个。根据学员编号判断：
+     * 仅执行更新
+     *
+     * @param students
+     * @return
+     */
+    UpdateResult insertAndUpdateStudentsSchoolsFromExcel(List<Student> students) throws Exception;
 
     /**
      * 查询学员个人信息

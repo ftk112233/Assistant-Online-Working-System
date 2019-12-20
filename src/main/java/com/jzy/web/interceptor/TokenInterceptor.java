@@ -8,8 +8,10 @@ package com.jzy.web.interceptor;
  * @Version 1.0
  **/
 
+import com.jzy.manager.util.ShiroUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.shiro.session.Session;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -30,6 +32,7 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
      **/
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        Session session = ShiroUtils.getSession();
         if (handler instanceof HandlerMethod) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             Method method = handlerMethod.getMethod();
@@ -37,16 +40,16 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
             if (annotation != null) {
                 boolean needSaveSession = annotation.save();
                 if (needSaveSession) {
-                    request.getSession(false).setAttribute("token", UUID.randomUUID().toString());
+                    session.setAttribute("token", UUID.randomUUID().toString());
                 }
                 boolean needRemoveSession = annotation.remove();
                 if (needRemoveSession) {
                     if (isRepeatSubmit(request)) {
-                        logger.warn(request.getSession().getAttribute("userId") + "重复提交了表单");
+                        logger.warn(session.getAttribute("userId") + "重复提交了表单");
                         response.sendRedirect(request.getContextPath() + "/formRepeatSubmit");
                         return false;
                     }
-                    request.getSession(false).removeAttribute("token");
+                    session.removeAttribute("token");
                 }
             }
             return true;
@@ -63,17 +66,17 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
      * @Param [request]
      **/
     private boolean isRepeatSubmit(HttpServletRequest request) {
-        String serverToken = (String) request.getSession(false).getAttribute("token");
+        String serverToken = (String) ShiroUtils.getSession().getAttribute("token");
         System.out.println(serverToken);
         if (serverToken == null) {
             return true;
         }
-        String clinetToken = request.getParameter("token");
-        System.out.println(clinetToken);
-        if (clinetToken == null) {
+        String clientToken = request.getParameter("token");
+        System.out.println(clientToken);
+        if (clientToken == null) {
             return true;
         }
-        if (!serverToken.equals(clinetToken)) {
+        if (!serverToken.equals(clientToken)) {
             return true;
         }
         return false;

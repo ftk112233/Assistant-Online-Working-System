@@ -150,6 +150,9 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
 
     @Override
     public String insertUserMessage(UserMessage userMessage) {
+        if (userMessage == null) {
+            return Constants.FAILURE;
+        }
         /*
          * 用户上传的图片的处理
          */
@@ -180,7 +183,7 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
 
     @Override
     public String uploadPicture(MultipartFile file, String id) throws InvalidParameterException {
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
             throw new InvalidParameterException(msg);

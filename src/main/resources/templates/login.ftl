@@ -129,6 +129,8 @@
                 layer.msg('滑块验证通过', {
                     icon: 1
                     , time: 1000
+                }, function () {
+                    $("#my_button").trigger("click");
                 });
             }
         });
