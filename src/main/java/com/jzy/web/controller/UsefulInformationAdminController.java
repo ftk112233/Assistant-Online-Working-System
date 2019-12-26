@@ -155,7 +155,7 @@ public class UsefulInformationAdminController extends AbstractController {
      */
     @RequestMapping("/getRecommendedSequence")
     @ResponseBody
-    public Map<String, Object> getRecommendedSequence(@RequestParam(value = "belongTo", required = false) String belongTo) throws InvalidParameterException {
+    public Map<String, Object> getRecommendedSequence(@RequestParam(value = "belongTo", required = false) String belongTo) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!StringUtils.isEmpty(belongTo) && !UsefulInformationUtils.isValidBelongTo(belongTo)) {
@@ -175,11 +175,10 @@ public class UsefulInformationAdminController extends AbstractController {
      * @param file
      * @param information
      * @return
-     * @throws InvalidParameterException
      */
     @RequestMapping("/updateUploadImage")
     @ResponseBody
-    public Map<String, Object> updateUploadImage(@RequestParam(value = "file", required = false) MultipartFile file, UsefulInformation information) throws InvalidParameterException {
+    public Map<String, Object> updateUploadImage(@RequestParam(value = "file", required = false) MultipartFile file, UsefulInformation information) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>(3);
 
@@ -202,7 +201,7 @@ public class UsefulInformationAdminController extends AbstractController {
      */
     @RequestMapping("/updateById")
     @ResponseBody
-    public Map<String, Object> updateById(UsefulInformation information) throws InvalidParameterException {
+    public Map<String, Object> updateById(UsefulInformation information) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!UsefulInformationUtils.isValidUsefulInformationUpdateInfo(information)) {
@@ -225,7 +224,7 @@ public class UsefulInformationAdminController extends AbstractController {
      */
     @RequestMapping("/insert")
     @ResponseBody
-    public Map<String, Object> insert(UsefulInformation information) throws InvalidParameterException {
+    public Map<String, Object> insert(UsefulInformation information) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!UsefulInformationUtils.isValidUsefulInformationUpdateInfo(information)) {

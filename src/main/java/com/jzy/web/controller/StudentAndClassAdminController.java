@@ -12,6 +12,7 @@ import com.jzy.model.dto.StudentAndClassDetailedDto;
 import com.jzy.model.dto.StudentAndClassSearchCondition;
 import com.jzy.model.entity.Class;
 import com.jzy.model.vo.ResultMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -64,8 +65,8 @@ public class StudentAndClassAdminController extends AbstractController {
     @RequestMapping("/getStudentAndClassInfo")
     @ResponseBody
     public ResultMap<List<StudentAndClassDetailedDto>> getStudentAndClassInfo(MyPage myPage, StudentAndClassSearchCondition condition) {
-        condition.setStudentId(condition.getStudentId() == null ? null : condition.getStudentId().toUpperCase());
-        condition.setClassId(condition.getClassId() == null ? null : condition.getClassId().toUpperCase());
+        condition.setStudentId(StringUtils.upperCase(condition.getStudentId()));
+        condition.setClassId(StringUtils.upperCase(condition.getClassId()));
         PageInfo<StudentAndClassDetailedDto> pageInfo = studentAndClassService.listStudentAndClasses(myPage, condition);
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
     }
@@ -91,7 +92,7 @@ public class StudentAndClassAdminController extends AbstractController {
      */
     @RequestMapping("/updateById")
     @ResponseBody
-    public Map<String, Object> updateById(@RequestParam(value = "currentTime", required = false) String currentTimeSwitch, StudentAndClassDetailedDto studentAndClassDetailedDto) throws InvalidParameterException {
+    public Map<String, Object> updateById(@RequestParam(value = "currentTime", required = false) String currentTimeSwitch, StudentAndClassDetailedDto studentAndClassDetailedDto) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!StudentAndClassUtils.isValidStudentAndClassUpdateDtoInfo(studentAndClassDetailedDto)) {
@@ -128,7 +129,7 @@ public class StudentAndClassAdminController extends AbstractController {
      */
     @RequestMapping("/insert")
     @ResponseBody
-    public Map<String, Object> insert(StudentAndClassDetailedDto studentAndClassDetailedDto) throws InvalidParameterException {
+    public Map<String, Object> insert(StudentAndClassDetailedDto studentAndClassDetailedDto) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!StudentAndClassUtils.isValidStudentAndClassUpdateDtoInfo(studentAndClassDetailedDto)) {

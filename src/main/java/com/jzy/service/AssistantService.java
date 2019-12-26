@@ -21,7 +21,7 @@ public interface AssistantService {
      * 根据助教id查询出助教信息
      *
      * @param id 助教id
-     * @return
+     * @return 对应助教
      */
     Assistant getAssistantById(Long id);
 
@@ -29,7 +29,7 @@ public interface AssistantService {
      * 根据助教工号查询出助教信息
      *
      * @param assistantWorkId 助教工号
-     * @return
+     * @return 对应助教
      */
     Assistant getAssistantByWorkId(String assistantWorkId);
 
@@ -37,7 +37,7 @@ public interface AssistantService {
      * 根据助教姓名查询出助教信息
      *
      * @param assistantName 助教姓名
-     * @return
+     * @return 对应助教
      */
     Assistant getAssistantByName(String assistantName);
 
@@ -45,15 +45,19 @@ public interface AssistantService {
      * 根据助教校区查询出助教信息
      *
      * @param campus 助教校区
-     * @return
+     * @return 指定校区的全部助教
      */
     List<Assistant> listAssistantsByCampus(String campus);
 
     /**
-     * 添加助教
+     * 添加一个助教
      *
      * @param assistant 新添加助教的信息
-     * @return
+     * @return (更新结果，更新记录数)
+     * 1."failure"：错误入参等异常
+     * 2."workIdRepeat"：工号冲突
+     * 3."nameRepeat"：姓名冲突
+     * 4."success": 更新成功
      */
     UpdateResult insertAssistant(Assistant assistant);
 
@@ -61,7 +65,11 @@ public interface AssistantService {
      * 修改助教信息由id修改
      *
      * @param assistant 修改后的助教信息
-     * @return
+     * @return 1."failure"：错误入参等异常
+     * 2."workIdRepeat"：工号冲突
+     * 3."nameRepeat"：姓名冲突
+     * 4."unchanged": 对比数据库原记录未做任何修改
+     * 5."success": 更新成功
      */
     String updateAssistantInfo(Assistant assistant);
 
@@ -69,7 +77,10 @@ public interface AssistantService {
      * 修改助教信息由工号修改
      *
      * @param assistant 修改后的助教信息
-     * @return
+     * @return (更新结果，更新记录数)
+     * 1."failure"：错误入参等异常
+     * 2."nameRepeat"：姓名冲突
+     * 3."success": 更新成功
      */
     UpdateResult updateAssistantByWorkId(Assistant assistant);
 
@@ -79,41 +90,33 @@ public interface AssistantService {
      *
      * @param originalAssistant 原来的助教信息
      * @param newAssistant      新的助教信息
-     * @return
+     * @return (更新结果，更新记录数)
+     * 1."failure"：错误入参等异常
+     * 2."nameRepeat"：姓名冲突
+     * 3."success": 更新成功
      */
     UpdateResult updateAssistantByWorkId(Assistant originalAssistant, Assistant newAssistant);
-
 
     /**
      * 根据从excel中读取到的assistant信息，更新插入多个。根据工号判断：
      * if 当前工号不存在
-     * 执行插入
+     * 执行插入。
      * else
-     * 根据工号更新
+     * 根据工号更新。
+     * 这里对于非法的入参采取抛出异常的方式，而不是返回"failure"，这是便于控制层捕获做进一步地异常处理
      *
-     * @param assistants
-     * @return
+     * @param assistants 输入的助教集合
+     * @return (更新结果，更新记录数)
+     * @throws InvalidParameterException 不合法输入助教list
      */
     UpdateResult insertAndUpdateAssistantsFromExcel(List<Assistant> assistants) throws InvalidParameterException;
-
-    /**
-     * 根据从excel中读取到的assistant信息，更新插入一个。根据工号判断：
-     * if 当前工号不存在
-     * 执行插入
-     * else
-     * 根据工号更新
-     *
-     * @param assistant
-     * @return
-     */
-    UpdateResult insertAndUpdateOneAssistantFromExcel(Assistant assistant) throws Exception;
 
     /**
      * 返回符合条件的助教信息分页结果
      *
      * @param myPage    分页{页号，每页数量}
      * @param condition 查询条件入参
-     * @return
+     * @return 分页结果集
      */
     PageInfo<Assistant> listAssistants(MyPage myPage, AssistantSearchCondition condition);
 
@@ -121,14 +124,15 @@ public interface AssistantService {
      * 根据id删除一个助教
      *
      * @param id 被删除助教的id
-     * @return
+     * @return 更新记录数
      */
     long deleteOneAssistantById(Long id);
 
     /**
-     * 根据id删除多个助教
+     * 根据id的列表删除多个助教
      *
      * @param ids 助教id的列表
+     * @return 更新记录数
      */
     long deleteManyAssistantsByIds(List<Long> ids);
 
@@ -136,8 +140,8 @@ public interface AssistantService {
      * 根据输入条件删除指定的助教
      *
      * @param condition 输入条件封装
-     * @return
+     * @return 更新记录数
      */
-    String deleteAssistantsByCondition(AssistantSearchCondition condition);
+    long deleteAssistantsByCondition(AssistantSearchCondition condition);
 
 }

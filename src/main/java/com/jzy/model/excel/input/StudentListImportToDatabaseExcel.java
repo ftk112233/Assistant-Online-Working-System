@@ -146,18 +146,19 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
 
         int rowCount = this.getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
-            if (StringUtils.isEmpty(this.getValueAt(sheetIx, i, columnIndexOfStudentId))) {
+            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId);
+            if (StringUtils.isEmpty(studentId)) {
                 //当前行学员号为空，跳过
                 continue;
             } else {
                 effectiveDataRowCount++;
             }
-            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId).toUpperCase();
+            studentId = studentId.toUpperCase();
             String studentName = this.getValueAt(sheetIx, i, columnIndexOfStudentName);
             String studentPhone = this.getValueAt(sheetIx, i, columnIndexOfStudentPhone);
             String studentPhoneBackup = this.getValueAt(sheetIx, i, columnIndexOfStudentPhoneBackup);
             String classId = this.getValueAt(sheetIx, i, columnIndexOfClassId);
-            classId = classId == null ? null : classId.toUpperCase();
+            classId = StringUtils.upperCase(classId);
             String registerTime = this.getValueAt(sheetIx, i, columnIndexOfRegisterTime);
             String remark = this.getValueAt(sheetIx, i, columnIndexOfRemark);
 
@@ -228,13 +229,14 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
 
         int rowCount = this.getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
-            if (StringUtils.isEmpty(this.getValueAt(sheetIx, i, columnIndexOfStudentId))) {
+            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId);
+            if (StringUtils.isEmpty(studentId)) {
                 //当前行学员号为空，跳过
                 continue;
             } else {
                 effectiveDataRowCount++;
             }
-            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId).toUpperCase();
+            studentId = studentId.toUpperCase();
             String studentName = this.getValueAt(sheetIx, i, columnIndexOfStudentName);
             String studentPhone = this.getValueAt(sheetIx, i, columnIndexOfStudentPhone);
             String studentPhoneBackup = this.getValueAt(sheetIx, i, columnIndexOfStudentPhoneBackup);

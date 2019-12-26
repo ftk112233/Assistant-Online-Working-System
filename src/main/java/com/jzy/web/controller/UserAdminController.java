@@ -59,6 +59,59 @@ public class UserAdminController extends AbstractController {
         return "user/admin/page";
     }
 
+    /**
+     * 根据角色设置，当前角色可以编辑的角色权限。如，学管只能修改用户角色为[学管, 助教长, 助教，教师，游客]，不能设成管理员;
+     * 而管理员可以修改用户角色为[管理员，学管, 助教长, 助教，教师，游客]
+     *
+     * @param model 把信息存到model渲染给前端
+     * @return
+     * @throws NoAuthorizationException
+     */
+    private String setEditUserModel(Model model) throws NoAuthorizationException {
+        User userSessionInfo = userService.getSessionUserInfo();
+        if (RoleEnum.ADMINISTRATOR.equals(userSessionInfo.getUserRole())) {
+            //管理员
+            model.addAttribute(ModelConstants.ROLES_MODEL_KEY, JSON.toJSONString(User.ROLES));
+        } else if (RoleEnum.ASSISTANT_MANAGER.equals(userSessionInfo.getUserRole())) {
+            //学管
+            List<String> roles = new ArrayList<>();
+            //[学管, 助教长, 助教，教师，游客]
+            roles.add(RoleEnum.ASSISTANT_MANAGER.getRole());
+            roles.add(RoleEnum.ASSISTANT_MASTER.getRole());
+            roles.add(RoleEnum.ASSISTANT.getRole());
+            roles.add(RoleEnum.TEACHER.getRole());
+            roles.add(RoleEnum.GUEST.getRole());
+            model.addAttribute(ModelConstants.ROLES_MODEL_KEY, JSON.toJSONString(roles));
+        } else {
+            String msg = userSessionInfo.getId() + "用户突破了权限!";
+            logger.error(msg);
+            throw new NoAuthorizationException(msg);
+        }
+        return userSessionInfo.getUserRole();
+    }
+
+    /**
+     * 判断当前登录的用户是否有编辑入参user对象的权限
+     *
+     * @param user  要编辑的user信息
+     * @param model 把信息存到model渲染给前端
+     * @return
+     * @throws NoAuthorizationException
+     */
+    private boolean hasAccessToEditUser(User user, Model model) throws NoAuthorizationException {
+        if (user == null) {
+            return false;
+        }
+        String role = setEditUserModel(model);
+        if (RoleEnum.ASSISTANT_MANAGER.equals(role)) {
+            if (RoleEnum.ADMINISTRATOR.equals(user.getUserRole())) {
+                //如果学管编辑了管理员，无权限
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     /**
      * 重定向到编辑用户iframe子页面并返回相应model
@@ -68,33 +121,14 @@ public class UserAdminController extends AbstractController {
      * @return
      */
     @RequestMapping("/updateForm")
-    public String updateForm(Model model, User user) throws NoAuthorizationException {
-        /**
-         * 根据角色设置，当前角色可以编辑的角色权限。如，学管只能修改用户角色为[学管, 助教长, 助教，教师，游客]，不能设成管理员;
-         *      而管理员可以修改用户角色为[管理员，学管, 助教长, 助教，教师，游客]
-         */
-        User userSessionInfo = userService.getSessionUserInfo();
-        if (RoleEnum.ADMINISTRATOR.equals(userSessionInfo.getUserRole())) {
-            //管理员
-            model.addAttribute(ModelConstants.ROLES_MODEL_KEY, JSON.toJSONString(User.ROLES));
-        } else if (RoleEnum.ASSISTANT_MANAGER.equals(userSessionInfo.getUserRole())) {
-            if (RoleEnum.ADMINISTRATOR.equals(user.getUserRole())) {
-                //如果学管编辑了管理员，无权限
+    public String updateForm(Model model, User user) {
+        try {
+            if (!hasAccessToEditUser(user, model)) {
                 return "tips/noPermissions";
             }
-            //学管
-            List<String> roles = new ArrayList<>();
-            //[学管, 助教长, 助教，教师，游客]
-            roles.add(RoleEnum.ASSISTANT_MANAGER.getRole());
-            roles.add(RoleEnum.ASSISTANT_MASTER.getRole());
-            roles.add(RoleEnum.ASSISTANT.getRole());
-            roles.add(RoleEnum.TEACHER.getRole());
-            roles.add(RoleEnum.GUEST.getRole());
-            model.addAttribute(ModelConstants.ROLES_MODEL_KEY, JSON.toJSONString(roles));
-        } else {
-            String msg = userSessionInfo.getId() + "用户突破了权限!";
-            logger.error(msg);
-            throw new NoAuthorizationException(msg);
+        } catch (NoAuthorizationException e) {
+            e.printStackTrace();
+            return "tips/noPermissions";
         }
 
         model.addAttribute(ModelConstants.USER_EDIT_MODEL_KEY, user);
@@ -102,43 +136,20 @@ public class UserAdminController extends AbstractController {
     }
 
     /**
-     * 重定向到编辑用户iframe子页面并返回相应model
+     * 重定向到添加用户iframe子页面并返回相应model
      *
      * @param model
-     * @param user  当前要被编辑的用户信息
      * @return
      */
     @RequestMapping("/insertForm")
-    public String insertForm(Model model, User user) throws NoAuthorizationException {
-        /**
-         * 根据角色设置，当前角色可以编辑的角色权限。如，学管只能修改用户角色为[学管, 助教长, 助教，教师，游客]，不能设成管理员;
-         *      而管理员可以修改用户角色为[管理员，学管, 助教长, 助教，教师，游客]
-         */
-        User userSessionInfo = userService.getSessionUserInfo();
-        if (RoleEnum.ADMINISTRATOR.equals(userSessionInfo.getUserRole())) {
-            //管理员
-            model.addAttribute(ModelConstants.ROLES_MODEL_KEY, JSON.toJSONString(User.ROLES));
-        } else if (RoleEnum.ASSISTANT_MANAGER.equals(userSessionInfo.getUserRole())) {
-            if (RoleEnum.ADMINISTRATOR.equals(user.getUserRole())) {
-                //如果学管编辑了管理员，无权限
-                return "tips/noPermissions";
-            }
-            //学管
-            List<String> roles = new ArrayList<>();
-            //[学管, 助教长, 助教，教师，游客]
-            roles.add(RoleEnum.ASSISTANT_MANAGER.getRole());
-            roles.add(RoleEnum.ASSISTANT_MASTER.getRole());
-            roles.add(RoleEnum.ASSISTANT.getRole());
-            roles.add(RoleEnum.TEACHER.getRole());
-            roles.add(RoleEnum.GUEST.getRole());
-            model.addAttribute(ModelConstants.ROLES_MODEL_KEY, JSON.toJSONString(roles));
-        } else {
-            String msg = userSessionInfo.getId() + "用户突破了权限!";
-            logger.error(msg);
-            throw new NoAuthorizationException(msg);
+    public String insertForm(Model model) {
+        try {
+            setEditUserModel(model);
+        } catch (NoAuthorizationException e) {
+            e.printStackTrace();
+            return "tips/noPermissions";
         }
 
-        model.addAttribute(ModelConstants.USER_EDIT_MODEL_KEY, user);
         return "user/admin/userFormAdd";
     }
 
@@ -164,11 +175,10 @@ public class UserAdminController extends AbstractController {
      * @param file
      * @param user
      * @return
-     * @throws InvalidParameterException
      */
     @RequestMapping("/uploadUserIcon")
     @ResponseBody
-    public Map<String, Object> uploadUserIcon(@RequestParam(value = "file", required = false) MultipartFile file, User user) throws InvalidParameterException {
+    public Map<String, Object> uploadUserIcon(@RequestParam(value = "file", required = false) MultipartFile file, User user) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>(3);
 
@@ -190,7 +200,7 @@ public class UserAdminController extends AbstractController {
      */
     @RequestMapping("/updateById")
     @ResponseBody
-    public Map<String, Object> updateById(User user) throws InvalidParameterException {
+    public Map<String, Object> updateById(User user) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserUpdateInfo(user)) {
@@ -211,7 +221,7 @@ public class UserAdminController extends AbstractController {
      */
     @RequestMapping("/insert")
     @ResponseBody
-    public Map<String, Object> insert(User user) throws InvalidParameterException {
+    public Map<String, Object> insert(User user){
         Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserInsertInfo(user)) {
@@ -321,7 +331,7 @@ public class UserAdminController extends AbstractController {
      */
     @RequestMapping("/import")
     @ResponseBody
-    public Map<String, Object> importExcel(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "type") Integer type) throws InvalidParameterException {
+    public Map<String, Object> importExcel(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "type") Integer type) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>();
         //返回layui规定的文件上传模块JSON格式
@@ -329,7 +339,7 @@ public class UserAdminController extends AbstractController {
         map2.put("src", "");
         map.put("data", map2);
 
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
             throw new InvalidParameterException(msg);
@@ -351,8 +361,8 @@ public class UserAdminController extends AbstractController {
         if (type != null) {
             AssistantInfoExcel excel = null;
             try {
-                excel = new AssistantInfoExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
-                excelEffectiveDataRowCount=excel.readUsersAndAssistantsFromExcel();
+                excel = new AssistantInfoExcel(file.getInputStream(), ExcelVersionEnum.getVersion(file.getOriginalFilename()));
+                excelEffectiveDataRowCount = excel.readUsersAndAssistantsFromExcel();
             } catch (IOException e) {
                 e.printStackTrace();
                 map.put("msg", Constants.FAILURE);
@@ -369,7 +379,7 @@ public class UserAdminController extends AbstractController {
 
             if (type.equals(1)) {
                 try {
-                    UpdateResult useResult=userService.insertAndUpdateUsersFromExcel(excel.getUsers());
+                    UpdateResult useResult = userService.insertAndUpdateUsersFromExcel(excel.getUsers());
                     databaseInsertRowCount += (int) useResult.getInsertCount();
                     databaseUpdateRowCount += (int) useResult.getUpdateCount();
                 } catch (Exception e) {
@@ -379,11 +389,11 @@ public class UserAdminController extends AbstractController {
                 }
             } else if (type.equals(2)) {
                 try {
-                    UpdateResult userResult=userService.insertAndUpdateUsersFromExcel(excel.getUsers());
+                    UpdateResult userResult = userService.insertAndUpdateUsersFromExcel(excel.getUsers());
                     databaseInsertRowCount += (int) userResult.getInsertCount();
                     databaseUpdateRowCount += (int) userResult.getUpdateCount();
 
-                    UpdateResult assistantResult=assistantService.insertAndUpdateAssistantsFromExcel(excel.getAssistants());
+                    UpdateResult assistantResult = assistantService.insertAndUpdateAssistantsFromExcel(excel.getAssistants());
                     databaseInsertRowCount += (int) assistantResult.getInsertCount();
                     databaseUpdateRowCount += (int) assistantResult.getUpdateCount();
                 } catch (Exception e) {
@@ -402,8 +412,8 @@ public class UserAdminController extends AbstractController {
             speedOfDatabaseImport.parseSpeed();
 
 
-            map.put("excelSpeed",speedOfExcelImport);
-            map.put("databaseSpeed",speedOfDatabaseImport);
+            map.put("excelSpeed", speedOfExcelImport);
+            map.put("databaseSpeed", speedOfDatabaseImport);
 
             map.put("msg", Constants.SUCCESS);
         }

@@ -35,16 +35,16 @@ public interface QuestionService {
     Question getQuestionByContent(String content);
 
     /**
-     * 查出所有问题
+     * 查出所有问题。全部问题的list要做redis缓存处理。
      *
-     * @return
+     * @return 全部问题的list
      */
     List<Question> listAllQuestions();
 
     /**
-     * 查出所有问题个数
+     * 查出数据库中所有问题个数
      *
-     * @return
+     * @return 问题个数
      */
     long countAllQuestions();
 
@@ -56,9 +56,11 @@ public interface QuestionService {
     Question getDefaultQuestion();
 
     /**
-     * 获得数据库中随机地一个问题
+     * 获得随机的一个问题
+     * 如果数据库中有，查出所有问题，随机选一个；
+     * 否者返回默认的问题（设定是数据库中必须至少保留一个问题，这个else逻辑仅仅作为备用方案）
      *
-     * @return
+     * @return 随机问题
      */
     Question getRandomQuestion();
 
@@ -66,15 +68,17 @@ public interface QuestionService {
      * 获得数据库中随机地一个问题，前该问题与输入问题不同
      *
      * @param currentQuestion 输入问题对象
-     * @return
+     * @return 不同的随机问题
+     * @throws NoMoreQuestionsException 除当前问题外没有更多问题的异常
      */
     Question getRandomDifferentQuestion(Question currentQuestion) throws NoMoreQuestionsException;
 
     /**
-     * 获得数据库中随机地一个问题，前该问题与输入问题不同
+     * 获得数据库中随机地一个问题，且该问题内容与输入问题内容currentQuestionContent不同
      *
      * @param currentQuestionContent 输入问题内容
-     * @return
+     * @return 不同的随机问题
+     * @throws NoMoreQuestionsException 除当前问题外没有更多问题的异常
      */
     Question getRandomDifferentQuestion(String currentQuestionContent) throws NoMoreQuestionsException;
 
@@ -82,10 +86,19 @@ public interface QuestionService {
      * 判断当前问题的输入答案是否正确
      *
      * @param questionContent 问题内容
+     * @param answerInput     输入的答案
+     * @return
+     * @throws InvalidParameterException 不合法的问题内容questionContent，问题不存在
+     */
+    boolean isCorrectAnswer(String questionContent, String answerInput) throws InvalidParameterException;
+
+    /**
+     * 是否是永真答案——“金爷nb”
+     *
      * @param answerInput 输入的答案
      * @return
      */
-    boolean isCorrectAnswer(String questionContent, String answerInput) throws InvalidParameterException;
+    boolean isAlwaysTrueAnswer(String answerInput);
 
     /**
      * 查询登录问题信息

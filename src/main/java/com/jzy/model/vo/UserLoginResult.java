@@ -18,10 +18,10 @@ public class UserLoginResult implements Serializable {
     private static final long serialVersionUID = 3347183837879977277L;
 
     //默认连续输错多少次，触发
-    public static int DEFAULT_WRONG_TIMES = 5;
+    public static final int DEFAULT_WRONG_TIMES = 5;
 
     //默认连续输错达到阈值次数后，触发的下次可尝试登录的操作时间间隔，单位：分钟
-    public static int DEFAULT_BASE_DELAY_TIME = 15;
+    public static final int DEFAULT_BASE_DELAY_TIME = 15;
 
     //是否登录成功标志
     private boolean success;
@@ -46,6 +46,13 @@ public class UserLoginResult implements Serializable {
 
     //如果成功，设置当前在User表中查询到的user信息
     private User user;
+
+    /**
+     * 设置登录失败的次数为默认次数
+     */
+    public void setDefaultWrongTimes(){
+        this.wrongTimes=DEFAULT_WRONG_TIMES;
+    }
 
     /**
      * 获取当前账户redis冻结缓存的键

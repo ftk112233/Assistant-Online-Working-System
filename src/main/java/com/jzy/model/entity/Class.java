@@ -25,12 +25,14 @@ import java.util.List;
 public class Class extends BaseEntity {
     private static final long serialVersionUID = 2082795401009058210L;
 
-    public static final Comparator<Class> CLASS_YEAR_SEASON_SUB_SEASON_COMPARATOR = new ClassYearSeasonSubSeasonComparator();
+    public static final Comparator<Class> CLASS_YEAR_SEASON_SUB_SEASON_COMPARATOR_DESC = new ClassYearSeasonSubSeasonComparatorDesc();
+
+    public static final Comparator<Class> CLASS_YEAR_SEASON_SUB_SEASON_COMPARATOR_ASC = new ClassYearSeasonSubSeasonComparatorAsc();
 
     /**
      * 自定义的班级上课年份季度比较器，先按年份从高到低排序，后按季度由高到低排序，再按分期由高到低排序
      */
-    private static class ClassYearSeasonSubSeasonComparator implements Comparator<Class> {
+    static class ClassYearSeasonSubSeasonComparatorDesc implements Comparator<Class> {
         @Override
         public int compare(Class o1, Class o2) {
             if (o1.getClassYear() != null && o2.getClassYear() != null) {
@@ -55,6 +57,16 @@ public class Class extends BaseEntity {
             }
 
             return 0;
+        }
+    }
+
+    /**
+     * 自定义的班级上课年份季度比较器，与ClassYearSeasonSubSeasonComparatorDesc相反升序排列
+     */
+    static class ClassYearSeasonSubSeasonComparatorAsc implements Comparator<Class> {
+        @Override
+        public int compare(Class o1, Class o2) {
+            return 0 - CLASS_YEAR_SEASON_SUB_SEASON_COMPARATOR_DESC.compare(o1, o2);
         }
     }
 
@@ -292,7 +304,7 @@ public class Class extends BaseEntity {
         c4.setClassSubSeason(null);
         classes.add(c4);
 
-        Collections.sort(classes, Class.CLASS_YEAR_SEASON_SUB_SEASON_COMPARATOR);
+        Collections.sort(classes, Class.CLASS_YEAR_SEASON_SUB_SEASON_COMPARATOR_DESC);
 
         for (Class clazz : classes) {
             System.out.println(clazz);

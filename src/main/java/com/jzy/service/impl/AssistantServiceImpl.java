@@ -31,6 +31,16 @@ import java.util.List;
 public class AssistantServiceImpl extends AbstractServiceImpl implements AssistantService {
     private final static Logger logger = LogManager.getLogger(AssistantServiceImpl.class);
 
+    /**
+     * 表示工号重复
+     */
+    private final static String WORK_ID_REPEAT="workIdRepeat";
+
+    /**
+     * 表示姓名重复
+     */
+    private final static String NAME_REPEAT="nameRepeat";
+
     @Autowired
     private AssistantMapper assistantMapper;
 
@@ -67,7 +77,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
         //新工号不为空
         if (getAssistantByWorkId(assistant.getAssistantWorkId()) != null) {
             //添加的工号已存在
-            return new UpdateResult("workIdRepeat");
+            return new UpdateResult(WORK_ID_REPEAT);
         }
 
         return insertAssistantWithUnrepeatedWorkId(assistant);
@@ -76,8 +86,11 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     /**
      * 插入工号不重复的助教信息
      *
-     * @param assistant
-     * @return
+     * @param assistant 新添加助教的信息
+     * @return (更新结果 ， 更新记录数)
+     * 1."failure"：错误入参等异常
+     * 2."nameRepeat"：姓名冲突
+     * 3."success": 更新成功
      */
     private UpdateResult insertAssistantWithUnrepeatedWorkId(Assistant assistant) {
         if (assistant == null) {
@@ -85,7 +98,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
         }
         if (getAssistantByName(assistant.getAssistantName()) != null) {
             //添加的姓名已存在
-            return new UpdateResult("nameRepeat");
+            return new UpdateResult(NAME_REPEAT);
         }
 
         if (StringUtils.isEmpty(assistant.getAssistantSex())) {
@@ -113,7 +126,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
                 //工号修改过了，判断是否与已存在的工号冲突
                 if (getAssistantByWorkId(assistant.getAssistantWorkId()) != null) {
                     //修改后的工号已存在
-                    return "workIdRepeat";
+                    return WORK_ID_REPEAT;
                 }
             }
         } else {
@@ -124,7 +137,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
             //姓名修改过了，判断是否与已存在的姓名冲突
             if (getAssistantByName(assistant.getAssistantName()) != null) {
                 //修改后的姓名已存在
-                return "nameRepeat";
+                return NAME_REPEAT;
             }
         }
 
@@ -160,7 +173,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
             //姓名修改过了，判断是否与已存在的姓名冲突
             if (getAssistantByName(newAssistant.getAssistantName()) != null) {
                 //修改后的姓名已存在
-                return new UpdateResult("nameRepeat");
+                return new UpdateResult(NAME_REPEAT);
             }
         }
 
@@ -190,8 +203,18 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
         return result;
     }
 
-    @Override
-    public UpdateResult insertAndUpdateOneAssistantFromExcel(Assistant assistant) throws InvalidParameterException {
+    /**
+     * 根据从excel中读取到的assistant信息，更新插入一个。根据工号判断：
+     * if 当前工号不存在
+     * 执行插入
+     * else
+     * 根据工号更新
+     * 这里对于非法的入参采取抛出异常的方式，而不是返回"failure"，这是便于控制层捕获做进一步地异常处理
+     *
+     * @param assistant 输入的助教
+     * @return (更新结果，更新记录数)
+     */
+    private UpdateResult insertAndUpdateOneAssistantFromExcel(Assistant assistant) throws InvalidParameterException {
         if (assistant == null) {
             String msg = "insertAndUpdateOneAssistantFromExcel方法输入助教assistant为null!";
             logger.error(msg);
@@ -245,11 +268,10 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     }
 
     @Override
-    public String deleteAssistantsByCondition(AssistantSearchCondition condition) {
+    public long deleteAssistantsByCondition(AssistantSearchCondition condition) {
         if (condition == null) {
-            return Constants.FAILURE;
+            return 0;
         }
-        assistantMapper.deleteAssistantsByCondition(condition);
-        return Constants.SUCCESS;
+        return assistantMapper.deleteAssistantsByCondition(condition);
     }
 }

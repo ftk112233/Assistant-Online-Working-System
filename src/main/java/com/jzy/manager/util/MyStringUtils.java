@@ -580,4 +580,8 @@ public class MyStringUtils {
 
         return result;
     }
+
+    public static void main(String[] args) {
+        System.out.println(getMaxLengthNumberSubstring("540曹杨312教"));
+    }
 }

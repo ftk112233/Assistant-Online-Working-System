@@ -46,6 +46,7 @@ public class AssistantAdminController extends AbstractController {
     /**
      * 跳转助教管理页面
      *
+     * @param model
      * @return
      */
     @RequestMapping("/page")
@@ -69,7 +70,8 @@ public class AssistantAdminController extends AbstractController {
     }
 
     /**
-     * 重定向到编辑助教iframe子页面并返回相应model
+     * 重定向到编辑助教iframe子页面并返回相应model。
+     *  其中被编辑的助教信息中select的元素不能通过layui iframe直接赋值，因此经由后台model传值
      *
      * @param model
      * @param assistant 当前要被编辑的助教信息
@@ -90,7 +92,7 @@ public class AssistantAdminController extends AbstractController {
      */
     @RequestMapping("/updateById")
     @ResponseBody
-    public Map<String, Object> updateById(Assistant assistant) throws InvalidParameterException {
+    public Map<String, Object> updateById(Assistant assistant) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!AssistantUtils.isValidAssistantUpdateInfo(assistant)) {
@@ -112,7 +114,7 @@ public class AssistantAdminController extends AbstractController {
      */
     @RequestMapping("/insert")
     @ResponseBody
-    public Map<String, Object> insert(Assistant assistant) throws InvalidParameterException {
+    public Map<String, Object> insert(Assistant assistant) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!AssistantUtils.isValidAssistantUpdateInfo(assistant)) {
@@ -165,27 +167,28 @@ public class AssistantAdminController extends AbstractController {
     /**
      * 条件删除多个助教ajax交互
      *
-     * @param condition 输入的查询条件
+     * @param condition 输入的查询条件 {@link AssistantSearchCondition}
      * @return
      */
     @RequestMapping("/deleteByCondition")
     @ResponseBody
     public Map<String, Object> deleteByCondition(AssistantSearchCondition condition) {
         Map<String, Object> map = new HashMap(1);
-        map.put("data", assistantService.deleteAssistantsByCondition(condition));
+        assistantService.deleteAssistantsByCondition(condition);
+        map.put("data", Constants.SUCCESS);
         return map;
     }
 
 
     /**
-     * 导入助教
+     * 表格导入助教
      *
      * @param file 上传的表格
-     * @return
+     * @return [更新结果, [更新条数，速度]]
      */
     @RequestMapping("/import")
     @ResponseBody
-    public Map<String, Object> importExcel(@RequestParam(value = "file", required = false) MultipartFile file) throws InvalidParameterException {
+    public Map<String, Object> importExcel(@RequestParam(value = "file", required = false) MultipartFile file) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>();
         //返回layui规定的文件上传模块JSON格式
@@ -193,7 +196,7 @@ public class AssistantAdminController extends AbstractController {
         map2.put("src", "");
         map.put("data", map2);
 
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
             throw new InvalidParameterException(msg);
@@ -214,9 +217,9 @@ public class AssistantAdminController extends AbstractController {
 
         AssistantInfoExcel excel = null;
         try {
-            excel = new AssistantInfoExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
-            excelEffectiveDataRowCount=excel.readAssistants();
-            UpdateResult assistantResult=assistantService.insertAndUpdateAssistantsFromExcel(excel.getAssistants());
+            excel = new AssistantInfoExcel(file.getInputStream(), ExcelVersionEnum.getVersion(file.getOriginalFilename()));
+            excelEffectiveDataRowCount = excel.readAssistants();
+            UpdateResult assistantResult = assistantService.insertAndUpdateAssistantsFromExcel(excel.getAssistants());
             databaseInsertRowCount += (int) assistantResult.getInsertCount();
             databaseUpdateRowCount += (int) assistantResult.getUpdateCount();
         } catch (Exception e) {
@@ -232,8 +235,8 @@ public class AssistantAdminController extends AbstractController {
         speedOfDatabaseImport.parseSpeed();
 
 
-        map.put("excelSpeed",speedOfExcelImport);
-        map.put("databaseSpeed",speedOfDatabaseImport);
+        map.put("excelSpeed", speedOfExcelImport);
+        map.put("databaseSpeed", speedOfDatabaseImport);
 
         map.put("msg", Constants.SUCCESS);
         return map;

@@ -137,7 +137,7 @@ public class ClassArrangementExcel extends Excel {
             String teacherName = this.getValueAt(sheetIx, i, columnIndexOfTeacherName);
             String assistantName = this.getValueAt(sheetIx, i, columnIndexOfAssistantName);
             String classId = this.getValueAt(sheetIx, i, columnIndexOfClassId);
-            classId = classId == null ? null : classId.toUpperCase();
+            classId = StringUtils.upperCase(classId);
             String className = this.getValueAt(sheetIx, i, columnIndexOfClassName);
             String classTime = this.getValueAt(sheetIx, i, columnIndexOfClassTime);
             String classroom = this.getValueAt(sheetIx, i, columnIndexOfClassroom);

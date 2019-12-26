@@ -170,7 +170,7 @@ public class ClassUtils {
      * @return
      */
     public static String getCurrentYear() {
-        return MyTimeUtils.getCurrentYear() + "";
+        return Integer.toString(MyTimeUtils.getCurrentYear());
     }
 
 }

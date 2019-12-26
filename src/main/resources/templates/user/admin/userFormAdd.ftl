@@ -116,7 +116,6 @@
             str += '<option value="' + json + '">' + json + '</option>';
             $("#userRole").append(str);
         }
-        $("#userRole").val('${userEdit.userRole!""}');
         form.render('select');
 
     });

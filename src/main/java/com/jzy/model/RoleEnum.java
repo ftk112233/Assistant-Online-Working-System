@@ -11,8 +11,35 @@ import java.util.List;
  * @date 2019/12/1 9:29
  **/
 public enum RoleEnum {
-    ADMINISTRATOR("管理员"),ASSISTANT_MANAGER("学管"),ASSISTANT_MASTER("助教长")
-    , ASSISTANT("助教"), TEACHER("教师"), GUEST("游客");
+    /**
+     * 角色枚举——管理员
+     */
+    ADMINISTRATOR("管理员"),
+
+    /**
+     * 角色枚举——学管
+     */
+    ASSISTANT_MANAGER("学管"),
+
+    /**
+     * 角色枚举——助教长
+     */
+    ASSISTANT_MASTER("助教长"),
+
+    /**
+     * 角色枚举——助教
+     */
+    ASSISTANT("助教"),
+
+    /**
+     * 角色枚举——教师
+     */
+    TEACHER("教师"),
+
+    /**
+     * 角色枚举——游客
+     */
+    GUEST("游客");
 
     private String role;
 

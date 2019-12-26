@@ -57,7 +57,7 @@ public class StudentAdminController extends AbstractController {
     @RequestMapping("/import")
     @ResponseBody
     public Map<String, Object> importExcel(@RequestParam(value = "file", required = false) MultipartFile file,@RequestParam(value = "deleteFirst",required = false) boolean deleteFirstChecked
-                                           ,@RequestParam(value = "type") Integer type) throws InvalidParameterException {
+                                           ,@RequestParam(value = "type") Integer type) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>();
         //返回layui规定的文件上传模块JSON格式
@@ -66,7 +66,7 @@ public class StudentAdminController extends AbstractController {
         map.put("data", map2);
 
 
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
             throw new InvalidParameterException(msg);
@@ -90,7 +90,7 @@ public class StudentAdminController extends AbstractController {
 
             if (type.equals(1)) {
                 try {
-                    excel = new StudentListImportToDatabaseExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
+                    excel = new StudentListImportToDatabaseExcel(file.getInputStream(), ExcelVersionEnum.getVersion(file.getOriginalFilename()));
                     excelEffectiveDataRowCount=excel.readStudentAndClassInfoFromExcel();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -135,7 +135,7 @@ public class StudentAdminController extends AbstractController {
                 }
             } else if (type.equals(2)) {
                 try {
-                    excel = new StudentListImportToDatabaseExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
+                    excel = new StudentListImportToDatabaseExcel(file.getInputStream(), ExcelVersionEnum.getVersion(file.getOriginalFilename()));
                     excelEffectiveDataRowCount=excel.readStudentDetailInfoFromExcel();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -212,11 +212,10 @@ public class StudentAdminController extends AbstractController {
      *
      * @param file
      * @return
-     * @throws InvalidParameterException
      */
     @RequestMapping("/importSchool")
     @ResponseBody
-    public Map<String, Object> importSchool(@RequestParam(value = "file", required = false) MultipartFile file) throws InvalidParameterException {
+    public Map<String, Object> importSchool(@RequestParam(value = "file", required = false) MultipartFile file) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>();
         //返回layui规定的文件上传模块JSON格式
@@ -224,7 +223,7 @@ public class StudentAdminController extends AbstractController {
         map2.put("src", "");
         map.put("data", map2);
 
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
             throw new InvalidParameterException(msg);
@@ -245,7 +244,7 @@ public class StudentAdminController extends AbstractController {
 
         StudentSchoolExcel excel = null;
         try {
-            excel = new StudentSchoolExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
+            excel = new StudentSchoolExcel(file.getInputStream(), ExcelVersionEnum.getVersion(file.getOriginalFilename()));
             excelEffectiveDataRowCount = excel.readStudentsSchoolsFromExcel();
         } catch (IOException e) {
             e.printStackTrace();
@@ -306,7 +305,7 @@ public class StudentAdminController extends AbstractController {
     @RequestMapping("/getStudentInfo")
     @ResponseBody
     public ResultMap<List<Student>> getStudentInfo(MyPage myPage, StudentSearchCondition condition) {
-        condition.setStudentId(condition.getStudentId() == null ? null : condition.getStudentId().toUpperCase());
+        condition.setStudentId(StringUtils.upperCase(condition.getStudentId()));
         PageInfo<Student> pageInfo = studentService.listStudents(myPage, condition);
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
     }
@@ -330,7 +329,7 @@ public class StudentAdminController extends AbstractController {
      */
     @RequestMapping("/updateById")
     @ResponseBody
-    public Map<String, Object> updateById(Student student) throws InvalidParameterException {
+    public Map<String, Object> updateById(Student student) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!StudentUtils.isValidStudentUpdateInfo(student)) {
@@ -352,7 +351,7 @@ public class StudentAdminController extends AbstractController {
      */
     @RequestMapping("/insert")
     @ResponseBody
-    public Map<String, Object> insert(Student student) throws InvalidParameterException {
+    public Map<String, Object> insert(Student student) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!StudentUtils.isValidStudentUpdateInfo(student)) {

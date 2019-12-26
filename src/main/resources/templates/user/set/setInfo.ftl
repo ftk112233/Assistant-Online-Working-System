@@ -49,7 +49,8 @@
                             <label class="layui-form-label">工号</label>
                             <div class="layui-input-inline">
                                 <input type="text" name="workId" value="${userInfo.userWorkId!""}"
-                                       class="layui-input" lay-verify="workId" lay-verType="tips" autocomplete="off" readonly>
+                                       class="layui-input" lay-verify="workId" lay-verType="tips" autocomplete="off"
+                                       readonly>
                             </div>
                             <div class="layui-form-mid layui-word-aux" id="workId-flag">工号不可修改</div>
                         </div>
@@ -178,6 +179,7 @@
                 , search = router.search
                 , upload = layui.upload;
 
+        //计算安全指数
         var secure = ['${userInfo.userIdCard!""}', '${userInfo.userEmail!""}', '${userInfo.userPhone!""}'];
         var secureParam = 0;
         for (var j = 0; j < secure.length; j++) {
@@ -208,6 +210,7 @@
         }
 
 
+        //是否绑定邮箱、手机的判断
         if ('${userInfo.userEmail!""}' === '') {
             $("#email-icon-ok").hide();
             $("#email-icon-close").show();
@@ -279,7 +282,7 @@
                     "userRealName": field.realName,
                     "userIcon": field.hiddenIconUrl
                 },
-                url: '${ctx}/user/updateOwnInfo?csrfToken='+'${csrfToken!""}' //实际使用请改成服务端真实接口
+                url: '${ctx}/user/updateOwnInfo?csrfToken=' + '${csrfToken!""}' //实际使用请改成服务端真实接口
                 , success: function (res2) {
                     if (res2.data === "success") {
                         layer.msg('修改已完成，请F5刷新页面', {

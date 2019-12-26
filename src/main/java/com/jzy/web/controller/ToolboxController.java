@@ -119,7 +119,7 @@ public class ToolboxController extends AbstractController {
      */
     @RequestMapping("/assistant/uploadStudentList")
     @ResponseBody
-    public Map<String, Object> uploadStudentList(@RequestParam(value = "file", required = false) MultipartFile file) throws InvalidParameterException {
+    public Map<String, Object> uploadStudentList(@RequestParam(value = "file", required = false) MultipartFile file) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>(3);
         //返回layui规定的文件上传模块JSON格式
@@ -127,7 +127,7 @@ public class ToolboxController extends AbstractController {
         map2.put("src", "");
         map.put("data", map2);
 
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
             throw new InvalidParameterException(msg);
@@ -142,7 +142,7 @@ public class ToolboxController extends AbstractController {
 
         StudentListUploadByUserExcel excel = null;
         try {
-            excel = new StudentListUploadByUserExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
+            excel = new StudentListUploadByUserExcel(file.getInputStream(), ExcelVersionEnum.getVersion(file.getOriginalFilename()));
 
             //try用户上传文件是否规范
             excel.readStudentAndClassInfoByClassIdFromExcel("any input");
@@ -306,7 +306,7 @@ public class ToolboxController extends AbstractController {
      */
     @RequestMapping("/assistant/uploadStudentListForSeatTable")
     @ResponseBody
-    public Map<String, Object> uploadStudentListForSeatTable(@RequestParam(value = "file", required = false) MultipartFile file) throws InvalidParameterException {
+    public Map<String, Object> uploadStudentListForSeatTable(@RequestParam(value = "file", required = false) MultipartFile file) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>(3);
         //返回layui规定的文件上传模块JSON格式
@@ -314,7 +314,7 @@ public class ToolboxController extends AbstractController {
         map2.put("src", "");
         map.put("data", map2);
 
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
             throw new InvalidParameterException(msg);
@@ -329,7 +329,7 @@ public class ToolboxController extends AbstractController {
 
         StudentListForSeatTableUploadByUserExcel excel = null;
         try {
-            excel = new StudentListForSeatTableUploadByUserExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
+            excel = new StudentListForSeatTableUploadByUserExcel(file.getInputStream(), ExcelVersionEnum.getVersion(file.getOriginalFilename()));
 
             excel.readStudentNames();
 
@@ -373,10 +373,6 @@ public class ToolboxController extends AbstractController {
                     tmp.setClassroom(classDetailedDto.getClassroom());
                     results.add(tmp);
                 }
-
-                //下载完座位表，清除缓存
-//                    studentListForSeatTableUploadByUserCache.remove(id);
-                //清除缓存交给springmvc拦截器
             }
 
 
@@ -555,7 +551,7 @@ public class ToolboxController extends AbstractController {
      * @return
      */
     @RequestMapping("/assistantAdministrator/downloadExample/{type}")
-    public String downloadExample(HttpServletRequest request, HttpServletResponse response, @PathVariable String type) throws InvalidParameterException {
+    public String downloadExample(HttpServletRequest request, HttpServletResponse response, @PathVariable String type) {
         int typeVal = Integer.parseInt(type);
         if (typeVal <= 0) {
             String msg = "downloadExample方法入参错误!";
@@ -597,7 +593,7 @@ public class ToolboxController extends AbstractController {
      */
     @RequestMapping("/assistantAdministrator/seatTableTemplateImport")
     @ResponseBody
-    public Map<String, Object> seatTableTemplateImport(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "classCampus", required = false) String classCampus) throws InvalidParameterException {
+    public Map<String, Object> seatTableTemplateImport(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "classCampus", required = false) String classCampus) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>(3);
         //返回layui规定的文件上传模块JSON格式
@@ -610,7 +606,7 @@ public class ToolboxController extends AbstractController {
             return map;
         }
 
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
             throw new InvalidParameterException(msg);
@@ -625,7 +621,7 @@ public class ToolboxController extends AbstractController {
 
         SeatTableTemplateInputExcel excel = null;
         try {
-            excel = new SeatTableTemplateInputExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
+            excel = new SeatTableTemplateInputExcel(file.getInputStream(), ExcelVersionEnum.getVersion(file.getOriginalFilename()));
             //读出教室
             List<CampusAndClassroom> campusAndClassrooms = excel.readSeatTable();
 
@@ -685,7 +681,7 @@ public class ToolboxController extends AbstractController {
      */
     @RequestMapping("/common/uploadStudentSchool")
     @ResponseBody
-    public Map<String, Object> uploadStudentSchool(@RequestParam(value = "file", required = false) MultipartFile file) throws InvalidParameterException {
+    public Map<String, Object> uploadStudentSchool(@RequestParam(value = "file", required = false) MultipartFile file) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>(3);
         //返回layui规定的文件上传模块JSON格式
@@ -693,7 +689,7 @@ public class ToolboxController extends AbstractController {
         map2.put("src", "");
         map.put("data", map2);
 
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
             throw new InvalidParameterException(msg);
@@ -709,7 +705,7 @@ public class ToolboxController extends AbstractController {
         StudentSchoolExcel excel = null;
 
         try {
-            excel = new StudentSchoolExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
+            excel = new StudentSchoolExcel(file.getInputStream(), ExcelVersionEnum.getVersion(file.getOriginalFilename()));
 
             //缓存中有文件，即用户上传过了
             excel.readStudentIdsFromExcel();

@@ -115,7 +115,7 @@ public class UserMessageController extends AbstractController {
      * @param message  含消息配图信息
      */
     @RequestMapping("/getPicture")
-    public void getPicture(HttpServletRequest request, HttpServletResponse response, UserMessage message) throws InvalidParameterException {
+    public void getPicture(HttpServletRequest request, HttpServletResponse response, UserMessage message) {
         if (message == null || StringUtils.isEmpty(message.getMessagePicture()) || !FileUtils.isImage(message.getMessagePicture())) {
             String msg = "getPicture方法错误入参";
             logger.error(msg);
@@ -257,7 +257,7 @@ public class UserMessageController extends AbstractController {
      */
     @RequestMapping("/uploadPicture")
     @ResponseBody
-    public Map<String, Object> uploadUserIcon(@RequestParam(value = "file", required = false) MultipartFile file) throws InvalidParameterException {
+    public Map<String, Object> uploadUserIcon(@RequestParam(value = "file", required = false) MultipartFile file) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>(3);
 
@@ -279,7 +279,7 @@ public class UserMessageController extends AbstractController {
      */
     @RequestMapping("/insertSendMessage")
     @ResponseBody
-    public Map<String, Object> insertSendMessage(@RequestParam(value = "hide", required = false) String hide, UserMessage message) throws InvalidParameterException {
+    public Map<String, Object> insertSendMessage(@RequestParam(value = "hide", required = false) String hide, UserMessage message) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!Constants.ON.equals(hide)) {
@@ -335,17 +335,17 @@ public class UserMessageController extends AbstractController {
      * 重定向到批量发送消息页面
      *
      * @param model
-     * @param users  批量发送的用户信息的json串
+     * @param users 批量发送的用户信息的json串
      * @return
      */
     @RequestMapping("/many/sendForm")
     public String manySendForm(Model model, @RequestParam("users") String users) {
         List<UserSendTo> usersParsed = JSON.parseArray(users, UserSendTo.class);
         List<Long> ids = new ArrayList<>();
-        StringBuffer userSendToShow=new StringBuffer();
+        StringBuffer userSendToShow = new StringBuffer();
         for (UserSendTo userSendTo : usersParsed) {
             ids.add(userSendTo.getId());
-            userSendToShow.append("@"+userSendTo.getUserRole()+"-"+userSendTo.getUserRealName()+"; ");
+            userSendToShow.append("@" + userSendTo.getUserRole() + "-" + userSendTo.getUserRealName() + "; ");
         }
         model.addAttribute(ModelConstants.USER_SEND_TO_IDS_MODEL_KEY, JSON.toJSONString(ids));
         model.addAttribute(ModelConstants.USER_SEND_TO_SHOW_MODEL_KEY, userSendToShow.toString());
@@ -360,10 +360,10 @@ public class UserMessageController extends AbstractController {
      */
     @RequestMapping("/many/insertSendMessage")
     @ResponseBody
-    public Map<String, Object> manyInsertSendMessage(@RequestParam(value = "hide", required = false) String hide,@RequestParam("userIds") String ids, UserMessage message) throws InvalidParameterException {
+    public Map<String, Object> manyInsertSendMessage(@RequestParam(value = "hide", required = false) String hide, @RequestParam("userIds") String ids, UserMessage message) {
         Map<String, Object> map = new HashMap<>(1);
 
-        Long userId =null;
+        Long userId = null;
         if (!Constants.ON.equals(hide)) {
             //未开匿名
             userId = userService.getSessionUserInfo().getId();
@@ -373,9 +373,9 @@ public class UserMessageController extends AbstractController {
 
         List<Long> idsParsed = JSON.parseArray(ids, Long.class);
 
-        List<UserMessage> userMessages=new ArrayList<>(idsParsed.size());
-        for (Long id:idsParsed){
-            UserMessage userMessage=new UserMessage();
+        List<UserMessage> userMessages = new ArrayList<>(idsParsed.size());
+        for (Long id : idsParsed) {
+            UserMessage userMessage = new UserMessage();
             userMessage.setUserId(id);
             userMessage.setUserFromId(userId);
             userMessage.setMessageTitle(message.getMessageTitle());
@@ -422,10 +422,10 @@ public class UserMessageController extends AbstractController {
      */
     @RequestMapping("/all/insertSendMessage")
     @ResponseBody
-    public Map<String, Object> allInsertSendMessage(@RequestParam(value = "hide", required = false) String hide, UserMessage message) throws InvalidParameterException {
+    public Map<String, Object> allInsertSendMessage(@RequestParam(value = "hide", required = false) String hide, UserMessage message) {
         Map<String, Object> map = new HashMap<>(1);
 
-        Long userId =null;
+        Long userId = null;
         if (!Constants.ON.equals(hide)) {
             //未开匿名
             userId = userService.getSessionUserInfo().getId();
@@ -435,9 +435,9 @@ public class UserMessageController extends AbstractController {
 
         List<User> users = userService.listAllUsers();
 
-        List<UserMessage> userMessages=new ArrayList<>(users.size());
-        for (User user:users){
-            UserMessage userMessage=new UserMessage();
+        List<UserMessage> userMessages = new ArrayList<>(users.size());
+        for (User user : users) {
+            UserMessage userMessage = new UserMessage();
             userMessage.setUserId(user.getId());
             userMessage.setUserFromId(userId);
             userMessage.setMessageTitle(message.getMessageTitle());

@@ -12,7 +12,35 @@ import java.util.List;
  * @date 2019/12/10 11:21
  **/
 public enum  SubSeasonEnum {
-    FIRST("一期", 1), SECOND("二期", 2), THIRD("三期", 3), FORTH("四期", 4), FIFTH("五期", 5), SIXTH("六期", 6);
+    /**
+     * 分期枚举——一期，在排序中权重为1，即最小
+     */
+    FIRST("一期", 1),
+
+    /**
+     * 分期枚举——二期，在排序中权重为2
+     */
+    SECOND("二期", 2),
+
+    /**
+     * 分期枚举——三期，在排序中权重为3
+     */
+    THIRD("三期", 3),
+
+    /**
+     * 分期枚举——四期，在排序中权重为4
+     */
+    FORTH("四期", 4),
+
+    /**
+     * 分期枚举——五期，在排序中权重为5
+     */
+    FIFTH("五期", 5),
+
+    /**
+     * 分期枚举——六期，在排序中权重为6
+     */
+    SIXTH("六期", 6);
 
     public static final Comparator<String> SUB_SEASON_COMPARATOR =new SubSeasonEnumComparator();
     /**

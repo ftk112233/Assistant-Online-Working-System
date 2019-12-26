@@ -1,15 +1,13 @@
 package com.jzy.manager.aspect;
 
 import com.jzy.manager.constant.RedisConstants;
+import com.jzy.service.RedisOperation;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author JinZhiyun
@@ -22,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class QuestionAspect {
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisOperation redisOperation;
 
     @Pointcut("execution(* com.jzy.service.impl.QuestionServiceImpl.insert*(..)) " +
             "|| execution(* com.jzy.service.impl.QuestionServiceImpl.update*(..))" +
@@ -37,6 +35,6 @@ public class QuestionAspect {
     @AfterReturning("updatePoints()")
     public void clearRedisAfterUpdate(JoinPoint jp){
         String key=RedisConstants.QUESTION_KEY;
-        redisTemplate.expire(key, 0 ,TimeUnit.SECONDS);
+        redisOperation.expireKey(key);
     }
 }

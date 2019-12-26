@@ -100,7 +100,7 @@ public class PermissionAdminController extends AbstractController {
      */
     @RequestMapping("/updateById")
     @ResponseBody
-    public Map<String, Object> updateById(RoleAndPermission roleAndPermission) throws InvalidParameterException {
+    public Map<String, Object> updateById(RoleAndPermission roleAndPermission) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!RoleAndPermissionUtils.isValidRoleAndPermissionUpdateInfo(roleAndPermission)) {
@@ -122,7 +122,7 @@ public class PermissionAdminController extends AbstractController {
      */
     @RequestMapping("/insert")
     @ResponseBody
-    public Map<String, Object> insert(RoleCheckbox roleCheckbox, RoleAndPermission roleAndPermission) throws InvalidParameterException {
+    public Map<String, Object> insert(RoleCheckbox roleCheckbox, RoleAndPermission roleAndPermission) {
         Map<String, Object> map = new HashMap<>(1);
 
         List<RoleAndPermission> roleAndPermissions = new ArrayList<>();

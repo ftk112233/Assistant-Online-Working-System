@@ -95,7 +95,7 @@ public class UserController extends AbstractController {
      */
     @RequestMapping("/uploadUserIcon")
     @ResponseBody
-    public Map<String, Object> uploadUserIcon(@RequestParam(value = "file", required = false) MultipartFile file) throws InvalidParameterException {
+    public Map<String, Object> uploadUserIcon(@RequestParam(value = "file", required = false) MultipartFile file) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>(3);
 
@@ -118,7 +118,7 @@ public class UserController extends AbstractController {
      */
     @RequestMapping("/updateOwnInfo")
     @ResponseBody
-    public Map<String, Object> updateInfoByCurrentUser(User user) throws InvalidParameterException {
+    public Map<String, Object> updateInfoByCurrentUser(User user) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserUpdateOwnInfo(user)) {
@@ -140,7 +140,7 @@ public class UserController extends AbstractController {
      */
     @RequestMapping("/updateOwnPassword")
     @ResponseBody
-    public Map<String, Object> updatePasswordByCurrentUser(@RequestParam("oldPassword") String userOldPassword, @RequestParam("newPassword") String userNewPassword) throws InvalidParameterException {
+    public Map<String, Object> updatePasswordByCurrentUser(@RequestParam("oldPassword") String userOldPassword, @RequestParam("newPassword") String userNewPassword) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserPassword(userNewPassword)) {
@@ -215,7 +215,7 @@ public class UserController extends AbstractController {
      */
     @RequestMapping("/addNewEmail")
     @ResponseBody
-    public Map<String, Object> addNewEmail(@RequestParam(value = "emailVerifyCode", required = false) String emailVerifyCode, @RequestParam("newEmail") String newEmail) throws InvalidParameterException {
+    public Map<String, Object> addNewEmail(@RequestParam(value = "emailVerifyCode", required = false) String emailVerifyCode, @RequestParam("newEmail") String newEmail) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserEmail(newEmail)) {
@@ -238,8 +238,8 @@ public class UserController extends AbstractController {
         }
 
         //auth=true，即已经经过了服务端验证
-        ShiroUtils.getSession().setAttribute(SessionConstants.USER_EMAIL_SESSION_KEY, new EmailVerifyCodeSession(newEmail, true));
-        if (!userService.ifValidEmailVerifyCode(new EmailVerifyCode(newEmail, emailVerifyCode))) {
+        ShiroUtils.setSessionAttribute(SessionConstants.USER_EMAIL_SESSION_KEY, new EmailVerifyCodeSession(newEmail, true));
+        if (!userService.isValidEmailVerifyCode(new EmailVerifyCode(newEmail, emailVerifyCode))) {
             map.put("data", "verifyCodeWrong");
         } else {
             if (userService.getUserByEmail(newEmail) != null) {
@@ -262,7 +262,7 @@ public class UserController extends AbstractController {
      */
     @RequestMapping("/modifyCurrentEmail")
     @ResponseBody
-    public Map<String, Object> modifyCurrentEmail(@RequestParam("oldEmail") String userOldEmail, @RequestParam("newEmail") String userNewEmail) throws InvalidParameterException {
+    public Map<String, Object> modifyCurrentEmail(@RequestParam("oldEmail") String userOldEmail, @RequestParam("newEmail") String userNewEmail) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserEmail(userNewEmail)) {
@@ -303,7 +303,7 @@ public class UserController extends AbstractController {
      */
     @RequestMapping("/modifyCurrentPhone")
     @ResponseBody
-    public Map<String, Object> modifyCurrentPhone(@RequestParam("newPhone") String userNewPhone) throws InvalidParameterException {
+    public Map<String, Object> modifyCurrentPhone(@RequestParam("newPhone") String userNewPhone) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserPhone(userNewPhone)) {

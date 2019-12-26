@@ -39,16 +39,6 @@ public class ShiroUtils {
     public static final String FINAL_PASSWORD_SALT = "654321";
 
     /**
-     * 获得shrio的session
-     *
-     * @return
-     */
-    public static Session getSession() {
-        return SecurityUtils.getSubject().getSession(true);
-    }
-
-
-    /**
      * 免密登录时用的密文
      */
     public static final String FINAL_PASSWORD_CIPHER_TEXT = encryptUserPassword(FINAL_PASSWORD_PLAINTEXT, FINAL_PASSWORD_SALT);
@@ -92,6 +82,35 @@ public class ShiroUtils {
             }
         }
         return request.getRemoteAddr();
+    }
+
+    /**
+     * 获得shrio的session
+     *
+     * @return
+     */
+    public static Session getSession() {
+        return SecurityUtils.getSubject().getSession(true);
+    }
+
+    /**
+     * 设置session的key, value
+     *
+     * @param key session的key
+     * @param value session的value
+     */
+    public static void setSessionAttribute(Object key, Object value) {
+        getSession().setAttribute(key, value);
+    }
+
+    /**
+     * 由session的key获得value
+     *
+     * @param key session的key
+     * @return session的value
+     */
+    public static Object getSessionAttribute(Object key) {
+        return getSession().getAttribute(key);
     }
 
 }

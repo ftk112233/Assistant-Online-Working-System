@@ -156,7 +156,7 @@ public class AssistantInfoExcel extends Excel {
             assistant.setAssistantWorkId(workId);
 
             String idCard = this.getValueAt(sheetIx, i, columnIndexOfIdCard);
-            idCard = idCard == null ? null : idCard.toUpperCase();
+            idCard = StringUtils.upperCase(idCard);
             user.setUserIdCard(idCard);
 
             String phone = this.getValueAt(sheetIx, i, columnIndexOfPhone);

@@ -101,7 +101,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
     @Override
     public User getSessionUserInfo() {
-        return (User) ShiroUtils.getSession().getAttribute(SessionConstants.USER_INFO_SESSION_KEY);
+        return (User) ShiroUtils.getSessionAttribute(SessionConstants.USER_INFO_SESSION_KEY);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             if (!RoleEnum.GUEST.equals(originUser.getUserRole())) {
                 //如果不是用游客号登陆的，根据id更新一下session中信息
                 User newUser = getUserById(originUser.getId());
-                ShiroUtils.getSession().setAttribute(SessionConstants.USER_INFO_SESSION_KEY, newUser);
+                ShiroUtils.setSessionAttribute(SessionConstants.USER_INFO_SESSION_KEY, newUser);
                 return newUser;
             }
         }
@@ -120,11 +120,12 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
     @Override
     public EmailVerifyCode sendVerifyCodeToEmail(String userEmail) throws InvalidParameterException {
-        if (StringUtils.isEmpty(userEmail)) {
-            throw new InvalidParameterException("发送的用户邮箱为空");
+        if (!MyStringUtils.isEmail(userEmail)) {
+            throw new InvalidParameterException("发送的用户邮箱不合法");
         }
         // 获取前端传入的参数
         String emailAddress = userEmail;
+        //6位随机验证码
         String verifyCode = CodeUtils.randomCodes();
         String emailMsg = "收到来自新东方优能中学助教工作平台的验证码：\n" + verifyCode + "\n有效时间: " + EmailVerifyCode.getValidTimeMinutes() + "分钟";
 
@@ -135,13 +136,14 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         final String baseKey = RedisConstants.USER_VERIFYCODE_EMAIL_KEY;
         String key = baseKey + ":" + userEmail;
         vOps.set(key, verifyCode);
+        //5分钟有效时间
         redisTemplate.expire(key, EmailVerifyCode.getValidTimeMinutes(), TimeUnit.MINUTES);
 
         return new EmailVerifyCode(userEmail, verifyCode);
     }
 
     @Override
-    public boolean ifValidEmailVerifyCode(EmailVerifyCode emailVerifyCode) {
+    public boolean isValidEmailVerifyCode(EmailVerifyCode emailVerifyCode) {
         if (emailVerifyCode == null || StringUtils.isEmpty(emailVerifyCode.getCode()) || StringUtils.isEmpty(emailVerifyCode.getEmail())) {
             logger.error("服务端收到了非法请求，请引起警惕");
             return false;
@@ -156,7 +158,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         }
 
         //验证通过即让当前key过期
-        expireKey(key);
+        redisOperation.expireKey(key);
         return true;
     }
 
@@ -171,6 +173,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             logger.error("由邮箱更改密码时，查找不到指定邮箱的用户。疑似绕过了前端请求。");
             return 0;
         }
+        //加密明文密码
         userPassword = ShiroUtils.encryptUserPassword(userPassword, user.getUserSalt());
         return userMapper.updatePasswordByEmail(userEmail, userPassword);
     }
@@ -480,7 +483,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         result.setInsertCount(userMapper.insertUser(user));
 
 
-        Long id = getUserByWorkId(user.getUserWorkId()).getId();
+        Long id = getUserByName(user.getUserName()).getId();
         //向新用户发送欢迎消息
         UserMessage message = new UserMessage();
         message.setUserId(id);
@@ -501,6 +504,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         if (UserMessageUtils.isValidUserMessageUpdateInfo(message)) {
             userMessageService.insertUserMessage(message);
         }
+
 
         return result;
     }
@@ -697,4 +701,5 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
                 ? new ArrayList<>() : userMapper.listUsersSendTo(condition);
         return new PageInfo<>(users);
     }
+
 }

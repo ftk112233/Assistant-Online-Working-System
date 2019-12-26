@@ -10,6 +10,7 @@ import com.jzy.model.dto.MissLessonStudentSearchCondition;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.entity.User;
 import com.jzy.model.vo.ResultMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -55,9 +56,9 @@ public class MissLessonStudentAdminController extends AbstractController {
     @RequestMapping("/getMissLessonStudentInfo")
     @ResponseBody
     public ResultMap<List<MissLessonStudentDetailedDto>> getMissLessonStudentInfo(MyPage myPage, MissLessonStudentSearchCondition condition) {
-        condition.setStudentId(condition.getStudentId() == null ? null : condition.getStudentId().toUpperCase());
-        condition.setOriginalClassId(condition.getOriginalClassId() == null ? null : condition.getOriginalClassId().toUpperCase());
-        condition.setCurrentClassId(condition.getCurrentClassId() == null ? null : condition.getCurrentClassId().toUpperCase());
+        condition.setStudentId(StringUtils.upperCase(condition.getStudentId()));
+        condition.setOriginalClassId(StringUtils.upperCase(condition.getOriginalClassId()));
+        condition.setCurrentClassId(StringUtils.upperCase(condition.getCurrentClassId()));
         PageInfo<MissLessonStudentDetailedDto> pageInfo = missLessonStudentService.listMissLessonStudents(myPage, condition);
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
     }
@@ -126,7 +127,7 @@ public class MissLessonStudentAdminController extends AbstractController {
      */
     @RequestMapping("/updateById")
     @ResponseBody
-    public Map<String, Object> updateById(MissLessonStudentDetailedDto missLessonStudentDetailedDto) throws InvalidParameterException {
+    public Map<String, Object> updateById(MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!MissLessonStudentUtils.isValidMissLessonStudentUpdateInfo(missLessonStudentDetailedDto)) {
@@ -147,7 +148,7 @@ public class MissLessonStudentAdminController extends AbstractController {
      */
     @RequestMapping("/insert")
     @ResponseBody
-    public Map<String, Object> insert(MissLessonStudentDetailedDto missLessonStudentDetailedDto) throws InvalidParameterException {
+    public Map<String, Object> insert(MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!MissLessonStudentUtils.isValidMissLessonStudentUpdateInfo(missLessonStudentDetailedDto)) {

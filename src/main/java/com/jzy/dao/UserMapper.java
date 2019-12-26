@@ -69,6 +69,7 @@ public interface UserMapper {
      *
      * @param userEmail 用户邮箱
      * @param userPassword 用户新密码（密文），直接set到数据库
+     * @return 更新记录数
      */
     long updatePasswordByEmail(@Param("userEmail") String userEmail, @Param("userPassword") String userPassword);
 

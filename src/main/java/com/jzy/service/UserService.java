@@ -75,11 +75,11 @@ public interface UserService {
     /**
      * 前台用户名/密码登录请求的业务逻辑，根据输入的用户名————这里有四种可能：
      * 1、用户名userName
-     * 2、用户工号userWorkId
+     * 2、用户身份证userIdCard
      * 3、用户邮箱userEmail
      * 4、用户电话userPhone
      * <p>
-     * 根据不同的情况调用相应业务方法，返回查询到的user信息
+     * 根据不同的情况调用相应业务方法，返回查询到的user信息。
      *
      * @param userName 用户名，四种可能，如上文
      * @return 查询到的user信息
@@ -102,11 +102,11 @@ public interface UserService {
     User updateSessionUserInfo();
 
     /**
-     * 发送邮箱验证码业务
+     * 想指定邮箱发送邮箱验证码
      *
      * @param userEmail 向哪个邮箱法发
-     * @return 发送的邮箱验证码的信息封装对象
-     * @throws Exception
+     * @return 发送的邮箱验证码的信息封装对象（目标邮箱，验证码）
+     * @throws InvalidParameterException 不合法的用户邮箱输入
      */
     EmailVerifyCode sendVerifyCodeToEmail(String userEmail) throws InvalidParameterException;
 
@@ -116,13 +116,14 @@ public interface UserService {
      * @param emailVerifyCode 输入验证码信息封装对象
      * @return
      */
-    boolean ifValidEmailVerifyCode(EmailVerifyCode emailVerifyCode);
+    boolean isValidEmailVerifyCode(EmailVerifyCode emailVerifyCode);
 
     /**
-     * 忘记密码时用邮箱验证，重置密码
+     * 根据用户邮箱修改密码。此处入参userPassword为明文，加密后传给dao接口更新数据库
      *
      * @param userEmail    用户邮箱
      * @param userPassword 用户新密码（明文）
+     * @return 更新记录数
      */
     long updatePasswordByEmail(String userEmail, String userPassword);
 

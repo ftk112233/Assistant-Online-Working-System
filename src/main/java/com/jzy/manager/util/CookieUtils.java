@@ -25,7 +25,7 @@ public class CookieUtils {
      */
     public static void setCSRFTokenCookieAndSession(HttpServletRequest request, HttpServletResponse response){
         String authorization = UUID.randomUUID().toString();
-        ShiroUtils.getSession().setAttribute(Constants.CSRF_NUMBER,authorization);
+        ShiroUtils.setSessionAttribute(Constants.CSRF_NUMBER,authorization);
         Cookie cookie = new Cookie(Constants.CSRF_NUMBER, authorization);
         cookie.setMaxAge(7 * 24 * 60 * 60);
         cookie.setPath(request.getContextPath()+"/");

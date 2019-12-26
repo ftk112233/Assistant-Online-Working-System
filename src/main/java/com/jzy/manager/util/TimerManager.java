@@ -21,9 +21,9 @@ public class TimerManager {
     /**
      * 默认的任务执行时间凌晨两点
      */
-    private static final int TASK_HOUR = 2;
-    private static final int TASK_MINUTE = 0;
-    private static final int TASK_SECOND = 0;
+    private static final int TASK_HOUR_2 = 2;
+    private static final int TASK_MINUTE_0 = 0;
+    private static final int TASK_SECOND_0 = 0;
 
     private TimerManager() {
     }
@@ -71,7 +71,7 @@ public class TimerManager {
      * @param task
      */
     public static void startDailyTask(TimerTask task) {
-        startDailyTask(task, TASK_HOUR, TASK_MINUTE, TASK_SECOND);
+        startDailyTask(task, TASK_HOUR_2, TASK_MINUTE_0, TASK_SECOND_0);
     }
 
     /**
@@ -89,11 +89,11 @@ public class TimerManager {
     }
 
     public static void main(String[] args) {
-        startTask(new  TimerTask(){
+        startTask(new TimerTask() {
             public void run() {
                 System.out.println("我有一头小毛驴!");
             }
-        },2000, 16,52,0);
+        }, 2000, 16, 52, 0);
     }
 
 }

@@ -66,7 +66,7 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
      * @Param [request]
      **/
     private boolean isRepeatSubmit(HttpServletRequest request) {
-        String serverToken = (String) ShiroUtils.getSession().getAttribute("token");
+        String serverToken = (String) ShiroUtils.getSessionAttribute("token");
         System.out.println(serverToken);
         if (serverToken == null) {
             return true;

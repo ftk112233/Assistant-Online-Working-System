@@ -12,6 +12,17 @@
     <link rel="stylesheet" href="${ctx}/plugins/layuiadmin/layui/css/layui.css" media="all">
     <link rel="stylesheet" href="${ctx}/plugins/layuiadmin/style/admin.css" media="all">
     <link rel="stylesheet" href="${ctx}/plugins/layuiadmin/style/login.css" media="all">
+    <#--<style>-->
+        <#--html,body{-->
+            <#--width:100%;-->
+            <#--height:100%-->
+        <#--}-->
+        <#--body{-->
+            <#--background: url(${ctx}/custom/img/background/d2.jpg) no-repeat top left;-->
+            <#--background-size: cover;-->
+        <#--}-->
+
+    <#--</style>-->
 </head>
 <body>
 <div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
@@ -103,6 +114,7 @@
                 , sliderVerify = layui.sliderVerify
                 , search = router.search;
 
+
         $('#LAY-user-login-password').on('keydown', function (event) {
             if (event.keyCode == 13) {
                 $("#my_button").trigger("click");
@@ -119,8 +131,7 @@
             }
         });
 
-
-
+        //定义滑块模块
         var slider=sliderVerify.render({
             elem: '#slider'
             ,bg : 'layui-bg-green'//自定义背景样式名
@@ -135,9 +146,11 @@
             }
         });
 
+        //尝试登录
         function testLogin(field){
             //禁用5秒
             disabledSubmitButtonWithTime('my_button', '登 入', 5);
+            layer.load(1, {shade: [0.1, '#fff']}); //上传loading
 
             //请求登入接口
             $.ajax({
@@ -153,7 +166,7 @@
                 }
                 ,
                 success: function (res) {
-
+                    layer.closeAll('loading'); //关闭loading
                     if (res.data.success) {
                         //登入成功的提示与跳转
                         return layer.msg('登入成功', {
@@ -165,7 +178,7 @@
                         });
                     } else {
                         // refresh();
-                        slider.reset();
+                        slider.reset(); //登录失败重置滑块
 
                         if (res.data.imgCodeWrong) {
                             return layer.msg("验证码错误！");
@@ -205,11 +218,13 @@
                 }
             });
         }
-        //提交
+
+        //按钮提交
         form.on('submit(LAY-user-login-submit)', function (obj) {
             var field = obj.field;
 
             if (!$("#div-slider").is(":hidden")) {
+                //如果需要滑块验证
                 if (!slider.isOk()) {//用于表单验证是否已经滑动成功
                     return layer.msg("请先通过滑块验证", {time:1500});
                 } else {
@@ -228,6 +243,7 @@
                     ,
                     success: function (res) {
                         if (res.data === 'suspicious') {
+                            //是可疑ip
                             $("#div-slider").show();
                             slider.reset();
                             return layer.msg("请先通过滑块验证", {time:1500});

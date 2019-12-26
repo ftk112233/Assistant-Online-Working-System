@@ -51,7 +51,7 @@ public class UserRealm extends AuthorizingRealm {
     protected ZSetOperations<String, Object> zSetOps;
 
     /**
-     * 授权逻辑
+     * 授权逻辑，根据用户的role从roleAndPermissionService接口的相应方法查询其perms集合
      *
      * @param principalCollection
      * @return
@@ -74,6 +74,12 @@ public class UserRealm extends AuthorizingRealm {
 
     /**
      * 认证逻辑
+     *  1. 是否是免密登录？是则通过事先规定好的密文、盐组合放行
+     *  2. 普通(用户名, 密码)的登录方式？
+     *      用户名可以是(用户名、身份证、邮箱或手机号)中任意一种。通过调用userService的接口返回查询到的用户对象
+     *      如果null，则用户名不存在；非null，下一步
+     *  3. 从redis缓存检查当前用户名是否因为尝试密码次数过多而被冻结？若没有，下一步。
+     *  4. 返回SimpleAuthenticationInfo对象校验比对输入密码
      *
      * @param authenticationToken
      * @return
@@ -83,7 +89,7 @@ public class UserRealm extends AuthorizingRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
         UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
 
-        String loginWithoutPasswordSuccess = (String) ShiroUtils.getSession().getAttribute(SessionConstants.LOGIN_WITHOUT_PASSWORD_SESSION_KEY);
+        String loginWithoutPasswordSuccess = (String) ShiroUtils.getSessionAttribute(SessionConstants.LOGIN_WITHOUT_PASSWORD_SESSION_KEY);
         if (Constants.SUCCESS.equals(loginWithoutPasswordSuccess)) {
             //通过邮箱证码等手段免密登录成功
             return new SimpleAuthenticationInfo(new User(), ShiroUtils.FINAL_PASSWORD_CIPHER_TEXT,

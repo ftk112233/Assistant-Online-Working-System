@@ -35,12 +35,13 @@ public class SendEmailUtils {
     }
 
     /**
-     * @return boolean
-     * @Author JinZhiyun
-     * @Description 想指定邮箱发送邮件服务
-     * @Date 23:22 2019/4/10
-     * @Param [emailAddress, emailMsg]
-     **/
+     * 向指定邮箱发送邮件
+     *
+     * @param emailAddressTo 目标邮箱
+     * @param emailMsg 邮件内容
+     * @param emailSubject 邮件主题
+     * @return
+     */
     public static boolean sendMail(String emailAddressTo, String emailMsg, String emailSubject) {
         // 发给谁
         String to = emailAddressTo;
@@ -101,8 +102,9 @@ public class SendEmailUtils {
     /**
      * 使用加密的方式,利用465端口进行传输邮件,开启ssl
      *
-     * @param emailAddressTo 为收件人邮箱
-     * @param emailMessage   发送的消息
+     * @param emailAddressTo 收件人邮箱
+     * @param emailSubject 发送的邮件主题
+     * @param emailMessage 发送的邮件内容
      */
     public static void sendEncryptedEmail(String emailAddressTo, String emailSubject, String emailMessage) {
         try {

@@ -47,17 +47,26 @@ public class ClassAdminController extends AbstractController {
     private final static Logger logger = LogManager.getLogger(ClassAdminController.class);
 
     /**
-     * 导入排班表
+     * 导入排班表。
+     * 读取用户上传的excel，先进行输入参数的校验。
+     * 如果入参无问题，读取excel中数据，
+     * 而后由是否开启自动解析，取读出数据中的一条做进一步解析处理；
+     * 再开始'先删后导'，如果开启了先删后导，把对应'年份-季度-分期-校区'的班级的信息先删除；
+     * 删除完成后调用classService对应方法将excel中读取到的数据执行更新&插入数据库。
+     * 如果没有任何异常，将更新结果——表格和数据库的[更新条数，速度]计算封装传回前端。
+     * 最后更新完成后需向对应班级所在校区用户发送消息通知；以及将'智能校历'缓存值redis
      *
-     * @param file                上传的文件
-     * @param parseClassIdChecked 是否开启自动解析的开关
-     * @param clazz               开班年份、校区、季度等信息的封装
-     * @return
+     * @param file 上传的文件
+     * @param parseClassIdChecked 是否开启自动解析
+     * @param deleteFirstChecked 是否开启先删后导
+     * @param chooseSeason 是否开启智能校历
+     * @param clazz 开班年份、季度、分期、校区信息的封装
+     * @return [更新结果, [更新条数，速度]]
      */
     @RequestMapping("/import")
     @ResponseBody
     public Map<String, Object> importExcel(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam("parseClassId") boolean parseClassIdChecked,
-                                           @RequestParam("deleteFirst") boolean deleteFirstChecked, @RequestParam("chooseSeason") boolean chooseSeason, Class clazz) throws InvalidParameterException {
+                                           @RequestParam("deleteFirst") boolean deleteFirstChecked, @RequestParam("chooseSeason") boolean chooseSeason, Class clazz) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>();
         //返回layui规定的文件上传模块JSON格式
@@ -80,7 +89,7 @@ public class ClassAdminController extends AbstractController {
             return map;
         }
 
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
             throw new InvalidParameterException(msg);
@@ -101,7 +110,7 @@ public class ClassAdminController extends AbstractController {
 
         ClassArrangementExcel excel = null;
         try {
-            excel = new ClassArrangementExcel(file.getInputStream(), ExcelVersionEnum.getVersionByName(file.getOriginalFilename()));
+            excel = new ClassArrangementExcel(file.getInputStream(), ExcelVersionEnum.getVersion(file.getOriginalFilename()));
             excelEffectiveDataRowCount = excel.readClassDetailFromExcel();
         } catch (IOException e) {
             e.printStackTrace();
@@ -213,8 +222,9 @@ public class ClassAdminController extends AbstractController {
     }
 
     /**
-     * 跳转班级管理页面
+     * 跳转班级管理页面。将select表单中需要渲染的选择内容添加至model
      *
+     * @param model
      * @return
      */
     @RequestMapping("/page")
@@ -240,7 +250,7 @@ public class ClassAdminController extends AbstractController {
     @RequestMapping("/getClassInfo")
     @ResponseBody
     public ResultMap<List<ClassDetailedDto>> getClassInfo(MyPage myPage, ClassSearchCondition condition) {
-        condition.setClassId(condition.getClassId() == null ? null : condition.getClassId().toUpperCase());
+        condition.setClassId(StringUtils.upperCase(condition.getClassId()));
         PageInfo<ClassDetailedDto> pageInfo = classService.listClasses(myPage, condition);
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
     }
@@ -289,7 +299,7 @@ public class ClassAdminController extends AbstractController {
      */
     @RequestMapping("/updateById")
     @ResponseBody
-    public Map<String, Object> updateById(ClassDetailedDto classDetailedDto) throws InvalidParameterException {
+    public Map<String, Object> updateById(ClassDetailedDto classDetailedDto) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!ClassUtils.isValidClassDetailedDtoInfo(classDetailedDto)) {
@@ -311,7 +321,7 @@ public class ClassAdminController extends AbstractController {
      */
     @RequestMapping("/insert")
     @ResponseBody
-    public Map<String, Object> insert(ClassDetailedDto classDetailedDto) throws InvalidParameterException {
+    public Map<String, Object> insert(ClassDetailedDto classDetailedDto) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!ClassUtils.isValidClassUpdateInfo(classDetailedDto)) {

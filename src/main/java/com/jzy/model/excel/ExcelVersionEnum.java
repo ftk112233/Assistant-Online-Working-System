@@ -34,14 +34,14 @@ public enum ExcelVersionEnum {
      * @param pathname 文件名
      * @return excel版本
      */
-    public static ExcelVersionEnum getVersionByName(String pathname) {
+    public static ExcelVersionEnum getVersion(String pathname) {
         if (pathname == null) {
             return null;
         }
-        if (pathname.endsWith(".xls")) {
+        if (pathname.endsWith(VERSION_2003.getSuffix())) {
             return VERSION_2003;
         }
-        if (pathname.endsWith(".xlsx")) {
+        if (pathname.endsWith(VERSION_2003.getSuffix())) {
             return VERSION_2007;
         }
         return null;

@@ -126,13 +126,14 @@ public class StudentSchoolExcel extends Excel implements Serializable {
         Map<String, Student> studentMap = new HashMap<>();
         int rowCount = this.getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
-            if (StringUtils.isEmpty(this.getValueAt(sheetIx, i, columnIndexOfStudentId))) {
+            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId);
+            if (StringUtils.isEmpty(studentId)) {
                 //当前行学员号为空，跳过
                 continue;
             } else {
                 effectiveDataRowCount++;
             }
-            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId).toUpperCase();
+            studentId = studentId.toUpperCase();
             String studentSchool = this.getValueAt(sheetIx, i, columnIndexOfStudentSchool);
 
             if (!StringUtils.isEmpty(studentSchool)) {
@@ -169,13 +170,14 @@ public class StudentSchoolExcel extends Excel implements Serializable {
         int effectiveDataRowCount = 0;
         int rowCount = this.getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
-            if (StringUtils.isEmpty(this.getValueAt(sheetIx, i, columnIndexOfStudentId))) {
+            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId);
+            if (StringUtils.isEmpty(studentId)) {
                 //当前行学员号为空，跳过
                 continue;
             } else {
                 effectiveDataRowCount++;
             }
-            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId).toUpperCase();
+            studentId = studentId.toUpperCase();
 
             studentIds.add(studentId);
         }
@@ -199,7 +201,7 @@ public class StudentSchoolExcel extends Excel implements Serializable {
             throw new ExcelColumnNotFoundException("学生学校统计表列属性中有未匹配的属性名");
         }
 
-        if (studentMap == null || studentMap.size() == 0){
+        if (studentMap == null || studentMap.size() == 0) {
             return true;
         }
 
@@ -240,7 +242,7 @@ public class StudentSchoolExcel extends Excel implements Serializable {
     public void resetParam() {
         students = new ArrayList<>();
         studentIds = new HashSet<>();
-        studentCache= new HashMap<>();
+        studentCache = new HashMap<>();
     }
 
     public static void main(String[] args) throws IOException, ExcelColumnNotFoundException, InputFileTypeException {

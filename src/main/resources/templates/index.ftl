@@ -38,10 +38,10 @@
                         <i class="layui-icon layui-icon-refresh-3"></i>
                     </a>
                 </li>
-                <li class="layui-nav-item layui-hide-xs" lay-unselect>
-                    <input type="text" placeholder="搜索..." autocomplete="off" class="layui-input layui-input-search"
-                           layadmin-event="serach" lay-action="">
-                </li>
+                <#--<li class="layui-nav-item layui-hide-xs" lay-unselect>-->
+                    <#--<input type="text" placeholder="搜索..." autocomplete="off" class="layui-input layui-input-search"-->
+                           <#--layadmin-event="serach" lay-action="">-->
+                <#--</li>-->
             </ul>
             <ul class="layui-nav layui-layout-right" lay-filter="layadmin-layout-right">
                 <li class="layui-nav-item" lay-unselect>
@@ -288,6 +288,7 @@
         <div class="layadmin-body-shade" layadmin-event="shade"></div>
     </div>
 </div>
+<script src="${ctx}/custom/js/img.js"></script>
 
 <script src="${ctx}/plugins/layuiadmin/layui/layui.js"></script>
 <script>
@@ -305,6 +306,8 @@
                 , upload = layui.upload
                 , laydate = layui.laydate;
 
+
+
         <#--console.log('${announcement}')-->
         <#if announcement.read == false>
             layer.open({
@@ -315,6 +318,26 @@
                 content: '${announcement.parsedContent!""}'
             });
         </#if>
+
+
+        var imgUrl = '${ctx}/custom/img/background/2.png';
+        function show_img(imgUrl) {
+            getImageWidth(imgUrl, function (w, h) {
+                w = w / (h / 500);
+                h = 500;
+                //页面层
+                layer.open({
+                    type: 1,
+                    time: 5000,
+                    title: false,
+                    area: [w + 'px', h + 'px'],
+                    skin: 'layui-layer-nobg', //没有背景色
+                    shadeClose: true,
+                    content: '<div style="text-align:center"><img style="height:500px;" src="' + imgUrl + '" /></div>'
+                });
+            });
+        }
+        show_img(imgUrl);
 
     });
 

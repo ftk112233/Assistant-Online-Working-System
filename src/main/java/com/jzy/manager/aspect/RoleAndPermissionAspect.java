@@ -1,15 +1,13 @@
 package com.jzy.manager.aspect;
 
 import com.jzy.manager.constant.RedisConstants;
+import com.jzy.service.RedisOperation;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author JinZhiyun
@@ -22,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RoleAndPermissionAspect {
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisOperation redisOperation;
 
     @Pointcut("execution(* com.jzy.service.impl.RoleAndPermissionServiceImpl.insert*(..)) " +
             "|| execution(* com.jzy.service.impl.RoleAndPermissionServiceImpl.update*(..))" +
@@ -38,6 +36,6 @@ public class RoleAndPermissionAspect {
     public void clearRedisAfterUpdate(JoinPoint jp){
         //清缓存
         String key = RedisConstants.ROLE_AND_PERMS_KEY;
-        redisTemplate.expire(key, 0 ,TimeUnit.SECONDS);
+        redisOperation.expireKey(key);
     }
 }

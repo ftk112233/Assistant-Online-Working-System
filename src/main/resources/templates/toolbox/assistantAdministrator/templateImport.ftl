@@ -29,8 +29,9 @@
                                         href="${ctx}/toolbox/assistantAdministrator/downloadExample/5">查看范例</a></p>
                                 <ul>
                                     <li>每张sheet的名字必须以教室门牌号（<b style="color:red">纯数字</b>）命名，如'301'</li>
-                                    <li>每张sheet中的单元格对应当前教室的座位，单元格的值必须是数字，且第一个座位从1开始</li>
-                                    <li>该表的sheet应该涵盖当前校区所有可用的教室，系统将读取这些教室到数据库！</li>
+                                    <li>每张sheet中的单元格对应当前教室的座位，单元格的值必须是数字，且第一个座位从1开始，以等差为1增加（1、2、3、4、...)。</li>
+                                    <li>每张sheet中<b style="color:red">除座位单元格为不要出现纯数字的单元格</b>，如讲台区域可以命名成"310讲台"，但不能命名成"310"!</li>
+                                    <li>该表的sheet应该涵盖当前校区所有可用的教室，系统将读取这些教室以及对应教室的座位容量到数据库！</li>
                                 </ul>
                             </div>
                             <div class="layui-form layui-timeline-content" style="margin-bottom: 20px;">
@@ -53,6 +54,12 @@
                                         style="background-color: #FFB800"
                                         id="import-seat-table" lay-filter="import-seat-table"><i
                                         class="layui-icon">&#xe67c;</i>导入座位表模板
+                            </div>
+                        </li>
+                        <li class="layui-timeline-item">
+                            <i class="layui-icon layui-timeline-axis"></i>
+                            <div class="layui-timeline-content layui-text">
+                                <div class="layui-timeline-title">大功告成！</div>
                             </div>
                         </li>
                     </ul>

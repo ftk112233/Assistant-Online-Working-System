@@ -91,7 +91,7 @@
         // 换一个问题
         $('#change-question').click(function () {
             // 设置button效果，开始计时
-            // disabledSubmitButtonWithTime('change-question', '换一个问题',3);
+            disabledSubmitButtonWithTime('change-question', '换一个问题',3);
 
             $.ajax({
                 type: "get",
@@ -122,12 +122,14 @@
             var field = obj.field;
             //禁用5秒
             disabledSubmitButtonWithTime('my_button', '登 入', 5);
+            layer.load(1, {shade: [0.1, '#fff']}); //上传loading
 
             //请求接口
             $.ajax({
                 url: '${ctx}/loginTestByQuestion' //实际使用请改成服务端真实接口
                 , data: {"answer": field.answer}
                 , success: function (res) {
+                    layer.closeAll('loading'); //关闭loading
                     if (res.data === "success") {
                         //登入成功的提示与跳转
                         return layer.msg('登入成功', {

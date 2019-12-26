@@ -210,9 +210,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
                 classDetailedDto.setFull(true);
             }
 
-            System.out.println(classDetailedDto);
-            System.out.println(Class.CLASS_YEAR_SEASON_SUB_SEASON_COMPARATOR.compare(classDetailedDto, current));
-            if (Class.CLASS_YEAR_SEASON_SUB_SEASON_COMPARATOR.compare(classDetailedDto, current) > 0) {
+            if (Class.CLASS_YEAR_SEASON_SUB_SEASON_COMPARATOR_ASC.compare(classDetailedDto, current) < 0) {
                 //结课判断
                 classDetailedDto.setOver(true);
             }
@@ -326,6 +324,6 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
 
     @Override
     public void deleteCurrentClassSeason() {
-        expireKey(RedisConstants.CURRENT_SEASON_KEY);
+        redisOperation.expireKey(RedisConstants.CURRENT_SEASON_KEY);
     }
 }

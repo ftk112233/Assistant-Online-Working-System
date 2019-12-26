@@ -39,7 +39,6 @@ public class HomeController extends AbstractController {
     public String console(Model model) {
         List<String> belongsTo = usefulInformationService.listAllBelongTo();
         model.addAttribute(ModelConstants.USEFUL_INFORMATION_BELONG_TO_MODEL_KEY, JSON.toJSONString(belongsTo));
-
         return "home/console";
     }
 

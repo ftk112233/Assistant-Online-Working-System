@@ -127,7 +127,6 @@
         });
         /*****************************************************/
 
-
         $('#LAY-user-login-smscode').on('keydown', function (event) {
             if (event.keyCode == 13) {
                 $("#my_button1").trigger("click");
@@ -191,6 +190,7 @@
 
             //禁用5秒
             disabledSubmitButtonWithTime('my_button', '重置新密码', 5);
+            layer.load(1, {shade: [0.1, '#fff']}); //上传loading
 
             //请求接口
             $.ajax({
@@ -199,6 +199,7 @@
                 type: 'post'
                 , data: {"userPassword": field.password}
                 , success: function (res) {
+                    layer.closeAll('loading'); //关闭loading
                     if (res.data === "success") {
                         layer.msg('密码已成功重置', {
                             offset: '15px'

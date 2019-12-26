@@ -79,7 +79,7 @@ public class TeacherAdminController extends AbstractController {
      */
     @RequestMapping("/updateById")
     @ResponseBody
-    public Map<String, Object> updateById(Teacher teacher) throws InvalidParameterException {
+    public Map<String, Object> updateById(Teacher teacher) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!TeacherUtils.isValidTeacherUpdateInfo(teacher)) {
@@ -101,7 +101,7 @@ public class TeacherAdminController extends AbstractController {
      */
     @RequestMapping("/insert")
     @ResponseBody
-    public Map<String, Object> insert(Teacher teacher) throws InvalidParameterException {
+    public Map<String, Object> insert(Teacher teacher) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!TeacherUtils.isValidTeacherUpdateInfo(teacher)) {

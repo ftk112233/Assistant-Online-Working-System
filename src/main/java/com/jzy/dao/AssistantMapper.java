@@ -18,7 +18,7 @@ public interface AssistantMapper {
      * 根据助教id查询出助教信息
      *
      * @param id 助教id
-     * @return
+     * @return 对应助教
      */
     Assistant getAssistantById(@Param("id") Long id);
 
@@ -26,7 +26,7 @@ public interface AssistantMapper {
      * 根据助教工号查询出助教信息
      *
      * @param assistantWorkId 助教工号
-     * @return
+     * @return 对应助教
      */
     Assistant getAssistantByWorkId(@Param("assistantWorkId") String assistantWorkId);
 
@@ -34,15 +34,15 @@ public interface AssistantMapper {
      * 根据助教姓名查询出助教信息
      *
      * @param assistantName 助教姓名
-     * @return
+     * @return 对应助教
      */
     Assistant getAssistantByName(@Param("assistantName") String assistantName);
 
     /**
-     * 添加助教
+     * 插入助教
      *
      * @param assistant 新添加助教的信息
-     * @return
+     * @return 更新记录数
      */
     long insertAssistant(Assistant assistant);
 
@@ -50,7 +50,7 @@ public interface AssistantMapper {
      * 修改助教信息由id修改
      *
      * @param assistant 修改后的助教信息
-     * @return
+     * @return 更新记录数
      */
     long updateAssistantInfo(Assistant assistant);
 
@@ -58,7 +58,7 @@ public interface AssistantMapper {
      * 修改助教信息由工号修改
      *
      * @param assistant 修改后的助教信息
-     * @return
+     * @return 更新记录数
      */
     long updateAssistantByWorkId(Assistant assistant);
 
@@ -66,7 +66,7 @@ public interface AssistantMapper {
      * 查询符合条件的助教信息
      *
      * @param condition  查询条件入参
-     * @return
+     * @return 结果集合
      */
     List<Assistant> listAssistants(AssistantSearchCondition condition);
 
@@ -74,7 +74,7 @@ public interface AssistantMapper {
      * 根据id删除一个助教
      *
      * @param id  被删除助教的id
-     * @return
+     * @return 更新记录数
      */
     long deleteOneAssistantById(@Param("id") Long id);
 
@@ -83,6 +83,7 @@ public interface AssistantMapper {
      * 根据id删除多个助教
      *
      * @param ids 助教id的列表
+     * @return 更新记录数
      */
     long deleteManyAssistantsByIds(List<Long> ids);
 
@@ -90,7 +91,7 @@ public interface AssistantMapper {
      * 根据输入条件删除指定的助教
      *
      * @param condition 输入条件封装
-     * @return
+     * @return 更新记录数
      */
     long deleteAssistantsByCondition(AssistantSearchCondition condition);
 
@@ -98,7 +99,7 @@ public interface AssistantMapper {
      * 根据助教校区查询出助教信息
      *
      * @param campus 助教校区
-     * @return
+     * @return 指定校区的全部助教
      */
     List<Assistant> listAssistantsByCampus(@Param("campus") String campus);
 }

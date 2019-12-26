@@ -2,6 +2,7 @@ package com.jzy.web.controller;
 
 import com.jzy.model.entity.Class;
 import com.jzy.model.vo.ClassIdSearchResult;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -62,10 +63,11 @@ public class ClassController extends AbstractController {
         map.put("code", 0);
         map.put("msg", "");
 
-        List<Class> classes=classService.listClassesLikeClassId(classId.toUpperCase());
+        classId = StringUtils.upperCase(classId);
+        List<Class> classes=classService.listClassesLikeClassId(classId);
         List<ClassIdSearchResult> results=new ArrayList<>();
         //按常识上的开课时间有近至远排序
-        Collections.sort(classes, Class.CLASS_YEAR_SEASON_SUB_SEASON_COMPARATOR);
+        Collections.sort(classes, Class.CLASS_YEAR_SEASON_SUB_SEASON_COMPARATOR_DESC);
 
         for (Class clazz:classes){
             clazz.setParsedClassYear();

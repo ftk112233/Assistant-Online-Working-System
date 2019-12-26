@@ -132,7 +132,7 @@ public class QuestionUtils {
      * @param inputAnswer 输入的答案
      * @return
      */
-    public static boolean isCorrectDefaultQuestionAnswer(String inputAnswer) {
+    public static boolean isCorrectAnswerOfDefaultQuestion(String inputAnswer) {
         if (isAlwaysTrueAnswer(inputAnswer)) {
             return true;
         }

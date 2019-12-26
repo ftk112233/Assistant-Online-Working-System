@@ -406,11 +406,11 @@ public class SystemUtils {
 //当前系统的内存使用率
         double memUsage = getMemUsage();
 //当前系统的硬盘使用率
-        double diskUsage = getDiskUsage();
+//        double diskUsage = getDiskUsage();
 
         System.out.println("cpuUsage:" + cpuUsage);
         System.out.println("memUsage:" + memUsage);
-        System.out.println("diskUsage:" + diskUsage);
+//        System.out.println("diskUsage:" + diskUsage);
 
 
     }

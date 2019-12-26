@@ -50,14 +50,14 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
 
     @Override
     public List<Question> listAllQuestions() {
-        String key=RedisConstants.QUESTION_KEY;
-        if (redisTemplate.hasKey(key)){
+        String key = RedisConstants.QUESTION_KEY;
+        if (redisTemplate.hasKey(key)) {
             //缓存中有
-            String questionsJSON= (String) valueOps.get(key);
+            String questionsJSON = (String) valueOps.get(key);
             return JSONArray.parseArray(questionsJSON, Question.class);
         }
 
-        List<Question> questions=questionMapper.listAllQuestions();
+        List<Question> questions = questionMapper.listAllQuestions();
         valueOps.set(key, JSON.toJSONString(questions));
         return questions;
     }
@@ -89,7 +89,7 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
 
     @Override
     public Question getRandomDifferentQuestion(Question currentQuestion) throws NoMoreQuestionsException {
-        if (currentQuestion == null){
+        if (currentQuestion == null) {
             return getRandomQuestion();
         }
 
@@ -98,17 +98,17 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
 
     @Override
     public Question getRandomDifferentQuestion(String currentQuestionContent) throws NoMoreQuestionsException {
-        if (StringUtils.isEmpty(currentQuestionContent)){
+        if (StringUtils.isEmpty(currentQuestionContent)) {
             return getRandomQuestion();
         }
 
-        List<Question> questions=listAllQuestions();
-        if (questions.size() <= 1){
+        List<Question> questions = listAllQuestions();
+        if (questions.size() <= 1) {
             //总共只有一个问题（或数据库没有问题，使用了默认问题），不找不同的问题了，抛出异常待捕获
             throw new NoMoreQuestionsException("数据库中只有一个问题!");
         }
 
-        Question newQuestion;
+        Question newQuestion = null;
         do {
             //循环直到找到与当前问题不同的问题
             newQuestion = getRandomQuestion();
@@ -119,37 +119,46 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
 
     @Override
     public boolean isCorrectAnswer(String questionContent, String answerInput) throws InvalidParameterException {
-        if (listAllQuestions().size() == 0){
+        if (StringUtils.isEmpty(answerInput)){
+            return false;
+        }
+
+        if (listAllQuestions().size() == 0) {
             //数据库没问题，即使用的是默认问题
-            return QuestionUtils.isCorrectDefaultQuestionAnswer(answerInput);
+            return QuestionUtils.isCorrectAnswerOfDefaultQuestion(answerInput);
         }
 
-        Question question=getQuestionByContent(questionContent);
-        if (question==null){
-            throw new InvalidParameterException();
+        Question question = getQuestionByContent(questionContent);
+        if (question == null) {
+            throw new InvalidParameterException("当前问题不存在！");
         }
 
-        if (QuestionUtils.isAlwaysTrueAnswer(answerInput)) {
+        if (isAlwaysTrueAnswer(answerInput)) {
             //用万能答案
             return true;
         }
 
-        if (question.getAnswer().equals(answerInput)){
+        if (question.getAnswer().equals(answerInput)) {
             //与答案1匹配
             return true;
         }
 
-        if (StringUtils.isEmpty(question.getAnswer2())){
+        if (StringUtils.isEmpty(question.getAnswer2())) {
             //没有第二答案
             return false;
         }
 
-        if (question.getAnswer2().equals(answerInput)){
+        if (question.getAnswer2().equals(answerInput)) {
             //与答案2相同
             return true;
         }
 
         return false;
+    }
+
+    @Override
+    public boolean isAlwaysTrueAnswer(String answerInput) {
+        return QuestionUtils.isAlwaysTrueAnswer(answerInput);
     }
 
     @Override
@@ -176,7 +185,7 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
             }
         }
 
-        if (question.equalsExceptBaseParamsAndTrueAnswerAndCreatorId(originalQuestion)){
+        if (question.equalsExceptBaseParamsAndTrueAnswerAndCreatorId(originalQuestion)) {
             //未修改
             return Constants.UNCHANGED;
         }
@@ -190,7 +199,7 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
         if (question == null) {
             return Constants.FAILURE;
         }
-        if (getQuestionByContent(question.getContent()) !=null) {
+        if (getQuestionByContent(question.getContent()) != null) {
             //修改后的问题已存在
             return "questionContentRepeat";
         }
@@ -205,7 +214,7 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
             return Constants.SUCCESS;
         }
 
-        if (countAllQuestions() <= 1){
+        if (countAllQuestions() <= 1) {
             return "atLeastOneQuestionNeeded";
         }
 
@@ -219,7 +228,7 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
             return Constants.SUCCESS;
         }
 
-        if (countAllQuestions() <= ids.size()){
+        if (countAllQuestions() <= ids.size()) {
             return "atLeastOneQuestionNeeded";
         }
 

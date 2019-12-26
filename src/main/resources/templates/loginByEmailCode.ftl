@@ -133,13 +133,14 @@
             var field = obj.field;
             //禁用5秒
             disabledSubmitButtonWithTime('my_button', '登 入', 5);
+            layer.load(1, {shade: [0.1, '#fff']}); //上传loading
 
             //请求接口
             $.ajax({
                 url: '${ctx}/loginTestByEmailCode' //实际使用请改成服务端真实接口
                 , data: {"emailVerifyCode": field.emailcode, "userEmail": field.email}
                 , success: function (res) {
-                    console.log(res)
+                    layer.closeAll('loading'); //关闭loading
                     if (res.data === "verifyCodeCorrect") {
                         //登入成功的提示与跳转
                         return layer.msg('登入成功', {

@@ -18,6 +18,7 @@ import com.jzy.model.vo.Announcement;
 import com.jzy.model.vo.EmailVerifyCodeSession;
 import com.jzy.model.vo.UserLoginInput;
 import com.jzy.model.vo.UserLoginResult;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
@@ -105,7 +106,7 @@ public class AuthenticationController extends AbstractController {
     }
 
     /**
-     * 跳转用问题登录页面，后台产生随机数（问题id），将id存在当前session，问题内容通过model返回前台
+     * 跳转用问题登录页面，后台questionService接口相应方法产生随机问题。将问题内容存在当前session，且问题内容通过model返回前台
      *
      * @param model
      * @return
@@ -115,14 +116,17 @@ public class AuthenticationController extends AbstractController {
         //获得随机问题
         Question question = questionService.getRandomQuestion();
         //把问题设到session
-        ShiroUtils.getSession().setAttribute(SessionConstants.LOGIN_QUESTION_SESSION_KEY, question.getContent());
+        ShiroUtils.setSessionAttribute(SessionConstants.LOGIN_QUESTION_SESSION_KEY, question.getContent());
         //把问题id的对应的问题内容放到model中
         model.addAttribute(ModelConstants.QUESTION_MODEL_KEY, question.getContent());
         return "loginByQuestion";
     }
 
     /**
-     * 跳转主页
+     * 跳转主页。同时完成以下工作：
+     * 1. 系统公告的读取
+     * 2. 根据当前登录的用户有无未读消息来决定主页的“小铃铛”是否需要设置小红点
+     * 3. CSRFToken的设置
      *
      * @param request
      * @param response
@@ -157,13 +161,16 @@ public class AuthenticationController extends AbstractController {
     }
 
     /**
-     * 判断当前用户名尝试登录的主机ip是否与上次的登录ip相同
+     * 判断当前用户名尝试登录的主机ip是否与上次的登录ip相同，通过redis缓存中对比判断
      *
      * @param userName 用户名
      * @param request
      * @return
      */
-    private boolean isUsualIpAddressForUserName(String userName, HttpServletRequest request) {
+    boolean isUsualIpAddress(String userName, HttpServletRequest request) {
+        if (StringUtils.isEmpty(userName)) {
+            return false;
+        }
         String ipKey = RedisConstants.USER_LOGIN_IP_KEY;
         if (hashOps.hasKey(ipKey, userName)) {
             //如果缓存中有上次登录成功的ip
@@ -174,22 +181,22 @@ public class AuthenticationController extends AbstractController {
             }
         }
         return true;
-
     }
 
     /**
-     * 测试ip是否可疑的ajax交互
+     * 测试当前要登录的用户名的ip是否可疑
      *
-     * @param userName
+     * @param userName 要登录的用户名
+     * @param request
      * @return
      */
     @RequestMapping("/testIp")
     @ResponseBody
     public Map<String, Object> testIp(@RequestParam(value = "userName", required = false) String userName, HttpServletRequest request) {
         Map<String, Object> map = new HashMap(1);
-        if (!isUsualIpAddressForUserName(userName, request)) {
+        if (!isUsualIpAddress(userName, request)) {
             //比较缓存中当前用户名上次登录成功的ip是否相同，判断ip是否可疑
-            ShiroUtils.getSession().setAttribute(SessionConstants.REQUIRE_SLIDER_AUTH_SESSION_KEY, Constants.YES);
+            ShiroUtils.setSessionAttribute(SessionConstants.REQUIRE_SLIDER_AUTH_SESSION_KEY, Constants.YES);
             map.put("data", "suspicious");
             return map;
         }
@@ -200,10 +207,13 @@ public class AuthenticationController extends AbstractController {
     }
 
     /**
-     * 登录交互
+     * （用户名，密码）登录交互。shiro实现
      *
-     * @param input 登录请求的入参封装--用户名&密码&图形验证码&是否记住密码
-     * @return
+     * @param input 登录请求的入参封装--用户名&密码&是否记住密码
+     * @return 1. 登录成功
+     * 2. 用户名不存在
+     * 3. 账号存在，但密码错误
+     * 4. 账户被锁定
      */
     @RequestMapping("/loginTest")
     @ResponseBody
@@ -220,8 +230,8 @@ public class AuthenticationController extends AbstractController {
 //            map.put("data", result);
 //            return map;
 //        }
-        String requiredSliderAuth= (String) session.getAttribute(SessionConstants.REQUIRE_SLIDER_AUTH_SESSION_KEY);
-        if (!isUsualIpAddressForUserName(input.getUserName(), request) && !Constants.YES.equals(requiredSliderAuth)){
+        String requiredSliderAuth = (String) session.getAttribute(SessionConstants.REQUIRE_SLIDER_AUTH_SESSION_KEY);
+        if (!isUsualIpAddress(input.getUserName(), request) && !Constants.YES.equals(requiredSliderAuth)) {
             //未经过testIp请求的可疑ip异常，可能是机器爆破等攻击方式
             logger.error("绕过滑块验证的可疑登录请求!");
             map.put("data", result);
@@ -249,7 +259,7 @@ public class AuthenticationController extends AbstractController {
             if (redisTemplate.hasKey(key)) {
                 //如果有登录失败记录
                 //登录成功，让当前登录失败次数的缓存过期
-                redisTemplate.expire(key, 0, TimeUnit.MINUTES);
+                redisOperation.expireKey(key);
             }
 
             //登录成功ip缓存
@@ -292,7 +302,7 @@ public class AuthenticationController extends AbstractController {
             //success标志默认false，可以不写
             result.setSuccess(false);
             result.setLocked(true);
-            result.setWrongTimes(UserLoginResult.DEFAULT_WRONG_TIMES);
+            result.setDefaultWrongTimes();
             //剩余锁定时间getExpire下取整，这里所以取+1
             result.setTimeRemaining(redisTemplate.getExpire(key, TimeUnit.MINUTES) + 1);
             map.put("data", result);
@@ -308,17 +318,18 @@ public class AuthenticationController extends AbstractController {
 
     /**
      * 发送验证码的ajax交互
+     * 将目标邮箱等信息存在session
      *
-     * @param user
+     * @param userEmail 发送的目标邮箱
      * @return
      */
     @RequestMapping("/sendVerifyCodeToEmail")
     @ResponseBody
-    public Map<String, Object> sendVerifyCodeToEmail(User user) {
+    public Map<String, Object> sendVerifyCodeToEmail(@RequestParam("userEmail") String userEmail) {
         Map<String, Object> map = new HashMap(1);
-        ShiroUtils.getSession().setAttribute(SessionConstants.USER_EMAIL_SESSION_KEY, new EmailVerifyCodeSession(user.getUserEmail(), false));
+        ShiroUtils.setSessionAttribute(SessionConstants.USER_EMAIL_SESSION_KEY, new EmailVerifyCodeSession(userEmail, false));
         try {
-            userService.sendVerifyCodeToEmail(user.getUserEmail());
+            userService.sendVerifyCodeToEmail(userEmail);
             map.put("msg", Constants.SUCCESS);
         } catch (Exception e) {
             logger.error("邮箱验证码发送失败!");
@@ -333,7 +344,9 @@ public class AuthenticationController extends AbstractController {
      *
      * @param emailVerifyCode 输入的验证码
      * @param user            用户的邮箱信息，用user对象封装
-     * @return
+     * @return 1. 邮箱不存在
+     * 2. 验证码错误
+     * 3. 验证码正确
      */
     @RequestMapping("/emailVerifyCodeTest")
     @ResponseBody
@@ -341,11 +354,11 @@ public class AuthenticationController extends AbstractController {
         Map<String, Object> map = new HashMap(1);
         if (userService.getUserByEmail(user.getUserEmail()) == null) {
             map.put("data", "emailUnregistered");
-        } else if (!userService.ifValidEmailVerifyCode(new EmailVerifyCode(user.getUserEmail(), emailVerifyCode))) {
+        } else if (!userService.isValidEmailVerifyCode(new EmailVerifyCode(user.getUserEmail(), emailVerifyCode))) {
             map.put("data", "verifyCodeWrong");
         } else {
             //auth=true，即已经经过了服务端验证
-            ShiroUtils.getSession().setAttribute(SessionConstants.USER_EMAIL_SESSION_KEY, new EmailVerifyCodeSession(user.getUserEmail(), true));
+            ShiroUtils.setSessionAttribute(SessionConstants.USER_EMAIL_SESSION_KEY, new EmailVerifyCodeSession(user.getUserEmail(), true));
             map.put("data", "verifyCodeCorrect");
         }
         return map;
@@ -354,19 +367,24 @@ public class AuthenticationController extends AbstractController {
     /**
      * 重置密码的ajax交互
      *
-     * @param user 入参用户信息
+     * @param user 入参用户密码信息
      * @return
      */
     @RequestMapping("/resetPassword")
     @ResponseBody
-    public Map<String, Object> resetPassword(User user) throws InvalidParameterException {
+    public Map<String, Object> resetPassword(User user) {
         Map<String, Object> map = new HashMap(1);
         if (!MyStringUtils.isPassword(user.getUserPassword())) {
             String msg = "错误的用户密码入参!";
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
-        EmailVerifyCodeSession emailVerifyCodeSession = (EmailVerifyCodeSession) ShiroUtils.getSession().getAttribute(SessionConstants.USER_EMAIL_SESSION_KEY);
+        EmailVerifyCodeSession emailVerifyCodeSession = (EmailVerifyCodeSession) ShiroUtils.getSessionAttribute(SessionConstants.USER_EMAIL_SESSION_KEY);
+        if (emailVerifyCodeSession == null) {
+            String msg = "在session中的邮箱验证码auth对象EmailVerifyCodeSession为空";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
         userService.updatePasswordByEmail(emailVerifyCodeSession.getUserEmail(), user.getUserPassword());
         map.put("data", Constants.SUCCESS);
         return map;
@@ -374,11 +392,13 @@ public class AuthenticationController extends AbstractController {
 
 
     /**
-     * 检测验证码是否正确的ajax交互
+     * 通过邮箱验证码登录
      *
      * @param emailVerifyCode 输入的验证码
      * @param user            用户的邮箱信息，用user对象封装
-     * @return
+     * @return 1. 邮箱未被注册
+     * 2. 邮箱验证码错误
+     * 3. 登录成功
      */
     @RequestMapping("/loginTestByEmailCode")
     @ResponseBody
@@ -387,11 +407,11 @@ public class AuthenticationController extends AbstractController {
         User userGetByEmail = userService.getUserByEmail(user.getUserEmail());
         if (userGetByEmail == null) {
             map.put("data", "emailUnregistered");
-        } else if (!userService.ifValidEmailVerifyCode(new EmailVerifyCode(user.getUserEmail(), emailVerifyCode))) {
+        } else if (!userService.isValidEmailVerifyCode(new EmailVerifyCode(user.getUserEmail(), emailVerifyCode))) {
             map.put("data", "verifyCodeWrong");
         } else {
             //auth=true，即已经经过了服务端验证
-            ShiroUtils.getSession().setAttribute(SessionConstants.USER_EMAIL_SESSION_KEY, new EmailVerifyCodeSession(user.getUserEmail(), true));
+            ShiroUtils.setSessionAttribute(SessionConstants.USER_EMAIL_SESSION_KEY, new EmailVerifyCodeSession(user.getUserEmail(), true));
 
             //通过验证，用固定的明文密文组实现免密登录
             Subject subject = SecurityUtils.getSubject();
@@ -423,15 +443,14 @@ public class AuthenticationController extends AbstractController {
     @ResponseBody
     public Map<String, Object> resetLoginQuestion() {
         Map<String, Object> map = new HashMap(1);
-        String originQuestionContent = (String) ShiroUtils.getSession().getAttribute(SessionConstants.LOGIN_QUESTION_SESSION_KEY);
+        String originQuestionContent = (String) ShiroUtils.getSessionAttribute(SessionConstants.LOGIN_QUESTION_SESSION_KEY);
         //获得新问题
-        Question newQuestion = null;
         try {
-            newQuestion = questionService.getRandomDifferentQuestion(originQuestionContent);
+            Question newQuestion = questionService.getRandomDifferentQuestion(originQuestionContent);
 
             if (newQuestion != null) {
                 //把问题内容设到session
-                ShiroUtils.getSession().setAttribute(SessionConstants.LOGIN_QUESTION_SESSION_KEY, newQuestion.getContent());
+                ShiroUtils.setSessionAttribute(SessionConstants.LOGIN_QUESTION_SESSION_KEY, newQuestion.getContent());
 
                 map.put("msg", "");
                 map.put("question", newQuestion.getContent());
@@ -450,14 +469,15 @@ public class AuthenticationController extends AbstractController {
      * 通过问题登录
      *
      * @param answer 用户输入的问题答案
-     * @return
+     * @return 1. 回答错误
+     * 2. 登录成功
      */
     @RequestMapping("/loginTestByQuestion")
     @ResponseBody
-    public Map<String, Object> loginTestByQuestion(@RequestParam(value = "answer", required = false) String answer) {
+    public Map<String, Object> loginTestByQuestion(@RequestParam("answer") String answer) {
         Map<String, Object> map = new HashMap(1);
 
-        String questionContent = (String) ShiroUtils.getSession().getAttribute(SessionConstants.LOGIN_QUESTION_SESSION_KEY);
+        String questionContent = (String) ShiroUtils.getSessionAttribute(SessionConstants.LOGIN_QUESTION_SESSION_KEY);
 
         try {
             if (!questionService.isCorrectAnswer(questionContent, answer)) {

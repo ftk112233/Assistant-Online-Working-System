@@ -78,7 +78,7 @@ public class QuestionAdminController extends AbstractController {
      */
     @RequestMapping("/updateById")
     @ResponseBody
-    public Map<String, Object> updateById(Question question) throws InvalidParameterException {
+    public Map<String, Object> updateById(Question question) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!QuestionUtils.isValidQuestionUpdateInfo(question)) {
@@ -107,13 +107,12 @@ public class QuestionAdminController extends AbstractController {
      * 登录问题管理中的添加问题请求
      *
      * @param anonymous 是否匿名
-     * @param question 添加问题的封装
+     * @param question  添加问题的封装
      * @return
-     * @throws InvalidParameterException
      */
     @RequestMapping("/insert")
     @ResponseBody
-    public Map<String, Object> insert(@RequestParam(value = "anonymous",required = false)String anonymous, Question question) throws InvalidParameterException {
+    public Map<String, Object> insert(@RequestParam(value = "anonymous", required = false) String anonymous, Question question) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!QuestionUtils.isValidQuestionUpdateInfo(question)) {
@@ -122,7 +121,7 @@ public class QuestionAdminController extends AbstractController {
             throw new InvalidParameterException(msg);
         }
 
-        if (!Constants.ON.equals(anonymous)){
+        if (!Constants.ON.equals(anonymous)) {
             //不匿名
             question.setCreatorId(userService.getSessionUserInfo().getId());
         }
@@ -143,7 +142,7 @@ public class QuestionAdminController extends AbstractController {
     public Map<String, Object> deleteOne(@RequestParam("id") Long id) {
         Map<String, Object> map = new HashMap(1);
 
-        map.put("data",questionService.deleteOneQuestionById(id));
+        map.put("data", questionService.deleteOneQuestionById(id));
         return map;
     }
 
