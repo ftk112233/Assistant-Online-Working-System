@@ -42,7 +42,7 @@ public class UserMessageController extends AbstractController {
     private final static Logger logger = LogManager.getLogger(UserMessageController.class);
 
     /**
-     * 跳转用户消息中心
+     * 跳转用户消息中心。需要计算未读消息的数量，传给model
      *
      * @return
      */
@@ -315,6 +315,35 @@ public class UserMessageController extends AbstractController {
     }
 
     /**
+     * 返回@指定用户的字符串显示结果
+     *  如，"@管理员-张三"
+     *
+     * @param user 用户
+     * @return 回显字串
+     */
+    private String getUserSendToShow(User user){
+        if (user == null){
+            return "";
+        }
+        return "@" + user.getUserRole() + "-" + user.getUserRealName()+"; ";
+    }
+
+
+    /**
+     * 返回@指定用户的字符串显示结果
+     *  如，"@管理员-张三"
+     *
+     * @param user 用户
+     * @return 回显字串
+     */
+    private String getUserSendToShow(UserSendTo user){
+        if (user == null){
+            return "";
+        }
+        return "@" + user.getUserRole() + "-" + user.getUserRealName()+"; ";
+    }
+
+    /**
      * 回复时重定向到发送消息页面
      *
      * @param model
@@ -326,7 +355,7 @@ public class UserMessageController extends AbstractController {
     public String replyForm(Model model, @RequestParam("id") Long id, @RequestParam(value = "title", required = false) String title) {
         User user = userService.getUserById(id);
         model.addAttribute(ModelConstants.USER_SEND_TO_MODEL_KEY, user);
-        model.addAttribute(ModelConstants.USER_SEND_TO_SHOW_MODEL_KEY, "@" + user.getUserRole() + "-" + user.getUserRealName());
+        model.addAttribute(ModelConstants.USER_SEND_TO_SHOW_MODEL_KEY, getUserSendToShow(user));
         model.addAttribute(ModelConstants.REPLY_TITLE_MODEL_KEY, "回复--" + title);
         return "user/message/sendForm";
     }
@@ -345,7 +374,7 @@ public class UserMessageController extends AbstractController {
         StringBuffer userSendToShow = new StringBuffer();
         for (UserSendTo userSendTo : usersParsed) {
             ids.add(userSendTo.getId());
-            userSendToShow.append("@" + userSendTo.getUserRole() + "-" + userSendTo.getUserRealName() + "; ");
+            userSendToShow.append(getUserSendToShow(userSendTo));
         }
         model.addAttribute(ModelConstants.USER_SEND_TO_IDS_MODEL_KEY, JSON.toJSONString(ids));
         model.addAttribute(ModelConstants.USER_SEND_TO_SHOW_MODEL_KEY, userSendToShow.toString());

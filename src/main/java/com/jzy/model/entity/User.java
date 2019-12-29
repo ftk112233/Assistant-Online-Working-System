@@ -115,10 +115,24 @@ public class User extends BaseEntity {
     /**
      * 为新插入或修改过的user配置默认的头像
      */
-    public void setDefaultUserIcon(){
+    public void setNewDefaultUserIcon(){
         if (StringUtils.isEmpty(this.getUserIcon())) {
             //用户头像为空
-            this.setUserIcon(USER_ICON_DEFAULT);
+            setDefaultUserIcon();
         }
+    }
+
+    /**
+     * 把当前用户头像设为默认头像
+     */
+    public void setDefaultUserIcon(){
+        this.setUserIcon(USER_ICON_DEFAULT);
+    }
+
+    /**
+     * 把当前用户头像设为默认头像
+     */
+    public boolean isDefaultUserIcon(){
+        return USER_ICON_DEFAULT.equals(this.userIcon);
     }
 }

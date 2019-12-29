@@ -57,7 +57,7 @@ public interface StudentMapper {
      * 查询学员个人信息
      *
      * @param condition 查询条件入参
-     * @return
+     * @return 结果集合
      */
     List<Student> listStudents(StudentSearchCondition condition);
 
@@ -65,7 +65,7 @@ public interface StudentMapper {
      * 修改学生信息由id修改
      *
      * @param student 修改后的学生信息
-     * @return
+     * @return 更新记录数
      */
     long updateStudentInfo(Student student);
 
@@ -73,7 +73,7 @@ public interface StudentMapper {
      * 删除一个学生，根据学生id
      *
      * @param id 被删除学生的id
-     * @return
+     * @return 更新记录数
      */
     long deleteOneStudentById(Long id);
 
@@ -81,6 +81,7 @@ public interface StudentMapper {
      * 根据id删除多个学生
      *
      * @param ids 学生id的列表
+     * @return 更新记录数
      */
     long deleteManyStudentsByIds(List<Long> ids);
 
@@ -88,7 +89,7 @@ public interface StudentMapper {
      * 条件删除多个学生
      *
      * @param condition 输入的查询条件
-     * @return
+     * @return 更新记录数
      */
     long deleteStudentsByCondition(StudentSearchCondition condition);
 
@@ -96,7 +97,7 @@ public interface StudentMapper {
      * 修改学生学校由学员编号修改
      *
      * @param student 修改后的学生信息
-     * @return
+     * @return 更新记录数
      */
     long updateStudentSchoolByStudentId(Student student);
 
@@ -104,7 +105,7 @@ public interface StudentMapper {
      * 修改学生姓名、手机、备用手机由学员编号修改
      *
      * @param student 修改后的学生信息
-     * @return
+     * @return 更新记录数
      */
     long updateStudentNameAndPhoneByStudentId(Student student);
 }

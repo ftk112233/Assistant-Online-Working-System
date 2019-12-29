@@ -23,7 +23,7 @@ public interface StudentAndClassMapper {
      * 查询指定学员编号和班号的记录数，即当前学员是否报了当前班
      *
      * @param studentId 学员编号
-     * @param classId 班号
+     * @param classId   班号
      * @return
      */
     Long countStudentAndClassByStudentIdAndClassId(@Param("studentId") String studentId, @Param("classId") String classId);
@@ -47,7 +47,7 @@ public interface StudentAndClassMapper {
     /**
      * 返回符合条件的学生上课信息分页结果
      *
-     * @param condition  查询条件入参
+     * @param condition 查询条件入参
      * @return
      */
     List<StudentAndClassDetailedDto> listStudentAndClasses(StudentAndClassSearchCondition condition);
@@ -64,7 +64,7 @@ public interface StudentAndClassMapper {
      * 编辑学员上课信息，由id修改
      *
      * @param studentAndClassDetailedDto 修改后的学员上课信息
-     * @return
+     * @return 更新记录数
      */
     long updateStudentAndClassInfo(StudentAndClassDetailedDto studentAndClassDetailedDto);
 
@@ -72,7 +72,7 @@ public interface StudentAndClassMapper {
      * 删除一个学员上课记录
      *
      * @param id 被删除学员上课的id
-     * @return
+     * @return 更新记录数
      */
     long deleteOneStudentAndClassById(Long id);
 
@@ -80,6 +80,7 @@ public interface StudentAndClassMapper {
      * 根据id删除多个学员上课记录
      *
      * @param ids 学员上课记录id的列表
+     * @return 更新记录数
      */
     long deleteManyStudentAndClassesByIds(List<Long> ids);
 
@@ -103,15 +104,16 @@ public interface StudentAndClassMapper {
      * 条件删除多个学生上课记录
      *
      * @param condition 输入的查询条件
-     * @return
+     * @return 更新记录数
      */
     long deleteStudentAndClassesByCondition(StudentAndClassSearchCondition condition);
 
     /**
-     * 查询指定年级的学生人数
+     * 查询指定年级下的学生人数
      *
      * @param condition 年份-季度-校区
-     * @return
+     * @return 如，[GroupedByGradeObjectTotal(name=小初衔接, value=100), GroupedByGradeObjectTotal(name=初一, value=200)],
+     * 表示小初衔接100人，初一200人
      */
     List<GroupedByGradeObjectTotal> countStudentsGroupByClassGrade(StudentAndClassSearchCondition condition);
 
@@ -119,7 +121,8 @@ public interface StudentAndClassMapper {
      * 查询指定年级的学生人数
      *
      * @param condition 年份-季度-校区
-     * @return
+     * @return 如，[GroupedBySubjectObjectTotal(name=语文, value=100), GroupedByGradeObjectTotal(name=数学, value=200)],
+     * 表示语文100人，数学200人
      */
     List<GroupedBySubjectObjectTotal> countStudentsGroupByClassSubject(StudentAndClassSearchCondition condition);
 
@@ -127,7 +130,8 @@ public interface StudentAndClassMapper {
      * 查询指定班型的学生人数
      *
      * @param condition 年份-季度-校区-年级-学科
-     * @return
+     * @return 如，[GroupedBySubjectObjectTotal(name=精进, value=100), GroupedByGradeObjectTotal(name=志高, value=200)],
+     *  表示精进100人，志高200人
      */
     List<GroupedByTypeObjectTotal> countStudentsGroupByClassType(StudentAndClassSearchCondition condition);
 }

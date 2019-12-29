@@ -41,6 +41,31 @@ import java.util.concurrent.TimeUnit;
 public class UserServiceImpl extends AbstractServiceImpl implements UserService {
     private final static Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
+    /**
+     * 表示工号重复
+     */
+    private final static String WORK_ID_REPEAT = "workIdRepeat";
+
+    /**
+     * 表示身份证重复
+     */
+    private final static String ID_CARD_REPEAT = "idCardRepeat";
+
+    /**
+     * 表示用户名重复
+     */
+    private final static String NAME_REPEAT = "nameRepeat";
+
+    /**
+     * 表示邮箱重复
+     */
+    private final static String EMAIL_REPEAT = "emailRepeat";
+
+    /**
+     * 表示电话重复
+     */
+    private final static String PHONE_REPEAT = "phoneRepeat";
+
     @Autowired
     private UserMapper userMapper;
 
@@ -207,6 +232,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         try {
             file.transferTo(dest);
         } catch (IOException e) {
+            e.printStackTrace();
             logger.error("id:" + id + "——用户头像上传失败");
         }
         return fileName;
@@ -218,26 +244,25 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         if (user == null) {
             return Constants.FAILURE;
         }
-        if (originalUser == null) {
-            logger.error("updateOwnInfo方法中获取不到用户session");
-            return Constants.UNKNOWN_ERROR;
-        }
 
-        if (!StringUtils.isEmpty(originalUser.getUserIdCard())) {
-            if (!originalUser.getUserIdCard().equals(user.getUserIdCard())) {
-                //如果身份证被修改过了
+        if (!StringUtils.isEmpty(user.getUserIdCard())) {
+            //新身份证不为空
+            if (!user.getUserIdCard().equals(originalUser.getUserIdCard())) {
+                //身份证修改过了，判断是否与已存在的身份证冲突
                 if (getUserByIdCard(user.getUserIdCard()) != null) {
-                    return "userIdCardExist";
+                    //修改后的身份证已存在
+                    return ID_CARD_REPEAT;
                 }
             }
         } else {
             user.setUserIdCard(null);
         }
 
+
         if (!originalUser.getUserName().equals(user.getUserName())) {
             //如果用户名被修改过了
             if (getUserByName(user.getUserName()) != null) {
-                return "userNameExist";
+                return NAME_REPEAT;
             }
         }
 
@@ -246,7 +271,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
          */
         if (!StringUtils.isEmpty(user.getUserIcon())) {
             //如果用户上传了新头像
-            if (!User.USER_ICON_DEFAULT.equals(originalUser.getUserIcon())) {
+            if (!originalUser.isDefaultUserIcon()) {
                 //如果用户原来的头像不是默认头像，需要将原来的头像删除
                 FileUtils.deleteFile(filePathProperties.getUploadUserIconPath() + originalUser.getUserIcon());
             }
@@ -320,7 +345,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
                 //工号修改过了，判断是否与已存在的工号冲突
                 if (getUserByWorkId(user.getUserWorkId()) != null) {
                     //修改后的工号已存在
-                    return "workIdRepeat";
+                    return WORK_ID_REPEAT;
                 }
             }
 
@@ -334,7 +359,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
                 //身份证修改过了，判断是否与已存在的身份证冲突
                 if (getUserByIdCard(user.getUserIdCard()) != null) {
                     //修改后的身份证已存在
-                    return "idCardRepeat";
+                    return ID_CARD_REPEAT;
                 }
             }
         } else {
@@ -345,7 +370,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             //用户名修改过了，判断是否与已存在的用户名冲突
             if (getUserByName(user.getUserName()) != null) {
                 //修改后的用户名已存在
-                return "nameRepeat";
+                return NAME_REPEAT;
             }
         }
 
@@ -355,7 +380,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
                 //邮箱修改过了，判断是否与已存在的邮箱冲突
                 if (getUserByEmail(user.getUserEmail()) != null) {
                     //修改后的邮箱已存在
-                    return "emailRepeat";
+                    return EMAIL_REPEAT;
                 }
             }
         } else {
@@ -368,7 +393,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
                 //电话修改过了，判断是否与已存在的电话冲突
                 if (getUserByPhone(user.getUserPhone()) != null) {
                     //修改后的电话已存在
-                    return "phoneRepeat";
+                    return PHONE_REPEAT;
                 }
             }
         } else {
@@ -380,7 +405,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
          */
         if (!StringUtils.isEmpty(user.getUserIcon())) {
             //如果用户上传了新头像
-            if (!User.USER_ICON_DEFAULT.equals(originalUser.getUserIcon())) {
+            if (!originalUser.isDefaultUserIcon()) {
                 //如果用户原来的头像不是默认头像，需要将原来的头像删除
                 FileUtils.deleteFile(filePathProperties.getUploadUserIconPath() + originalUser.getUserIcon());
             }
@@ -414,7 +439,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             //新工号不为空
             if (getUserByWorkId(user.getUserWorkId()) != null) {
                 //添加的工号已存在
-                return new UpdateResult("workIdRepeat");
+                return new UpdateResult(WORK_ID_REPEAT);
             }
         } else {
             user.setUserWorkId(null);
@@ -427,8 +452,13 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     /**
      * 插入工号不重复的用户信息
      *
-     * @param user
-     * @return
+     * @param user 用户信息
+     * @return 1. "idCardRepeat"：身份证重复
+     * 2. "nameRepeat"：姓名重复
+     * 3. "emailRepeat"：邮箱重复
+     * 4. "phoneRepeat"：电话重复
+     * 5."unchanged": 对比数据库原记录未做任何修改
+     * 6."success": 更新成功
      */
     private UpdateResult insertUserWithUnrepeatedWorkId(User user) {
         if (user == null) {
@@ -438,7 +468,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             //新身份证不为空
             if (getUserByIdCard(user.getUserIdCard()) != null) {
                 //添加的身份证已存在
-                return new UpdateResult("idCardRepeat");
+                return new UpdateResult(ID_CARD_REPEAT);
             }
         } else {
             user.setUserIdCard(null);
@@ -447,14 +477,14 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         if (getUserByName(user.getUserName()) != null) {
             //添加的用户名已存在
-            return new UpdateResult("nameRepeat");
+            return new UpdateResult(NAME_REPEAT);
         }
 
         if (!StringUtils.isEmpty(user.getUserEmail())) {
             //新邮箱不为空
             if (getUserByEmail(user.getUserEmail()) != null) {
                 //添加的邮箱已存在
-                return new UpdateResult("emailRepeat");
+                return new UpdateResult(EMAIL_REPEAT);
             }
         } else {
             user.setUserEmail(null);
@@ -464,7 +494,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             //新手机不为空
             if (getUserByPhone(user.getUserPhone()) != null) {
                 //添加的电话已存在
-                return new UpdateResult("phoneRepeat");
+                return new UpdateResult(PHONE_REPEAT);
             }
         } else {
             user.setUserPhone(null);
@@ -475,7 +505,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
          */
         user.setDefaultUserPasswordAndSalt();
 
-        user.setDefaultUserIcon();
+        user.setNewDefaultUserIcon();
 
 
         UpdateResult result = new UpdateResult(Constants.SUCCESS);
@@ -499,7 +529,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
                 .append("<br>4. 登录方式之懒癌登录：懒癌登录方式的答案，可以在\"左边菜单栏>懒癌登录问题一览\"查询。你也可以将自己喜欢的问题添加到问题的随机池中！")
                 .append("<br>5. 用户角色权限说明：管理员>学管>助教长>助教=教师>游客。可在：用户>个人信息>基本资料，查看自己的角色。通过\"懒癌登录\"的用户角色是游客~");
         message.setMessageContent(messageContent.toString());
-        message.setMessagePicture(UserMessage.WELCOME_PICTURE);
+        message.setWelcomePicture();
         message.setMessageTime(new Date());
         if (UserMessageUtils.isValidUserMessageUpdateInfo(message)) {
             userMessageService.insertUserMessage(message);
@@ -521,7 +551,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
              * 删除用户头像文件
              */
             if (!StringUtils.isEmpty(user.getUserIcon())) {
-                if (!user.getUserIcon().equals(User.USER_ICON_DEFAULT)) {
+                if (!user.isDefaultUserIcon()) {
                     //如果用户原来的头像不是默认头像，需要将原来的头像删除
                     FileUtils.deleteFile(filePathProperties.getUploadUserIconPath() + user.getUserIcon());
                 }
@@ -614,7 +644,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
                 //身份证修改过了，判断是否与已存在的身份证冲突
                 if (getUserByIdCard(newUser.getUserIdCard()) != null) {
                     //修改后的身份证已存在
-                    return "idCardRepeat";
+                    return ID_CARD_REPEAT;
                 }
             }
         } else {
@@ -625,7 +655,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             //用户名修改过了，判断是否与已存在的用户名冲突
             if (getUserByName(newUser.getUserName()) != null) {
                 //修改后的用户名已存在
-                return "nameRepeat";
+                return NAME_REPEAT;
             }
         }
 
@@ -635,7 +665,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
                 //邮箱修改过了，判断是否与已存在的邮箱冲突
                 if (getUserByEmail(newUser.getUserEmail()) != null) {
                     //修改后的邮箱已存在
-                    return "emailRepeat";
+                    return EMAIL_REPEAT;
                 }
             }
         } else {
@@ -648,7 +678,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
                 //电话修改过了，判断是否与已存在的电话冲突
                 if (getUserByPhone(newUser.getUserPhone()) != null) {
                     //修改后的电话已存在
-                    return "phoneRepeat";
+                    return PHONE_REPEAT;
                 }
             }
         } else {

@@ -43,7 +43,7 @@ public interface UserMessageMapper {
      * 查询指定条件的用户消息
      *
      * @param condition 查询条件
-     * @return
+     * @return 符合条件的消息
      */
     List<UserMessageDto> listUserMessages(UserMessageSearchCondition condition);
 
@@ -51,7 +51,7 @@ public interface UserMessageMapper {
      * 根据已读条件查询用户消息
      *
      * @param read 是否已读
-     * @return
+     * @return 符合条件的消息
      */
     List<UserMessageDto> listUserMessagesByRead(@Param("userId") Long userId, @Param("read") boolean read);
 
@@ -59,7 +59,7 @@ public interface UserMessageMapper {
      * 根据主键id查询消息传输对象，含发送者的详细信息等
      *
      * @param id 主键id
-     * @return
+     * @return 用户消息详情
      */
     UserMessageDto getUserMessageDtoById(@Param("id") Long id);
 
@@ -67,7 +67,7 @@ public interface UserMessageMapper {
      * 根据输入id将消息标记已读
      *
      * @param id 主键id
-     * @return
+     * @return 更新记录数
      */
     long updateUserMessageReadById(@Param("id") Long id);
 
@@ -76,7 +76,7 @@ public interface UserMessageMapper {
      *
      * @param userId 用户id
      * @param read   布尔值是否已读
-     * @return
+     * @return 状态为read的消息数量
      */
     long countUserMessagesByUserIdAndRead(@Param("userId") Long userId, @Param("read") boolean read);
 
@@ -84,7 +84,7 @@ public interface UserMessageMapper {
      * 根据输入id的列表将消息标记已读
      *
      * @param ids 主键id的列表
-     * @return
+     * @return 更新记录数
      */
     long updateManyUserMessagesReadByIds(List<Long> ids);
 
@@ -92,7 +92,7 @@ public interface UserMessageMapper {
      * 将指定所有者用户id的所有消息置为已读
      *
      * @param userId 用户id
-     * @return
+     * @return 更新记录数
      */
     long updateManyUserMessagesReadByUserId(@Param("userId") Long userId);
 
@@ -100,7 +100,7 @@ public interface UserMessageMapper {
      * 删除多个消息
      *
      * @param ids 多个消息的id的列表
-     * @return
+     * @return 更新记录数
      */
     long deleteManyUserMessagesByIds(List<Long> ids);
 
@@ -108,7 +108,7 @@ public interface UserMessageMapper {
      * 添加一条消息
      *
      * @param userMessage 新添加的消息
-     * @return
+     * @return 更新记录数
      */
     long insertUserMessage(UserMessage userMessage);
 }

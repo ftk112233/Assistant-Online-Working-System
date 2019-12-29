@@ -136,7 +136,8 @@ public class UserController extends AbstractController {
      *
      * @param userOldPassword 老密码
      * @param userNewPassword 新密码
-     * @return
+     * @return 1. 输入原始密码错误
+     * 2.更新成功
      */
     @RequestMapping("/updateOwnPassword")
     @ResponseBody

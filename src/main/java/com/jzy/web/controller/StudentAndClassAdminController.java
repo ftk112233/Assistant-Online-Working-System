@@ -36,7 +36,7 @@ public class StudentAndClassAdminController extends AbstractController {
     private final static Logger logger = LogManager.getLogger(StudentAndClassAdminController.class);
 
     /**
-     * 跳转学员上课信息管理页面
+     * 跳转学员上课信息管理页面。将select表单中需要渲染的选择内容添加至model
      *
      * @return
      */
@@ -56,7 +56,8 @@ public class StudentAndClassAdminController extends AbstractController {
     }
 
     /**
-     * 查询学员上课信息的ajax交互
+     * 查询学员上课信息的ajax交互。
+     * 其中学员编号、班级编码字段查询不分大小写，因此将该字段upperCase置为全部大写（数据库中班级编码统一为全部大写）后传给服务层
      *
      * @param myPage    分页{页号，每页数量}
      * @param condition 查询条件入参
@@ -75,17 +76,15 @@ public class StudentAndClassAdminController extends AbstractController {
     /**
      * 重定向到转班iframe子页面并返回相应model
      *
-     * @param model
-     * @param studentAndClassDetailedDto 当前要被编辑的学员上课信息
      * @return
      */
     @RequestMapping("/updateForm")
-    public String updateForm(Model model, StudentAndClassDetailedDto studentAndClassDetailedDto) {
+    public String updateForm() {
         return "student/sc/admin/studentAndClassFormEdit";
     }
 
     /**
-     * 学员上课信息管理中的编辑学员上课信息请求，由id修改
+     * 学员上课信息管理中的编辑学员上课信息请求，由id修改。
      *
      * @param studentAndClassDetailedDto 修改后的学员上课信息
      * @return

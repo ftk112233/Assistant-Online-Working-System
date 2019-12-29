@@ -40,7 +40,7 @@ public class ClassController extends AbstractController {
      * 根据输入班级编码解析班级校区季度班型等信息，返回解析后的class对象
      *
      * @param classId 班级编码
-     * @return
+     * @return 解析后的class对象（作为json返回）
      */
     @RequestMapping("/getParsedClassByParsingClassId")
     @ResponseBody
@@ -51,10 +51,13 @@ public class ClassController extends AbstractController {
     }
 
     /**
-     * 根据输入班级编码解析班级校区季度班型等信息，返回解析后的class对象
+     * 获取模糊匹配的班级编码，且不区分大小写。
+     * 即输入classId，先置为全部大写，在从数据库like模糊查询。
+     * 再将查询到的所有结果按照"年份-季度-分期"降序排列，即越近期越靠前。
+     * 将所有结果进一步封装成ClassIdSearchResult返回前端。
      *
-     * @param classId 班级编码
-     * @return
+     * @param classId 输入字符串作为关键字
+     * @return 含ClassIdSearchResult的列表 {@link ClassIdSearchResult}
      */
     @RequestMapping("/getClassesLikeClassId")
     @ResponseBody

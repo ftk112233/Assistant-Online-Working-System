@@ -30,7 +30,7 @@ public class HomeController extends AbstractController {
     private final static Logger logger = LogManager.getLogger(HomeController.class);
 
     /**
-     * 跳转控制台
+     * 跳转控制台。在模型中添加常用信息的所有归属，以便前端的渲染。
      *
      * @param model
      * @return
@@ -41,37 +41,6 @@ public class HomeController extends AbstractController {
         model.addAttribute(ModelConstants.USEFUL_INFORMATION_BELONG_TO_MODEL_KEY, JSON.toJSONString(belongsTo));
         return "home/console";
     }
-
-
-//    /**
-//     * 问题收集的提交问题
-//     *
-//     * @return
-//     */
-//    @RequestMapping("/getSystemLoad")
-//    @ResponseBody
-//    public Map<String, Object> getSystemLoad() {
-//        Map<String, Object> map = new HashMap<>(1);
-//
-//        //系统监控
-//        double cpuUsage = 0;
-//        double memUsage = 0;
-//        double diskUsage = 0;
-//        try {
-//            //当前系统的cpu使用率
-//           cpuUsage = SystemUtils.getCpuUsage();
-//            //当前系统的内存使用率
-//            memUsage = SystemUtils.getMemUsage();
-//            //当前系统的硬盘使用率
-//            diskUsage = SystemUtils.getDiskUsage();
-//
-//            System.out.println(diskUsage+"///////");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        map.put("data", new SystemInformation(cpuUsage, memUsage, diskUsage));
-//        return map;
-//    }
 
     /**
      * 跳转问题收集页面
@@ -85,9 +54,12 @@ public class HomeController extends AbstractController {
 
 
     /**
-     * 问题收集的提交问题
+     * 问题收集的提交问题。
+     * 1. 是否匿名发送？
+     * 2. 向开发者的邮箱发送提交问题
+     * 3. 如果用户绑定了邮箱，向用户邮箱发送回访邮件
      *
-     * @param problemCollection 前台表单参数封装
+     * @param problemCollection 前台表单参数封装 {@link ProblemCollection}
      * @return
      */
     @RequestMapping("/sendProblem")

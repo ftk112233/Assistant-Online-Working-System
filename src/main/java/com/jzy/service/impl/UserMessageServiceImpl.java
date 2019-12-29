@@ -103,7 +103,7 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
 
     @Override
     public long updateManyUserMessagesReadByIds(List<Long> ids) {
-        if (ids == null ||ids.size() == 0){
+        if (ids == null || ids.size() == 0) {
             return 0;
         }
         return userMessageMapper.updateManyUserMessagesReadByIds(ids);
@@ -128,7 +128,8 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
             /*
              * 删除图片
              */
-            if (!UserMessage.WELCOME_PICTURE.equals(message.getMessagePicture())) {
+            if (!message.isWelcomePicture()) {
+                //不是欢迎图片
                 if (!StringUtils.isEmpty(message.getMessagePicture())) {
                     FileUtils.deleteFile(filePathProperties.getUserMessagePictureDirectory() + message.getMessagePicture());
                 }
@@ -138,11 +139,11 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
 
     @Override
     public long deleteManyUserMessagesByIds(List<Long> ids) {
-        if (ids == null ||ids.size() == 0){
+        if (ids == null || ids.size() == 0) {
             return 0;
         }
 
-        for (Long id:ids){
+        for (Long id : ids) {
             deletePictureFileById(id);
         }
         return userMessageMapper.deleteManyUserMessagesByIds(ids);
@@ -156,8 +157,8 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
         /*
          * 用户上传的图片的处理
          */
-        if (!UserMessage.WELCOME_PICTURE.equals(userMessage.getMessagePicture())) {
-            //如果不是欢迎图片，就要做相应重名
+        if (!userMessage.isWelcomePicture()) {
+            //如果不是欢迎图片，就要做重命名
             if (!StringUtils.isEmpty(userMessage.getMessagePicture())) {
                 //如果用户上传了新图片
                 //将上传的新图片文件重名为含日期时间的newUserIconName，该新文件名用来保存到数据库
@@ -177,8 +178,8 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
 
     @Override
     public String uploadPicture(MultipartFile file) throws InvalidParameterException {
-        Long userId=userService.getSessionUserInfo().getId();
-        return uploadPicture(file,userId.toString());
+        Long userId = userService.getSessionUserInfo().getId();
+        return uploadPicture(file, userId.toString());
     }
 
     @Override
@@ -210,21 +211,21 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
 
     @Override
     public String insertManyUserMessages(List<UserMessage> userMessages) throws Exception {
-        if (userMessages == null || userMessages.size() == 0){
-            return Constants.SUCCESS;
+        if (userMessages == null || userMessages.size() == 0) {
+            return Constants.FAILURE;
         }
 
-        String originalFile="";
-        for (UserMessage message:userMessages){
+        String originalFile = "";
+        for (UserMessage message : userMessages) {
             /*
              * 用户上传的图片的处理
              */
             if (!StringUtils.isEmpty(message.getMessagePicture())) {
                 //如果用户上传了新图片
                 //将上传的新图片文件重名为含日期时间的newUserIconName，该新文件名用来保存到数据库
-                originalFile=message.getMessagePicture();
-                String newPicture = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss").format(new Date()) + "_" +UUID.randomUUID().toString().replace("-","")+"_"+ originalFile;
-                FileUtils.copyFile(filePathProperties.getUserMessagePictureDirectory()+originalFile, filePathProperties.getUserMessagePictureDirectory()+ newPicture);
+                originalFile = message.getMessagePicture();
+                String newPicture = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss").format(new Date()) + "_" + UUID.randomUUID().toString().replace("-", "") + "_" + originalFile;
+                FileUtils.copyFile(filePathProperties.getUserMessagePictureDirectory() + originalFile, filePathProperties.getUserMessagePictureDirectory() + newPicture);
                 message.setMessagePicture(newPicture);
 
             } else {

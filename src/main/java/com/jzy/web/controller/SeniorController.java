@@ -36,7 +36,7 @@ public class SeniorController extends AbstractController {
     private final static Logger logger = LogManager.getLogger(SeniorController.class);
 
     /**
-     * 登录问题管理页面
+     * 学生人数分析页面
      *
      * @return
      */
@@ -53,7 +53,7 @@ public class SeniorController extends AbstractController {
     /**
      * 条件查询各年级下的学生人数比
      *
-     * @param condition
+     * @param condition 查询条件封装
      * @return
      */
     @RequestMapping("/getStudentTotalGroupByClassGrade")
@@ -70,7 +70,7 @@ public class SeniorController extends AbstractController {
     /**
      * 条件查询各学科的学生人数比
      *
-     * @param condition
+     * @param condition 查询条件封装
      * @return
      */
     @RequestMapping("/getStudentTotalGroupByClassSubject")
@@ -87,7 +87,7 @@ public class SeniorController extends AbstractController {
     /**
      * 条件查询各班型的学生人数比
      *
-     * @param condition
+     * @param condition 查询条件封装
      * @return
      */
     @RequestMapping("/getStudentTotalGroupByClassType")
@@ -105,7 +105,7 @@ public class SeniorController extends AbstractController {
     }
 
     /**
-     * 登录问题管理页面
+     * 学生人数分析（高级）页面
      *
      * @return
      */
@@ -122,7 +122,7 @@ public class SeniorController extends AbstractController {
     /**
      * 查询指定年级对应人数，以及该年级下各班型对应人数
      *
-     * @param condition
+     * @param condition 查询条件封装
      * @return
      */
     @RequestMapping("/getStudentTotalGroupByClassGradeAndType")
@@ -200,7 +200,7 @@ public class SeniorController extends AbstractController {
     /**
      * 查询指定学科对应人数，以及该学科下各班型对应人数
      *
-     * @param condition
+     * @param condition 查询条件封装
      * @return
      */
     @RequestMapping("/getStudentTotalGroupByClassSubjectAndType")

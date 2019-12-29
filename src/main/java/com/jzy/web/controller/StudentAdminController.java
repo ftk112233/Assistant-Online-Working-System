@@ -98,7 +98,7 @@ public class StudentAdminController extends AbstractController {
                     return map;
                 } catch (ExcelColumnNotFoundException e) {
                     e.printStackTrace();
-                    map.put("msg", "excelColumnNotFound");
+                    map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
                     return map;
                 } catch (InputFileTypeException e) {
                     e.printStackTrace();
@@ -143,7 +143,7 @@ public class StudentAdminController extends AbstractController {
                     return map;
                 } catch (ExcelColumnNotFoundException e) {
                     e.printStackTrace();
-                    map.put("msg", "excelColumnNotFound");
+                    map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
                     return map;
                 } catch (InputFileTypeException e) {
                     e.printStackTrace();
@@ -252,7 +252,7 @@ public class StudentAdminController extends AbstractController {
             return map;
         } catch (ExcelColumnNotFoundException e) {
             e.printStackTrace();
-            map.put("msg", "excelColumnNotFound");
+            map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
             return map;
         } catch (InputFileTypeException e) {
             e.printStackTrace();
@@ -412,7 +412,8 @@ public class StudentAdminController extends AbstractController {
     @ResponseBody
     public Map<String, Object> deleteByCondition(StudentSearchCondition condition) {
         Map<String, Object> map = new HashMap(1);
-        map.put("data", studentService.deleteStudentsByCondition(condition));
+        studentService.deleteStudentsByCondition(condition);
+        map.put("data", Constants.SUCCESS);
         return map;
     }
 }

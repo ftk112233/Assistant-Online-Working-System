@@ -291,12 +291,12 @@
                         }, function () {
                             location.href = "${ctx}/user/setInfo"
                         });
-                    } else if (res2.data === "userNameExist") {
+                    } else if (res2.data === "nameRepeat") {
                         layer.msg('该用户名已存在', {
                             icon: 5,
                             anim: 6
                         });
-                    } else if (res2.data === "userIdCardExist") {
+                    } else if (res2.data === "idCardRepeat") {
                         layer.msg('该身份证已被注册', {
                             icon: 5,
                             anim: 6

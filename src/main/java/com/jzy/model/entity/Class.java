@@ -229,10 +229,11 @@ public class Class extends BaseEntity {
     /**
      * 格式化地设置当前班级对象的上课时间和简化的上课时间,
      * 如输入上课时间："(具体以课表为准)周六8:15-10:45(11.2,11.9休息,11.3,11.4上课)";
-     * 设置classTime="(具体以课表为准)周六8:15-10:45(11.2,11.9休息,11.3,11.4上课)"
-     * classSimplifiedTime="8:15-10:45"
+     * 设置：
+     * classTime="(具体以课表为准)周六8:15-10:45(11.2,11.9休息,11.3,11.4上课)"
+     * classSimplifiedTime="8:15-10:45"，即classSimplifiedTime只取时间区间部分
      *
-     * @param classTime
+     * @param classTime 班级上课时间描述
      */
     public void setParsedClassTime(String classTime) {
         this.classTime = classTime;

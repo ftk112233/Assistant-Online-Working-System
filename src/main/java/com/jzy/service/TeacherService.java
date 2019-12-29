@@ -20,7 +20,7 @@ public interface TeacherService {
      * 根据教师id查询教师
      *
      * @param id 教师id
-     * @return
+     * @return 对应教师对象
      */
     Teacher getTeacherById(Long id);
 
@@ -28,7 +28,7 @@ public interface TeacherService {
      * 根据教师工号查询教师
      *
      * @param teacherId 教师工号
-     * @return
+     * @return 对应教师对象
      */
     Teacher getTeacherByWorkId(String teacherId);
 
@@ -36,7 +36,7 @@ public interface TeacherService {
      * 根据教师姓名查询教师
      *
      * @param teacherName 教师姓名
-     * @return
+     * @return 对应教师对象
      */
     Teacher getTeacherByName(String teacherName);
 
@@ -44,7 +44,11 @@ public interface TeacherService {
      * 添加教师
      *
      * @param teacher 新添加教师的信息
-     * @return
+     * @return (更新结果, 更新记录数)
+     * 1."failure"：错误入参等异常
+     * 2."workIdRepeat"：工号冲突
+     * 3."nameRepeat"：姓名冲突
+     * 4."success": 更新成功
      */
     UpdateResult insertTeacher(Teacher teacher);
 
@@ -52,7 +56,10 @@ public interface TeacherService {
      * 修改教师信息由工号修改
      *
      * @param teacher 修改后的教师信息
-     * @return
+     * @return 1."failure"：错误入参等异常
+     * 2."nameRepeat"：姓名冲突
+     * 3."unchanged": 对比数据库原记录未做任何修改
+     * 4."success": 更新成功
      */
     String updateTeacherByWorkId(Teacher teacher);
 
@@ -61,7 +68,10 @@ public interface TeacherService {
      *
      * @param originalTeacher 原来的教师信息
      * @param newTeacher      修改教师信息由工号修改
-     * @return
+     * @return 1."failure"：错误入参等异常
+     * 2."nameRepeat"：姓名冲突
+     * 3."unchanged": 对比数据库原记录未做任何修改
+     * 4."success": 更新成功
      */
     String updateTeacherByWorkId(Teacher originalTeacher, Teacher newTeacher);
 
@@ -94,7 +104,7 @@ public interface TeacherService {
      *
      * @param myPage    分页{页号，每页数量}
      * @param condition 查询条件入参
-     * @return
+     * @return 分页结果
      */
     PageInfo<Teacher> listTeachers(MyPage myPage, TeacherSearchCondition condition);
 
@@ -102,7 +112,11 @@ public interface TeacherService {
      * 修改教师信息由id修改
      *
      * @param teacher 修改后的教师信息
-     * @return
+     * @return 1."failure"：错误入参等异常
+     * 2."workIdRepeat"：工号冲突
+     * 3."nameRepeat"：姓名冲突
+     * 4."unchanged": 对比数据库原记录未做任何修改
+     * 5."success": 更新成功
      */
     String updateTeacherInfo(Teacher teacher);
 
@@ -110,6 +124,7 @@ public interface TeacherService {
      * 根据id删除一个教师
      *
      * @param id 教师id
+     * @return 更新记录数
      */
     long deleteOneTeacherById(Long id);
 
@@ -117,6 +132,7 @@ public interface TeacherService {
      * 根据id删除多个个教师
      *
      * @param ids 教师id的列表
+     * @return 更新记录数
      */
     long deleteManyTeachersByIds(List<Long> ids);
 
@@ -124,7 +140,7 @@ public interface TeacherService {
      * 根据输入条件删除指定的教师
      *
      * @param condition 输入条件封装
-     * @return
+     * @return 更新记录数
      */
-    String deleteTeachersByCondition(TeacherSearchCondition condition);
+    long deleteTeachersByCondition(TeacherSearchCondition condition);
 }

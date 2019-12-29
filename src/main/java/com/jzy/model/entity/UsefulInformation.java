@@ -20,12 +20,12 @@ public class UsefulInformation extends BaseEntity {
     /**
      * 默认的信息所有者，所有校区公有
      */
-    public static final String DEFAULT_BELONG_TO= "公共";
+    public static final String DEFAULT_BELONG_TO = "公共";
 
     /**
      * 默认的信息配图名
      */
-    public static final String DEFAULT_IMAGE= "image_default.png";
+    public static final String DEFAULT_IMAGE = "image_default.png";
 
     /**
      * 每个类别的记录顺序相邻sequence的默认差值
@@ -65,14 +65,32 @@ public class UsefulInformation extends BaseEntity {
     /**
      * 设置默认配图
      */
-    public void setDefaultImage(){
-        this.image=DEFAULT_IMAGE;
+    public void setDefaultImage() {
+        this.image = DEFAULT_IMAGE;
+    }
+
+    /**
+     * 当前信息的配图是否是默认配图
+     *
+     * @return
+     */
+    public boolean isDefaultImage() {
+        return DEFAULT_IMAGE.equals(this.image);
     }
 
     /**
      * 设置默认类别
      */
-    public void setDefaultBelongTo(){
-        this.belongTo=DEFAULT_BELONG_TO;
+    public void setDefaultBelongTo() {
+        this.belongTo = DEFAULT_BELONG_TO;
+    }
+
+    /**
+     * 当前信息的类别是否是默认类别
+     *
+     * @return
+     */
+    public boolean isDefaultBelongTo() {
+        return DEFAULT_BELONG_TO.equals(this.belongTo);
     }
 }

@@ -38,12 +38,16 @@ public enum ExcelVersionEnum {
         if (pathname == null) {
             return null;
         }
-        if (pathname.endsWith(VERSION_2003.getSuffix())) {
-            return VERSION_2003;
+        if (pathname.endsWith(ExcelVersionEnum.VERSION_2003.getSuffix())) {
+            return ExcelVersionEnum.VERSION_2003;
         }
-        if (pathname.endsWith(VERSION_2003.getSuffix())) {
+        if (pathname.endsWith(ExcelVersionEnum.VERSION_2007.getSuffix())) {
             return VERSION_2007;
         }
         return null;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getVersion("1.xlsx"));
     }
 }

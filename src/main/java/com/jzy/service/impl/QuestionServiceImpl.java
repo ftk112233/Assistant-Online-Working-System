@@ -14,6 +14,7 @@ import com.jzy.manager.util.QuestionUtils;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.QuestionSearchCondition;
 import com.jzy.model.dto.QuestionWithCreatorDto;
+import com.jzy.model.dto.UpdateResult;
 import com.jzy.model.entity.Question;
 import com.jzy.service.QuestionService;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +35,16 @@ import java.util.List;
 @Service
 public class QuestionServiceImpl extends AbstractServiceImpl implements QuestionService {
     private final static Logger logger = LogManager.getLogger(QuestionServiceImpl.class);
+
+    /**
+     * 表示问题的内容重复
+     */
+    private final static String QUESTION_CONTENT_REPEAT="questionContentRepeat";
+
+    /**
+     * 表示至少需要一个问题
+     */
+    private final static String AT_LEAST_ONE_NEEDED="atLeastOneQuestionNeeded";
 
     @Autowired
     private QuestionMapper questionMapper;
@@ -181,7 +192,7 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
             //问题内容改过了，判断是否与已存在的记录冲突
             if (getQuestionByContent(question.getContent()) != null) {
                 //修改后的问题已存在
-                return "questionContentRepeat";
+                return QUESTION_CONTENT_REPEAT;
             }
         }
 
@@ -201,7 +212,7 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
         }
         if (getQuestionByContent(question.getContent()) != null) {
             //修改后的问题已存在
-            return "questionContentRepeat";
+            return QUESTION_CONTENT_REPEAT;
         }
 
         questionMapper.insertQuestion(question);
@@ -209,30 +220,34 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
     }
 
     @Override
-    public String deleteOneQuestionById(Long id) {
+    public UpdateResult deleteOneQuestionById(Long id) {
         if (id == null) {
-            return Constants.SUCCESS;
+            return new UpdateResult(Constants.SUCCESS);
         }
 
         if (countAllQuestions() <= 1) {
-            return "atLeastOneQuestionNeeded";
+            return new UpdateResult(AT_LEAST_ONE_NEEDED);
         }
 
-        questionMapper.deleteOneQuestionById(id);
-        return Constants.SUCCESS;
+        long count=questionMapper.deleteOneQuestionById(id);
+        UpdateResult result= new UpdateResult(Constants.SUCCESS);
+        result.setDeleteCount(count);
+        return result;
     }
 
     @Override
-    public String deleteManyQuestionsByIds(List<Long> ids) {
+    public UpdateResult deleteManyQuestionsByIds(List<Long> ids) {
         if (ids == null || ids.size() == 0) {
-            return Constants.SUCCESS;
+            return new UpdateResult(Constants.SUCCESS);
         }
 
         if (countAllQuestions() <= ids.size()) {
-            return "atLeastOneQuestionNeeded";
+            return new UpdateResult(AT_LEAST_ONE_NEEDED);
         }
 
-        questionMapper.deleteManyQuestionsByIds(ids);
-        return Constants.SUCCESS;
+        long count=questionMapper.deleteManyQuestionsByIds(ids);
+        UpdateResult result= new UpdateResult(Constants.SUCCESS);
+        result.setDeleteCount(count);
+        return result;
     }
 }

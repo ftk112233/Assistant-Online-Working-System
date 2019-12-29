@@ -92,8 +92,4 @@ public enum RoleEnum {
         }
         return false;
     }
-
-    public static void main(String[] args) {
-        System.out.println(RoleEnum.ADMINISTRATOR.equals("管理"));
-    }
 }

@@ -31,6 +31,21 @@ import java.util.concurrent.TimeUnit;
 public class ClassServiceImpl extends AbstractServiceImpl implements ClassService {
     private final static Logger logger = LogManager.getLogger(ClassServiceImpl.class);
 
+    /**
+     * 表示班级编码重复
+     */
+    private final static String CLASS_ID_REPEAT = "classIdRepeat";
+
+    /**
+     * 表示教师不存在
+     */
+    private final static String TEACHER_NOT_EXIST = "teacherNotExist";
+
+    /**
+     * 表示助教不存在
+     */
+    private final static String ASSISTANT_NOT_EXIST = "assistantNotExist";
+
     @Autowired
     private ClassMapper classMapper;
 
@@ -77,7 +92,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
 
     @Override
     public UpdateResult updateClassByClassId(ClassDetailedDto classDetailedDto) {
-        if (classDetailedDto == null){
+        if (classDetailedDto == null) {
             return new UpdateResult(Constants.FAILURE);
         }
         long count = classMapper.updateClassByClassId(classDetailedDto);
@@ -94,7 +109,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
         //新班号不为空
         if (getClassByClassId(classDetailedDto.getClassId()) != null) {
             //添加的班号已存在
-            return new UpdateResult("classIdRepeat");
+            return new UpdateResult(CLASS_ID_REPEAT);
         }
 
         return insertClassWithUnrepeatedClassId(classDetailedDto);
@@ -104,8 +119,11 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     /**
      * 插入班号不重复的班级信息
      *
-     * @param classDetailedDto
-     * @return
+     * @param classDetailedDto 新添加班级的信息
+     * @return (更新结果 ， 更新记录数)
+     * 1."teacherNotExist"：教师不存在
+     * 2."assistantNotExist"：助教不存在
+     * 3."success": 更新成功
      */
     private UpdateResult insertClassWithUnrepeatedClassId(ClassDetailedDto classDetailedDto) {
         if (classDetailedDto == null) {
@@ -115,7 +133,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
             //修改后的教师姓名不为空
             if (teacherService.getTeacherByName(classDetailedDto.getTeacherName()) == null) {
                 //修改后的教师姓名不存在
-                return new UpdateResult("teacherNotExist");
+                return new UpdateResult(TEACHER_NOT_EXIST);
 
             }
         }
@@ -124,7 +142,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
             //修改后的助教姓名不为空
             if (assistantService.getAssistantByName(classDetailedDto.getAssistantName()) == null) {
                 //修改后的助教姓名不存在
-                return new UpdateResult("assistantNotExist");
+                return new UpdateResult(ASSISTANT_NOT_EXIST);
             }
         }
 
@@ -137,7 +155,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     }
 
     @Override
-    public UpdateResult insertAndUpdateClassesFromExcel(List<ClassDetailedDto> classDetailedDtos) throws Exception {
+    public UpdateResult insertAndUpdateClassesFromExcel(List<ClassDetailedDto> classDetailedDtos) throws InvalidParameterException {
         if (classDetailedDtos == null) {
             String msg = "insertAndUpdateClassesFromExcel方法输入classDetailedDto为null!";
             logger.error(msg);
@@ -159,8 +177,17 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
         return result;
     }
 
-    @Override
-    public UpdateResult insertAndUpdateOneClassFromExcel(ClassDetailedDto classDetailedDto) throws Exception {
+    /**
+     * 根据从excel中读取到的classDetailedDtos信息，更新插入一个。根据班号判断：
+     * if 当前班号不存在
+     * 执行插入
+     * else
+     * 根据班号更新
+     *
+     * @param classDetailedDto 班级的详细信息
+     * @return (更新结果, 更新记录数)
+     */
+    private UpdateResult insertAndUpdateOneClassFromExcel(ClassDetailedDto classDetailedDto) throws InvalidParameterException {
         if (classDetailedDto == null) {
             String msg = "insertAndUpdateOneClassFromExcel方法输入classDetailedDto为null!";
             logger.error(msg);
@@ -195,14 +222,10 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
         current.setClassYear(classSeason.getClassYear());
         current.setClassSeason(classSeason.getClassSeason());
         current.setClassSubSeason(classSeason.getClassSubSeason());
-        System.out.println(current);
 
-        for (int i = 0; i < classDetailedDtos.size(); i++) {
-            ClassDetailedDto classDetailedDto = classDetailedDtos.get(i);
-
+        for (ClassDetailedDto classDetailedDto: classDetailedDtos) {
             if (!StringUtils.isEmpty(classDetailedDto.getClassYear())) {
                 classDetailedDto.setParsedClassYear();
-                classDetailedDtos.set(i, classDetailedDto);
             }
 
             if (classDetailedDto.getClassroomCapacity() == null || classDetailedDto.getClassStudentsCount() >= classDetailedDto.getClassroomCapacity()) {
@@ -234,7 +257,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
             return Constants.FAILURE;
         }
         ClassDetailedDto originalClass = getClassDetailById(classDetailedDto.getId());
-        if (originalClass == null){
+        if (originalClass == null) {
             return Constants.FAILURE;
         }
 
@@ -243,7 +266,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
             //班号修改过了，判断是否与已存在的工号冲突
             if (getClassByClassId(classDetailedDto.getClassId()) != null) {
                 //修改后的班号已存在
-                return "classIdRepeat";
+                return CLASS_ID_REPEAT;
             }
         }
 
@@ -251,7 +274,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
             //修改后的教师姓名不为空
             if (teacherService.getTeacherByName(classDetailedDto.getTeacherName()) == null) {
                 //修改后的教师姓名不存在
-                return "teacherNotExist";
+                return TEACHER_NOT_EXIST;
             }
         }
 
@@ -259,7 +282,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
             //修改后的助教姓名不为空
             if (assistantService.getAssistantByName(classDetailedDto.getAssistantName()) == null) {
                 //修改后的助教姓名不存在
-                return "assistantNotExist";
+                return ASSISTANT_NOT_EXIST;
             }
         }
 
@@ -293,6 +316,9 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
 
     @Override
     public UpdateResult deleteClassesByCondition(ClassSearchCondition condition) {
+        if (condition == null) {
+            return new UpdateResult(Constants.FAILURE);
+        }
         long count = classMapper.deleteClassesByCondition(condition);
         UpdateResult result = new UpdateResult(Constants.SUCCESS);
         result.setDeleteCount(count);
@@ -315,7 +341,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
 
     @Override
     public void updateCurrentClassSeason(CurrentClassSeason classSeason) {
-        if (classSeason == null){
+        if (classSeason == null) {
             return;
         }
         valueOps.set(RedisConstants.CURRENT_SEASON_KEY, classSeason);

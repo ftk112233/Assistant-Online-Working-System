@@ -12,7 +12,6 @@ import com.jzy.model.vo.ResultMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -40,7 +39,7 @@ public class TeacherAdminController extends AbstractController {
      * @return
      */
     @RequestMapping("/page")
-    public String page(Model model) {
+    public String page() {
         return "teacher/admin/page";
     }
 
@@ -61,12 +60,10 @@ public class TeacherAdminController extends AbstractController {
     /**
      * 重定向到编辑助教权限iframe子页面并返回相应model
      *
-     * @param model
-     * @param teacher 当前要被编辑的教师信息
      * @return
      */
     @RequestMapping("/updateForm")
-    public String updateForm(Model model, Teacher teacher) {
+    public String updateForm() {
         return "teacher/admin/teacherForm";
     }
 
@@ -161,7 +158,8 @@ public class TeacherAdminController extends AbstractController {
     @ResponseBody
     public Map<String, Object> deleteByCondition(TeacherSearchCondition condition) {
         Map<String, Object> map = new HashMap(1);
-        map.put("data", teacherService.deleteTeachersByCondition(condition));
+        teacherService.deleteTeachersByCondition(condition);
+        map.put("data", Constants.SUCCESS);
         return map;
     }
 }

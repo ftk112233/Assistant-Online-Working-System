@@ -42,6 +42,11 @@ import java.util.concurrent.TimeUnit;
 public class UsefulInformationServiceImpl extends AbstractServiceImpl implements UsefulInformationService {
     private final static Logger logger = LogManager.getLogger(UsefulInformationServiceImpl.class);
 
+    /**
+     * 归属和序号值组合冲突
+     */
+    private final static String BELONG_TO_AND_SEQUENCE_REPEAT="belongToAndSequenceRepeat";
+
     @Autowired
     private UsefulInformationMapper usefulInformationMapper;
 
@@ -168,7 +173,7 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
             //所属类别或序号修改过了，判断是否与已存在的记录冲突
             if (getUsefulInformationByBelongToAndSequence(information.getBelongTo(), information.getSequence()) != null) {
                 //修改后的类别或序号已存在
-                return "belongToAndSequenceRepeat";
+                return BELONG_TO_AND_SEQUENCE_REPEAT;
             }
         }
 
@@ -177,7 +182,7 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
          */
         if (!StringUtils.isEmpty(information.getImage())) {
             //如果用户上传了新配图
-            if (!UsefulInformation.DEFAULT_IMAGE.equals(originalInformation.getImage())) {
+            if (!originalInformation.isDefaultImage()) {
                 //如果原来的配图不是默认配图，需要将原来的配图删除
                 FileUtils.deleteFile(filePathProperties.getUsefulInformationImageDirectory() + originalInformation.getImage());
             }
@@ -208,7 +213,7 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
         //所属类别或序号修改过了，判断是否与已存在的记录冲突
         if (getUsefulInformationByBelongToAndSequence(information.getBelongTo(), information.getSequence()) != null) {
             //修改后的类别或序号已存在
-            return "belongToAndSequenceRepeat";
+            return BELONG_TO_AND_SEQUENCE_REPEAT;
         }
 
         /*
@@ -255,9 +260,9 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
     }
 
     /**
-     * 根据信息id删除配图
+     * 根据信息id删除配图。如果配图为空或者是默认配图，不执行删除
      *
-     * @param id
+     * @param id 常用信息的id
      */
     private void deleteImageById(Long id) {
         UsefulInformation information = getUsefulInformationById(id);
@@ -266,7 +271,7 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
              * 删除配图
              */
             if (!StringUtils.isEmpty(information.getImage())) {
-                if (!information.getImage().equals(UsefulInformation.DEFAULT_IMAGE)) {
+                if (!information.isDefaultImage()) {
                     //如果原来的配图不是默认配图，需要将原来的配图删除
                     FileUtils.deleteFile(filePathProperties.getUsefulInformationImageDirectory() + information.getImage());
                 }

@@ -137,15 +137,26 @@ public class AuthenticationController extends AbstractController {
     public String index(HttpServletRequest request, HttpServletResponse response, Model model) {
         User user = userService.getSessionUserInfo();
         Announcement announcement = new Announcement();
-        if (!hashOps.hasKey(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, user.getId().toString())) {
-            //已读公告，即缓存无
-            announcement.setRead(true);
-        } else {
-            announcement = (Announcement) hashOps.get(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, user.getId().toString());
-            if (!announcement.isPermanent()) {
-                //阅后即焚，则清除缓存
-                hashOps.delete(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, user.getId().toString());
+
+        Announcement baseAnnouncement = (Announcement) hashOps.get(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, Constants.BASE_ANNOUNCEMENT.toString());
+        if (baseAnnouncement != null) {
+            if (baseAnnouncement.isPermanent()) {
+                //如果是永久公告，读id=-2的公告即可
+                announcement = baseAnnouncement;
+            } else {
+                if (!hashOps.hasKey(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, user.getId().toString())) {
+                    //已读公告，即缓存无
+                    announcement.setRead(true);
+                } else {
+                    announcement = (Announcement) hashOps.get(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, user.getId().toString());
+                    //阅后即焚，则清除缓存
+                    hashOps.delete(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, user.getId().toString());
+
+                }
             }
+        } else {
+            //没有任何公告，read置为false，这样前台不会显示公告
+            announcement.setRead(true);
         }
         model.addAttribute(ModelConstants.ANNOUNCEMENT_MODEL_KEY, announcement);
 
@@ -499,7 +510,7 @@ public class AuthenticationController extends AbstractController {
                     guest.setUserName(UUID.randomUUID().toString());
                     guest.setUserRealName(CodeUtils.randomCodes());
                     guest.setUserRole(RoleEnum.GUEST.getRole());
-                    guest.setUserIcon(User.USER_ICON_DEFAULT);
+                    guest.setDefaultUserIcon();
                     session.setAttribute(SessionConstants.USER_INFO_SESSION_KEY, guest);
                     map.put("data", Constants.SUCCESS);
                 } catch (AuthenticationException e) {

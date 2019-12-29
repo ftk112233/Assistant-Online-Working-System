@@ -34,19 +34,22 @@ public class SystemController extends AbstractController {
     private final static Logger logger = LogManager.getLogger(SystemController.class);
 
     /**
-     * 跳转公告推送
+     * 跳转公告推送，从缓存中取上次的公告添加到model
      *
      * @return
      */
     @RequestMapping("/announcement")
     public String announcement(Model model) {
-        Announcement announcement = (Announcement) hashOps.get(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, Constants.ZERO.toString());
+        Announcement announcement = (Announcement) hashOps.get(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, Constants.BASE_ANNOUNCEMENT.toString());
         model.addAttribute(ModelConstants.ANNOUNCEMENT_EDIT_MODEL_KEY, announcement == null ? new Announcement() : announcement);
         return "system/announcement";
     }
 
     /**
-     * 发布推送
+     * 发布推送。
+     * 注意游客的公告处理，其id为-1
+     * id为-2的公告作为下次编辑是的缓存。
+     * 其他id为正常用户的公告
      *
      * @param announcement 推送的信息
      * @return
@@ -65,12 +68,17 @@ public class SystemController extends AbstractController {
         announcement.setRead(false);
         announcement.parse();
 
-        //推游客的公告
-        hashOps.put(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, Constants.GUEST_ID.toString(), announcement);
-        //推id为0的公告，即缓存公告
-        hashOps.put(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, Constants.ZERO.toString(), announcement);
-        for (User user : users) {
-            hashOps.put(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, user.getId().toString(), announcement);
+
+        //推id为-2的公告，即缓存公告
+        hashOps.put(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, Constants.BASE_ANNOUNCEMENT.toString(), announcement);
+
+        //如果是永久有效的公告，读取的时候只要读id=-2的即可，所以不用对每个用户id都保存缓存。
+        if (!announcement.isPermanent()) {
+            //推游客的公告
+            hashOps.put(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, Constants.GUEST_ID.toString(), announcement);
+            for (User user : users) {
+                hashOps.put(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, user.getId().toString(), announcement);
+            }
         }
 
         map.put("data", Constants.SUCCESS);
@@ -78,7 +86,7 @@ public class SystemController extends AbstractController {
     }
 
     /**
-     * 清除推送
+     * 清除推送。把游客（id=-1）和其他用户的公告都删除，只保留基本的公告缓存id=-2
      *
      * @return
      */
@@ -89,6 +97,7 @@ public class SystemController extends AbstractController {
 
         List<User> users = userService.listAllUsers();
 
+        hashOps.delete(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, Constants.GUEST_ID.toString());
         for (User user : users) {
             hashOps.delete(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, user.getId().toString());
         }
@@ -98,7 +107,7 @@ public class SystemController extends AbstractController {
     }
 
     /**
-     * 跳转智能校历
+     * 跳转智能校历。从缓存中查校历
      *
      * @return
      */

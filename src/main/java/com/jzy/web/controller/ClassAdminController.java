@@ -118,7 +118,7 @@ public class ClassAdminController extends AbstractController {
             return map;
         } catch (ExcelColumnNotFoundException e) {
             e.printStackTrace();
-            map.put("msg", "excelColumnNotFound");
+            map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
             return map;
         } catch (InputFileTypeException e) {
             e.printStackTrace();
@@ -241,7 +241,8 @@ public class ClassAdminController extends AbstractController {
     }
 
     /**
-     * 查询班级信息的ajax交互
+     * 查询班级信息的ajax交互。
+     * 其中班级编码字段查询不分大小写，因此将该字段upperCase置为全部大写（数据库中班级编码统一为全部大写）后传给服务层
      *
      * @param myPage    分页{页号，每页数量}
      * @param condition 查询条件入参
@@ -256,7 +257,8 @@ public class ClassAdminController extends AbstractController {
     }
 
     /**
-     * 查询助教自己的班级信息的ajax交互
+     * 查询助教自己的班级信息的ajax交互。
+     * 从当前登录用户的session信息中获得用户工号，传给condition查询条件
      *
      * @param myPage    分页{页号，每页数量}
      * @param condition 查询条件入参
@@ -273,6 +275,7 @@ public class ClassAdminController extends AbstractController {
 
     /**
      * 重定向到编辑班级iframe子页面并返回相应model
+     *  其中被编辑的信息中select的元素不能通过layui iframe直接赋值，因此经由后台model传值
      *
      * @param model
      * @param clazz 当前要被编辑的班级信息
@@ -372,7 +375,7 @@ public class ClassAdminController extends AbstractController {
     }
 
     /**
-     * 条件删除多个助教ajax交互
+     * 条件删除多个班级ajax交互
      *
      * @param condition 输入的查询条件
      * @return
@@ -390,12 +393,12 @@ public class ClassAdminController extends AbstractController {
      * 重定向到预览班级信息iframe子页面并返回相应model
      *
      * @param model
-     * @param clazz 当前输入的含班号的班级信息
+     * @param classId 当前输入的班号
      * @return
      */
     @RequestMapping("/getPreviewClassInfo")
-    public String getPreviewClassInfo(Model model, Class clazz) {
-        ClassDetailedDto classDetailedDto = classService.getClassDetailByClassId(clazz.getClassId());
+    public String getPreviewClassInfo(Model model, @RequestParam(value = "classId",required = false) String classId) {
+        ClassDetailedDto classDetailedDto = classService.getClassDetailByClassId(classId);
         if (classDetailedDto == null) {
             classDetailedDto = new ClassDetailedDto();
         }

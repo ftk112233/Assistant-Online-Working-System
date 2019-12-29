@@ -67,4 +67,20 @@ public class UserMessage extends BaseEntity {
      * 消息备注，可以为空，不超过500个字符
      */
     private String messageRemark;
+
+    /**
+     * 设置当前消息的图片为欢迎图片
+     */
+    public void setWelcomePicture(){
+        this.messagePicture=WELCOME_PICTURE;
+    }
+
+    /**
+     * 判断当前消息的配图是否为欢迎图片
+     *
+     * @return
+     */
+    public boolean isWelcomePicture(){
+        return WELCOME_PICTURE.equals(this.messagePicture);
+    }
 }

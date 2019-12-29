@@ -1,6 +1,7 @@
 package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.StudentSearchCondition;
 import com.jzy.model.dto.UpdateResult;
@@ -20,7 +21,7 @@ public interface StudentService {
      * 根据主键id修改查询学生
      *
      * @param id 主键id
-     * @return
+     * @return 对应学生对象
      */
     Student getStudentById(Long id);
 
@@ -28,7 +29,7 @@ public interface StudentService {
      * 根据学员编号修改查询学生
      *
      * @param studentId 学员编号
-     * @return
+     * @return 对应学生对象
      */
     Student getStudentByStudentId(String studentId);
 
@@ -36,7 +37,9 @@ public interface StudentService {
      * 修改学生信息由学员编号修改
      *
      * @param student 修改后的学生信息
-     * @return
+     * @return (更新结果, 更新记录数)
+     * 1."failure"：错误入参等异常
+     * 2."success": 更新成功
      */
     UpdateResult updateStudentByStudentId(Student student);
 
@@ -44,7 +47,9 @@ public interface StudentService {
      * 修改学生姓名、手机、备用手机由学员编号修改
      *
      * @param student 修改后的学生信息
-     * @return
+     * @return (更新结果, 更新记录数)
+     * 1."failure"：错误入参等异常
+     * 2."success": 更新成功
      */
     UpdateResult updateStudentNameAndPhoneByStudentId(Student student);
 
@@ -52,7 +57,9 @@ public interface StudentService {
      * 修改学生学校由学员编号修改
      *
      * @param student 修改后的学生信息
-     * @return
+     * @return (更新结果, 更新记录数)
+     * 1."failure"：错误入参等异常
+     * 2."success": 更新成功
      */
     UpdateResult updateStudentSchoolByStudentId(Student student);
 
@@ -60,6 +67,10 @@ public interface StudentService {
      * 添加学生
      *
      * @param student 添加学生的信息
+     * @return (更新结果, 更新记录数)
+     * 1."failure"：错误入参等异常
+     * 2."studentIdRepeat"：学员号冲突
+     * 3."success": 更新成功
      */
     UpdateResult insertStudent(Student student);
 
@@ -74,7 +85,7 @@ public interface StudentService {
      * @param students
      * @return
      */
-    UpdateResult insertAndUpdateStudentsDetailedFromExcel(List<Student> students) throws Exception;
+    UpdateResult insertAndUpdateStudentsDetailedFromExcel(List<Student> students) throws InvalidParameterException;
 
     /**
      * 根据从excel中读取到的students信息（包括手机等字段），更新插入一个。根据学员编号判断：
@@ -86,7 +97,7 @@ public interface StudentService {
      * @param student
      * @return
      */
-    UpdateResult insertAndUpdateOneStudentDetailedFromExcel(Student student) throws Exception;
+    UpdateResult insertAndUpdateOneStudentDetailedFromExcel(Student student) throws InvalidParameterException;
 
     /**
      * 根据从excel中读取到的students信息（一般就学号姓名，不包括手机等字段），更新插入多个。根据学员编号判断：
@@ -98,7 +109,7 @@ public interface StudentService {
      * @param students
      * @return
      */
-    UpdateResult insertAndUpdateStudentsFromExcel(List<Student> students) throws Exception;
+    UpdateResult insertAndUpdateStudentsFromExcel(List<Student> students) throws InvalidParameterException;
 
     /**
      * 根据从excel中读取到的students信息（一般就学号姓名，不包括手机等字段），更新插入一个。根据学员编号判断：
@@ -110,7 +121,7 @@ public interface StudentService {
      * @param student
      * @return
      */
-    UpdateResult insertAndUpdateOneStudentFromExcel(Student student) throws Exception;
+    UpdateResult insertAndUpdateOneStudentFromExcel(Student student) throws InvalidParameterException;
 
     /**
      * 根据从excel中读取到的student学校信息，更新一个。根据学员编号判断：
@@ -119,7 +130,7 @@ public interface StudentService {
      * @param student
      * @return
      */
-    UpdateResult insertAndUpdateOneStudentSchoolFromExcel(Student student) throws Exception;
+    UpdateResult insertAndUpdateOneStudentSchoolFromExcel(Student student) throws InvalidParameterException;
 
     /**
      * 根据从excel中读取到的students学校信息，更新多个。根据学员编号判断：
@@ -128,14 +139,14 @@ public interface StudentService {
      * @param students
      * @return
      */
-    UpdateResult insertAndUpdateStudentsSchoolsFromExcel(List<Student> students) throws Exception;
+    UpdateResult insertAndUpdateStudentsSchoolsFromExcel(List<Student> students) throws InvalidParameterException;
 
     /**
      * 查询学员个人信息
      *
      * @param myPage    分页{页号，每页数量}
      * @param condition 查询条件入参
-     * @return
+     * @return 分页结果
      */
     PageInfo<Student> listStudents(MyPage myPage, StudentSearchCondition condition);
 
@@ -143,7 +154,10 @@ public interface StudentService {
      * 修改学生信息由id修改
      *
      * @param student 修改后的学生信息
-     * @return
+     * @return 1."failure"：错误入参等异常
+     * 2."workIdRepeat"：工号冲突
+     * 3."unchanged": 对比数据库原记录未做任何修改
+     * 4."success": 更新成功
      */
     String updateStudentInfo(Student student);
 
@@ -151,7 +165,7 @@ public interface StudentService {
      * 删除一个学生，根据学生id
      *
      * @param id 被删除学生的id
-     * @return
+     * @return 更新记录数
      */
     long deleteOneStudentById(Long id);
 
@@ -159,6 +173,7 @@ public interface StudentService {
      * 根据id删除多个学生
      *
      * @param ids 学生id的列表
+     * @return 更新记录数
      */
     long deleteManyStudentsByIds(List<Long> ids);
 
@@ -166,7 +181,7 @@ public interface StudentService {
      * 条件删除多个学生
      *
      * @param condition 输入的查询条件
-     * @return
+     * @return 更新记录数
      */
-    String deleteStudentsByCondition(StudentSearchCondition condition);
+    long deleteStudentsByCondition(StudentSearchCondition condition);
 }

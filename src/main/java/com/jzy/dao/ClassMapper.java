@@ -58,8 +58,7 @@ public interface ClassMapper {
     /**
      * 返回所有的班级编码
      *
-     * @param
-     * @return
+     * @return 所有班号的list
      */
     List<String> listAllClassIds();
 
@@ -67,7 +66,7 @@ public interface ClassMapper {
      * 修改班级信息请求，由id修改
      *
      * @param classDetailedDto 修改后的班级信息
-     * @return
+     * @return 更新记录数
      */
     long updateClassInfo(ClassDetailedDto classDetailedDto);
 
@@ -75,6 +74,7 @@ public interface ClassMapper {
      * 删除一个班级
      *
      * @param id 被删除班级的id
+     * @return 更新记录数
      */
     long deleteOneClassById(Long id);
 
@@ -82,7 +82,7 @@ public interface ClassMapper {
      * 根据班级编码查询班级详细信息，注意这里classId不是主键id
      *
      * @param classId 班级编码
-     * @return
+     * @return 班级的详细信息
      */
     ClassDetailedDto getClassDetailByClassId(@Param("classId") String classId);
 

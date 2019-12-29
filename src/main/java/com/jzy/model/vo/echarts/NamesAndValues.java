@@ -42,7 +42,7 @@ public class NamesAndValues implements Serializable {
     }
 
     /**
-     * 把(name, total)的对象列表，按对应泛型对象中自定义的排序规则添加到NamesAndTotals对象中。
+     * 把(name, total)的对象列表，按对应泛型中自定义的排序规则添加到NamesAndTotals对象中。
      *
      * @param objectTotals
      * @param <T>          DefaultGroupedObjectTotal及其子类

@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -42,12 +41,13 @@ public class MissLessonStudentAdminController extends AbstractController {
      * @return
      */
     @RequestMapping("/page")
-    public String page(Model model) {
+    public String page() {
         return "student/missLesson/admin/page";
     }
 
     /**
-     * 查询补课学员信息的ajax交互
+     * 查询补课学员信息的ajax交互。
+     * 其中学员号、原班号、补课班号字段查询不分大小写，因此将该字段upperCase置为全部大写（数据库中班级编码统一为全部大写）后传给服务层
      *
      * @param myPage    分页{页号，每页数量}
      * @param condition 查询条件入参
@@ -64,7 +64,8 @@ public class MissLessonStudentAdminController extends AbstractController {
     }
 
     /**
-     * 查询我班上的要补课学员的信息的ajax交互
+     * 查询我班上的要补课学员的信息的ajax交互。
+     * 因此将查询条件中的原班助教工号置为当前会话用户的工号
      *
      * @param myPage    分页{页号，每页数量}
      * @param condition 查询条件入参
@@ -81,6 +82,7 @@ public class MissLessonStudentAdminController extends AbstractController {
 
     /**
      * 查询补课到我班上的学员的信息的ajax交互
+     * 因此将查询条件中的补课班助教工号置为当前会话用户的工号
      *
      * @param myPage    分页{页号，每页数量}
      * @param condition 查询条件入参
@@ -96,26 +98,23 @@ public class MissLessonStudentAdminController extends AbstractController {
     }
 
     /**
-     * 重定向到编辑补课学生iframe子页面并返回相应model
+     * 重定向到编辑补课学生iframe子页面
      *
-     * @param model
-     * @param missLessonStudentDetailedDto 当前要被编辑的补课学生信息
      * @return
      */
     @RequestMapping("/updateForm")
-    public String updateForm(Model model, MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
+    public String updateForm() {
 //        model.addAttribute(ModelConstants.MISS_LESSON_STUDENT_EDIT_MODEL_KEY, missLessonStudentDetailedDto);
         return "student/missLesson/admin/missLessonStudentFormEdit";
     }
 
     /**
-     * 重定向到编辑补课学生iframe子页面并返回相应model
+     * 重定向到编辑补课学生iframe子页面
      *
-     * @param model
      * @return
      */
     @RequestMapping("/insertForm")
-    public String insertForm(Model model) {
+    public String insertForm() {
         return "student/missLesson/admin/missLessonStudentFormAdd";
     }
 
@@ -208,7 +207,8 @@ public class MissLessonStudentAdminController extends AbstractController {
     @ResponseBody
     public Map<String, Object> deleteByCondition(MissLessonStudentSearchCondition condition) {
         Map<String, Object> map = new HashMap(1);
-        map.put("data", missLessonStudentService.deleteMissLessonStudentsByCondition(condition));
+        missLessonStudentService.deleteMissLessonStudentsByCondition(condition);
+        map.put("data", Constants.SUCCESS);
         return map;
     }
 }

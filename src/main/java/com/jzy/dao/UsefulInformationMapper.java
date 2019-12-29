@@ -18,7 +18,7 @@ public interface UsefulInformationMapper {
      * 根据id查询当前常用信息
      *
      * @param id 主键id
-     * @return
+     * @return 对应常用信息
      */
     UsefulInformation getUsefulInformationById(@Param("id") Long id);
 
@@ -26,7 +26,7 @@ public interface UsefulInformationMapper {
      * 根据所有者查询当前所有常用信息
      *
      * @param belongTo 所有者
-     * @return
+     * @return 所有常用信息
      */
     List<UsefulInformation> listUsefulInformationByBelongTo(@Param("belongTo") String belongTo);
 
@@ -34,7 +34,7 @@ public interface UsefulInformationMapper {
      * 条件查询常用信息
      *
      * @param condition 查询条件入参
-     * @return
+     * @return 符合条件的常用信息
      */
     List<UsefulInformation> listUsefulInformation(UsefulInformationSearchCondition condition);
 
@@ -42,16 +42,16 @@ public interface UsefulInformationMapper {
      * 根据当前的所属类别获得推荐的序号值
      *
      * @param belongTo 所属类别
-     * @return
+     * @return 序号值
      */
     Long getRecommendedSequence(@Param("belongTo") String belongTo);
 
     /**
-     * 根据所属类别和序号查询
+     * 根据所属类别和序号查询常用信息
      *
      * @param belongTo 所属类别
      * @param sequence 序号
-     * @return
+     * @return 指定类别和序号对应的常用信息
      */
     UsefulInformation getUsefulInformationByBelongToAndSequence(@Param("belongTo") String belongTo, @Param("sequence") Long sequence);
 
@@ -59,7 +59,7 @@ public interface UsefulInformationMapper {
      * 常用信息管理中的编辑常用信息请求，由id修改
      *
      * @param information 修改后的常用信息
-     * @return
+     * @return 更新记录数
      */
     long updateUsefulInformationInfo(UsefulInformation information);
 
@@ -67,7 +67,7 @@ public interface UsefulInformationMapper {
      * 常用信息管理中的添加常用信息
      *
      * @param information 新添加常用信息
-     * @return
+     * @return 更新记录数
      */
     long insertUsefulInformation(UsefulInformation information);
 
@@ -75,7 +75,7 @@ public interface UsefulInformationMapper {
      * 删除一个常用信息
      *
      * @param id 被删除常用信息的id
-     * @return
+     * @return 更新记录数
      */
     long deleteOneUsefulInformationById(Long id);
 
@@ -83,7 +83,7 @@ public interface UsefulInformationMapper {
      * 删除多个常用信息
      *
      * @param ids 被删除常用信息的id的列表
-     * @return
+     * @return 更新记录数
      */
     long deleteManyUsefulInformationByIds(List<Long> ids);
 }

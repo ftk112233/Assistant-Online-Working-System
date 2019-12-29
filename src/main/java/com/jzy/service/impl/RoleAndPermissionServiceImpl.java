@@ -31,6 +31,11 @@ import java.util.List;
 public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements RoleAndPermissionService {
     private final static Logger logger = LogManager.getLogger(RoleAndPermissionServiceImpl.class);
 
+    /**
+     * 表示(角色, 权限)组合冲突
+     */
+    private final static String ROLE_AND_PERM_REPEAT="roleAndPermRepeat";
+
     @Autowired
     private RoleAndPermissionMapper roleAndPermissionMapper;
 
@@ -81,7 +86,7 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
             //角色或权限修改过了，判断是否与已存在的记录冲突
             if (getByRoleAndPerm(roleAndPermission.getRole(), roleAndPermission.getPerm()) != null) {
                 //修改后的角色和权限已存在
-                return "roleAndPermRepeat";
+                return ROLE_AND_PERM_REPEAT;
             }
         }
 
@@ -107,7 +112,7 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
         }
         if (getByRoleAndPerm(roleAndPermission.getRole(), roleAndPermission.getPerm()) != null) {
             //角色和权限已存在
-            return "roleAndPermRepeat";
+            return ROLE_AND_PERM_REPEAT;
         }
 
         roleAndPermissionMapper.insertRoleAndPermission(roleAndPermission);
@@ -119,7 +124,6 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
         if (id == null) {
             return 0;
         }
-
         return roleAndPermissionMapper.deleteOneRoleAndPermissionById(id);
     }
 
@@ -128,7 +132,6 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
         if (ids == null ||ids.size() == 0){
             return 0;
         }
-
         return roleAndPermissionMapper.deleteManyRoleAndPermissionsByIds(ids);
     }
 }

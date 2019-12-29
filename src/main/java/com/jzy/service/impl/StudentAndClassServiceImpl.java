@@ -34,6 +34,21 @@ import java.util.List;
 public class StudentAndClassServiceImpl extends AbstractServiceImpl implements StudentAndClassService {
     private final static Logger logger = LogManager.getLogger(StudentAndClassServiceImpl.class);
 
+    /**
+     * 表示学员在当前班的上课记录已存在
+     */
+    private final static String STUDENT_AND_CLASS_EXIST = "studentAndClassExist";
+
+    /**
+     * 表示学员不存在
+     */
+    private final static String STUDENT_NOT_EXIST = "studentNotExist";
+
+    /**
+     * 表示班级不存在
+     */
+    private final static String CLASS_NOT_EXIST = "classNotExist";
+
     @Autowired
     private StudentAndClassMapper studentAndClassMapper;
 
@@ -54,7 +69,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
         }
         if (countStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto.getStudentId(), studentAndClassDetailedDto.getClassId()) > 0) {
             //重复报班
-            return new UpdateResult("studentAndClassExist");
+            return new UpdateResult(STUDENT_AND_CLASS_EXIST);
         }
 
         return insertUnrepeatedStudentAndClass(studentAndClassDetailedDto);
@@ -63,8 +78,10 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
     /**
      * 插入学员号不重复的学员报班信息
      *
-     * @param studentAndClassDetailedDto
-     * @return
+     * @param studentAndClassDetailedDto 学员号不重复的学员报班对象
+     * @return 1."studentNotExist": 学员不存在
+     * 2."classNotExist": 班级不存在
+     * 3."success": 更新成功
      */
     private UpdateResult insertUnrepeatedStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto) {
         if (studentAndClassDetailedDto == null) {
@@ -73,13 +90,13 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
         Student student = studentService.getStudentByStudentId(studentAndClassDetailedDto.getStudentId());
         if (student == null) {
             //学员号不存在
-            return new UpdateResult("studentNotExist");
+            return new UpdateResult(STUDENT_NOT_EXIST);
         }
 
         Class clazz = classService.getClassByClassId(studentAndClassDetailedDto.getClassId());
         if (clazz == null) {
             //班号不存在
-            return new UpdateResult("classNotExist");
+            return new UpdateResult(CLASS_NOT_EXIST);
         }
 
         UpdateResult result = new UpdateResult(Constants.SUCCESS);
@@ -179,7 +196,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
             //学员号和班号中的一个修改过了，判断是否与已存在的<学员号, 班号>冲突
             if (countStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto.getStudentId(), studentAndClassDetailedDto.getClassId()) > 0) {
                 //修改后的上课记录已存在
-                return "studentAndClassExist";
+                return STUDENT_AND_CLASS_EXIST;
             }
 
             if (!studentAndClassDetailedDto.getStudentId().equals(originalStudentId)) {
@@ -187,7 +204,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
                 Student student = studentService.getStudentByStudentId(studentAndClassDetailedDto.getStudentId());
                 if (student == null) {
                     //学员号不存在
-                    return "studentNotExist";
+                    return STUDENT_NOT_EXIST;
                 }
             }
 
@@ -196,7 +213,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
                 Class clazz = classService.getClassByClassId(studentAndClassDetailedDto.getClassId());
                 if (clazz == null) {
                     //班号不存在
-                    return "classNotExist";
+                    return CLASS_NOT_EXIST;
                 }
             }
         }

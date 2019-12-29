@@ -20,7 +20,7 @@ public interface MissLessonStudentService {
      *
      * @param myPage    分页{页号，每页数量}
      * @param condition 查询条件入参
-     * @return
+     * @return 分页结果
      */
     PageInfo<MissLessonStudentDetailedDto> listMissLessonStudents(MyPage myPage, MissLessonStudentSearchCondition condition);
 
@@ -29,6 +29,10 @@ public interface MissLessonStudentService {
      *
      * @param missLessonStudentDetailedDto 修改后的补课学生信息
      * @return
+     * 1."failure"：错误入参等异常
+     * 2."originalClassNotExist"：原班号不存在
+     * 3."currentClassNotExist"：补课班号不存在
+     * 4."success": 更新成功
      */
     String updateMissLessonStudentInfo(MissLessonStudentDetailedDto missLessonStudentDetailedDto);
 
@@ -37,6 +41,10 @@ public interface MissLessonStudentService {
      *
      * @param missLessonStudentDetailedDto 新添加补课学生
      * @return
+     * 1."failure"：错误入参等异常
+     * 2."originalClassNotExist"：原班号不存在
+     * 3."currentClassNotExist"：补课班号不存在
+     * 4."success": 更新成功
      */
     String insertMissLessonStudent(MissLessonStudentDetailedDto missLessonStudentDetailedDto);
 
@@ -44,7 +52,7 @@ public interface MissLessonStudentService {
      * 删除一个补课学生记录
      *
      * @param id 被删除补课学生的id
-     * @return
+     * @return 更新记录数
      */
     long deleteOneMissLessonStudentById(Long id);
 
@@ -52,6 +60,7 @@ public interface MissLessonStudentService {
      * 根据id删除多个补课学生记录
      *
      * @param ids 补课学生id的列表
+     * @return 更新记录数
      */
     long deleteManyMissLessonStudentsByIds(List<Long> ids);
 
@@ -59,7 +68,7 @@ public interface MissLessonStudentService {
      * 条件删除多个学补课生记录
      *
      * @param condition 输入的查询条件
-     * @return
+     * @return 更新记录数
      */
-    String deleteMissLessonStudentsByCondition(MissLessonStudentSearchCondition condition);
+    long deleteMissLessonStudentsByCondition(MissLessonStudentSearchCondition condition);
 }

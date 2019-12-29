@@ -41,7 +41,7 @@ public class QuestionAdminController extends AbstractController {
      * @return
      */
     @RequestMapping("/page")
-    public String page(Model model) {
+    public String page() {
         return "question/admin/page";
     }
 
@@ -104,7 +104,7 @@ public class QuestionAdminController extends AbstractController {
     }
 
     /**
-     * 登录问题管理中的添加问题请求
+     * 登录问题管理中的添加问题请求。需要是否匿名的判断处理
      *
      * @param anonymous 是否匿名
      * @param question  添加问题的封装
@@ -142,7 +142,7 @@ public class QuestionAdminController extends AbstractController {
     public Map<String, Object> deleteOne(@RequestParam("id") Long id) {
         Map<String, Object> map = new HashMap(1);
 
-        map.put("data", questionService.deleteOneQuestionById(id));
+        map.put("data", questionService.deleteOneQuestionById(id).getResult());
         return map;
     }
 
@@ -163,7 +163,7 @@ public class QuestionAdminController extends AbstractController {
             ids.add(question.getId());
         }
 
-        map.put("data", questionService.deleteManyQuestionsByIds(ids));
+        map.put("data", questionService.deleteManyQuestionsByIds(ids).getResult());
         return map;
     }
 }

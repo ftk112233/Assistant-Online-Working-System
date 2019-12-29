@@ -20,6 +20,7 @@ import com.jzy.model.excel.input.AssistantInfoExcel;
 import com.jzy.model.vo.ResultMap;
 import com.jzy.model.vo.Speed;
 import com.jzy.model.vo.SqlProceedSpeed;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -114,7 +115,8 @@ public class UserAdminController extends AbstractController {
 
 
     /**
-     * 重定向到编辑用户iframe子页面并返回相应model
+     * 重定向到编辑用户iframe子页面并返回相应model。
+     * 要根据当前会话用户身份判断是否有权利编辑该用户
      *
      * @param model
      * @param user  当前要被编辑的用户信息
@@ -155,7 +157,8 @@ public class UserAdminController extends AbstractController {
 
 
     /**
-     * 查询用户信息的ajax交互
+     * 查询用户信息的ajax交互。
+     * 其中用户身份证查询不分大小写，因此将该字段upperCase置为全部大写（数据库中班级编码统一为全部大写）后传给服务层
      *
      * @param myPage    分页{页号，每页数量}
      * @param condition 查询条件入参
@@ -164,7 +167,7 @@ public class UserAdminController extends AbstractController {
     @RequestMapping("/getUserInfo")
     @ResponseBody
     public ResultMap<List<User>> getUserInfo(MyPage myPage, UserSearchCondition condition) {
-        condition.setUserIdCard(condition.getUserIdCard() == null ? null : condition.getUserIdCard().toUpperCase());
+        condition.setUserIdCard(StringUtils.upperCase(condition.getUserIdCard()));
         PageInfo<User> pageInfo = userService.listUsers(myPage, condition);
         return new ResultMap<>(0, "", (int) pageInfo.getTotal(), pageInfo.getList());
     }
@@ -172,8 +175,8 @@ public class UserAdminController extends AbstractController {
     /**
      * 用户管理中的上传头像
      *
-     * @param file
-     * @param user
+     * @param file 头像文件
+     * @param user 要上传头像的用户
      * @return
      */
     @RequestMapping("/uploadUserIcon")
@@ -369,7 +372,7 @@ public class UserAdminController extends AbstractController {
                 return map;
             } catch (ExcelColumnNotFoundException e) {
                 e.printStackTrace();
-                map.put("msg", "excelColumnNotFound");
+                map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
                 return map;
             } catch (InputFileTypeException e) {
                 e.printStackTrace();

@@ -9,9 +9,9 @@ package com.jzy.model.excel;
  **/
 public interface ExcelValidity {
     /**
-     * 表格的列属性名是否匹配
+     * 表格的列属性名是否符合要求
      *
-     * @return
+     * @return 是否符合的布尔值
      */
     default boolean isValidColumn(){
         return true;

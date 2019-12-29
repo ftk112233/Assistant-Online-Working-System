@@ -27,6 +27,11 @@ import java.util.List;
 public class CampusAndClassroomServiceImpl extends AbstractServiceImpl implements CampusAndClassroomService {
     private final static Logger logger = LogManager.getLogger(CampusAndClassroomServiceImpl.class);
 
+    /**
+     * 校区和教室组合已存在
+     */
+    private final static String CAMPUS_AND_CLASSROOM_REPEAT="campusAndClassroomRepeat";
+
     @Autowired
     private CampusAndClassroomMapper campusAndClassroomMapper;
 
@@ -77,7 +82,7 @@ public class CampusAndClassroomServiceImpl extends AbstractServiceImpl implement
         }
         if (getByCampusAndClassroom(campusAndClassroom.getCampus(), campusAndClassroom.getClassroom()) != null) {
             //已存在
-            return "campusAndClassroomRepeat";
+            return CAMPUS_AND_CLASSROOM_REPEAT;
         }
 
         campusAndClassroomMapper.insertCampusAndClassroom(campusAndClassroom);

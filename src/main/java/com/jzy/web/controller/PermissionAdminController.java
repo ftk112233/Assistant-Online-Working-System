@@ -6,7 +6,6 @@ import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.RoleAndPermissionUtils;
-import com.jzy.model.RoleEnum;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.RoleAndPermissionSearchCondition;
 import com.jzy.model.entity.RoleAndPermission;
@@ -67,7 +66,7 @@ public class PermissionAdminController extends AbstractController {
 
     /**
      * 重定向到编辑角色权限iframe子页面并返回相应model
-     *
+     *  其中被编辑的roleAndPermission信息中select的元素不能通过layui iframe直接赋值，因此经由后台model传值
      * @param model
      * @param roleAndPermission 当前要被编辑的权限信息
      * @return
@@ -114,9 +113,10 @@ public class PermissionAdminController extends AbstractController {
     }
 
     /**
-     * 角色权限管理中的添加角色权限请求
+     * 角色权限管理中的添加角色权限请求。
+     * 从前端接受的角色为checkbox形式，即角色可以选择多个；故需要对每个选中的role封装成一个roleAndPermission对象，后再执行insert
      *
-     * @param roleCheckbox      角色checkbox输入
+     * @param roleCheckbox      角色checkbox输入 {@link RoleCheckbox}
      * @param roleAndPermission 新添加角色权限的信息
      * @return
      */
@@ -125,52 +125,9 @@ public class PermissionAdminController extends AbstractController {
     public Map<String, Object> insert(RoleCheckbox roleCheckbox, RoleAndPermission roleAndPermission) {
         Map<String, Object> map = new HashMap<>(1);
 
-        List<RoleAndPermission> roleAndPermissions = new ArrayList<>();
+        List<RoleAndPermission> roleAndPermissions = roleCheckbox.getRoleAndPermissions(roleAndPermission);
 
-        if (roleCheckbox.isOnRole0()) {
-            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
-            newRoleAndPermission.setRole(RoleEnum.ADMINISTRATOR.getRole());
-            newRoleAndPermission.setPerm(roleAndPermission.getPerm());
-            newRoleAndPermission.setRemark(roleAndPermission.getRemark());
-            roleAndPermissions.add(newRoleAndPermission);
-        }
-        if (roleCheckbox.isOnRole1()) {
-            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
-            newRoleAndPermission.setRole(RoleEnum.ASSISTANT_MANAGER.getRole());
-            newRoleAndPermission.setPerm(roleAndPermission.getPerm());
-            newRoleAndPermission.setRemark(roleAndPermission.getRemark());
-            roleAndPermissions.add(newRoleAndPermission);
-        }
-        if (roleCheckbox.isOnRole2()) {
-            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
-            newRoleAndPermission.setRole(RoleEnum.ASSISTANT_MASTER.getRole());
-            newRoleAndPermission.setPerm(roleAndPermission.getPerm());
-            newRoleAndPermission.setRemark(roleAndPermission.getRemark());
-            roleAndPermissions.add(newRoleAndPermission);
-        }
-        if (roleCheckbox.isOnRole3()) {
-            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
-            newRoleAndPermission.setRole(RoleEnum.ASSISTANT.getRole());
-            newRoleAndPermission.setPerm(roleAndPermission.getPerm());
-            newRoleAndPermission.setRemark(roleAndPermission.getRemark());
-            roleAndPermissions.add(newRoleAndPermission);
-        }
-        if (roleCheckbox.isOnRole4()) {
-            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
-            newRoleAndPermission.setRole(RoleEnum.TEACHER.getRole());
-            newRoleAndPermission.setPerm(roleAndPermission.getPerm());
-            newRoleAndPermission.setRemark(roleAndPermission.getRemark());
-            roleAndPermissions.add(newRoleAndPermission);
-        }
-        if (roleCheckbox.isOnRole5()) {
-            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
-            newRoleAndPermission.setRole(RoleEnum.GUEST.getRole());
-            newRoleAndPermission.setPerm(roleAndPermission.getPerm());
-            newRoleAndPermission.setRemark(roleAndPermission.getRemark());
-            roleAndPermissions.add(newRoleAndPermission);
-        }
-
-        String result = "";
+        String result = Constants.FAILURE;
         for (RoleAndPermission rap : roleAndPermissions) {
             if (!RoleAndPermissionUtils.isValidRoleAndPermissionInsertInfo(rap)) {
                 String msg = "insert方法错误入参";

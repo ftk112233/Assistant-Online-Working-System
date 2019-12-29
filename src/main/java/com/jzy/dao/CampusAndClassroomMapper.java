@@ -16,8 +16,8 @@ public interface CampusAndClassroomMapper {
     /**
      * 根据id获取校区及教室
      *
-     * @param id
-     * @return
+     * @param id 主键id
+     * @return 校区及教室对象
      */
     CampusAndClassroom getCampusAndClassroomById(@Param("id") Long id);
 
@@ -49,7 +49,7 @@ public interface CampusAndClassroomMapper {
      * 根据校区查询相应教室
      *
      * @param campus 校区名称
-     * @return
+     * @return 指定校区的所有教室
      */
     List<String> listClassroomsByCampus(@Param("campus") String campus);
 }

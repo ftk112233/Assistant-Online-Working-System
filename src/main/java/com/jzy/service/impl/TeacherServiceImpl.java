@@ -30,6 +30,16 @@ import java.util.List;
 public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherService {
     private final static Logger logger = LogManager.getLogger(TeacherServiceImpl.class);
 
+    /**
+     * 表示工号冲突
+     */
+    private final static String WORK_ID_REPEAT="workIdRepeat";
+
+    /**
+     * 表示姓名冲突
+     */
+    private final static String NAME_REPEAT="nameRepeat";
+
     @Autowired
     private TeacherMapper teacherMapper;
 
@@ -52,7 +62,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
     public UpdateResult insertTeacher(Teacher teacher) {
         if (getTeacherByName(teacher.getTeacherName()) != null) {
             //添加的姓名已存在
-            return new UpdateResult("nameRepeat");
+            return new UpdateResult(NAME_REPEAT);
         }
 
         return insertTeacherWithUnrepeatedName(teacher);
@@ -68,7 +78,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
         //新工号不为空
         if (getTeacherByWorkId(teacher.getTeacherWorkId()) != null) {
             //添加的工号已存在
-            return new UpdateResult("workIdRepeat");
+            return new UpdateResult(WORK_ID_REPEAT);
         }
 
         if (StringUtils.isEmpty(teacher.getTeacherSex())) {
@@ -98,7 +108,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
             //姓名修改过了，判断是否与已存在的姓名冲突
             if (getTeacherByName(newTeacher.getTeacherName()) != null) {
                 //添加的姓名已存在
-                return "nameRepeat";
+                return NAME_REPEAT;
             }
         }
 
@@ -171,7 +181,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
                 //工号修改过了，判断是否与已存在的工号冲突
                 if (getTeacherByWorkId(teacher.getTeacherWorkId()) != null) {
                     //修改后的工号已存在
-                    return "workIdRepeat";
+                    return WORK_ID_REPEAT;
                 }
             }
         } else {
@@ -182,7 +192,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
             //姓名修改过了，判断是否与已存在的姓名冲突
             if (getTeacherByName(teacher.getTeacherName()) != null) {
                 //修改后的姓名已存在
-                return "nameRepeat";
+                return NAME_REPEAT;
             }
         }
 
@@ -216,8 +226,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
     }
 
     @Override
-    public String deleteTeachersByCondition(TeacherSearchCondition condition) {
-        teacherMapper.deleteTeachersByCondition(condition);
-        return Constants.SUCCESS;
+    public long deleteTeachersByCondition(TeacherSearchCondition condition) {
+        return teacherMapper.deleteTeachersByCondition(condition);
     }
 }

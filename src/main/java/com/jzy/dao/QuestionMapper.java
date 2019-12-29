@@ -19,7 +19,7 @@ public interface QuestionMapper {
      * 根据id查询问题
      *
      * @param id 主键id
-     * @return
+     * @return 对应问题对象
      */
     Question getQuestionById(@Param("id") Long id);
 
@@ -27,14 +27,14 @@ public interface QuestionMapper {
      * 根据问题内容查询问题
      *
      * @param content 问题内容
-     * @return
+     * @return 对应问题对象
      */
     Question getQuestionByContent(@Param("content") String content);
 
     /**
      * 查出所有问题
      *
-     * @return
+     * @return 所有问题的list
      */
     List<Question> listAllQuestions();
 
@@ -42,7 +42,7 @@ public interface QuestionMapper {
      * 查询登录问题信息
      *
      * @param condition 查询条件入参
-     * @return
+     * @return 登录问题的详细信息
      */
     List<QuestionWithCreatorDto> listQuestions(QuestionSearchCondition condition);
 
@@ -50,7 +50,7 @@ public interface QuestionMapper {
      * 修改登录问题，由id修改
      *
      * @param question 修改后的问题信息
-     * @return
+     * @return 更新记录数
      */
     long updateQuestionInfo(Question question);
 
@@ -58,14 +58,14 @@ public interface QuestionMapper {
      * 添加问题
      *
      * @param question 添加问题的封装
-     * @return
+     * @return 更新记录数
      */
     long insertQuestion(Question question);
 
     /**
      * 查出所有问题个数
      *
-     * @return
+     * @return 所有问题个数
      */
     long countAllQuestions();
 
@@ -73,7 +73,7 @@ public interface QuestionMapper {
      * 删除一个问题
      *
      * @param id 被删除问题限的id
-     * @return
+     * @return 更新记录数
      */
     long deleteOneQuestionById(@Param("id") Long id);
 
@@ -81,7 +81,7 @@ public interface QuestionMapper {
      * 删除多个问题
      *
      * @param ids 多个问题id列表
-     * @return
+     * @return 更新记录数
      */
     long deleteManyQuestionsByIds(List<Long> ids);
 }

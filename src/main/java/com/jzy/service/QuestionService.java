@@ -6,6 +6,7 @@ import com.jzy.manager.exception.NoMoreQuestionsException;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.QuestionSearchCondition;
 import com.jzy.model.dto.QuestionWithCreatorDto;
+import com.jzy.model.dto.UpdateResult;
 import com.jzy.model.entity.Question;
 
 import java.util.List;
@@ -105,7 +106,7 @@ public interface QuestionService {
      *
      * @param myPage    分页{页号，每页数量}
      * @param condition 查询条件入参
-     * @return
+     * @return 分页结果
      */
     PageInfo<QuestionWithCreatorDto> listQuestions(MyPage myPage, QuestionSearchCondition condition);
 
@@ -113,7 +114,10 @@ public interface QuestionService {
      * 修改登录问题，由id修改
      *
      * @param question 修改后的问题信息
-     * @return
+     * @return 1."failure"：错误入参等异常
+     * 2."questionContentRepeat"：问题内容已存在
+     * 3."unchanged": 对比数据库原记录未做任何修改
+     * 4."success": 更新成功
      */
     String updateQuestionInfo(Question question);
 
@@ -121,7 +125,9 @@ public interface QuestionService {
      * 添加问题
      *
      * @param question 添加问题的封装
-     * @return
+     * @return 1."failure"：错误入参等异常
+     * 2."questionContentRepeat"：问题内容已存在
+     * 3."success": 更新成功
      */
     String insertQuestion(Question question);
 
@@ -129,15 +135,19 @@ public interface QuestionService {
      * 删除一个问题
      *
      * @param id 被删除问题限的id
-     * @return
+     * @return (更新结果, 更新记录数)
+     * 1."atLeastOneQuestionNeeded"：不能完成删除，至少需要保留一个问题
+     * 2."success": 更新成功
      */
-    String deleteOneQuestionById(Long id);
+    UpdateResult deleteOneQuestionById(Long id);
 
     /**
      * 删除多个问题
      *
      * @param ids 多个问题id列表
-     * @return
+     * @return (更新结果, 更新记录数)
+     * 1."atLeastOneQuestionNeeded"：不能完成删除，至少需要保留一个问题
+     * 2."success": 更新成功
      */
-    String deleteManyQuestionsByIds(List<Long> ids);
+    UpdateResult deleteManyQuestionsByIds(List<Long> ids);
 }

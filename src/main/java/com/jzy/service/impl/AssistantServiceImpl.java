@@ -34,12 +34,12 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     /**
      * 表示工号重复
      */
-    private final static String WORK_ID_REPEAT="workIdRepeat";
+    private final static String WORK_ID_REPEAT = "workIdRepeat";
 
     /**
      * 表示姓名重复
      */
-    private final static String NAME_REPEAT="nameRepeat";
+    private final static String NAME_REPEAT = "nameRepeat";
 
     @Autowired
     private AssistantMapper assistantMapper;
@@ -63,10 +63,9 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     public List<Assistant> listAssistantsByCampus(String campus) {
         if (StringUtils.isEmpty(campus)) {
             return new ArrayList<>();
-        } else {
-            return assistantMapper.listAssistantsByCampus(campus);
         }
 
+        return assistantMapper.listAssistantsByCampus(campus);
     }
 
     @Override
@@ -212,7 +211,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
      * 这里对于非法的入参采取抛出异常的方式，而不是返回"failure"，这是便于控制层捕获做进一步地异常处理
      *
      * @param assistant 输入的助教
-     * @return (更新结果，更新记录数)
+     * @return (更新结果 ， 更新记录数)
      */
     private UpdateResult insertAndUpdateOneAssistantFromExcel(Assistant assistant) throws InvalidParameterException {
         if (assistant == null) {

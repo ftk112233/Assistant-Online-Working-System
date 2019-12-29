@@ -89,7 +89,8 @@ public class UsefulInformationAdminController extends AbstractController {
     }
 
     /**
-     * 通过字节流向前端返回显示配图
+     * 通过字节流向前端返回显示配图。
+     * 注意对图片的处理，如果没有为空，给默认的配图
      *
      * @param request
      * @param response
@@ -148,7 +149,7 @@ public class UsefulInformationAdminController extends AbstractController {
     }
 
     /**
-     * 根据当前的所属类别获得推荐的序号值
+     * 根据当前的所属类别获得推荐的序号值。
      *
      * @param belongTo 所属类别
      * @return
@@ -172,13 +173,12 @@ public class UsefulInformationAdminController extends AbstractController {
     /**
      * 上传配图
      *
-     * @param file
-     * @param information
+     * @param file 配图文件
      * @return
      */
     @RequestMapping("/updateUploadImage")
     @ResponseBody
-    public Map<String, Object> updateUploadImage(@RequestParam(value = "file", required = false) MultipartFile file, UsefulInformation information) {
+    public Map<String, Object> updateUploadImage(@RequestParam(value = "file", required = false) MultipartFile file) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>(3);
 

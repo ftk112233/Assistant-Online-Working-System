@@ -20,7 +20,7 @@ public interface UserMapper {
      * 根据用户表自增主键id查询出用户信息
      *
      * @param id 用户表自增主键
-     * @return
+     * @return 对应用户对象
      */
     User getUserById(@Param("id") Long id);
 
@@ -28,7 +28,7 @@ public interface UserMapper {
      * 根据用户名查询出用户信息
      *
      * @param userName 用户名
-     * @return
+     * @return 对应用户对象
      */
     User getUserByName(@Param("userName") String userName);
 
@@ -36,7 +36,7 @@ public interface UserMapper {
      * 根据用户工号查询出用户信息
      *
      * @param userWorkId 用户工号
-     * @return
+     * @return 对应用户对象
      */
     User getUserByWorkId(@Param("userWorkId") String userWorkId);
 
@@ -44,7 +44,7 @@ public interface UserMapper {
      * 根据用户身份证查询出用户信息
      *
      * @param userIdCard 用户身份证
-     * @return
+     * @return 对应用户对象
      */
     User getUserByIdCard(@Param("userIdCard") String userIdCard);
 
@@ -52,7 +52,7 @@ public interface UserMapper {
      * 根据用户邮箱查询出用户信息
      *
      * @param userEmail 用户邮箱
-     * @return
+     * @return 对应用户对象
      */
     User getUserByEmail(@Param("userEmail") String userEmail);
 
@@ -60,7 +60,7 @@ public interface UserMapper {
      * 根据用户电话查询出用户信息
      *
      * @param userPhone 用户电话
-     * @return
+     * @return 对应用户对象
      */
     User getUserByPhone(@Param("userPhone") String userPhone);
 
@@ -108,7 +108,7 @@ public interface UserMapper {
      * 查询所有符合条件的用户信息
      *
      * @param condition 查询条件封装
-     * @return
+     * @return 符合条件的用户信息
      */
     List<User> listUsers(UserSearchCondition condition);
 
@@ -116,6 +116,7 @@ public interface UserMapper {
      * 根据用户id更新用户的其他字段
      *
      * @param user 修改后的用户信息
+     * @return 更新记录数
      */
     long updateUserInfo(User user);
 
@@ -123,6 +124,7 @@ public interface UserMapper {
      * 插入新用户
      *
      * @param user 新用户信息
+     * @return 更新记录数
      */
     long insertUser(User user);
 
@@ -130,6 +132,7 @@ public interface UserMapper {
      * 根据id删除一个用户
      *
      * @param id 用户id
+     * @return 更新记录数
      */
     long deleteOneUserById(@Param("id") Long id);
 
@@ -137,6 +140,7 @@ public interface UserMapper {
      * 根据工号更新用户信息
      *
      * @param user 新的用户信息
+     * @return 更新记录数
      */
     long updateUserByWorkId(User user);
 
@@ -144,13 +148,14 @@ public interface UserMapper {
      * 根据id删除多个用户
      *
      * @param ids 用户id的list
+     * @return 更新记录数
      */
     long deleteManyUsersByIds(List<Long> ids);
 
     /**
      * 查询出所有的用户
      *
-     * @return
+     * @return 所有用户集合
      */
     List<User> listAllUsers();
 
@@ -158,7 +163,7 @@ public interface UserMapper {
      * 发送消息页面，用户综合查询
      *
      * @param condition 查询条件入参
-     * @return
+     * @return 符合条件的用户信息 {@link UserSendTo}
      */
     List<UserSendTo> listUsersSendTo(UserSendToSearchCondition condition);
 }

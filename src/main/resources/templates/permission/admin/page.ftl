@@ -252,12 +252,12 @@
                             console.log(field);
                             // var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
                             var json = {
-                                role0: field.role0
-                                , role1: field.role1
-                                , role2: field.role2
-                                , role3: field.role3
-                                , role4: field.role4
-                                , role5: field.role5
+                                administrator: field.role0
+                                , assistantManager: field.role1
+                                , assistantMaster: field.role2
+                                , assistant: field.role3
+                                , teacher: field.role4
+                                , guest: field.role5
                                 , perm: field.perm
                                 , remark: field.remark
                             };

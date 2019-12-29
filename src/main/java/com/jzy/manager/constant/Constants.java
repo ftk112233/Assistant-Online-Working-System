@@ -14,6 +14,8 @@ public class Constants {
     private Constants() {
     }
 
+    public static final String INDEX="http://xdf.kurochan.top/";
+
     public static final List<String> SEX = Arrays.asList("男", "女");
 
     /**
@@ -56,6 +58,8 @@ public class Constants {
 
     public static final String UNCHANGED = "unchanged";
 
+    public static final String EXCEL_COLUMN_NOT_FOUND="excelColumnNotFound";
+
     public static final String ON = "on";
 
     public static final String YES = "yes";
@@ -64,11 +68,18 @@ public class Constants {
 
     public static final Long MINUS_ONE = -1L;
 
+    public static final Long MINUS_TWO = -2L;
+
     public static final Long GUEST_ID = MINUS_ONE;
 
     /**
      * 固定管理员id
      */
     public static final Long ADMIN_USER_ID =ZERO;
+
+    /**
+     * 固定的公告的id=-2
+     */
+    public static final Long BASE_ANNOUNCEMENT=MINUS_TWO;
 
 }

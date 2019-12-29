@@ -22,7 +22,7 @@ public interface StudentAndClassService {
      * 根据id查询StudentAndClass
      *
      * @param id 学员上课对象的自增主键id
-     * @return
+     * @return 对应的学员上课记录
      */
     StudentAndClass getStudentAndClassById(Long id);
 
@@ -31,15 +31,20 @@ public interface StudentAndClassService {
      *
      * @param studentId 学员编号
      * @param classId   班号
-     * @return
+     * @return 0或1
      */
     Long countStudentAndClassByStudentIdAndClassId(String studentId, String classId);
 
     /**
      * 插入一个学生报班记录
      *
-     * @param studentAndClassDetailedDto
-     * @return
+     * @param studentAndClassDetailedDto 新的学员报班记录
+     * @return (更新结果, 更新记录数)
+     * 1."failure"：错误入参等异常
+     * 2."studentAndClassExist"：学员在当前班的上课记录已存在
+     * 3."studentNotExist": 学员不存在
+     * 4."classNotExist": 班级不存在
+     * 5."success": 更新成功
      */
     UpdateResult insertStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto);
 
@@ -47,7 +52,9 @@ public interface StudentAndClassService {
      * 根据当前学员号和报班班号更新，报班情况
      *
      * @param studentAndClassDetailedDto
-     * @return
+     * @return (更新结果, 更新记录数)
+     * 1."failure"：错误入参等异常
+     * 2."success": 更新成功
      */
     UpdateResult updateStudentAndClassByStudentIdAndClassId(StudentAndClassDetailedDto studentAndClassDetailedDto);
 
@@ -76,11 +83,11 @@ public interface StudentAndClassService {
     UpdateResult insertAndUpdateOneStudentAndClassFromExcel(StudentAndClassDetailedDto studentAndClassDetailedDto) throws Exception;
 
     /**
-     * 查询学员上课信息的ajax交互
+     * 查询学员上课信息的ajax交互。其中classYear
      *
      * @param myPage    分页{页号，每页数量}
      * @param condition 查询条件入参
-     * @return
+     * @return 分页结果
      */
     PageInfo<StudentAndClassDetailedDto> listStudentAndClasses(MyPage myPage, StudentAndClassSearchCondition condition);
 
@@ -88,7 +95,11 @@ public interface StudentAndClassService {
      * 编辑学员上课信息，由id修改
      *
      * @param studentAndClassDetailedDto 修改后的学员上课信息
-     * @return
+     * @return 1."failure"：错误入参等异常
+     * 2."studentAndClassExist"：学员在当前班的上课记录已存在
+     * 3."studentNotExist": 学员不存在
+     * 4."classNotExist": 班级不存在
+     * 5."success": 更新成功
      */
     String updateStudentAndClassInfo(StudentAndClassDetailedDto studentAndClassDetailedDto);
 
@@ -96,7 +107,7 @@ public interface StudentAndClassService {
      * 删除一个学员上课记录
      *
      * @param id 被删除学员上课的id
-     * @return
+     * @return 更新记录数
      */
     long deleteOneStudentAndClassById(Long id);
 
@@ -104,6 +115,7 @@ public interface StudentAndClassService {
      * 根据id删除多个学员上课记录
      *
      * @param ids 学员上课记录id的列表
+     * @return 更新记录数
      */
     long deleteManyStudentAndClassesByIds(List<Long> ids);
 
@@ -127,15 +139,17 @@ public interface StudentAndClassService {
      * 条件删除多个学生上课记录
      *
      * @param condition 输入的查询条件
-     * @return
+     * @return (更新结果, 更新记录数)
+     * 1."failure"：错误入参等异常
+     * 2."success": 更新成功
      */
     UpdateResult deleteStudentAndClassesByCondition(StudentAndClassSearchCondition condition);
 
     /**
-     * 查询指定年级的学生人数
+     * 查询指定年级下的学生人数。
      *
      * @param condition 年份-季度-校区
-     * @return
+     * @return 如: NamesAndValues(names=[小初衔接, 初一, 初二], values=[100, 200, 300])，即小初衔接100人，初一200人....
      */
     NamesAndValues countStudentsGroupByClassGrade(StudentAndClassSearchCondition condition);
 
@@ -143,7 +157,7 @@ public interface StudentAndClassService {
      * 查询指定学科的学生人数
      *
      * @param condition 年份-季度-校区
-     * @return
+     * @return 如，NamesAndValues(names=[语文, 数学, 英语], values=[100, 200, 300])，即语文100人，数学200人....
      */
     NamesAndValues countStudentsGroupByClassSubject(StudentAndClassSearchCondition condition);
 
@@ -151,7 +165,7 @@ public interface StudentAndClassService {
      * 查询指定班型的学生人数
      *
      * @param condition 年份-季度-校区
-     * @return
+     * @return NamesAndValues(names = [精进, 志高, 行远], values = [100, 200, 300])，即精进100人，志高200人....
      */
     List<GroupedByTypeObjectTotal> countStudentsGroupByClassType(StudentAndClassSearchCondition condition);
 
@@ -159,7 +173,10 @@ public interface StudentAndClassService {
      * 查询指定年级对应人数，以及该年级下各班型对应人数
      *
      * @param condition 年份-季度-校区
-     * @return 结果已排序
+     * @return 结果已排序。
+     * 如，[GroupedByGradeAndTypeObjectTotal(name=小初衔接, value=1000), groupedByTypeObjectTotals=[GroupedBySubjectObjectTotal(name=精进, value=100), GroupedByGradeObjectTotal(name=志高, value=200)]
+     * ,GroupedByGradeAndTypeObjectTotal(name=初一, value=2000), groupedByTypeObjectTotals=[GroupedBySubjectObjectTotal(name=精进, value=300), GroupedByGradeObjectTotal(name=志高, value=400)]]
+     * 小初衔接年级共1000人，其中精进班100人，志高班200人；初一年级共2000人，其中精进班300人，志高班400人
      */
     List<GroupedByGradeAndTypeObjectTotal> countStudentsGroupByClassGradeAndType(StudentAndClassSearchCondition condition);
 
@@ -167,7 +184,10 @@ public interface StudentAndClassService {
      * 查询指定学科对应人数，以及该年级下各学科对应人数
      *
      * @param condition 年份-季度-校区
-     * @return 结果已排序
+     * @return 结果已排序。
+     * 如，[GroupedBySubjectAndTypeObjectTotal(name=语文, value=1000), groupedByTypeObjectTotals=[GroupedBySubjectObjectTotal(name=精进, value=100), GroupedByGradeObjectTotal(name=志高, value=200)]
+     * ,GroupedBySubjectAndTypeObjectTotal(name=数学, value=2000), groupedByTypeObjectTotals=[GroupedBySubjectObjectTotal(name=精进, value=300), GroupedByGradeObjectTotal(name=志高, value=400)]]
+     * 修读语文共1000人，其中精进班100人，志高班200人；修读数学共2000人，其中精进班300人，志高班400人
      */
     List<GroupedBySubjectAndTypeObjectTotal> countStudentsGroupByClassSubjectAndType(StudentAndClassSearchCondition condition);
 }

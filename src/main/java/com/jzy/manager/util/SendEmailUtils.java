@@ -30,6 +30,7 @@ public class SendEmailUtils {
 
     private static final String HOST = "smtp.qq.com"; //邮件服务器
 
+    @Deprecated
     public static boolean sendMail(String emailAddress, String emailMsg) {
         return sendMail(emailAddress, emailMsg, subject);
     }
@@ -42,6 +43,7 @@ public class SendEmailUtils {
      * @param emailSubject 邮件主题
      * @return
      */
+    @Deprecated
     public static boolean sendMail(String emailAddressTo, String emailMsg, String emailSubject) {
         // 发给谁
         String to = emailAddressTo;
@@ -228,6 +230,7 @@ public class SendEmailUtils {
      * @param subject
      * @param message
      */
+    @Deprecated
     public static void sendConcurrentEmail(String addressTo, String subject, String message) {
         createSendEmailThread(addressTo, subject, message).start();
     }

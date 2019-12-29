@@ -18,7 +18,7 @@ public interface MissLessonStudentMapper {
      * 查询补课学员信息
      *
      * @param condition 查询条件入参
-     * @return
+     * @return 符合条件的补课记录
      */
     List<MissLessonStudentDetailedDto> listMissLessonStudents(MissLessonStudentSearchCondition condition);
 
@@ -26,7 +26,7 @@ public interface MissLessonStudentMapper {
      * 修改补课学生信息，由id修改
      *
      * @param missLessonStudentDetailedDto 修改后的补课学生信息
-     * @return
+     * @return 更新记录数
      */
     long updateMissLessonStudentInfo(MissLessonStudentDetailedDto missLessonStudentDetailedDto);
 
@@ -34,7 +34,7 @@ public interface MissLessonStudentMapper {
      * 添加补课学生
      *
      * @param missLessonStudentDetailedDto 新添加补课学生
-     * @return
+     * @return 更新记录数
      */
     long insertMissLessonStudent(MissLessonStudentDetailedDto missLessonStudentDetailedDto);
 
@@ -42,7 +42,7 @@ public interface MissLessonStudentMapper {
      * 删除一个补课学生记录
      *
      * @param id 被删除补课学生的id
-     * @return
+     * @return 更新记录数
      */
     long deleteOneMissLessonStudentById(@Param("id") Long id);
 
@@ -50,6 +50,7 @@ public interface MissLessonStudentMapper {
      * 根据id删除多个补课学生记录
      *
      * @param ids 补课学生id的列表
+     * @return 更新记录数
      */
     long deleteManyMissLessonStudentsByIds(List<Long> ids);
 

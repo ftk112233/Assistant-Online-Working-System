@@ -1,6 +1,11 @@
 package com.jzy.model.vo;
 
+import com.jzy.model.RoleEnum;
+import com.jzy.model.entity.RoleAndPermission;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @ClassName RoleCheckbox
@@ -16,54 +21,116 @@ public class RoleCheckbox {
     /**
      * 管理员
      */
-    private String role0;
+    private String administrator;
 
     /**
      * 学管
      */
-    private String role1;
+    private String assistantManager;
 
     /**
      * 助教长
      */
-    private String role2;
+    private String assistantMaster;
 
     /**
      * 助教
      */
-    private String role3;
+    private String assistant;
 
     /**
      * 教师
      */
-    private String role4;
+    private String teacher;
 
     /**
      * 游客
      */
-    private String role5;
+    private String guest;
 
-    public boolean isOnRole0(){
-        return ON.equals(role0);
+    /**
+     * administrator的checkbox是否被选中，下同理
+     *
+     * @return
+     */
+    public boolean isAdministratorOn(){
+        return ON.equals(administrator);
     }
 
-    public boolean isOnRole1(){
-        return ON.equals(role1);
+    public boolean isAssistantManagerOn(){
+        return ON.equals(assistantManager);
     }
 
-    public boolean isOnRole2(){
-        return ON.equals(role2);
+    public boolean isAssistantMasterOn(){
+        return ON.equals(assistantMaster);
     }
 
-    public boolean isOnRole3(){
-        return ON.equals(role3);
+    public boolean isAssistantOn(){
+        return ON.equals(assistant);
     }
 
-    public boolean isOnRole4(){
-        return ON.equals(role4);
+    public boolean isTeacherOn(){
+        return ON.equals(teacher);
     }
 
-    public boolean isOnRole5(){
-        return ON.equals(role5);
+    public boolean isGuestOn(){
+        return ON.equals(guest);
+    }
+
+    /**
+     * 根据当前checkbox选中的角色，生成相应的RoleAndPermission的list。
+     * 如选中(administrator, assistantManager)
+     * 则返回[角色为管理员的roleAndPermission, 角色为学管的roleAndPermission]
+     *
+     * @param roleAndPermission 原来的roleAndPermission信息
+     * @return 含选中角色的RoleAndPermission集合
+     */
+    public List<RoleAndPermission> getRoleAndPermissions(RoleAndPermission roleAndPermission){
+        List<RoleAndPermission> roleAndPermissions = new ArrayList<>();
+
+        if (isAdministratorOn()) {
+            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
+            newRoleAndPermission.setRole(RoleEnum.ADMINISTRATOR.getRole());
+            newRoleAndPermission.setPerm(roleAndPermission.getPerm());
+            newRoleAndPermission.setRemark(roleAndPermission.getRemark());
+            roleAndPermissions.add(newRoleAndPermission);
+        }
+        if (isAssistantManagerOn()) {
+            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
+            newRoleAndPermission.setRole(RoleEnum.ASSISTANT_MANAGER.getRole());
+            newRoleAndPermission.setPerm(roleAndPermission.getPerm());
+            newRoleAndPermission.setRemark(roleAndPermission.getRemark());
+            roleAndPermissions.add(newRoleAndPermission);
+        }
+        if (isAssistantMasterOn()) {
+            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
+            newRoleAndPermission.setRole(RoleEnum.ASSISTANT_MASTER.getRole());
+            newRoleAndPermission.setPerm(roleAndPermission.getPerm());
+            newRoleAndPermission.setRemark(roleAndPermission.getRemark());
+            roleAndPermissions.add(newRoleAndPermission);
+        }
+        if (isAssistantOn()) {
+            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
+            newRoleAndPermission.setRole(RoleEnum.ASSISTANT.getRole());
+            newRoleAndPermission.setPerm(roleAndPermission.getPerm());
+            newRoleAndPermission.setRemark(roleAndPermission.getRemark());
+            roleAndPermissions.add(newRoleAndPermission);
+        }
+        if (isTeacherOn()) {
+            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
+            newRoleAndPermission.setRole(RoleEnum.TEACHER.getRole());
+            newRoleAndPermission.setPerm(roleAndPermission.getPerm());
+            newRoleAndPermission.setRemark(roleAndPermission.getRemark());
+            roleAndPermissions.add(newRoleAndPermission);
+        }
+        if (isGuestOn()) {
+            RoleAndPermission newRoleAndPermission = new RoleAndPermission();
+            newRoleAndPermission.setRole(RoleEnum.GUEST.getRole());
+            newRoleAndPermission.setPerm(roleAndPermission.getPerm());
+            newRoleAndPermission.setRemark(roleAndPermission.getRemark());
+            roleAndPermissions.add(newRoleAndPermission);
+        }
+
+        return roleAndPermissions;
     }
 }

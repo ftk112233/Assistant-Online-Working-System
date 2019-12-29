@@ -37,15 +37,18 @@ public interface RoleAndPermissionService {
      *
      * @param myPage    分页{页号，每页数量}
      * @param condition 查询条件入参
-     * @return
+     * @return 分页结果
      */
     PageInfo<RoleAndPermission> listRoleAndPerms(MyPage myPage, RoleAndPermissionSearchCondition condition);
 
     /**
      * 角色权限管理中修改角色权限信息由id修改
      *
-     * @param roleAndPermission 修改用户信息
-     * @return 返回字串代表，更新的结果。如更新成功，(角色，权限)已存在等等...
+     * @param roleAndPermission 修改过的角色权限信息信息
+     * @return 1."failure"：错误入参等异常
+     * 2."roleAndPermRepeat"：(角色, 权限)组合已存在
+     * 3."unchanged": 对比数据库原记录未做任何修改
+     * 4."success": 更新成功
      */
     String updateRoleAndPermissionInfo(RoleAndPermission roleAndPermission);
 
@@ -53,7 +56,7 @@ public interface RoleAndPermissionService {
      * 根据id查询结果对象
      *
      * @param id 自增id
-     * @return
+     * @return 对应角色权限对象
      */
     RoleAndPermission getRoleAndPermById(Long id);
 
@@ -61,7 +64,9 @@ public interface RoleAndPermissionService {
      * 角色权限管理中的添加角色权限
      *
      * @param roleAndPermission 新添加角色权限的信息
-     * @return
+     * @return 1."failure"：错误入参等异常
+     * 2."roleAndPermRepeat"：(角色, 权限)组合已存在
+     * 3."success": 更新成功
      */
     String insertRoleAndPermission(RoleAndPermission roleAndPermission);
 
@@ -69,6 +74,7 @@ public interface RoleAndPermissionService {
      * 根据id删除一个角色权限
      *
      * @param id 角色权限id
+     * @return 更新记录数
      */
     long deleteOneRoleAndPermissionById(Long id);
 
@@ -76,6 +82,7 @@ public interface RoleAndPermissionService {
      * 根据id删除多个角色权限
      *
      * @param ids 角色权限id的列表
+     * @return 更新记录数
      */
     long deleteManyRoleAndPermissionsByIds(List<Long> ids);
 }

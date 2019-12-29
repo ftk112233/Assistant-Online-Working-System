@@ -64,6 +64,18 @@ public class StudentAndClassServiceTest extends BaseTest {
 
     @Test
     public void countStudentsGroupByClassGradeAndType() {
-        System.out.println(studentAndClassService.countStudentsGroupByClassGradeAndType(new StudentAndClassSearchCondition()));
+        StudentAndClassSearchCondition condition=new StudentAndClassSearchCondition();
+        condition.setClassYear("2019");
+        condition.setClassSubSeason(null);
+        condition.setClassSeason("秋下");
+        System.out.println(studentAndClassService.countStudentsGroupByClassGradeAndType(condition));    }
+
+    @Test
+    public void countStudentsGroupByClassSubjectAndType() {
+        StudentAndClassSearchCondition condition=new StudentAndClassSearchCondition();
+        condition.setClassYear("2019");
+        condition.setClassSubSeason(null);
+        condition.setClassSeason("秋下");
+        System.out.println(studentAndClassService.countStudentsGroupByClassSubjectAndType(condition));
     }
 }

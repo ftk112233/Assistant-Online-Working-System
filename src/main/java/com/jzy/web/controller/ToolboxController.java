@@ -71,7 +71,7 @@ public class ToolboxController extends AbstractController {
             @Override
             public void run() {
                 ToolboxController.clearCache();
-                logger.info("定时清理ToolboxController的cache执行！");
+                logger.info("定时清理ToolboxController的cache执行！----" + MyTimeUtils.dateToStrYMDHMS(new Date()));
             }
         });
     }
@@ -112,7 +112,9 @@ public class ToolboxController extends AbstractController {
     }
 
     /**
-     * 手动上传花名册
+     * 手动上传花名册。
+     * 这里调用excel.readStudentAndClassInfoByClassIdFromExcel("any input");的作用是扫描一下输入excel符合要求：
+     * 如果不符合捕获异常，马上返回前端；如果没有任何异常，才把上传的文件放到cache中。
      *
      * @param file 上传的表格
      * @return
@@ -160,7 +162,7 @@ public class ToolboxController extends AbstractController {
             return map;
         } catch (ExcelColumnNotFoundException e) {
             e.printStackTrace();
-            map.put("msg", "excelColumnNotFound");
+            map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
             return map;
         }
 
@@ -169,7 +171,8 @@ public class ToolboxController extends AbstractController {
     }
 
     /**
-     * 导出助教工作手册（不含座位表）
+     * 导出助教工作手册（不含座位表）。
+     * 根据是否打开黑魔法，如果不开，表示是用户手动上传的，从cache中取文件
      *
      * @param classDetailedDto 输入的校区班号等信息的封装
      * @return
@@ -238,6 +241,7 @@ public class ToolboxController extends AbstractController {
 
     /**
      * 导出座位表
+     * 根据是否打开黑魔法，如果不开，表示是用户手动上传的，从cache中取文件
      *
      * @param classDetailedDto 输入的校区班号等信息的封装
      * @return
@@ -299,7 +303,7 @@ public class ToolboxController extends AbstractController {
 
 
     /**
-     * 手动上传用来做座位表的名单
+     * 手动上传用来做座位表的名单。 如果不符合捕获异常，马上返回前端；如果没有任何异常，才把上传的文件放到cache中。
      *
      * @param file 上传的表格
      * @return
@@ -346,7 +350,8 @@ public class ToolboxController extends AbstractController {
     }
 
     /**
-     * 导出座位表
+     * 导出座位表。
+     * 从cache中取上传过的文件
      *
      * @param classDetailedDto 输入的校区班号等信息的封装
      * @return
@@ -410,7 +415,10 @@ public class ToolboxController extends AbstractController {
     }
 
     /**
-     * 导出补课单
+     * 导出补课单。
+     * 1.根据是否同步数据库。如果打开——向数据库插入学生补课记录，向原班助教和补课班助教发送消息
+     * 2.根据是否开启邮件提醒。如果打开——向相应的助教发送邮件提醒
+     * 3.下载补课单
      *
      * @param request
      * @param response
@@ -497,11 +505,11 @@ public class ToolboxController extends AbstractController {
                     //如果打开邮件提醒
                     String title = "AOWS-重要提醒";
                     if (!StringUtils.isEmpty(originalUser.getUserEmail())) {
-                        String content1 = "你的班上有需要补课的学生！前往查看http://xdf.kurochan.top/。";
+                        String content1 = "你的班上有需要补课的学生！前往查看" + Constants.INDEX + "。";
                         SendEmailUtils.sendConcurrentEncryptedEmail(originalUser.getUserEmail(), title, content1);
                     }
                     if (!StringUtils.isEmpty(currentUser.getUserEmail())) {
-                        String content2 = "有学生补课到你的班上！前往查看http://xdf.kurochan.top/。";
+                        String content2 = "有学生补课到你的班上！前往查看" + Constants.INDEX + "。";
                         SendEmailUtils.sendConcurrentEncryptedEmail(currentUser.getUserEmail(), title, content2);
                     }
                 }
@@ -543,7 +551,7 @@ public class ToolboxController extends AbstractController {
     }
 
     /**
-     * 学管工具箱中导入信息表格的范例下载
+     * 学管工具箱中导入信息表格的范例下载。
      *
      * @param request
      * @param response
@@ -586,7 +594,7 @@ public class ToolboxController extends AbstractController {
     }
 
     /**
-     * 导入座位表模板
+     * 导入座位表模板。如果捕获异常，马上返回前端。
      *
      * @param file 上传的表格
      * @return
@@ -674,7 +682,7 @@ public class ToolboxController extends AbstractController {
 
 
     /**
-     * 上传学校统计空表
+     * 上传学校统计空表。如有异常捕获，返回前端；如没有，表格存cache。
      *
      * @param file 上传的表格
      * @return
@@ -733,7 +741,7 @@ public class ToolboxController extends AbstractController {
             return map;
         } catch (ExcelColumnNotFoundException e) {
             e.printStackTrace();
-            map.put("msg", "excelColumnNotFound");
+            map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
             return map;
         }
 
@@ -742,7 +750,7 @@ public class ToolboxController extends AbstractController {
     }
 
     /**
-     * 下载读取好的学校统计表
+     * 下载读取好的学校统计表。从cache中读用户上传的文件
      *
      * @return
      */
@@ -763,7 +771,7 @@ public class ToolboxController extends AbstractController {
 
         try {
             //下载处理好的文件
-            FileUtils.downloadFile(request, response, excelCache, "学校统计_" + UUID.randomUUID().toString() + ExcelVersionEnum.VERSION_2007.getSuffix());
+            FileUtils.downloadFile(request, response, excelCache, "学校统计_" + UUID.randomUUID().toString().replace("-", "") + excelCache.getVersion().getSuffix());
         } catch (IOException e) {
             e.printStackTrace();
             String msg = "downloadStudentSchool下载文件失败";
