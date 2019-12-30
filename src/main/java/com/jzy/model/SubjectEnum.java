@@ -94,7 +94,7 @@ public enum SubjectEnum {
     /**
      * 获取所有学科列表
      *
-     * @return
+     * @return 所有学科的list
      */
     public static List<String> getSubjectsList() {
         List<String> list = new ArrayList<>();
@@ -108,7 +108,7 @@ public enum SubjectEnum {
      * 判断当前输入学科字串是否存在
      *
      * @param subject 输入学科字串
-     * @return
+     * @return 是否存在的布尔值
      */
     public static boolean hasSubject(String subject) {
         for (SubjectEnum subjectEnum : SubjectEnum.values()) {
@@ -124,7 +124,7 @@ public enum SubjectEnum {
      * 判断当前枚举是否与学科（字符串）相同
      *
      * @param subject 字符串类型的学科
-     * @return
+     * @return 是否相同的布尔值
      */
     public boolean equals(String subject){
         if (this.getSubject().equals(subject)){
@@ -137,7 +137,7 @@ public enum SubjectEnum {
      * 根据输入学科的字符串找到对应枚举对象
      *
      * @param subject 输入学科字串
-     * @return 枚举对象
+     * @return 学科枚举对象
      */
     public static SubjectEnum getSubjectEnumBySubject(String subject) {
         for (SubjectEnum subjectEnum : SubjectEnum.values()) {
@@ -152,7 +152,7 @@ public enum SubjectEnum {
      * 根据学科名称返回权重
      *
      * @param subject 学科
-     * @return
+     * @return 学科的权重
      */
     public static int getWeightBySubject(String subject){
         SubjectEnum subjectEnum=getSubjectEnumBySubject(subject);
@@ -166,7 +166,7 @@ public enum SubjectEnum {
      * 根据学科代码返回枚举
      *
      * @param code 学科代码
-     * @return
+     * @return 学科枚举对象
      */
     public static SubjectEnum getSubjectEnumByCode(String code){
         for (SubjectEnum subjectEnum : SubjectEnum.values()) {
@@ -181,7 +181,7 @@ public enum SubjectEnum {
      * 根据学科代码返回学科名称
      *
      * @param code 学科代码
-     * @return
+     * @return 学科名称字符串
      */
     public static String getSubjectByCode(String code){
         SubjectEnum subjectEnum=getSubjectEnumByCode(code);

@@ -131,7 +131,7 @@ public class ClassUtils {
     /**
      * 根据当前月份日期智能判断当前季度
      *
-     * @return
+     * @return 季度
      */
     public static String getCurrentSeason() {
         int month = MyTimeUtils.getCurrentMonth();
@@ -167,10 +167,9 @@ public class ClassUtils {
     /**
      * 获取当前年份
      *
-     * @return
+     * @return 年份-字符串
      */
     public static String getCurrentYear() {
         return Integer.toString(MyTimeUtils.getCurrentYear());
     }
-
 }

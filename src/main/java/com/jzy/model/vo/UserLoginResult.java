@@ -57,8 +57,8 @@ public class UserLoginResult implements Serializable {
     /**
      * 获取当前账户redis冻结缓存的键
      *
-     * @param userId
-     * @return
+     * @param userId 用户id
+     * @return 缓存的键
      */
     public static String getUserLoginFailKey(String userId) {
         return RedisConstants.USER_LOGIN_FAIL_KEY + ":" + userId;

@@ -136,8 +136,19 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
         return result;
     }
 
-    @Override
-    public UpdateResult insertAndUpdateOneStudentDetailedFromExcel(Student student) throws InvalidParameterException {
+
+    /**
+     * 根据从excel中读取到的students信息（包括手机等字段），更新插入一个。根据学员编号判断：
+     * if 当前学员编号不存在
+     * 执行插入
+     * else
+     * 根据学员编号更新
+     *
+     * @param student
+     * @return 更新结果
+     * @throws InvalidParameterException 不合法的入参异常
+     */
+    private UpdateResult insertAndUpdateOneStudentDetailedFromExcel(Student student) throws InvalidParameterException {
         if (student == null) {
             String msg = "insertAndUpdateOneStudentFromExcel方法输入学生student为null!";
             logger.error(msg);
@@ -178,8 +189,18 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
         return result;
     }
 
-    @Override
-    public UpdateResult insertAndUpdateOneStudentFromExcel(Student student) throws InvalidParameterException {
+    /**
+     * 根据从excel中读取到的students信息（一般就学号姓名，不包括手机等字段），更新插入一个。根据学员编号判断：
+     * if 当前学员编号不存在
+     * 执行插入
+     * else
+     * 根据学员编号更新
+     *
+     * @param student 只含学号、姓名的学生信息
+     * @return 更新结果
+     * @throws InvalidParameterException 不合法的入参异常
+     */
+    private UpdateResult insertAndUpdateOneStudentFromExcel(Student student) throws InvalidParameterException {
         if (student == null) {
             String msg = "insertAndUpdateOneStudentFromExcel方法输入学生student为null!";
             logger.error(msg);
@@ -204,7 +225,34 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
     }
 
     @Override
-    public UpdateResult insertAndUpdateOneStudentSchoolFromExcel(Student student) throws InvalidParameterException {
+    public UpdateResult insertAndUpdateStudentsSchoolsFromExcel(List<Student> students) throws InvalidParameterException {
+        UpdateResult result = new UpdateResult();
+        for (Student student : students) {
+            if (StudentUtils.isValidStudentInfo(student)) {
+                UpdateResult resultTmp = insertAndUpdateOneStudentSchoolFromExcel(student);
+                result.add(resultTmp);
+            } else {
+                String msg = "学生花名册读取到的student学校不合法!";
+                logger.error(msg);
+                throw new InvalidParameterException(msg);
+            }
+        }
+        result.setResult(Constants.SUCCESS);
+        return result;
+    }
+
+    /**
+     * 根据从excel中读取到的student学校信息，更新一个。根据学员编号判断：
+     * if 当前学员编号不存在
+     * 执行插入
+     * else
+     * 根据学员编号更新学校
+     *
+     * @param student 只含学号、学校的学生信息
+     * @return 更新结果
+     * @throws InvalidParameterException 不合法的入参异常
+     */
+    private UpdateResult insertAndUpdateOneStudentSchoolFromExcel(Student student) throws InvalidParameterException {
         if (student == null) {
             String msg = "updateOneStudentSchoolFromExcel方法输入学生student为null!";
             logger.error(msg);
@@ -226,23 +274,6 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
             result.add(insertStudentWithUnrepeatedStudentId(student));
         }
 
-        result.setResult(Constants.SUCCESS);
-        return result;
-    }
-
-    @Override
-    public UpdateResult insertAndUpdateStudentsSchoolsFromExcel(List<Student> students) throws InvalidParameterException {
-        UpdateResult result = new UpdateResult();
-        for (Student student : students) {
-            if (StudentUtils.isValidStudentInfo(student)) {
-                UpdateResult resultTmp = insertAndUpdateOneStudentSchoolFromExcel(student);
-                result.add(resultTmp);
-            } else {
-                String msg = "学生花名册读取到的student学校不合法!";
-                logger.error(msg);
-                throw new InvalidParameterException(msg);
-            }
-        }
         result.setResult(Constants.SUCCESS);
         return result;
     }

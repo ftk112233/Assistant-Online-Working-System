@@ -74,7 +74,6 @@ public interface StudentService {
      */
     UpdateResult insertStudent(Student student);
 
-
     /**
      * 根据从excel中读取到的students信息（包括手机等字段），更新插入多个。根据学员编号判断：
      * if 当前学员编号不存在
@@ -82,62 +81,35 @@ public interface StudentService {
      * else
      * 根据学员编号更新
      *
-     * @param students
-     * @return
+     * @param students 读取到的学生信息
+     * @return 更新结果
+     * @throws InvalidParameterException 不合法的入参异常
      */
     UpdateResult insertAndUpdateStudentsDetailedFromExcel(List<Student> students) throws InvalidParameterException;
 
     /**
-     * 根据从excel中读取到的students信息（包括手机等字段），更新插入一个。根据学员编号判断：
+     * 根据从excel中读取到的students信息（就学号姓名，不包括手机等字段），更新插入多个。根据学员编号判断：
      * if 当前学员编号不存在
      * 执行插入
      * else
-     * 根据学员编号更新
+     * 根据学员编号更新姓名
      *
-     * @param student
-     * @return
-     */
-    UpdateResult insertAndUpdateOneStudentDetailedFromExcel(Student student) throws InvalidParameterException;
-
-    /**
-     * 根据从excel中读取到的students信息（一般就学号姓名，不包括手机等字段），更新插入多个。根据学员编号判断：
-     * if 当前学员编号不存在
-     * 执行插入
-     * else
-     * 根据学员编号更新
-     *
-     * @param students
-     * @return
+     * @param students 只含学号、姓名的学生信息集合
+     * @return 更新结果
+     * @throws InvalidParameterException 不合法的入参异常
      */
     UpdateResult insertAndUpdateStudentsFromExcel(List<Student> students) throws InvalidParameterException;
 
     /**
-     * 根据从excel中读取到的students信息（一般就学号姓名，不包括手机等字段），更新插入一个。根据学员编号判断：
+     * 根据从excel中读取到的students学校信息，更新多个。根据学员编号判断：
      * if 当前学员编号不存在
      * 执行插入
      * else
-     * 根据学员编号更新
+     * 根据学员编号更新学校
      *
-     * @param student
-     * @return
-     */
-    UpdateResult insertAndUpdateOneStudentFromExcel(Student student) throws InvalidParameterException;
-
-    /**
-     * 根据从excel中读取到的student学校信息，更新一个。根据学员编号判断：
-     * 仅执行更新
-     *
-     * @param student
-     * @return
-     */
-    UpdateResult insertAndUpdateOneStudentSchoolFromExcel(Student student) throws InvalidParameterException;
-
-    /**
-     * 根据从excel中读取到的students学校信息，更新多个。根据学员编号判断：
-     * 仅执行更新
-     *
-     * @param students
-     * @return
+     * @param students 只含学号、学校的学生信息集合
+     * @return 更新结果
+     * @throws InvalidParameterException 不合法的入参异常
      */
     UpdateResult insertAndUpdateStudentsSchoolsFromExcel(List<Student> students) throws InvalidParameterException;
 

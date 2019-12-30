@@ -102,8 +102,8 @@ public class MyTimeUtils {
      * @Date 17:26 2019/6/23
      * @Param [dateDate]
      **/
-    public static String dateToStrYMD(Date dateDate) {
-        return dateToStr(dateDate, FORMAT_YMD);
+    public static String dateToStringYMD(Date date) {
+        return dateToString(date, FORMAT_YMD);
     }
 
     /**
@@ -113,20 +113,20 @@ public class MyTimeUtils {
      * @Date 17:26 2019/6/23
      * @Param [dateDate]
      **/
-    public static String dateToStrYMDHMS(Date dateDate) {
-        return dateToStr(dateDate, FORMAT_YMDHMS);
+    public static String dateToStringYMDHMS(Date date) {
+        return dateToString(date, FORMAT_YMDHMS);
     }
 
     /**
      * 将短时间格式时间转换为字符串，手动指定格式
      *
-     * @param dateDate
-     * @param formatStr
-     * @return
+     * @param date Date对象
+     * @param formatStr format格式化字符串
+     * @return 字符串形式的date
      */
-    public static String dateToStr(Date dateDate, String formatStr) {
+    public static String dateToString(Date date, String formatStr) {
         SimpleDateFormat formatter = new SimpleDateFormat(formatStr);
-        String dateString = formatter.format(dateDate);
+        String dateString = formatter.format(date);
         return dateString;
     }
 
@@ -137,8 +137,8 @@ public class MyTimeUtils {
      * @Date 17:27 2019/6/23
      * @Param [strDate]
      **/
-    public static Date strToDateYMD(String strDate) {
-        return strToDate(strDate, FORMAT_YMD);
+    public static Date stringToDateYMD(String strDate) {
+        return stringToDate(strDate, FORMAT_YMD);
     }
 
     /**
@@ -148,11 +148,11 @@ public class MyTimeUtils {
      * @Date 17:27 2019/6/23
      * @Param [strDate]
      **/
-    public static Date strToDateYMDHMS(String strDate) {
-        return strToDate(strDate, FORMAT_YMDHMS);
+    public static Date stringToDateYMDHMS(String strDate) {
+        return stringToDate(strDate, FORMAT_YMDHMS);
     }
 
-    public static Date strToDate(String strDate, String formatStr) {
+    public static Date stringToDate(String strDate, String formatStr) {
         SimpleDateFormat formatter = new SimpleDateFormat(formatStr);
         ParsePosition pos = new ParsePosition(0);
         Date strtodate = formatter.parse(strDate, pos);
@@ -163,8 +163,8 @@ public class MyTimeUtils {
      * 将cst时间转为Date
      *
      * @param cst cst时间字符串
-     * @return
-     * @throws ParseException
+     * @return Date对象
+     * @throws ParseException 格式化失败
      */
     public static Date cstToDate(String cst) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
@@ -174,7 +174,7 @@ public class MyTimeUtils {
     /**
      * 获取当前年份
      *
-     * @return
+     * @return 当前年份-整数
      */
     public static int getCurrentYear() {
         Calendar cal = Calendar.getInstance();
@@ -185,7 +185,7 @@ public class MyTimeUtils {
     /**
      * 获取当前月份
      *
-     * @return
+     * @return 当前月份-整数
      */
     public static int getCurrentMonth() {
         Calendar cal = Calendar.getInstance();
@@ -196,7 +196,7 @@ public class MyTimeUtils {
     /**
      * 获取当前日
      *
-     * @return
+     * @return 当前日期-整数
      */
     public static int getCurrentDay() {
         Calendar cal = Calendar.getInstance();

@@ -1,8 +1,8 @@
 package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.exception.NoMoreQuestionsException;
+import com.jzy.manager.exception.QuestionNotExistException;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.QuestionSearchCondition;
 import com.jzy.model.dto.QuestionWithCreatorDto;
@@ -23,7 +23,7 @@ public interface QuestionService {
      * 根据id查询问题
      *
      * @param id 主键id
-     * @return
+     * @return 对应问题
      */
     Question getQuestionById(Long id);
 
@@ -31,7 +31,7 @@ public interface QuestionService {
      * 根据问题内容查询问题
      *
      * @param content 问题内容
-     * @return
+     * @return 对应问题
      */
     Question getQuestionByContent(String content);
 
@@ -52,7 +52,7 @@ public interface QuestionService {
     /**
      * 获得默认问题问题
      *
-     * @return
+     * @return 问题对象
      */
     Question getDefaultQuestion();
 
@@ -61,7 +61,7 @@ public interface QuestionService {
      * 如果数据库中有，查出所有问题，随机选一个；
      * 否者返回默认的问题（设定是数据库中必须至少保留一个问题，这个else逻辑仅仅作为备用方案）
      *
-     * @return 随机问题
+     * @return 随机问题对象
      */
     Question getRandomQuestion();
 
@@ -72,7 +72,7 @@ public interface QuestionService {
      * @return 不同的随机问题
      * @throws NoMoreQuestionsException 除当前问题外没有更多问题的异常
      */
-    Question getRandomDifferentQuestion(Question currentQuestion) throws NoMoreQuestionsException;
+    Question getDifferentRandomQuestion(Question currentQuestion) throws NoMoreQuestionsException;
 
     /**
      * 获得数据库中随机地一个问题，且该问题内容与输入问题内容currentQuestionContent不同
@@ -81,23 +81,23 @@ public interface QuestionService {
      * @return 不同的随机问题
      * @throws NoMoreQuestionsException 除当前问题外没有更多问题的异常
      */
-    Question getRandomDifferentQuestion(String currentQuestionContent) throws NoMoreQuestionsException;
+    Question getDifferentRandomQuestion(String currentQuestionContent) throws NoMoreQuestionsException;
 
     /**
      * 判断当前问题的输入答案是否正确
      *
      * @param questionContent 问题内容
      * @param answerInput     输入的答案
-     * @return
-     * @throws InvalidParameterException 不合法的问题内容questionContent，问题不存在
+     * @return 是否正确的布尔值
+     * @throws QuestionNotExistException 不合法的问题内容questionContent，问题不存在
      */
-    boolean isCorrectAnswer(String questionContent, String answerInput) throws InvalidParameterException;
+    boolean isCorrectAnswer(String questionContent, String answerInput) throws QuestionNotExistException;
 
     /**
      * 是否是永真答案——“金爷nb”
      *
      * @param answerInput 输入的答案
-     * @return
+     * @return 是否是永真答案
      */
     boolean isAlwaysTrueAnswer(String answerInput);
 

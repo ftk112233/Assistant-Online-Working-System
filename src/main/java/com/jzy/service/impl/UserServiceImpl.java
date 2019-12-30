@@ -6,6 +6,8 @@ import com.jzy.dao.UserMapper;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.constant.SessionConstants;
+import com.jzy.manager.exception.InvalidEmailException;
+import com.jzy.manager.exception.InvalidFileInputException;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.*;
 import com.jzy.model.RoleEnum;
@@ -144,9 +146,9 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     }
 
     @Override
-    public EmailVerifyCode sendVerifyCodeToEmail(String userEmail) throws InvalidParameterException {
+    public EmailVerifyCode sendVerifyCodeToEmail(String userEmail) throws InvalidEmailException {
         if (!MyStringUtils.isEmail(userEmail)) {
-            throw new InvalidParameterException("发送的用户邮箱不合法");
+            throw new InvalidEmailException("发送的用户邮箱不合法");
         }
         // 获取前端传入的参数
         String emailAddress = userEmail;
@@ -204,17 +206,17 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     }
 
     @Override
-    public String uploadUserIcon(MultipartFile file) throws InvalidParameterException {
+    public String uploadUserIcon(MultipartFile file) throws InvalidFileInputException {
         User user = userService.getSessionUserInfo();
         return uploadUserIcon(file, user.getId().toString());
     }
 
     @Override
-    public String uploadUserIcon(MultipartFile file, String id) throws InvalidParameterException {
+    public String uploadUserIcon(MultipartFile file, String id) throws InvalidFileInputException {
         if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
-            throw new InvalidParameterException(msg);
+            throw new InvalidFileInputException(msg);
         }
 
 
@@ -584,7 +586,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     }
 
     @Override
-    public UpdateResult insertAndUpdateUsersFromExcel(List<User> users) throws Exception {
+    public UpdateResult insertAndUpdateUsersFromExcel(List<User> users) throws InvalidParameterException {
         if (users == null) {
             String msg = "insertAndUpdateUsersFromExcel方法输入用户users为null!";
             logger.error(msg);
@@ -604,8 +606,18 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         return result;
     }
 
-    @Override
-    public UpdateResult insertAndUpdateOneUserFromExcel(User user) throws Exception {
+    /**
+     * 根据从excel中读取到的user信息，更新插入一个。根据工号判断：
+     * if 当前工号不存在
+     * 执行插入
+     * else
+     * 根据工号更新
+     *
+     * @param user 要更新的用户信息
+     * @return 更新结果
+     * @throws InvalidParameterException 不合法的入参异常
+     */
+    private UpdateResult insertAndUpdateOneUserFromExcel(User user) throws InvalidParameterException {
         if (user == null) {
             String msg = "insertAndUpdateOneUserFromExcel方法输入用户user为null!";
             logger.error(msg);

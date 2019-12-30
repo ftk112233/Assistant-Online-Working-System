@@ -101,7 +101,7 @@ public enum  TypeEnum {
     /**
      * 获取所有班型列表
      *
-     * @return
+     * @return 所有班型的list
      */
     public static List<String> getTypesList() {
         List<String> list = new ArrayList<>();
@@ -115,7 +115,7 @@ public enum  TypeEnum {
      * 判断当前输入班型字串是否存在
      *
      * @param type 输入班型字串
-     * @return
+     * @return 是否存在的布尔值
      */
     public static boolean hasType(String type) {
         for (TypeEnum typeEnum : TypeEnum.values()) {
@@ -131,7 +131,7 @@ public enum  TypeEnum {
      * 判断当前枚举是否与班型（字符串）相同
      *
      * @param type 字符串类型的班型
-     * @return
+     * @return 是否相同的布尔值
      */
     public boolean equals(String type){
         if (this.getType().equals(type)){
@@ -159,7 +159,7 @@ public enum  TypeEnum {
      * 根据班型名称返回权重
      *
      * @param type 班型
-     * @return
+     * @return 班型的权重
      */
     public static int getWeightByType(String type){
         TypeEnum typeEnum=getTypeEnumByType(type);
@@ -173,7 +173,7 @@ public enum  TypeEnum {
      * 根据班型代码返回枚举
      *
      * @param code 班型代码
-     * @return
+     * @return 班型枚举对象
      */
     public static TypeEnum getTypeEnumByCode(String code){
         for (TypeEnum typeEnum : TypeEnum.values()) {
@@ -188,7 +188,7 @@ public enum  TypeEnum {
      * 根据班型代码返回班型名称
      *
      * @param code 班型代码
-     * @return
+     * @return 班型名称字符串
      */
     public static String getTypeByCode(String code){
         TypeEnum typeEnum=getTypeEnumByCode(code);

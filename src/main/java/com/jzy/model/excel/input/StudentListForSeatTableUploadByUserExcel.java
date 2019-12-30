@@ -2,7 +2,7 @@ package com.jzy.model.excel.input;
 
 import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.ExcelColumnNotFoundException;
-import com.jzy.manager.exception.InputFileTypeException;
+import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.model.excel.Excel;
 import com.jzy.model.excel.ExcelVersionEnum;
 import lombok.Data;
@@ -45,15 +45,15 @@ public class StudentListForSeatTableUploadByUserExcel extends Excel implements S
     public StudentListForSeatTableUploadByUserExcel() {
     }
 
-    public StudentListForSeatTableUploadByUserExcel(String inputFile) throws IOException, InputFileTypeException {
+    public StudentListForSeatTableUploadByUserExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public StudentListForSeatTableUploadByUserExcel(File file) throws IOException, InputFileTypeException {
+    public StudentListForSeatTableUploadByUserExcel(File file) throws IOException, InvalidFileTypeException {
         super(file);
     }
 
-    public StudentListForSeatTableUploadByUserExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InputFileTypeException {
+    public StudentListForSeatTableUploadByUserExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
     }
 
@@ -65,6 +65,7 @@ public class StudentListForSeatTableUploadByUserExcel extends Excel implements S
      * 第一行必须为属性名，在第一行中找到属性名为“学员姓名”的列，将所有姓名存储到map中并返回
      *
      * @return map类型成员变量studentNames
+     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
      */
     public List<String> readStudentNames() throws ExcelColumnNotFoundException {
         resetParam();

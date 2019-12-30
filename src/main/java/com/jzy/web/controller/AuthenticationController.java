@@ -6,6 +6,7 @@ import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.constant.SessionConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.exception.NoMoreQuestionsException;
+import com.jzy.manager.exception.QuestionNotExistException;
 import com.jzy.manager.util.CodeUtils;
 import com.jzy.manager.util.CookieUtils;
 import com.jzy.manager.util.MyStringUtils;
@@ -457,7 +458,7 @@ public class AuthenticationController extends AbstractController {
         String originQuestionContent = (String) ShiroUtils.getSessionAttribute(SessionConstants.LOGIN_QUESTION_SESSION_KEY);
         //获得新问题
         try {
-            Question newQuestion = questionService.getRandomDifferentQuestion(originQuestionContent);
+            Question newQuestion = questionService.getDifferentRandomQuestion(originQuestionContent);
 
             if (newQuestion != null) {
                 //把问题内容设到session
@@ -522,7 +523,7 @@ public class AuthenticationController extends AbstractController {
                 //移除问题
                 session.removeAttribute(SessionConstants.LOGIN_QUESTION_SESSION_KEY);
             }
-        } catch (InvalidParameterException e) {
+        } catch (QuestionNotExistException e) {
             e.printStackTrace();
             String msg = "isCorrectAnswer方法输入问题内容不存在!";
             logger.error(msg);

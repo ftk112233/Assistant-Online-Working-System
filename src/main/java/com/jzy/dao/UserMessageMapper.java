@@ -19,7 +19,7 @@ public interface UserMessageMapper {
      * 根据主键id查询消息
      *
      * @param id 主键id
-     * @return
+     * @return 对应消息对象
      */
     UserMessage getUserMessageById(@Param("id") Long id);
 
@@ -27,7 +27,7 @@ public interface UserMessageMapper {
      * 根据拥有消息的用户的id查询消息
      *
      * @param userId 拥有消息的用户的id
-     * @return
+     * @return 对应消息对象
      */
     UserMessage getUserMessageByUserId(@Param("userId") Long userId);
 
@@ -35,7 +35,7 @@ public interface UserMessageMapper {
      * 根据用户id（发送方）查询消息
      *
      * @param userFromId 用户id（发送方）
-     * @return
+     * @return 对应消息对象
      */
     UserMessage getUserMessageByUserFromId(@Param("userFromId") Long userFromId);
 

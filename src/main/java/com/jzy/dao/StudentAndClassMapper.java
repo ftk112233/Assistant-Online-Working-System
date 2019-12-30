@@ -88,7 +88,7 @@ public interface StudentAndClassMapper {
      * 根据班级编码查询班级的所有学生及班级的详细信息
      *
      * @param classId 班级编码
-     * @return
+     * @return 结果用 {@link StudentAndClassDetailedDto} 的子类 {@link StudentAndClassDetailedWithSubjectsDto} 返回，子类和父类字段的差集都先空着
      */
     List<StudentAndClassDetailedWithSubjectsDto> listStudentAndClassesByClassId(@Param("classId") String classId);
 
@@ -96,7 +96,7 @@ public interface StudentAndClassMapper {
      * 根据学员号, 当前年份-季度，查询该学生的所有上课详细信息
      *
      * @param condition 学员号, 当前年份-季度等信息
-     * @return
+     * @return 所有上课详细信息
      */
     List<StudentAndClassDetailedDto> listStudentAndClassesWithSubjectsByStudentId(StudentAndClassSearchCondition condition);
 

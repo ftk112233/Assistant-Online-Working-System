@@ -103,8 +103,7 @@ public interface ClassService {
     /**
      * 返回所有的班级编码
      *
-     * @param
-     * @return
+     * @return 所有的班级编码
      */
     List<String> listAllClassIds();
 
@@ -112,7 +111,7 @@ public interface ClassService {
      * 根据班级编码模糊查询返回匹配的班级编码,注意这里classId不是主键id
      *
      * @param classId 班级编码
-     * @return
+     * @return 所有匹配的班级编码
      */
     List<String> listClassIdsLikeClassId(String classId);
 

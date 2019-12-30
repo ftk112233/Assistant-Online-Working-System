@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
-import com.jzy.manager.exception.ExcelColumnNotFoundException;
-import com.jzy.manager.exception.InputFileTypeException;
-import com.jzy.manager.exception.InvalidParameterException;
-import com.jzy.manager.exception.NoAuthorizationException;
+import com.jzy.manager.exception.*;
 import com.jzy.manager.util.UserUtils;
 import com.jzy.model.RoleEnum;
 import com.jzy.model.dto.MyPage;
@@ -345,14 +342,14 @@ public class UserAdminController extends AbstractController {
         if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
-            throw new InvalidParameterException(msg);
+            throw new InvalidFileInputException(msg);
         }
 
 
         if (!Excel.isExcel(file.getOriginalFilename())) {
             String msg = "上传文件不是excel";
             logger.error(msg);
-            throw new InvalidParameterException(msg);
+            throw new InvalidFileInputException(msg);
         }
 
         long startTime = System.currentTimeMillis();   //获取开始时间
@@ -374,7 +371,7 @@ public class UserAdminController extends AbstractController {
                 e.printStackTrace();
                 map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
                 return map;
-            } catch (InputFileTypeException e) {
+            } catch (InvalidFileTypeException e) {
                 e.printStackTrace();
                 map.put("msg", Constants.FAILURE);
                 return map;

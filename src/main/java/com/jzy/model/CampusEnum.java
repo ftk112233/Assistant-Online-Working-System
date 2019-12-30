@@ -47,7 +47,7 @@ public enum CampusEnum {
     private static final Map<String, List<String>> CAMPUS_CLASSROOMS = new HashMap<>(CAMPUS_COUNT);
 
     static {
-        /**
+        /*
          * 曹杨，一校区编码为"02"，二校区编码为"07"
          */
         CAMPUSES.put("02", CAO_YANG.getName());
@@ -153,7 +153,7 @@ public enum CampusEnum {
      * 判断当前输入校区名称字串是否存在
      *
      * @param campusNameStr 输入校区名称字串
-     * @return
+     * @return 是否存在的布尔值
      */
     public static boolean hasCampusName(String campusNameStr) {
         for (CampusEnum campusEnum : CampusEnum.values()) {
@@ -168,7 +168,7 @@ public enum CampusEnum {
      * 根据输入校区名的字符串找到对应枚举对象
      *
      * @param campusNameStr 输入校区名称字串
-     * @return 枚举对象
+     * @return 校区枚举对象
      */
     public static CampusEnum getCampusEnumByNameString(String campusNameStr) {
         for (CampusEnum campusEnum : CampusEnum.values()) {
@@ -183,7 +183,7 @@ public enum CampusEnum {
      * 根据输入校区编码找到对应校区名称
      *
      * @param campusCode 校区编码
-     * @return
+     * @return 校区名称字符串
      */
     public static String getCampusNameByCode(String campusCode) {
         return CAMPUSES.get(campusCode);
@@ -193,17 +193,17 @@ public enum CampusEnum {
      * 根据输入校区编码找到对应校区枚举
      *
      * @param campusCode 校区编码
-     * @return
+     * @return 校区枚举对象
      */
     public static CampusEnum getCampusEnumByCode(String campusCode) {
         return getCampusEnumByNameString(CAMPUSES.get(campusCode));
     }
 
     /**
-     * 根据输入的校区名称返回其所有的教师门牌号，改用数据库查询
+     * 根据输入的校区名称返回其所有的教室门牌号，改用数据库查询
      *
      * @param campusName 校区名称
-     * @return
+     * @return 指定校区名下的所有教室
      */
     @Deprecated
     public static List<String> getClassroomsByCampusName(String campusName) {

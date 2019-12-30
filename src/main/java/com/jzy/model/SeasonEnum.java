@@ -82,7 +82,7 @@ public enum SeasonEnum {
     /**
      * 获取所有季度列表
      *
-     * @return
+     * @return 所有季度的list
      */
     public static List<String> getSeasonsList() {
         List<String> list = new ArrayList<>();
@@ -96,7 +96,7 @@ public enum SeasonEnum {
      * 判断当前输入季度字串是否存在
      *
      * @param season 输入季度字串
-     * @return
+     * @return 是否存在的布尔值
      */
     public static boolean hasSeason(String season) {
         for (SeasonEnum seasonEnum : SeasonEnum.values()) {
@@ -112,7 +112,7 @@ public enum SeasonEnum {
      * 判断当前枚举是否与季度（字符串）相同
      *
      * @param season 字符串类型的季度
-     * @return
+     * @return 是否相同的布尔值
      */
     public boolean equals(String season) {
         if (this.getSeason().equals(season)) {
@@ -125,7 +125,7 @@ public enum SeasonEnum {
      * 根据季度代码返回枚举
      *
      * @param code 季度代码
-     * @return
+     * @return 季度枚举对象
      */
     public static SeasonEnum getSeasonEnumByCode(String code) {
         for (SeasonEnum seasonEnum : SeasonEnum.values()) {
@@ -140,7 +140,7 @@ public enum SeasonEnum {
      * 根据季度代码返回季度名称
      *
      * @param code 季度代码
-     * @return
+     * @return 季度名称
      */
     public static String getSeasonByCode(String code) {
         SeasonEnum seasonEnum = getSeasonEnumByCode(code);
@@ -155,7 +155,7 @@ public enum SeasonEnum {
      * 根据季度名称返回季度枚举
      *
      * @param season 季度
-     * @return
+     * @return 季度枚举对象
      */
     public static SeasonEnum getSeasonEnumBySeason(String season) {
         for (SeasonEnum seasonEnum : SeasonEnum.values()) {
@@ -170,7 +170,7 @@ public enum SeasonEnum {
      * 根据季度名称返回季度的时间权重
      *
      * @param season 季度
-     * @return
+     * @return 季度的时间权重
      */
     public static int getTimeWeightBySeason(String season) {
         SeasonEnum seasonEnum = getSeasonEnumBySeason(season);

@@ -1,7 +1,7 @@
 package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jzy.manager.exception.InvalidParameterException;
+import com.jzy.manager.exception.InvalidFileInputException;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.UsefulInformationSearchCondition;
 import com.jzy.model.entity.UsefulInformation;
@@ -105,9 +105,9 @@ public interface UsefulInformationService {
      *
      * @param file 上传得到的文件
      * @return 保存文件的名称，用来传回前端，用以之后修改信息中的配图路径
-     * @throws InvalidParameterException 不合法的入参
+     * @throws InvalidFileInputException 不合法的入参
      */
-    String uploadImage(MultipartFile file) throws InvalidParameterException;
+    String uploadImage(MultipartFile file) throws InvalidFileInputException;
 
     /**
      * 上传配图。如果id为空，配图的文件名保存为uuid; 如果id非空保存为”image_"+id的值的形式
@@ -115,9 +115,9 @@ public interface UsefulInformationService {
      * @param file 上传得到的文件
      * @param id   用户id
      * @return 保存文件的名称，用来传回前端，用以之后修改信息中的配图路径
-     * @throws InvalidParameterException 不合法的入参
+     * @throws InvalidFileInputException 不合法的入参
      */
-    String uploadImage(MultipartFile file, String id) throws InvalidParameterException;
+    String uploadImage(MultipartFile file, String id) throws InvalidFileInputException;
 
     /**
      * 常用信息管理中的编辑常用信息请求，由id修改。

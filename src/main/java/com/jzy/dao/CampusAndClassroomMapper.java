@@ -25,7 +25,7 @@ public interface CampusAndClassroomMapper {
      * 删除指定校区的校区教室记录
      *
      * @param campus 校区名称
-     * @return
+     * @return 更新记录数
      */
     long deleteCampusAndClassroomsByCampus(@Param("campus") String campus);
 
@@ -34,7 +34,7 @@ public interface CampusAndClassroomMapper {
      *
      * @param campus    校区名称
      * @param classroom 教室号
-     * @return
+     * @return 校区及教室对象
      */
     CampusAndClassroom getByCampusAndClassroom(@Param("campus") String campus, @Param("classroom") String classroom);
 
@@ -42,6 +42,7 @@ public interface CampusAndClassroomMapper {
      * 插入一个校区和教室记录
      *
      * @param campusAndClassroom 要插入的对象
+     * @return 更新记录数
      */
     long insertCampusAndClassroom(CampusAndClassroom campusAndClassroom);
 

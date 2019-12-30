@@ -1,10 +1,11 @@
 package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
+import com.jzy.manager.exception.InvalidEmailException;
+import com.jzy.manager.exception.InvalidFileInputException;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.model.dto.*;
 import com.jzy.model.entity.User;
-import com.jzy.model.dto.UserSendTo;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -93,11 +94,10 @@ public interface UserService {
      */
     User getSessionUserInfo();
 
-
     /**
      * 当用户修改过资料后，更新当前session中的登录用户信息（通过自增代理主键id更新）
      *
-     * @return
+     * @return 会话中的用户信息
      */
     User updateSessionUserInfo();
 
@@ -106,15 +106,15 @@ public interface UserService {
      *
      * @param userEmail 向哪个邮箱法发
      * @return 发送的邮箱验证码的信息封装对象（目标邮箱，验证码）
-     * @throws InvalidParameterException 不合法的用户邮箱输入
+     * @throws InvalidEmailException 不合法的用户邮箱输入
      */
-    EmailVerifyCode sendVerifyCodeToEmail(String userEmail) throws InvalidParameterException;
+    EmailVerifyCode sendVerifyCodeToEmail(String userEmail) throws InvalidEmailException;
 
     /**
-     * 验证邮箱验证码正确与否，是否失效
+     * 验证邮箱验证码正确与否；或是否失效
      *
      * @param emailVerifyCode 输入验证码信息封装对象
-     * @return
+     * @return 不失效且正确=true
      */
     boolean isValidEmailVerifyCode(EmailVerifyCode emailVerifyCode);
 
@@ -132,8 +132,9 @@ public interface UserService {
      *
      * @param file 上传得到的文件
      * @return 保存文件的名称，用来传回前端，用以之后修改用户信息中的头像路径
+     * @throws InvalidFileInputException 不合法的文件入参
      */
-    String uploadUserIcon(MultipartFile file) throws InvalidParameterException;
+    String uploadUserIcon(MultipartFile file) throws InvalidFileInputException;
 
     /**
      * 上传用户头像
@@ -141,8 +142,9 @@ public interface UserService {
      * @param file 上传得到的文件
      * @param id   用户id
      * @return 保存文件的名称，用来传回前端，用以之后修改用户信息中的头像路径
+     * @throws InvalidFileInputException 不合法的文件入参
      */
-    String uploadUserIcon(MultipartFile file, String id) throws InvalidParameterException;
+    String uploadUserIcon(MultipartFile file, String id) throws InvalidFileInputException;
 
     /**
      * 用户自己修改用户基本资料，注意这里不是用户管理中的更改
@@ -248,22 +250,11 @@ public interface UserService {
      * else
      * 根据工号更新
      *
-     * @param users
-     * @return
+     * @param users 要更新的用户信息集合
+     * @return 更新结果
+     * @throws InvalidParameterException 不合法的入参异常
      */
-    UpdateResult insertAndUpdateUsersFromExcel(List<User> users) throws Exception;
-
-    /**
-     * 根据从excel中读取到的user信息，更新插入一个。根据工号判断：
-     * if 当前工号不存在
-     * 执行插入
-     * else
-     * 根据工号更新
-     *
-     * @param user
-     * @return
-     */
-    UpdateResult insertAndUpdateOneUserFromExcel(User user) throws Exception;
+    UpdateResult insertAndUpdateUsersFromExcel(List<User> users) throws InvalidParameterException;
 
     /**
      * 根据工号更新用户信息

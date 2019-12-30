@@ -2,7 +2,7 @@ package com.jzy.model.excel.input;
 
 import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.ExcelColumnNotFoundException;
-import com.jzy.manager.exception.InputFileTypeException;
+import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.model.entity.Student;
 import com.jzy.model.excel.Excel;
 import com.jzy.model.excel.ExcelVersionEnum;
@@ -62,15 +62,15 @@ public class StudentSchoolExcel extends Excel implements Serializable {
     public StudentSchoolExcel() {
     }
 
-    public StudentSchoolExcel(String inputFile) throws IOException, InputFileTypeException {
+    public StudentSchoolExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public StudentSchoolExcel(File file) throws IOException, InputFileTypeException {
+    public StudentSchoolExcel(File file) throws IOException, InvalidFileTypeException {
         super(file);
     }
 
-    public StudentSchoolExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InputFileTypeException {
+    public StudentSchoolExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
     }
 
@@ -110,7 +110,7 @@ public class StudentSchoolExcel extends Excel implements Serializable {
      * 从学生学校统计表中读取信息
      *
      * @return 返回表格有效数据的行数
-     * @throws ExcelColumnNotFoundException
+     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
      */
     public int readStudentsSchoolsFromExcel() throws ExcelColumnNotFoundException {
         resetParam();
@@ -245,7 +245,7 @@ public class StudentSchoolExcel extends Excel implements Serializable {
         studentCache = new HashMap<>();
     }
 
-    public static void main(String[] args) throws IOException, ExcelColumnNotFoundException, InputFileTypeException {
+    public static void main(String[] args) throws IOException, ExcelColumnNotFoundException, InvalidFileTypeException {
         StudentSchoolExcel excel = new StudentSchoolExcel("C:\\Users\\92970\\Desktop\\1.xlsx");
         excel.getValueAt(0, 1, 0);
         excel.setValueAt(0, 1, 1, "1");

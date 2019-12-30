@@ -68,7 +68,7 @@ public enum RoleEnum {
      * 判断当前输入角色字串是否存在
      *
      * @param role 输入角色字串
-     * @return
+     * @return 是否存在的布尔值
      */
     public static boolean hasRole(String role) {
         for (RoleEnum roleEnum : RoleEnum.values()) {
@@ -84,7 +84,7 @@ public enum RoleEnum {
      * 判断当前枚举是否与角色（字符串）相同
      *
      * @param role 字符串类型的角色
-     * @return
+     * @return 是否相同的布尔值
      */
     public boolean equals(String role){
         if (this.getRole().equals(role)){

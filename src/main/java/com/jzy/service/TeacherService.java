@@ -1,6 +1,7 @@
 package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.TeacherSearchCondition;
 import com.jzy.model.dto.UpdateResult;
@@ -77,27 +78,13 @@ public interface TeacherService {
 
     /**
      * 根据从excel中读取到的teachers信息，更新插入多个。根据工号判断：
-     * if 当前工号不存在
-     * 执行插入
-     * else
-     * 根据工号更新
+     * 仅执行插入。由于目前版本从表格只能读取教师姓名字段，所以不用工号做重名校验。只要当前名字不存在，即插入
      *
-     * @param teachers
-     * @return
+     * @param teachers 读取到的教师信息集合
+     * @return 更新结果
+     * @throws InvalidParameterException 不合法的入参异常
      */
-    UpdateResult insertAndUpdateTeachersFromExcel(List<Teacher> teachers) throws Exception;
-
-    /**
-     * 根据从excel中读取到的teachers信息，更新插入一个。根据工号判断：
-     * if 当前工号不存在
-     * 执行插入
-     * else
-     * 根据工号更新
-     *
-     * @param teacher
-     * @return
-     */
-    UpdateResult insertAndUpdateOneTeacherFromExcel(Teacher teacher) throws Exception;
+    UpdateResult insertAndUpdateTeachersFromExcel(List<Teacher> teachers) throws InvalidParameterException;
 
     /**
      * 返回符合条件的教师信息分页结果

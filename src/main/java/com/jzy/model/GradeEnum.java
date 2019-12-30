@@ -96,7 +96,7 @@ public enum  GradeEnum {
     /**
      * 获取所有年级列表
      *
-     * @return
+     * @return 所有年级的list
      */
     public static List<String> getGradesList() {
         List<String> list = new ArrayList<>();
@@ -110,7 +110,7 @@ public enum  GradeEnum {
      * 判断当前输入年级字串是否存在
      *
      * @param grade 输入年级字串
-     * @return
+     * @return 是否存在的布尔值
      */
     public static boolean hasGrade(String grade) {
         for (GradeEnum gradeEnum : GradeEnum.values()) {
@@ -123,10 +123,10 @@ public enum  GradeEnum {
 
 
     /**
-     * 判断当前枚举是否与年级（字符串）相同
+     * 判断当前枚举的grade属性是否与输入年级（字符串）相同
      *
      * @param grade 字符串类型的年级
-     * @return
+     * @return 是否相同
      */
     public boolean equals(String grade){
         if (this.getGrade().equals(grade)){
@@ -139,7 +139,7 @@ public enum  GradeEnum {
      * 根据输入年级的字符串找到对应枚举对象
      *
      * @param grade 输入年级字串
-     * @return 枚举对象
+     * @return 年级枚举对象
      */
     public static GradeEnum getGradeEnumByGrade(String grade) {
         for (GradeEnum gradeEnum : GradeEnum.values()) {
@@ -154,7 +154,7 @@ public enum  GradeEnum {
      * 根据年级名称返回权重
      *
      * @param grade 年级
-     * @return
+     * @return 指定年级的权重
      */
     public static int getWeightByGrade(String grade){
         GradeEnum gradeEnum=getGradeEnumByGrade(grade);
@@ -168,7 +168,7 @@ public enum  GradeEnum {
      * 根据年级代码返回枚举
      *
      * @param code 年级代码
-     * @return
+     * @return 年级枚举对象
      */
     public static GradeEnum getGradeEnumByCode(String code){
         for (GradeEnum gradeEnum : GradeEnum.values()) {
@@ -183,7 +183,7 @@ public enum  GradeEnum {
      * 根据年级代码返回年级名称
      *
      * @param code 年级代码
-     * @return
+     * @return 年级名称字符串
      */
     public static String getGradeByCode(String code){
         GradeEnum gradeEnum=getGradeEnumByCode(code);

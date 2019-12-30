@@ -121,7 +121,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
     }
 
     @Override
-    public UpdateResult insertAndUpdateTeachersFromExcel(List<Teacher> teachers) throws Exception {
+    public UpdateResult insertAndUpdateTeachersFromExcel(List<Teacher> teachers) throws InvalidParameterException {
         UpdateResult result=new UpdateResult();
         for (Teacher teacher : teachers) {
             if (TeacherUtils.isValidTeacherInfo(teacher)) {
@@ -137,8 +137,15 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
         return result;
     }
 
-    @Override
-    public UpdateResult insertAndUpdateOneTeacherFromExcel(Teacher teacher) throws Exception {
+    /**
+     * 根据从excel中读取到的teachers信息，更新插入一个。根据工号判断：
+     * 仅执行插入。由于目前版本从表格只能读取教师姓名字段，所以不用工号做重名校验。只要当前名字不存在，即插入
+     *
+     * @param teacher 读取到的教师信息
+     * @return 更新结果
+     * @throws InvalidParameterException 不合法的入参异常
+     */
+    private UpdateResult insertAndUpdateOneTeacherFromExcel(Teacher teacher) throws InvalidParameterException {
         if (teacher == null) {
             String msg = "insertAndUpdateOneTeacherFromExcel方法输入teacher为null!";
             logger.error(msg);
@@ -147,7 +154,8 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
 
         UpdateResult result=new UpdateResult();
 
-        /**
+        /*
+           TODO
          * 由于目前版本从表格只能读取教师姓名字段，所以不用工号做重名校验。只要当前名字不存在，即插入
          */
         if (getTeacherByName(teacher.getTeacherName()) == null) {

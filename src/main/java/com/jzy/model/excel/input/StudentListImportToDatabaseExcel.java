@@ -2,7 +2,7 @@ package com.jzy.model.excel.input;
 
 import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.ExcelColumnNotFoundException;
-import com.jzy.manager.exception.InputFileTypeException;
+import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.manager.util.FileUtils;
 import com.jzy.manager.util.MyTimeUtils;
 import com.jzy.model.dto.StudentAndClassDetailedDto;
@@ -79,15 +79,15 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
     public StudentListImportToDatabaseExcel() {
     }
 
-    public StudentListImportToDatabaseExcel(String inputFile) throws IOException, InputFileTypeException {
+    public StudentListImportToDatabaseExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public StudentListImportToDatabaseExcel(File file) throws IOException, InputFileTypeException {
+    public StudentListImportToDatabaseExcel(File file) throws IOException, InvalidFileTypeException {
         super(file);
     }
 
-    public StudentListImportToDatabaseExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InputFileTypeException {
+    public StudentListImportToDatabaseExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
     }
 
@@ -100,7 +100,7 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
      * 学生Student对象直接读出，教师teacher对象也直接读出，班级信息整体和学生、助教、教师封装成StudentAndClassDto
      *
      * @return 返回表格有效数据的行数
-     * @throws ExcelColumnNotFoundException
+     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
      */
     public int readStudentAndClassInfoFromExcel() throws ExcelColumnNotFoundException {
         resetParam();
@@ -192,7 +192,7 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
      * 学生Student对象直接读出
      *
      * @return 返回表格有效数据的行数
-     * @throws ExcelColumnNotFoundException
+     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
      */
     public int readStudentDetailInfoFromExcel() throws ExcelColumnNotFoundException {
         resetParam();
@@ -259,7 +259,7 @@ public class StudentListImportToDatabaseExcel extends Excel implements Serializa
         studentAndClassDetailedDtos = new ArrayList<>();
     }
 
-    public static void main(String[] args) throws IOException, ExcelColumnNotFoundException, InputFileTypeException {
+    public static void main(String[] args) throws IOException, ExcelColumnNotFoundException, InvalidFileTypeException {
         StudentListImportToDatabaseExcel excel = new StudentListImportToDatabaseExcel("D:\\aows_resources\\toolbox\\example\\" + FileUtils.EXAMPLES.get(4));
         excel.readStudentDetailInfoFromExcel();
         for (Student student : excel.getStudents()) {

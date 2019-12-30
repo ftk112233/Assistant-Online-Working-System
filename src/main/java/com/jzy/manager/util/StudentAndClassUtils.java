@@ -65,24 +65,4 @@ public class StudentAndClassUtils {
     public static boolean isValidStudentAndClassUpdateDtoInfo(StudentAndClassDetailedDto studentAndClassDetailedDto) {
         return isValidStudentAndClassDetailedDtoInfo(studentAndClassDetailedDto);
     }
-
-    /**
-     * 将输入对象的年份字段由yyyy-mm-dd转成yyyy
-     * 改用class类自带的成员方法
-     *
-     * @param input
-     * @return
-     */
-    @Deprecated
-    public static StudentAndClassDetailedDto parseClassYear(StudentAndClassDetailedDto input) {
-        if (input != null) {
-            String year = input.getClassYear();
-            int idx = year.indexOf('-');
-            if (idx >= 0) {
-                String parsedYear = year.substring(0, year.indexOf('-'));
-                input.setClassYear(parsedYear);
-            }
-        }
-        return input;
-    }
 }

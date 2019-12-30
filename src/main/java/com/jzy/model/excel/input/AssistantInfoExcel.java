@@ -2,7 +2,7 @@ package com.jzy.model.excel.input;
 
 import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.ExcelColumnNotFoundException;
-import com.jzy.manager.exception.InputFileTypeException;
+import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.manager.util.CodeUtils;
 import com.jzy.model.entity.Assistant;
 import com.jzy.model.entity.User;
@@ -62,15 +62,15 @@ public class AssistantInfoExcel extends Excel {
     public AssistantInfoExcel() {
     }
 
-    public AssistantInfoExcel(String inputFile) throws IOException, InputFileTypeException {
+    public AssistantInfoExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public AssistantInfoExcel(File file) throws IOException, InputFileTypeException {
+    public AssistantInfoExcel(File file) throws IOException, InvalidFileTypeException {
         super(file);
     }
 
-    public AssistantInfoExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InputFileTypeException {
+    public AssistantInfoExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
     }
 
@@ -82,7 +82,8 @@ public class AssistantInfoExcel extends Excel {
      * 从助教信息表中读取信息，封装成user对象和assistant对象添加到成员变量列表中
      *
      * @return 返回表格有效数据的行数
-     * @throws ExcelColumnNotFoundException
+     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
+
      */
     public int readUsersAndAssistantsFromExcel() throws ExcelColumnNotFoundException {
         resetParam();
@@ -185,6 +186,7 @@ public class AssistantInfoExcel extends Excel {
      * 从助教信息表中读取信息，封装成user对象
      *
      * @return 返回表格有效数据的行数
+     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
      */
     public int readUsers() throws ExcelColumnNotFoundException {
         return readUsersAndAssistantsFromExcel();
@@ -194,6 +196,7 @@ public class AssistantInfoExcel extends Excel {
      * 从助教信息表中读取信息，封装成assistant对象
      *
      * @return 返回表格有效数据的行数
+     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
      */
     public int readAssistants() throws ExcelColumnNotFoundException {
         return readUsersAndAssistantsFromExcel();

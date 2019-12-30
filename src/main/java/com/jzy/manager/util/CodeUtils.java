@@ -12,6 +12,11 @@ import java.util.Random;
  * @date 2019/11/14 23:19
  **/
 public class CodeUtils {
+    /**
+     * 默认验证码长度为6
+     */
+    private final static int DEFAULT_CODE_LENGTH = 6;
+
     private CodeUtils() {
     }
 
@@ -20,13 +25,13 @@ public class CodeUtils {
      *
      * @param input 输入的验证码
      * @param code  实际的验证码
-     * @return
+     * @return 是否相同的布尔值
      */
     public static boolean equals(String input, String code) {
-        if (StringUtils.isEmpty(input) && StringUtils.isEmpty(code)){
+        if (StringUtils.isEmpty(input) && StringUtils.isEmpty(code)) {
             return true;
-        } else{
-            if (StringUtils.isEmpty(input) || StringUtils.isEmpty(code)){
+        } else {
+            if (StringUtils.isEmpty(input) || StringUtils.isEmpty(code)) {
                 return false;
             }
         }
@@ -36,27 +41,24 @@ public class CodeUtils {
     /**
      * 生成6位随机数
      *
-     * @return
+     * @return 6位数字随机数
      */
     public static String randomCodes() {
-        return randomCodes(6);
+        return randomCodes(DEFAULT_CODE_LENGTH);
     }
 
 
     /**
      * 生成n位随机数
      *
-     * @return
+     * @return n位数字随机数
      */
     public static String randomCodes(int len) {
         StringBuilder code = new StringBuilder();
         Random random = new Random();
         for (int i = 0; i < len; i++) {
-
             int r = random.nextInt(10); //每次随机出一个数字（0-9）
-
             code.append(r);  //把每次随机出的数字拼在一起
-
         }
         return code.toString();
     }
@@ -66,7 +68,7 @@ public class CodeUtils {
      *
      * @param start 开始（含）
      * @param end   结束（含）
-     * @return
+     * @return 随机整数
      */
     public static Integer oneRandomNumber(int start, int end) {
         Random random = new Random();

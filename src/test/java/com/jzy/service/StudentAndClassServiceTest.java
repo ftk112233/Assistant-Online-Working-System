@@ -2,7 +2,7 @@ package com.jzy.service;
 
 import com.jzy.BaseTest;
 import com.jzy.config.FilePathProperties;
-import com.jzy.manager.exception.InputFileTypeException;
+import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
 import com.jzy.model.dto.StudentAndClassSearchCondition;
 import com.jzy.model.excel.input.StudentListImportToDatabaseExcel;
@@ -37,16 +37,7 @@ public class StudentAndClassServiceTest extends BaseTest {
     }
 
     @Test
-    public void listStudentAndClassesByClassId() {
-        List<StudentAndClassDetailedWithSubjectsDto> studentAndClassDetailedDtos=studentAndClassService.listStudentAndClassesByClassId("U6ECFC020006");
-        for (StudentAndClassDetailedWithSubjectsDto s:studentAndClassDetailedDtos){
-            System.out.println(s);
-        }
-        System.out.println(studentAndClassDetailedDtos.size());
-    }
-
-    @Test
-    public void listStudentAndClassesWithSubjectsByClassId() throws IOException, InputFileTypeException {
+    public void listStudentAndClassesWithSubjectsByClassId() throws IOException, InvalidFileTypeException {
         List<StudentAndClassDetailedWithSubjectsDto> results=studentAndClassService.listStudentAndClassesWithSubjectsByClassId("U6ECFC020006");
 //        AssistantTutorialExcel excel=new AssistantTutorialExcel(filePathProperties.getToolboxAssistantTutorialTemplatePathAndName("曹杨"));
         SeatTableTemplateExcel excel=new SeatTableTemplateExcel(filePathProperties.getToolboxSeatTableTemplatePathAndName("曹杨"));

@@ -19,7 +19,7 @@ public interface ClassMapper {
      * 根据班级id查询班级
      *
      * @param id 班级id
-     * @return
+     * @return 对应班级对象
      */
     Class getClassById(@Param("id") Long id);
 
@@ -27,7 +27,7 @@ public interface ClassMapper {
      * 根据班级编码查询班级,，注意这里classId不是主键id
      *
      * @param classId 班级编码
-     * @return
+     * @return 对应班级对象
      */
     Class getClassByClassId(@Param("classId") String classId);
 
@@ -35,7 +35,7 @@ public interface ClassMapper {
      * 修改班级信息由班级编码修改，注意这里classId不是主键id
      *
      * @param classDetailedDto 修改后的班级信息
-     * @return
+     * @return 更新记录数
      */
     long updateClassByClassId(ClassDetailedDto classDetailedDto);
 
@@ -43,7 +43,7 @@ public interface ClassMapper {
      * 添加班级
      *
      * @param classDetailedDto 新添加班级的信息
-     * @return
+     * @return 更新记录数
      */
     long insertClass(ClassDetailedDto classDetailedDto);
 
@@ -51,7 +51,7 @@ public interface ClassMapper {
      * 返回符合条件的班级信息分页结果
      *
      * @param condition  查询条件入参
-     * @return
+     * @return 符合条件的班级详细信息集合
      */
     List<ClassDetailedDto> listClasses(ClassSearchCondition condition);
 
@@ -90,6 +90,7 @@ public interface ClassMapper {
      * 根据id删除多个班级
      *
      * @param ids 班级id的列表
+     * @return 更新记录数
      */
     long deleteManyClassesByIds(List<Long> ids);
 
@@ -97,7 +98,7 @@ public interface ClassMapper {
      * 根据输入条件删除指定的班级
      *
      * @param condition 输入条件封装
-     * @return
+     * @return 更新记录数
      */
     long deleteClassesByCondition(ClassSearchCondition condition);
 
@@ -105,7 +106,7 @@ public interface ClassMapper {
      * 根据班级编码模糊查询班级,注意这里classId不是主键id
      *
      * @param classId 班级编码
-     * @return
+     * @return like入参班号的所有班级对象
      */
     List<Class> listClassesLikeClassId(@Param("classId") String classId);
 
@@ -113,7 +114,7 @@ public interface ClassMapper {
      * 根据班级编码模糊查询返回匹配的班级编码,注意这里classId不是主键id
      *
      * @param classId 班级编码
-     * @return
+     * @return like入参班号的所有班号
      */
     List<String> listClassIdsLikeClassId(@Param("classId") String classId);
 
@@ -121,7 +122,7 @@ public interface ClassMapper {
      * 根据班级id查询班级详细信息，注意这里是主键id
      *
      * @param id 班级id
-     * @return
+     * @return 对应id的班级详细信息
      */
     ClassDetailedDto getClassDetailById(@Param("id") Long id);
 }

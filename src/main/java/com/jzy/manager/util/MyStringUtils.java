@@ -23,7 +23,7 @@ public class MyStringUtils {
     /**
      * 判断输入字串是否符合用户名格式，6~20位(数字、字母、下划线)以字母开头
      *
-     * @param userName
+     * @param userName 输入字串
      * @return
      */
     public static boolean isUserName(String userName) {

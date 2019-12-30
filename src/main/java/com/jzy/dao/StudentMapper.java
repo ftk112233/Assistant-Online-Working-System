@@ -18,7 +18,7 @@ public interface StudentMapper {
      * 根据主键id修改查询学生
      *
      * @param id 主键id
-     * @return
+     * @return 对应学生对象
      */
     Student getStudentById(@Param("id") Long id);
 
@@ -26,7 +26,7 @@ public interface StudentMapper {
      * 根据学员编号修改查询学生
      *
      * @param studentId 学员编号
-     * @return
+     * @return 对应学生对象
      */
     Student getStudentByStudentId(@Param("studentId") String studentId);
 
@@ -34,6 +34,7 @@ public interface StudentMapper {
      * 添加学生
      *
      * @param student 添加学生的信息
+     * @return 更新记录数
      */
     long insertStudent(Student student);
 
@@ -41,7 +42,7 @@ public interface StudentMapper {
      * 修改学生信息学员编号修改
      *
      * @param student 修改后的学生信息
-     * @return
+     * @return 更新记录数
      */
     long updateStudentByStudentId(Student student);
 
@@ -49,7 +50,7 @@ public interface StudentMapper {
      * 修改学生姓名学员编号修改
      *
      * @param student 修改后的学生信息
-     * @return
+     * @return 更新记录数
      */
     long updateStudentNameByStudentId(Student student);
 

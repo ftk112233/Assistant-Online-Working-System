@@ -2,7 +2,9 @@ package com.jzy.web.controller;
 
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.SessionConstants;
+import com.jzy.manager.exception.InvalidEmailException;
 import com.jzy.manager.exception.InvalidParameterException;
+import com.jzy.manager.exception.InvalidPhoneException;
 import com.jzy.manager.util.FileUtils;
 import com.jzy.manager.util.ShiroUtils;
 import com.jzy.manager.util.UserUtils;
@@ -222,7 +224,7 @@ public class UserController extends AbstractController {
         if (!UserUtils.isValidUserEmail(newEmail)) {
             String msg = "addNewEmail方法错误入参";
             logger.error(msg);
-            throw new InvalidParameterException(msg);
+            throw new InvalidEmailException(msg);
         }
         User userInfoSession = userService.getSessionUserInfo();
         //前端服务端双重校验确保安全
@@ -269,7 +271,7 @@ public class UserController extends AbstractController {
         if (!UserUtils.isValidUserEmail(userNewEmail)) {
             String msg = "modifyCurrentEmail方法错误入参";
             logger.error(msg);
-            throw new InvalidParameterException(msg);
+            throw new InvalidEmailException(msg);
         }
         User userInfoSession = userService.getSessionUserInfo();
         //前端服务端双重校验确保安全
@@ -310,7 +312,7 @@ public class UserController extends AbstractController {
         if (!UserUtils.isValidUserPhone(userNewPhone)) {
             String msg = "modifyCurrentPhone方法错误入参";
             logger.error(msg);
-            throw new InvalidParameterException(msg);
+            throw new InvalidPhoneException(msg);
         }
         User userInfoSession = userService.getSessionUserInfo();
 

@@ -19,7 +19,7 @@ public interface RoleAndPermissionService {
      * 根据角色查询权限
      *
      * @param role 角色
-     * @return
+     * @return 角色权限对象
      */
     List<String> listPermsByRole(String role);
 
@@ -28,7 +28,7 @@ public interface RoleAndPermissionService {
      *
      * @param role 角色
      * @param perm 权限
-     * @return
+     * @return 角色权限对象
      */
     RoleAndPermission getByRoleAndPerm(String role, String perm);
 

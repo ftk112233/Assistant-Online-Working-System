@@ -77,6 +77,7 @@ public interface UserMapper {
      * 用户自己更新用户信息，只有部分字段，注意不是用户管理中的更新
      *
      * @param user 用户信息
+     * @return 更新记录数
      */
     long updateOwnInfo(User user);
 
@@ -85,6 +86,7 @@ public interface UserMapper {
      *
      * @param id 用户id
      * @param userEmail 新安全邮箱
+     * @return 更新记录数
      */
     long updateEmailById(@Param("id") Long id, @Param("userEmail") String userEmail);
 
@@ -93,6 +95,7 @@ public interface UserMapper {
      *
      * @param id 用户id
      * @param userPhone 新安全手机
+     * @return 更新记录数
      */
     long updatePhoneById(@Param("id") Long id,@Param("userPhone") String userPhone);
 
@@ -101,6 +104,7 @@ public interface UserMapper {
      *
      * @param id 用户id
      * @param userPassword 用户密文密码
+     * @return 更新记录数
      */
     long updatePasswordById(@Param("id") Long id,@Param("userPassword") String userPassword);
 

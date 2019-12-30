@@ -9,6 +9,7 @@ import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.exception.NoMoreQuestionsException;
+import com.jzy.manager.exception.QuestionNotExistException;
 import com.jzy.manager.util.CodeUtils;
 import com.jzy.manager.util.QuestionUtils;
 import com.jzy.model.dto.MyPage;
@@ -99,16 +100,16 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
     }
 
     @Override
-    public Question getRandomDifferentQuestion(Question currentQuestion) throws NoMoreQuestionsException {
+    public Question getDifferentRandomQuestion(Question currentQuestion) throws NoMoreQuestionsException {
         if (currentQuestion == null) {
             return getRandomQuestion();
         }
 
-        return getRandomDifferentQuestion(currentQuestion.getContent());
+        return getDifferentRandomQuestion(currentQuestion.getContent());
     }
 
     @Override
-    public Question getRandomDifferentQuestion(String currentQuestionContent) throws NoMoreQuestionsException {
+    public Question getDifferentRandomQuestion(String currentQuestionContent) throws NoMoreQuestionsException {
         if (StringUtils.isEmpty(currentQuestionContent)) {
             return getRandomQuestion();
         }
@@ -129,7 +130,7 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
     }
 
     @Override
-    public boolean isCorrectAnswer(String questionContent, String answerInput) throws InvalidParameterException {
+    public boolean isCorrectAnswer(String questionContent, String answerInput) throws QuestionNotExistException {
         if (StringUtils.isEmpty(answerInput)){
             return false;
         }
@@ -141,7 +142,7 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
 
         Question question = getQuestionByContent(questionContent);
         if (question == null) {
-            throw new InvalidParameterException("当前问题不存在！");
+            throw new QuestionNotExistException("当前问题不存在！");
         }
 
         if (isAlwaysTrueAnswer(answerInput)) {

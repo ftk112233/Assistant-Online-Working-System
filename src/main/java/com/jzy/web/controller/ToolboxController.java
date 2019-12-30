@@ -71,7 +71,7 @@ public class ToolboxController extends AbstractController {
             @Override
             public void run() {
                 ToolboxController.clearCache();
-                logger.info("定时清理ToolboxController的cache执行！----" + MyTimeUtils.dateToStrYMDHMS(new Date()));
+                logger.info("定时清理ToolboxController的cache执行！----" + MyTimeUtils.dateToStringYMDHMS(new Date()));
             }
         });
     }
@@ -132,14 +132,14 @@ public class ToolboxController extends AbstractController {
         if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
-            throw new InvalidParameterException(msg);
+            throw new InvalidFileInputException(msg);
         }
 
 
         if (!Excel.isExcel(file.getOriginalFilename())) {
             String msg = "上传文件不是excel";
             logger.error(msg);
-            throw new InvalidParameterException(msg);
+            throw new InvalidFileInputException(msg);
         }
 
         StudentListUploadByUserExcel excel = null;
@@ -152,7 +152,7 @@ public class ToolboxController extends AbstractController {
             //将当前用户上传的花名册put到cache中，以备输出文件时读取
             Long id = userService.getSessionUserInfo().getId();
             studentListUploadByUserCache.put(id, excel);
-        } catch (InputFileTypeException e) {
+        } catch (InvalidFileTypeException e) {
             e.printStackTrace();
             map.put("msg", Constants.FAILURE);
             return map;
@@ -222,7 +222,7 @@ public class ToolboxController extends AbstractController {
             e.printStackTrace();
         } catch (ClassTooManyStudentsException e) {
             e.printStackTrace();
-        } catch (InputFileTypeException e) {
+        } catch (InvalidFileTypeException e) {
             e.printStackTrace();
         }
 
@@ -284,7 +284,7 @@ public class ToolboxController extends AbstractController {
             e.printStackTrace();
         } catch (ExcelColumnNotFoundException e) {
             e.printStackTrace();
-        } catch (InputFileTypeException e) {
+        } catch (InvalidFileTypeException e) {
             e.printStackTrace();
         }
 
@@ -321,14 +321,14 @@ public class ToolboxController extends AbstractController {
         if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
-            throw new InvalidParameterException(msg);
+            throw new InvalidFileInputException(msg);
         }
 
 
         if (!Excel.isExcel(file.getOriginalFilename())) {
             String msg = "上传文件不是excel";
             logger.error(msg);
-            throw new InvalidParameterException(msg);
+            throw new InvalidFileInputException(msg);
         }
 
         StudentListForSeatTableUploadByUserExcel excel = null;
@@ -471,7 +471,7 @@ public class ToolboxController extends AbstractController {
                         .append("<br>" + "补课班级名称：").append(currentClass.getClassName())
                         .append("<br>" + "补课班级助教：").append(currentClass.getAssistantName())
                         .append("<br>" + "补课班级任课教师：").append(currentClass.getTeacherName())
-                        .append("<br>" + "补课时间 ：").append(MyTimeUtils.dateToStrYMD(missLessonStudentDetailedDto.getDate()) + ", " + missLessonStudentDetailedDto.getCurrentClassSimplifiedTime())
+                        .append("<br>" + "补课时间 ：").append(MyTimeUtils.dateToStringYMD(missLessonStudentDetailedDto.getDate()) + ", " + missLessonStudentDetailedDto.getCurrentClassSimplifiedTime())
                         .append("<br>" + "补课班级上课教室：").append(currentClass.getClassCampus() + currentClass.getClassroom() + "教");
                 originalMessage.setMessageContent(originalMessageContent.toString());
                 originalMessage.setMessageTime(new Date());
@@ -489,7 +489,7 @@ public class ToolboxController extends AbstractController {
                 currentMessage.setMessageTitle("有学生补课到你的班上");
                 StringBuffer currentMessageContent = new StringBuffer();
                 currentMessageContent.append("学生<em>").append(missLessonStudentDetailedDto.getStudentName()).append("</em>补课到你的\"").append(currentClass.getClassName()).append("\"(上课时间：").append(currentClass.getClassSimplifiedTime()).append("，上课教室：").append(currentClass.getClassCampus() + currentClass.getClassroom() + "教)。")
-                        .append("<br>" + "补课日期：").append(MyTimeUtils.dateToStrYMD(missLessonStudentDetailedDto.getDate()))
+                        .append("<br>" + "补课日期：").append(MyTimeUtils.dateToStringYMD(missLessonStudentDetailedDto.getDate()))
                         .append("<br>" + "原班号：").append(originalClass.getClassId())
                         .append("<br>" + "原班级名称：").append(originalClass.getClassName())
                         .append("<br>" + "原班级助教：").append(originalClass.getAssistantName())
@@ -519,7 +519,7 @@ public class ToolboxController extends AbstractController {
             excel.writeMissLesson(missLessonStudentDetailedDto);
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (InputFileTypeException e) {
+        } catch (InvalidFileTypeException e) {
             e.printStackTrace();
         }
 
@@ -617,14 +617,14 @@ public class ToolboxController extends AbstractController {
         if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
-            throw new InvalidParameterException(msg);
+            throw new InvalidFileInputException(msg);
         }
 
 
         if (!Excel.isExcel(file.getOriginalFilename())) {
             String msg = "上传文件不是excel";
             logger.error(msg);
-            throw new InvalidParameterException(msg);
+            throw new InvalidFileInputException(msg);
         }
 
         SeatTableTemplateInputExcel excel = null;
@@ -655,7 +655,7 @@ public class ToolboxController extends AbstractController {
             e.printStackTrace();
             map.put("msg", "sheetNameError");
             return map;
-        } catch (InputFileTypeException e) {
+        } catch (InvalidFileTypeException e) {
             e.printStackTrace();
             map.put("msg", Constants.FAILURE);
             return map;
@@ -700,14 +700,14 @@ public class ToolboxController extends AbstractController {
         if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
-            throw new InvalidParameterException(msg);
+            throw new InvalidFileInputException(msg);
         }
 
 
         if (!Excel.isExcel(file.getOriginalFilename())) {
             String msg = "上传文件不是excel";
             logger.error(msg);
-            throw new InvalidParameterException(msg);
+            throw new InvalidFileInputException(msg);
         }
 
         StudentSchoolExcel excel = null;
@@ -735,7 +735,7 @@ public class ToolboxController extends AbstractController {
             e.printStackTrace();
             map.put("msg", Constants.FAILURE);
             return map;
-        } catch (InputFileTypeException e) {
+        } catch (InvalidFileTypeException e) {
             e.printStackTrace();
             map.put("msg", Constants.FAILURE);
             return map;

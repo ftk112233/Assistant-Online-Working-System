@@ -180,8 +180,8 @@ public class FileUtils {
     /**
      * 输入文件名是否是图片
      *
-     * @param imgPath
-     * @return
+     * @param imgPath 文件目录
+     * @return 是否是图片的布尔值
      */
     public static boolean isImage(String imgPath) {
         boolean flag = false;

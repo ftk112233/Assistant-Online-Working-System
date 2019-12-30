@@ -76,7 +76,7 @@ public enum  SubSeasonEnum {
     /**
      * 获取所有分期的列表
      *
-     * @return
+     * @return 所有分期的list
      */
     public static List<String> getSubSeasonsList() {
         List<String> list = new ArrayList<>();
@@ -90,7 +90,7 @@ public enum  SubSeasonEnum {
      * 判断当前输入季度分期字串是否存在
      *
      * @param subSeason 输入季度分期
-     * @return
+     * @return 是否存在的布尔值
      */
     public static boolean hasSubSeason(String subSeason) {
         for (SubSeasonEnum subSeasonEnum : SubSeasonEnum.values()) {
@@ -106,7 +106,7 @@ public enum  SubSeasonEnum {
      * 判断当前季度分期枚举是否与季度分期（字符串）相同
      *
      * @param subSeason 字符串类型的季度分期
-     * @return
+     * @return 是否相同的布尔值
      */
     public boolean equals(String subSeason){
         if (this.getSubSeason().equals(subSeason)){
@@ -120,7 +120,7 @@ public enum  SubSeasonEnum {
      * 根据季度分期名称返回季度枚举
      *
      * @param subSeason 分期
-     * @return
+     * @return 分期枚举对象
      */
     public static SubSeasonEnum getSubSeasonEnumBySubSeason(String subSeason){
         for (SubSeasonEnum seasonEnum : SubSeasonEnum.values()) {
@@ -135,7 +135,7 @@ public enum  SubSeasonEnum {
      * 根据季度分期名称返回季度分期的时间权重
      *
      * @param subSeason 分期
-     * @return
+     * @return 分期的时间权重
      */
     public static int getTimeWeightBySubSeason(String subSeason){
         SubSeasonEnum seasonEnum=getSubSeasonEnumBySubSeason(subSeason);

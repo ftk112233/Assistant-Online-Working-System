@@ -1,7 +1,7 @@
 package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jzy.manager.exception.InvalidParameterException;
+import com.jzy.manager.exception.InvalidFileInputException;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.UserMessageDto;
 import com.jzy.model.dto.UserMessageSearchCondition;
@@ -132,8 +132,9 @@ public interface UserMessageService {
      *
      * @param file 上传得到的文件
      * @return 保存文件的名称，用来传回前端
+     * @throws InvalidFileInputException 不合法的文件入参
      */
-    String uploadPicture(MultipartFile file) throws InvalidParameterException;
+    String uploadPicture(MultipartFile file) throws InvalidFileInputException;
 
     /**
      * 上传消息图片附件
@@ -141,8 +142,9 @@ public interface UserMessageService {
      * @param file 上传得到的文件
      * @param id   用户id
      * @return 保存文件的名称，用来传回前端
+     * @throws InvalidFileInputException 不合法的文件入参
      */
-    String uploadPicture(MultipartFile file, String id) throws InvalidParameterException;
+    String uploadPicture(MultipartFile file, String id) throws InvalidFileInputException;
 
     /**
      * 批量插入用户消息

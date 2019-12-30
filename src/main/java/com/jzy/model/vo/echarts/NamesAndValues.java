@@ -32,7 +32,7 @@ public class NamesAndValues implements Serializable {
     /**
      * 把(name, total)的对象，添加到NamesAndTotals对象中
      *
-     * @param objectTotal
+     * @param objectTotal (类别, 数量)对象
      */
     public void add(DefaultGroupedObjectTotal objectTotal) {
         if (objectTotal != null) {
@@ -44,8 +44,8 @@ public class NamesAndValues implements Serializable {
     /**
      * 把(name, total)的对象列表，按对应泛型中自定义的排序规则添加到NamesAndTotals对象中。
      *
-     * @param objectTotals
-     * @param <T>          DefaultGroupedObjectTotal及其子类
+     * @param objectTotals 多个(类别, 数量)对象
+     * @param <T>    DefaultGroupedObjectTotal及其子类
      */
     public <T extends DefaultGroupedObjectTotal> void addAll(List<T> objectTotals) {
         if (objectTotals != null) {

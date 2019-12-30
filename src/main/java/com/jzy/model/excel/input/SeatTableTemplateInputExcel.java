@@ -1,7 +1,7 @@
 package com.jzy.model.excel.input;
 
 import com.jzy.manager.exception.ExcelSheetNameInvalidException;
-import com.jzy.manager.exception.InputFileTypeException;
+import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.model.entity.CampusAndClassroom;
 import com.jzy.model.excel.Excel;
 import com.jzy.model.excel.ExcelVersionEnum;
@@ -32,15 +32,15 @@ public class SeatTableTemplateInputExcel extends Excel implements Serializable {
     public SeatTableTemplateInputExcel() {
     }
 
-    public SeatTableTemplateInputExcel(String inputFile) throws IOException, InputFileTypeException {
+    public SeatTableTemplateInputExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public SeatTableTemplateInputExcel(File file) throws IOException, InputFileTypeException {
+    public SeatTableTemplateInputExcel(File file) throws IOException, InvalidFileTypeException {
         super(file);
     }
 
-    public SeatTableTemplateInputExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InputFileTypeException {
+    public SeatTableTemplateInputExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
     }
 
@@ -57,8 +57,9 @@ public class SeatTableTemplateInputExcel extends Excel implements Serializable {
     /**
      * 根据输入输入的座位表读取教室信息
      *
-     * @return
-     * @throws IOException
+     * @return 所有校区和教室对象的封装集合
+     * @throws IOException 处理excel时的io异常
+     * @throws ExcelSheetNameInvalidException 不合法的sheet名，这里指教室门牌号不是纯数字
      */
     public List<CampusAndClassroom> readSeatTable() throws IOException, ExcelSheetNameInvalidException {
         resetParam();

@@ -1,6 +1,7 @@
 package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.model.dto.*;
 import com.jzy.model.dto.echarts.GroupedByGradeAndTypeObjectTotal;
 import com.jzy.model.dto.echarts.GroupedBySubjectAndTypeObjectTotal;
@@ -51,7 +52,7 @@ public interface StudentAndClassService {
     /**
      * 根据当前学员号和报班班号更新，报班情况
      *
-     * @param studentAndClassDetailedDto
+     * @param studentAndClassDetailedDto 更新后的学员上课记录
      * @return (更新结果, 更新记录数)
      * 1."failure"：错误入参等异常
      * 2."success": 更新成功
@@ -65,22 +66,11 @@ public interface StudentAndClassService {
      * else
      * 根据学员号和班号更新
      *
-     * @param studentAndClassDetailedDtos
-     * @return
+     * @param studentAndClassDetailedDtos 要更新的学员上课记录
+     * @return 更新结果
+     * @throws InvalidParameterException 不合法的入参异常
      */
-    UpdateResult insertAndUpdateStudentAndClassesFromExcel(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos) throws Exception;
-
-    /**
-     * 根据从excel中读取到的studentAndClassDetailedDto信息，更新插入一个。根据学员号和班号判断：
-     * if 当前学员号和班号组合不存在
-     * 执行插入
-     * else
-     * 根据学员号和班号更新
-     *
-     * @param studentAndClassDetailedDto
-     * @return
-     */
-    UpdateResult insertAndUpdateOneStudentAndClassFromExcel(StudentAndClassDetailedDto studentAndClassDetailedDto) throws Exception;
+    UpdateResult insertAndUpdateStudentAndClassesFromExcel(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos) throws InvalidParameterException;
 
     /**
      * 查询学员上课信息的ajax交互。其中classYear
@@ -120,18 +110,10 @@ public interface StudentAndClassService {
     long deleteManyStudentAndClassesByIds(List<Long> ids);
 
     /**
-     * 根据班级编码查询班级的所有学生及班级的详细信息
-     *
-     * @param classId 班级编码
-     * @return
-     */
-    List<StudentAndClassDetailedWithSubjectsDto> listStudentAndClassesByClassId(String classId);
-
-    /**
      * 根据班级编码查询班级的所有学生及班级的详细信息，包括该学生在当前班级id所解析到的年份、季度下所修读的所有学科
      *
      * @param classId 班级编码
-     * @return
+     * @return 带当前学员所有在读学科的学员上课记录 {@link StudentAndClassDetailedWithSubjectsDto}
      */
     List<StudentAndClassDetailedWithSubjectsDto> listStudentAndClassesWithSubjectsByClassId(String classId);
 

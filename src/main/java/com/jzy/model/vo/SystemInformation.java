@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @author JinZhiyun
  * @version 1.0
  * @ClassName SystemInformation
- * @description 系统信息的vo
+ * @description 系统信息的vo TODO
  * @date 2019/12/7 9:06
  **/
 @Data

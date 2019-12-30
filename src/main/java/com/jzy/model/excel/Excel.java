@@ -1,6 +1,6 @@
 package com.jzy.model.excel;
 
-import com.jzy.manager.exception.InputFileTypeException;
+import com.jzy.manager.exception.InvalidFileTypeException;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -64,9 +64,9 @@ public class Excel implements Serializable, Resettable, ExcelValidity {
      *
      * @param inputFile 输入文件路径
      * @throws IOException
-     * @throws InputFileTypeException
+     * @throws InvalidFileTypeException
      */
-    public Excel(String inputFile) throws IOException, InputFileTypeException {
+    public Excel(String inputFile) throws IOException, InvalidFileTypeException {
         this(new File(inputFile));
     }
 
@@ -75,9 +75,9 @@ public class Excel implements Serializable, Resettable, ExcelValidity {
      *
      * @param file 输入文件对象
      * @throws IOException
-     * @throws InputFileTypeException
+     * @throws InvalidFileTypeException
      */
-    public Excel(File file) throws IOException, InputFileTypeException {
+    public Excel(File file) throws IOException, InvalidFileTypeException {
         String inputFile = file.getName();
         if (inputFile.endsWith(ExcelVersionEnum.VERSION_2003.getSuffix())) {
             version = ExcelVersionEnum.VERSION_2003;
@@ -86,7 +86,7 @@ public class Excel implements Serializable, Resettable, ExcelValidity {
             version = ExcelVersionEnum.VERSION_2007;
             workbook = new XSSFWorkbook(new FileInputStream(file));
         } else {
-            throw new InputFileTypeException("输入文件格式不是.xls或.xlsx");
+            throw new InvalidFileTypeException("输入文件格式不是.xls或.xlsx");
         }
         this.inputFilePath = inputFile;
     }
@@ -97,9 +97,9 @@ public class Excel implements Serializable, Resettable, ExcelValidity {
      * @param inputStream 输入流对象
      * @param version     excel版本的枚举对象
      * @throws IOException
-     * @throws InputFileTypeException
+     * @throws InvalidFileTypeException
      */
-    public Excel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InputFileTypeException {
+    public Excel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         if (version.equals(ExcelVersionEnum.VERSION_2003)) {
             this.version = version;
             workbook = new HSSFWorkbook(inputStream);
@@ -107,7 +107,7 @@ public class Excel implements Serializable, Resettable, ExcelValidity {
             this.version = version;
             workbook = new XSSFWorkbook(inputStream);
         } else {
-            throw new InputFileTypeException("输入文件格式不是.xls或.xlsx");
+            throw new InvalidFileTypeException("输入文件格式不是.xls或.xlsx");
         }
     }
 

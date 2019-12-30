@@ -1,7 +1,7 @@
 package com.jzy.model.excel.template;
 
 
-import com.jzy.manager.exception.InputFileTypeException;
+import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.manager.util.MyTimeUtils;
 import com.jzy.model.dto.MissLessonStudentDetailedDto;
 import com.jzy.model.excel.Excel;
@@ -26,15 +26,15 @@ public class MissedLessonExcel extends Excel implements Serializable {
     public MissedLessonExcel() {
     }
 
-    public MissedLessonExcel(String inputFile) throws IOException, InputFileTypeException {
+    public MissedLessonExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public MissedLessonExcel(File file) throws IOException, InputFileTypeException {
+    public MissedLessonExcel(File file) throws IOException, InvalidFileTypeException {
         super(file);
     }
 
-    public MissedLessonExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InputFileTypeException {
+    public MissedLessonExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
     }
 
@@ -58,8 +58,8 @@ public class MissedLessonExcel extends Excel implements Serializable {
      *
      * @param input             缺课的信息封装
      * @param missedLessonCount 缺课次数
-     * @return
-     * @throws IOException
+     * @return 写入成功与否
+     * @throws IOException 写excel的io异常
      */
     public boolean writeMissLesson(MissLessonStudentDetailedDto input, int missedLessonCount) throws IOException {
         int sheetIx = 0;
@@ -72,7 +72,7 @@ public class MissedLessonExcel extends Excel implements Serializable {
         //填补课班号
         this.setValueAt(sheetIx, targetRow, 4, input.getCurrentClassId());
         //填上课时间
-        this.setValueAt(sheetIx, targetRow, 5, MyTimeUtils.dateToStrYMD(input.getDate()) + ", " + input.getCurrentClassSimplifiedTime());
+        this.setValueAt(sheetIx, targetRow, 5, MyTimeUtils.dateToStringYMD(input.getDate()) + ", " + input.getCurrentClassSimplifiedTime());
         //填上课教室
         this.setValueAt(sheetIx, targetRow, 6, input.getCurrentClassroom());
         //填原班助教

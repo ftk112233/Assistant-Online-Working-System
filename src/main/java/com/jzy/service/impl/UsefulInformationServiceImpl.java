@@ -7,7 +7,7 @@ import com.github.pagehelper.PageInfo;
 import com.jzy.dao.UsefulInformationMapper;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.RedisConstants;
-import com.jzy.manager.exception.InvalidParameterException;
+import com.jzy.manager.exception.InvalidFileInputException;
 import com.jzy.manager.util.FileUtils;
 import com.jzy.model.CampusEnum;
 import com.jzy.model.dto.MyPage;
@@ -126,17 +126,17 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
     }
 
     @Override
-    public String uploadImage(MultipartFile file) throws InvalidParameterException {
+    public String uploadImage(MultipartFile file) throws InvalidFileInputException {
         User user = userService.getSessionUserInfo();
         return uploadImage(file, user.getId().toString());
     }
 
     @Override
-    public String uploadImage(MultipartFile file, String id) throws InvalidParameterException {
+    public String uploadImage(MultipartFile file, String id) throws InvalidFileInputException {
         if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
-            throw new InvalidParameterException(msg);
+            throw new InvalidFileInputException(msg);
         }
 
 

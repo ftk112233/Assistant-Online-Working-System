@@ -2,7 +2,7 @@ package com.jzy.model.excel.input;
 
 import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.ExcelColumnNotFoundException;
-import com.jzy.manager.exception.InputFileTypeException;
+import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.model.dto.ClassDetailedDto;
 import com.jzy.model.entity.Teacher;
 import com.jzy.model.excel.Excel;
@@ -47,15 +47,15 @@ public class ClassArrangementExcel extends Excel {
     public ClassArrangementExcel() {
     }
 
-    public ClassArrangementExcel(String inputFile) throws IOException, InputFileTypeException {
+    public ClassArrangementExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public ClassArrangementExcel(File file) throws IOException, InputFileTypeException {
+    public ClassArrangementExcel(File file) throws IOException, InvalidFileTypeException {
         super(file);
     }
 
-    public ClassArrangementExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InputFileTypeException {
+    public ClassArrangementExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
     }
 
@@ -83,7 +83,7 @@ public class ClassArrangementExcel extends Excel {
      *  学生Student对象直接读出，教师teacher对象也直接读出，班级信息整体和学生、助教、教师封装成StudentAndClassDto
      *
      * @return 返回表格有效数据的行数
-     * @throws ExcelColumnNotFoundException
+     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
      */
     public int readClassDetailFromExcel() throws ExcelColumnNotFoundException {
         resetParam();
@@ -168,7 +168,7 @@ public class ClassArrangementExcel extends Excel {
         classDetailedDtos = new ArrayList<>();
     }
 
-    public static void main(String[] args) throws IOException, ExcelColumnNotFoundException, InputFileTypeException {
+    public static void main(String[] args) throws IOException, ExcelColumnNotFoundException, InvalidFileTypeException {
         ClassArrangementExcel excel = new ClassArrangementExcel("D:\\aows_resources\\toolbox\\example\\曹杨秋季助教排班.xlsx");
         excel.readClassDetailFromExcel();
         for (Teacher teacher : excel.getTeachers()) {

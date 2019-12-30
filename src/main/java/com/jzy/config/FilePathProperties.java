@@ -44,7 +44,7 @@ public class FilePathProperties {
     /**
      * 返回用户上传头像所存储目录
      *
-     * @return
+     * @return 目录
      */
     public String getUploadUserIconPath() {
         return root + SEPARATOR + uploadUserIconDirectory + SEPARATOR;
@@ -53,16 +53,16 @@ public class FilePathProperties {
     /**
      * 工具箱上传表格示例的目录
      *
-     * @return
+     * @return 目录
      */
     public String getToolboxExamplePath() {
         return root + SEPARATOR + toolboxDirectory + SEPARATOR + toolboxExampleDirectory + SEPARATOR;
     }
 
     /**
-     * 工具箱上传表格示例的全路径，根据key确定具体文件
+     * 工具箱上传表格示例的全路径，根据key确定具体文件。
      *
-     * @return
+     * @return 含具体文件名的目录
      */
     public String getToolboxExamplePathAndNameByKey(Integer key) {
         return getToolboxExamplePath() + FileUtils.EXAMPLES.get(key);
@@ -71,7 +71,7 @@ public class FilePathProperties {
     /**
      * 工具箱表格模板的目录
      *
-     * @return
+     * @return 目录
      */
     public String getToolboxTemplatePath() {
         return root + SEPARATOR + toolboxDirectory + SEPARATOR + toolboxTemplateDirectory + SEPARATOR;
@@ -80,7 +80,7 @@ public class FilePathProperties {
     /**
      * 工具箱指定校区的助教工作手册模板的目录
      *
-     * @return
+     * @return 目录
      */
     public String getToolboxAssistantTutorialTemplatePathAndName(String campus) {
         return getToolboxTemplatePath() + CampusEnum.getCampusEnumByNameString(campus) + SEPARATOR + FileUtils.TEMPLATES.get(1);
@@ -89,7 +89,7 @@ public class FilePathProperties {
     /**
      * 工具箱指定校区的座位表模板的目录
      *
-     * @return
+     * @return 目录
      */
     public String getToolboxSeatTableTemplatePathAndName(String campus) {
         return getToolboxTemplatePath() + CampusEnum.getCampusEnumByNameString(campus) + SEPARATOR + FileUtils.TEMPLATES.get(2);
@@ -98,7 +98,7 @@ public class FilePathProperties {
     /**
      * 工具箱指定校区的补课单模板的目录
      *
-     * @return
+     * @return 目录
      */
     public String getToolboxMissLessonTemplatePathAndName(String campus) {
         return getToolboxTemplatePath() + CampusEnum.getCampusEnumByNameString(campus) + SEPARATOR + FileUtils.TEMPLATES.get(3);
@@ -107,7 +107,7 @@ public class FilePathProperties {
     /**
      * 返回常用信息配图所存储目录
      *
-     * @return
+     * @return 目录
      */
     public String getUsefulInformationImageDirectory() {
         return root + SEPARATOR + usefulInformationImageDirectory + SEPARATOR;
@@ -116,7 +116,7 @@ public class FilePathProperties {
     /**
      * 返回用户消息配图所存储目录
      *
-     * @return
+     * @return 目录
      */
     public String getUserMessagePictureDirectory() {
         return root + SEPARATOR + userMessagePictureDirectory + SEPARATOR;

@@ -118,7 +118,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
     }
 
     @Override
-    public UpdateResult insertAndUpdateStudentAndClassesFromExcel(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos) throws Exception {
+    public UpdateResult insertAndUpdateStudentAndClassesFromExcel(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos) throws InvalidParameterException {
         if (studentAndClassDetailedDtos == null) {
             String msg = "insertAndUpdateStudentAndClassesFromExcel方法输入studentAndClassDetailedDtos为null!";
             logger.error(msg);
@@ -140,8 +140,18 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
         return result;
     }
 
-    @Override
-    public UpdateResult insertAndUpdateOneStudentAndClassFromExcel(StudentAndClassDetailedDto studentAndClassDetailedDto) throws Exception {
+    /**
+     * 根据从excel中读取到的studentAndClassDetailedDto信息，更新插入一个。根据学员号和班号判断：
+     * if 当前学员号和班号组合不存在
+     * 执行插入
+     * else
+     * 根据学员号和班号更新
+     *
+     * @param studentAndClassDetailedDto 要更新的学员上课记录
+     * @return 更新结果
+     * @throws InvalidParameterException 不合法的入参异常
+     */
+    private UpdateResult insertAndUpdateOneStudentAndClassFromExcel(StudentAndClassDetailedDto studentAndClassDetailedDto) throws InvalidParameterException {
         if (studentAndClassDetailedDto == null) {
             String msg = "insertAndUpdateOneStudentAndClassFromExcel方法输入studentAndClassDetailedDto为null!";
             logger.error(msg);
@@ -238,8 +248,13 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
         return studentAndClassMapper.deleteManyStudentAndClassesByIds(ids);
     }
 
-    @Override
-    public List<StudentAndClassDetailedWithSubjectsDto> listStudentAndClassesByClassId(String classId) {
+    /**
+     * 根据班级编码查询班级的所有学生及班级的详细信息。
+     *
+     * @param classId 班级编码
+     * @return 结果用 {@link StudentAndClassDetailedDto} 的子类 {@link StudentAndClassDetailedWithSubjectsDto} 返回，子类和父类字段的差集都先空着
+     */
+    private List<StudentAndClassDetailedWithSubjectsDto> listStudentAndClassesByClassId(String classId) {
         return StringUtils.isEmpty(classId) ? new ArrayList<>() : studentAndClassMapper.listStudentAndClassesByClassId(classId);
     }
 

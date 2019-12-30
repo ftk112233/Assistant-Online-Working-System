@@ -49,7 +49,7 @@ public class ShiroUtils {
      *
      * @param source 明文
      * @param salt   盐
-     * @return
+     * @return 密文字符串
      */
     public static String encryptUserPassword(String source, String salt) {
         return new Md5Hash(source, ByteSource.Util.bytes(salt), HASH_ITERATIONS).toHex();
@@ -72,7 +72,7 @@ public class ShiroUtils {
     /***
      * 获取客户端ip地址(可以穿透代理)
      * @param request
-     * @return
+     * @return ip地址
      */
     public static String getClientIpAddress(HttpServletRequest request) {
         for (String header : HEADERS_TO_TRY) {

@@ -2,7 +2,7 @@ package com.jzy.model.excel.input;
 
 import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.ExcelColumnNotFoundException;
-import com.jzy.manager.exception.InputFileTypeException;
+import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
 import com.jzy.model.excel.Excel;
 import com.jzy.model.excel.ExcelVersionEnum;
@@ -55,15 +55,15 @@ public class StudentListUploadByUserExcel extends Excel implements Serializable 
     public StudentListUploadByUserExcel() {
     }
 
-    public StudentListUploadByUserExcel(String inputFile) throws IOException, InputFileTypeException {
+    public StudentListUploadByUserExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public StudentListUploadByUserExcel(File file) throws IOException, InputFileTypeException {
+    public StudentListUploadByUserExcel(File file) throws IOException, InvalidFileTypeException {
         super(file);
     }
 
-    public StudentListUploadByUserExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InputFileTypeException {
+    public StudentListUploadByUserExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
     }
 
@@ -75,6 +75,7 @@ public class StudentListUploadByUserExcel extends Excel implements Serializable 
      * 输入班级编号筛选班级下的所有学生有用信息，如：学员编号、学员姓名、学员联系方式
      *
      * @param classId 编号
+     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
      */
     public List<StudentAndClassDetailedWithSubjectsDto> readStudentAndClassInfoByClassIdFromExcel(String classId) throws ExcelColumnNotFoundException {
         resetParam();

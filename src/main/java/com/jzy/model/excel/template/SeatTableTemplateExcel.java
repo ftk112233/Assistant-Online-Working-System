@@ -1,6 +1,6 @@
 package com.jzy.model.excel.template;
 
-import com.jzy.manager.exception.InputFileTypeException;
+import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
 import com.jzy.model.excel.Excel;
 import com.jzy.model.excel.ExcelVersionEnum;
@@ -26,15 +26,15 @@ public class SeatTableTemplateExcel extends Excel implements Serializable {
     public SeatTableTemplateExcel() {
     }
 
-    public SeatTableTemplateExcel(String inputFile) throws IOException, InputFileTypeException {
+    public SeatTableTemplateExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public SeatTableTemplateExcel(File file) throws IOException, InputFileTypeException {
+    public SeatTableTemplateExcel(File file) throws IOException, InvalidFileTypeException {
         super(file);
     }
 
-    public SeatTableTemplateExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InputFileTypeException {
+    public SeatTableTemplateExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
     }
 
@@ -46,8 +46,8 @@ public class SeatTableTemplateExcel extends Excel implements Serializable {
      * 删除除输入classroom外的其他教室的sheet
      *
      * @param classroom 教室号
-     * @return
-     * @throws IOException
+     * @return 写入成功与否
+     * @throws IOException 写excel的io异常
      */
     private boolean deleteOtherSheets(String classroom) throws IOException {
         if (StringUtils.isEmpty(classroom)) {
@@ -69,8 +69,8 @@ public class SeatTableTemplateExcel extends Excel implements Serializable {
      * 根据输入学生名单列表修改对应教室的座位
      *
      * @param data 从数据库中读取到的信息或手动输入的表格中读到的信息，以及用户输入的信息
-     * @return
-     * @throws IOException
+     * @return 写入成功与否
+     * @throws IOException 写excel的io异常
      */
     public boolean writeSeatTable(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException {
         StudentAndClassDetailedWithSubjectsDto dto = new StudentAndClassDetailedWithSubjectsDto();

@@ -4,7 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.UserMessageMapper;
 import com.jzy.manager.constant.Constants;
-import com.jzy.manager.exception.InvalidParameterException;
+import com.jzy.manager.exception.InvalidFileInputException;
 import com.jzy.manager.util.FileUtils;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.UserMessageDto;
@@ -177,17 +177,17 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
     }
 
     @Override
-    public String uploadPicture(MultipartFile file) throws InvalidParameterException {
+    public String uploadPicture(MultipartFile file) throws InvalidFileInputException {
         Long userId = userService.getSessionUserInfo().getId();
         return uploadPicture(file, userId.toString());
     }
 
     @Override
-    public String uploadPicture(MultipartFile file, String id) throws InvalidParameterException {
+    public String uploadPicture(MultipartFile file, String id) throws InvalidFileInputException {
         if (file == null || file.isEmpty()) {
             String msg = "上传文件为空";
             logger.error(msg);
-            throw new InvalidParameterException(msg);
+            throw new InvalidFileInputException(msg);
         }
 
 

@@ -3,7 +3,7 @@ package com.jzy.model.excel.template;
 import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.ClassTooManyStudentsException;
 import com.jzy.manager.exception.ExcelColumnNotFoundException;
-import com.jzy.manager.exception.InputFileTypeException;
+import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
 import com.jzy.model.excel.Excel;
 import com.jzy.model.excel.ExcelVersionEnum;
@@ -73,15 +73,15 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
     public AssistantTutorialExcel() {
     }
 
-    public AssistantTutorialExcel(String inputFile) throws IOException, InputFileTypeException {
+    public AssistantTutorialExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public AssistantTutorialExcel(File file) throws IOException, InputFileTypeException {
+    public AssistantTutorialExcel(File file) throws IOException, InvalidFileTypeException {
         super(file);
     }
 
-    public AssistantTutorialExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InputFileTypeException {
+    public AssistantTutorialExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
     }
 
@@ -93,9 +93,11 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
      * 修改制作开班电话表
      *
      * @param data 从数据库中读取到的信息或手动输入的表格中读到的信息，以及用户输入的信息
-     * @return
-     * @throws IOException
-     * @throws ClassTooManyStudentsException
+     * @return 写入成功与否
+     * @throws IOException 写excel的io异常
+     * @throws ClassTooManyStudentsException 班级的学生人数过多，不能写入模板表格。
+     *   这里由于模板中只给了100条空行用来放置要写入的数据。因此如果入参行数超过这个阈值会抛出此异常
+     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
      */
     public boolean writeClassStartSheet(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException, ClassTooManyStudentsException, ExcelColumnNotFoundException {
         // 获得班上学生总人数
@@ -189,9 +191,11 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
      * 修改制作签到表
      *
      * @param data 从数据库中读取到的信息或手动输入的表格中读到的信息，以及用户输入的信息
-     * @return
-     * @throws IOException
-     * @throws ClassTooManyStudentsException
+     * @return 写入成功与否
+     * @throws IOException 写excel的io异常
+     * @throws ClassTooManyStudentsException 班级的学生人数过多，不能写入模板表格。
+     *   这里由于模板中只给了100条空行用来放置要写入的数据。因此如果入参行数超过这个阈值会抛出此异常
+     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
      */
     public boolean writeSignSheet(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException, ClassTooManyStudentsException, ExcelColumnNotFoundException {
         // 获得班上学生总人数
@@ -265,9 +269,11 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
      * 修改制作信息回访表
      *
      * @param data 从数据库中读取到的信息或手动输入的表格中读到的信息，以及用户输入的信息
-     * @return
-     * @throws IOException
-     * @throws ClassTooManyStudentsException
+     * @return 写入成功与否
+     * @throws IOException 写excel的io异常
+     * @throws ClassTooManyStudentsException 班级的学生人数过多，不能写入模板表格。
+     *   这里由于模板中只给了100条空行用来放置要写入的数据。因此如果入参行数超过这个阈值会抛出此异常
+     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
      */
     public boolean writeCallbackSheet(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException, ClassTooManyStudentsException, ExcelColumnNotFoundException {
         // 获得班上学生总人数
@@ -340,10 +346,9 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
      * 若之后有更改要另外操作请使用 {@link SeatTableTemplateExcel}
      *
      * @param data 从花名册中读取到的信息以及用户输入的信息
-     * @return
-     * @throws IOException
+     * @return 写入成功与否
      */
-    public boolean setSeatSheet(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException {
+    public boolean setSeatSheet(List<StudentAndClassDetailedWithSubjectsDto> data){
         // TODO
         return true;
     }
@@ -352,8 +357,11 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
      * 使用巴啦啦能量！完成对助教工作手册的所有处理（不含开班电话）！
      *
      * @param data 从花名册或数据库中读取到的信息以及用户输入的信息
-     * @return
-     * @throws IOException
+     * @return 写入成功与否
+     * @throws IOException 写excel的io异常
+     * @throws ClassTooManyStudentsException 班级的学生人数过多，不能写入模板表格。
+     *   这里由于模板中只给了100条空行用来放置要写入的数据。因此如果入参行数超过这个阈值会抛出此异常
+     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
      */
     public boolean writeAssistantTutorialWithoutSeatTable(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException, ExcelColumnNotFoundException, ClassTooManyStudentsException {
         return writeClassStartSheet(data) && writeSignSheet(data) && writeCallbackSheet(data);
