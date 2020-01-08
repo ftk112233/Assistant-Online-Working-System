@@ -1,5 +1,7 @@
 package com.jzy.other;
 
+import junit.framework.TestCase;
+
 /**
  * @ClassName Test
  * @Author JinZhiyun
@@ -7,6 +9,5 @@ package com.jzy.other;
  * @Date 2019/12/11 21:30
  * @Version 1.0
  **/
-public class Test {
-
+public class Test extends TestCase {
 }

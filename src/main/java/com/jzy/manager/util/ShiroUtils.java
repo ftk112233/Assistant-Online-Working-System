@@ -104,6 +104,15 @@ public class ShiroUtils {
     }
 
     /**
+     * 移除session的指定key
+     *
+     * @param key session的key
+     */
+    public static void removeSessionAttribute(Object key) {
+        getSession().removeAttribute(key);
+    }
+
+    /**
      * 由session的key获得value
      *
      * @param key session的key
