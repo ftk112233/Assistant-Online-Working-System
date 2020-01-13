@@ -5,7 +5,7 @@ import com.jzy.manager.exception.ClassTooManyStudentsException;
 import com.jzy.manager.exception.ExcelColumnNotFoundException;
 import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
-import com.jzy.model.excel.Excel;
+import com.jzy.model.excel.AbstractTemplateExcel;
 import com.jzy.model.excel.ExcelVersionEnum;
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -22,7 +22,7 @@ import java.util.List;
  * @description 助教工作手册模板的模型类
  * @date 2019/11/1 15:28
  **/
-public class AssistantTutorialExcel extends Excel implements Serializable {
+public class AssistantTutorialExcel extends AbstractTemplateExcel implements Serializable {
     private static final long serialVersionUID = 2416400649170324596L;
 
     private static final String CAMPUS_COLUMN = ExcelConstants.CAMPUS_COLUMN_2;
@@ -53,17 +53,17 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
     /**
      * 开班电话表sheet索引
      */
-    private static final int CLASS_START_SHEET_INDEX = 0;
+    private static final int CLASS_START_SHEET_INDEX = 1;
 
     /**
      * 签到表sheet索引
      */
-    private static final int SIGN_SHEET_INDEX = 1;
+    private static final int SIGN_SHEET_INDEX = 0;
 
     /**
      * 信息回访表sheet索引
      */
-    private static final int CALLBACK_SHEET_INDEX = 3;
+    private static final int CALLBACK_SHEET_INDEX = 2;
 
     /**
      * 座位表sheet索引
@@ -112,51 +112,54 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
         int row0ColumnCount = this.getColumnCount(CLASS_START_SHEET_INDEX, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
             String value = this.getValueAt(CLASS_START_SHEET_INDEX, startRow, i);
-            switch (value) {
-                case CAMPUS_COLUMN:
-                    columnIndexOfCampus = i;
-                    break;
-                case CLASS_ID_COLUMN:
-                    columnIndexOfClassId = i;
-                    break;
-                case TEACHER_NAME_COLUMN:
-                    columnIndexOfTeacherName = i;
-                    break;
-                case ASSISTANT_NAME_COLUMN:
-                    columnIndexOfAssistantName = i;
-                    break;
-                case STUDENT_ID_COLUMN:
-                    columnIndexOfStudentId = i;
-                    break;
-                case STUDENT_NAME_COLUMN:
-                    columnIndexOfStudentName = i;
-                    break;
-                case STUDENT_PHONE_COLUMN:
-                    columnIndexOfStudentPhone = i;
-                    break;
-                case TEACHER_REQUIREMENT_COLUMN:
-                    columnIndexOfTeacherRequirement = i;
-                    break;
-                case STUDENT_SCHOOL_COLUMN:
-                    columnIndexOfStudentSchool = i;
-                    break;
-                case SUBJECTS_COLUMN:
-                    columnIndexOfSubjects = i;
-                    break;
-                default:
+            if (value!=null) {
+                switch (value) {
+                    case CAMPUS_COLUMN:
+                        columnIndexOfCampus = i;
+                        break;
+                    case CLASS_ID_COLUMN:
+                        columnIndexOfClassId = i;
+                        break;
+                    case TEACHER_NAME_COLUMN:
+                        columnIndexOfTeacherName = i;
+                        break;
+                    case ASSISTANT_NAME_COLUMN:
+                        columnIndexOfAssistantName = i;
+                        break;
+                    case STUDENT_ID_COLUMN:
+                        columnIndexOfStudentId = i;
+                        break;
+                    case STUDENT_NAME_COLUMN:
+                        columnIndexOfStudentName = i;
+                        break;
+                    case STUDENT_PHONE_COLUMN:
+                        columnIndexOfStudentPhone = i;
+                        break;
+                    case TEACHER_REQUIREMENT_COLUMN:
+                        columnIndexOfTeacherRequirement = i;
+                        break;
+                    case STUDENT_SCHOOL_COLUMN:
+                        columnIndexOfStudentSchool = i;
+                        break;
+                    case SUBJECTS_COLUMN:
+                        columnIndexOfSubjects = i;
+                        break;
+                    default:
+                }
             }
         }
 
         if (columnIndexOfCampus < 0 || columnIndexOfClassId < 0 || columnIndexOfTeacherName < 0 || columnIndexOfAssistantName < 0
                 || columnIndexOfStudentId < 0 || columnIndexOfStudentName < 0 || columnIndexOfStudentPhone < 0
-                || columnIndexOfTeacherRequirement < 0 || columnIndexOfStudentSchool < 0 || columnIndexOfSubjects < 0) {
+                || columnIndexOfTeacherRequirement < 0 || columnIndexOfStudentSchool < 0) {
+//                || columnIndexOfSubjects < 0) {
             //列属性中有未匹配的属性名
             throw new ExcelColumnNotFoundException("助教工作手册-开班电话表sheet列属性中有未匹配的属性名");
         }
 
 
-        for (int i = 0; i < rowCountToSave; i++) {
-            StudentAndClassDetailedWithSubjectsDto object = data.get(i);
+        for (int i = startRow; i < rowCountToSave+startRow; i++) {
+            StudentAndClassDetailedWithSubjectsDto object = data.get(i-startRow);
             //遍历每行要填的学生上课信息对象
             // 填校区
             this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfCampus, object.getClassCampus());
@@ -177,8 +180,8 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
             // 填学校
             this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentSchool, object.getStudentSchool());
             // 填所有在读学科
-            String subjectsToString = object.getSubjects() == null ? "" : object.getSubjects().toString();
-            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfSubjects, subjectsToString);
+//            String subjectsToString = object.getSubjects() == null ? "" : object.getSubjects().toString();
+//            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfSubjects, subjectsToString);
         }
 
         // 删除多余行
@@ -223,17 +226,19 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
         int row0ColumnCount = this.getColumnCount(SIGN_SHEET_INDEX, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
             String value = this.getValueAt(SIGN_SHEET_INDEX, startRow, i);
-            switch (value) {
-                case STUDENT_ID_COLUMN:
-                    columnIndexOfStudentId = i;
-                    break;
-                case STUDENT_NAME_COLUMN:
-                    columnIndexOfStudentName = i;
-                    break;
-                case STUDENT_PHONE_COLUMN:
-                    columnIndexOfStudentPhone = i;
-                    break;
-                default:
+            if (value!=null) {
+                switch (value) {
+                    case STUDENT_ID_COLUMN:
+                        columnIndexOfStudentId = i;
+                        break;
+                    case STUDENT_NAME_COLUMN:
+                        columnIndexOfStudentName = i;
+                        break;
+                    case STUDENT_PHONE_COLUMN:
+                        columnIndexOfStudentPhone = i;
+                        break;
+                    default:
+                }
             }
         }
 
@@ -243,8 +248,8 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
         }
 
 
-        for (int i = 0; i < rowCountToSave; i++) {
-            StudentAndClassDetailedWithSubjectsDto object = data.get(i);
+        for (int i = startRow; i < rowCountToSave+startRow; i++) {
+            StudentAndClassDetailedWithSubjectsDto object = data.get(i-startRow);
             //遍历每行要填的学生上课信息对象
             // 填学员编号
             this.setValueAt(SIGN_SHEET_INDEX, i + 1, columnIndexOfStudentId, object.getStudentId());
@@ -288,26 +293,28 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
         int row0ColumnCount = this.getColumnCount(CALLBACK_SHEET_INDEX, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
             String value = this.getValueAt(CALLBACK_SHEET_INDEX, startRow, i);
-            switch (value) {
-                case CAMPUS_COLUMN:
-                    columnIndexOfCampus = i;
-                    break;
-                case CLASS_ID_COLUMN:
-                    columnIndexOfClassId = i;
-                    break;
-                case TEACHER_NAME_COLUMN:
-                    columnIndexOfTeacherName = i;
-                    break;
-                case ASSISTANT_NAME_COLUMN:
-                    columnIndexOfAssistantName = i;
-                    break;
-                case STUDENT_ID_COLUMN:
-                    columnIndexOfStudentId = i;
-                    break;
-                case STUDENT_NAME_COLUMN:
-                    columnIndexOfStudentName = i;
-                    break;
-                default:
+            if (value!=null) {
+                switch (value) {
+                    case CAMPUS_COLUMN:
+                        columnIndexOfCampus = i;
+                        break;
+                    case CLASS_ID_COLUMN:
+                        columnIndexOfClassId = i;
+                        break;
+                    case TEACHER_NAME_COLUMN:
+                        columnIndexOfTeacherName = i;
+                        break;
+                    case ASSISTANT_NAME_COLUMN:
+                        columnIndexOfAssistantName = i;
+                        break;
+                    case STUDENT_ID_COLUMN:
+                        columnIndexOfStudentId = i;
+                        break;
+                    case STUDENT_NAME_COLUMN:
+                        columnIndexOfStudentName = i;
+                        break;
+                    default:
+                }
             }
         }
 
@@ -318,8 +325,8 @@ public class AssistantTutorialExcel extends Excel implements Serializable {
         }
 
 
-        for (int i = 0; i < rowCountToSave; i++) {
-            StudentAndClassDetailedWithSubjectsDto object = data.get(i);
+        for (int i = startRow; i < rowCountToSave+startRow; i++) {
+            StudentAndClassDetailedWithSubjectsDto object = data.get(i-startRow);
             //遍历每行要填的学生上课信息对象
             // 填校区
             this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfCampus, object.getClassCampus());

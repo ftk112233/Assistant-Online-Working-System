@@ -217,8 +217,13 @@
                         skin: 'layui-layer-molv' //样式类名
                         , closeBtn: 0
                     });
+                }else if (res.msg === "tooManyRows") {
+                    return layer.alert('输入表格的行数过多。最大行数限制：' + res.rowCountThreshold + '，实际行数：' + res.actualRowCount + '。尝试删除最后多余的空白行？“ctrl+shift+↓”，“右键”，“删除”，“整行”', {
+                        skin: 'layui-layer-lan'
+                        , closeBtn: 0
+                    });
                 } else if (res.msg === "excelColumnNotFound") {
-                    return layer.alert('表格中有列属性名不符合规范!', {
+                    return layer.alert('未找到名称为"' + res.whatWrong + '"的列!', {
                         skin: 'layui-layer-lan'
                         , closeBtn: 0
                     });
@@ -262,12 +267,17 @@
                         skin: 'layui-layer-molv' //样式类名
                         , closeBtn: 0
                     });
-                } else if (res.msg === "excelColumnNotFound") {
-                    return layer.alert('表格中有列属性名不符合规范!', {
+                }else if (res.msg === "tooManyRows") {
+                    return layer.alert('输入表格的行数过多。最大行数限制：' + res.rowCountThreshold + '，实际行数：' + res.actualRowCount + '。尝试删除最后多余的空白行？“ctrl+shift+↓”，“右键”，“删除”，“整行”', {
                         skin: 'layui-layer-lan'
                         , closeBtn: 0
                     });
-                } else {
+                } else if (res.msg === "excelColumnNotFound") {
+                    return layer.alert('未找到名称为"' + res.whatWrong + '"的列!', {
+                        skin: 'layui-layer-lan'
+                        , closeBtn: 0
+                    });
+                }else {
                     return layer.alert('导入失败!', {
                         skin: 'layui-layer-lan'
                         , closeBtn: 0

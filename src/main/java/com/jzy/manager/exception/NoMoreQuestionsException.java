@@ -8,6 +8,8 @@ package com.jzy.manager.exception;
  * @date 2019/12/3 16:14
  **/
 public class NoMoreQuestionsException extends QuestionException {
+    private static final long serialVersionUID = 2847848072452853636L;
+
     public NoMoreQuestionsException() {
     }
 

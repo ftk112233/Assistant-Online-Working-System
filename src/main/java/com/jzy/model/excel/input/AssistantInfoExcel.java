@@ -2,11 +2,13 @@ package com.jzy.model.excel.input;
 
 import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.ExcelColumnNotFoundException;
+import com.jzy.manager.exception.ExcelTooManyRowsException;
 import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.manager.util.CodeUtils;
+import com.jzy.model.RoleEnum;
 import com.jzy.model.entity.Assistant;
 import com.jzy.model.entity.User;
-import com.jzy.model.excel.Excel;
+import com.jzy.model.excel.AbstractInputExcel;
 import com.jzy.model.excel.ExcelVersionEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,7 +18,9 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @ClassName AssistantInfoExcel
@@ -27,21 +31,15 @@ import java.util.*;
  **/
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class AssistantInfoExcel extends Excel {
+public class AssistantInfoExcel extends AbstractInputExcel {
     private static final long serialVersionUID = 7188139549224217001L;
 
     private static final String DEPART_COLUMN = ExcelConstants.DEPART_COLUMN;
-
     private static final String CAMPUS_COLUMN = ExcelConstants.CAMPUS_COLUMN;
-
     private static final String REAL_NAME_COLUMN = ExcelConstants.REAL_NAME_COLUMN;
-
     private static final String WORK_ID_COLUMN = ExcelConstants.WORK_ID_COLUMN;
-
     private static final String ID_CARD_COLUMN = ExcelConstants.ID_CARD_COLUMN;
-
     private static final String PHONE_COLUMN = ExcelConstants.PHONE_COLUMN;
-
     private static final String REMARK_COLUMN = ExcelConstants.REMARK_COLUMN;
 
     /**
@@ -58,6 +56,18 @@ public class AssistantInfoExcel extends Excel {
      * 读取到的信息封装成assistant对象
      */
     private List<Assistant> assistants;
+
+    /**
+     * 规定名称的列的索引位置，初始值为-1无效值，即表示还没找到
+     */
+    private int columnIndexOfDepart = -1;
+    private int columnIndexOfCampusName = -1;
+    private int columnIndexOfRealName = -1;
+    private int columnIndexOfWorkId = -1;
+    private int columnIndexOfIdCard = -1;
+    private int columnIndexOfPhone = -1;
+    private int columnIndexOfRemark = -1;
+
 
     public AssistantInfoExcel() {
     }
@@ -83,60 +93,27 @@ public class AssistantInfoExcel extends Excel {
      *
      * @return 返回表格有效数据的行数
      * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
-
+     * @throws ExcelTooManyRowsException 行数超过规定值，将规定的上限值和实际值都传给异常对象
      */
-    public int readUsersAndAssistantsFromExcel() throws ExcelColumnNotFoundException {
-        resetParam();
+    public int readUsersAndAssistantsFromExcel() throws ExcelColumnNotFoundException, ExcelTooManyRowsException {
+        resetOutput();
 
         int sheetIx = 0;
 
+        testRowCountValidityOfSheet(sheetIx);
+
         // 先扫描第startRow行找到"工号"、"姓名"、"手机"等信息所在列的位置
-        int columnIndexOfDepart = -1, columnIndexOfCampusName = -2, columnIndexOfRealName = -3, columnIndexOfWorkId = -4, columnIndexOfIdCard = -7, columnIndexOfPhone = -9, columnIndexOfRemark = -10;
-        int row0ColumnCount = this.getColumnCount(sheetIx, startRow); // 第startRow行的列数
-        for (int i = 0; i < row0ColumnCount; i++) {
-            String value = this.getValueAt(sheetIx, startRow, i);
-            switch (value) {
-                case DEPART_COLUMN:
-                    columnIndexOfDepart = i;
-                    break;
-                case CAMPUS_COLUMN:
-                    columnIndexOfCampusName = i;
-                    break;
-                case REAL_NAME_COLUMN:
-                    columnIndexOfRealName = i;
-                    break;
-                case WORK_ID_COLUMN:
-                    columnIndexOfWorkId = i;
-                    break;
-                case ID_CARD_COLUMN:
-                    columnIndexOfIdCard = i;
-                    break;
-                case PHONE_COLUMN:
-                    columnIndexOfPhone = i;
-                    break;
-                case REMARK_COLUMN:
-                    columnIndexOfRemark = i;
-                    break;
-                default:
-            }
-        }
+        findColumnIndexOfSpecifiedName(sheetIx);
 
-        if (columnIndexOfCampusName < 0 || columnIndexOfRealName < 0 || columnIndexOfWorkId < 0
-                || columnIndexOfIdCard < 0 || columnIndexOfPhone < 0) {
-            //这里未校验部门和备注
-            //列属性中有未匹配的属性名
-            throw new ExcelColumnNotFoundException("助教信息列属性中有未匹配的属性名");
-        }
-
-        int effectiveDataRowCount=0;
+        int effectiveDataRowCount = 0;
 
         int rowCount = this.getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
             User user = new User();
             Assistant assistant = new Assistant();
 
-            if (StringUtils.isEmpty(this.getValueAt(sheetIx, i, columnIndexOfWorkId))) {
-                //当前行工号为空，跳过
+            if (StringUtils.isEmpty(this.getValueAt(sheetIx, i, columnIndexOfRealName))) {
+                //当前行姓名为空，跳过
                 continue;
             } else {
                 effectiveDataRowCount++;
@@ -153,6 +130,10 @@ public class AssistantInfoExcel extends Excel {
             assistant.setAssistantName(realName);
 
             String workId = this.getValueAt(sheetIx, i, columnIndexOfWorkId);
+            if (StringUtils.isEmpty(workId)) {
+                //某些情况下，学管未能知晓助教的工号，因此助教和用户工号先给一个uuid
+                workId = UUID.randomUUID().toString().replace("-", "");
+            }
             user.setUserWorkId(workId);
             assistant.setAssistantWorkId(workId);
 
@@ -172,7 +153,7 @@ public class AssistantInfoExcel extends Excel {
             //用户名默认身份证
             String userName = StringUtils.isEmpty(idCard) ? "a_" + CodeUtils.randomCodes() + CodeUtils.randomCodes() : "a_" + idCard;
             user.setUserName(userName);
-            user.setUserRole("助教");
+            user.setUserRole(RoleEnum.ASSISTANT.getRole());
 
 
             users.add(user);
@@ -187,8 +168,9 @@ public class AssistantInfoExcel extends Excel {
      *
      * @return 返回表格有效数据的行数
      * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
+     * @throws ExcelTooManyRowsException 行数超过规定值，将规定的上限值和实际值都传给异常对象
      */
-    public int readUsers() throws ExcelColumnNotFoundException {
+    public int readUsers() throws ExcelColumnNotFoundException, ExcelTooManyRowsException {
         return readUsersAndAssistantsFromExcel();
     }
 
@@ -197,14 +179,85 @@ public class AssistantInfoExcel extends Excel {
      *
      * @return 返回表格有效数据的行数
      * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
+     * @throws ExcelTooManyRowsException 行数超过规定值，将规定的上限值和实际值都传给异常对象
      */
-    public int readAssistants() throws ExcelColumnNotFoundException {
+    public int readAssistants() throws ExcelColumnNotFoundException, ExcelTooManyRowsException {
         return readUsersAndAssistantsFromExcel();
     }
 
     @Override
-    public void resetParam() {
+    public void resetOutput() {
         users = new ArrayList<>();
         assistants = new ArrayList<>();
+    }
+
+    @Override
+    public void resetColumnIndex() {
+        columnIndexOfDepart = -1;
+        columnIndexOfCampusName = -1;
+        columnIndexOfRealName = -1;
+        columnIndexOfWorkId = -1;
+        columnIndexOfIdCard = -1;
+        columnIndexOfPhone = -1;
+        columnIndexOfRemark = -1;
+    }
+
+    @Override
+    protected void findColumnIndexOfSpecifiedName(int sheetIx) throws ExcelColumnNotFoundException {
+        resetColumnIndex();
+
+        int row0ColumnCount = this.getColumnCount(sheetIx, startRow); // 第startRow行的列数
+        for (int i = 0; i < row0ColumnCount; i++) {
+            String value = this.getValueAt(sheetIx, startRow, i);
+            if (value != null) {
+                switch (value) {
+                    case DEPART_COLUMN:
+                        columnIndexOfDepart = i;
+                        break;
+                    case CAMPUS_COLUMN:
+                        columnIndexOfCampusName = i;
+                        break;
+                    case REAL_NAME_COLUMN:
+                        columnIndexOfRealName = i;
+                        break;
+                    case WORK_ID_COLUMN:
+                        columnIndexOfWorkId = i;
+                        break;
+                    case ID_CARD_COLUMN:
+                        columnIndexOfIdCard = i;
+                        break;
+                    case PHONE_COLUMN:
+                        columnIndexOfPhone = i;
+                        break;
+                    case REMARK_COLUMN:
+                        columnIndexOfRemark = i;
+                        break;
+                    default:
+                }
+            }
+        }
+
+        testColumnNameValidity();
+    }
+
+    @Override
+    public boolean testColumnNameValidity() throws ExcelColumnNotFoundException {
+        if (columnIndexOfCampusName < 0) {
+            throw new ExcelColumnNotFoundException(null, CAMPUS_COLUMN);
+        }
+        if (columnIndexOfRealName < 0) {
+            throw new ExcelColumnNotFoundException(null, REAL_NAME_COLUMN);
+        }
+        if (columnIndexOfWorkId < 0) {
+            throw new ExcelColumnNotFoundException(null, WORK_ID_COLUMN);
+        }
+        if (columnIndexOfIdCard < 0) {
+            throw new ExcelColumnNotFoundException(null, ID_CARD_COLUMN);
+        }
+        if (columnIndexOfPhone < 0) {
+            throw new ExcelColumnNotFoundException(null, PHONE_COLUMN);
+        }
+
+        return true;
     }
 }

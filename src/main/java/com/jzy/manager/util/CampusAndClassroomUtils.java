@@ -19,8 +19,30 @@ public class CampusAndClassroomUtils {
         return !StringUtils.isEmpty(campus) && CampusEnum.hasCampusName(campus) && campus.length() <= 20;
     }
 
+    /**
+     * 教室的合法内容是一个数字串或者一个数字串加一个字母。
+     * 如：301、301A...
+     *
+     * @param classroom
+     * @return
+     */
     public static boolean isValidClassroom(String classroom) {
-        return !StringUtils.isEmpty(classroom) && classroom.length() <= 10;
+        boolean base=!StringUtils.isEmpty(classroom) && classroom.length() <= 10;
+        if (!base){
+            return false;
+        }
+
+        if (StringUtils.isNumeric(classroom)){
+            return true;
+        }
+
+        if (MyStringUtils.isLetter(classroom.charAt(classroom.length()-1))){
+            //最后一个是字母
+            if (StringUtils.isNumeric(classroom.substring(0, classroom.length()-1))){
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isValidClassroomCapacity(Integer capacity) {

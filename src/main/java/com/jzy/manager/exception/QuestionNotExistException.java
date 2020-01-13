@@ -8,6 +8,8 @@ package com.jzy.manager.exception;
  * @Version 1.0
  **/
 public class QuestionNotExistException extends QuestionException {
+    private static final long serialVersionUID = 2236595887891411892L;
+
     public QuestionNotExistException() {
     }
 

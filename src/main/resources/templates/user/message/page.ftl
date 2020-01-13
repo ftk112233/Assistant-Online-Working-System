@@ -120,7 +120,7 @@
             , cols: [[
                 {type: 'checkbox', fixed: 'left'}
                 , {field: 'messageTitle', title: '标题', minWidth: 300, templet: tplTitle}
-                , {field: 'userFrom', title: '发送人', width: 170}
+                , {field: 'userFrom', title: '发送人', width: 300}
                 , {field: 'messageTime', title: '时间', width: 170}
             ]]
             , limit: 10
@@ -149,7 +149,7 @@
             , cols: [[
                 {type: 'checkbox', fixed: 'left'}
                 , {field: 'messageTitle', title: '标题', minWidth: 300, templet: tplTitle}
-                , {field: 'userFrom', title: '发送人', width: 170}
+                , {field: 'userFrom', title: '发送人', width: 300}
                 , {field: 'messageTime', title: '时间', width: 170}
             ]]
             , limit: 10

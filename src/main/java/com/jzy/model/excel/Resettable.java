@@ -9,8 +9,14 @@ package com.jzy.model.excel;
  **/
 public interface Resettable {
     /**
-     * 重置成员变量
+     * 重置所有表示读取结果的成员变量
      */
-    default void resetParam() {
+    default void resetOutput() {
+    }
+
+    /**
+     * 重置所有表示规定列的索引值的成员变量
+     */
+    default void resetColumnIndex() {
     }
 }

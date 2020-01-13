@@ -370,10 +370,17 @@ public class UserAdminController extends AbstractController {
             } catch (ExcelColumnNotFoundException e) {
                 e.printStackTrace();
                 map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
+                map.put("whatWrong", e.getWhatWrong());
                 return map;
             } catch (InvalidFileTypeException e) {
                 e.printStackTrace();
                 map.put("msg", Constants.FAILURE);
+                return map;
+            } catch (ExcelTooManyRowsException e) {
+                e.printStackTrace();
+                map.put("msg", Constants.EXCEL_TOO_MANY_ROWS);
+                map.put("rowCountThreshold", e.getRowCountThreshold());
+                map.put("actualRowCount", e.getActualRowCount());
                 return map;
             }
 

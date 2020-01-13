@@ -163,6 +163,13 @@ public class ToolboxController extends AbstractController {
         } catch (ExcelColumnNotFoundException e) {
             e.printStackTrace();
             map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
+            map.put("whatWrong", e.getWhatWrong());
+            return map;
+        } catch (ExcelTooManyRowsException e) {
+            e.printStackTrace();
+            map.put("msg", Constants.EXCEL_TOO_MANY_ROWS);
+            map.put("rowCountThreshold", e.getRowCountThreshold());
+            map.put("actualRowCount", e.getActualRowCount());
             return map;
         }
 
@@ -216,13 +223,7 @@ public class ToolboxController extends AbstractController {
 
             //将读到的数据，修改到助教工作手册模板表格中
             excel.writeAssistantTutorialWithoutSeatTable(results);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ExcelColumnNotFoundException e) {
-            e.printStackTrace();
-        } catch (ClassTooManyStudentsException e) {
-            e.printStackTrace();
-        } catch (InvalidFileTypeException e) {
+        } catch (IOException | ExcelColumnNotFoundException | ClassTooManyStudentsException | ExcelTooManyRowsException | InvalidFileTypeException e) {
             e.printStackTrace();
         }
 
@@ -248,7 +249,7 @@ public class ToolboxController extends AbstractController {
      */
     @RequestMapping("/assistant/exportAssistantTutorialAndSeatTable")
     public String exportAssistantTutorialAndSeatTable(HttpServletRequest request, HttpServletResponse response,
-                                                      @RequestParam(value = "magic", required = false) String magic, ClassDetailedDto classDetailedDto) {
+                                                      @RequestParam(value = "magic", required = false) String magic, ClassDetailedDto classDetailedDto) throws InvalidFileTypeException {
         SeatTableTemplateExcel excel = null;
         try {
             List<StudentAndClassDetailedWithSubjectsDto> results = new ArrayList<>();
@@ -280,11 +281,7 @@ public class ToolboxController extends AbstractController {
 
             //将读到的数据，修改到助教工作手册模板表格中
             excel.writeSeatTable(results);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ExcelColumnNotFoundException e) {
-            e.printStackTrace();
-        } catch (InvalidFileTypeException e) {
+        } catch (IOException | ExcelColumnNotFoundException | ExcelTooManyRowsException e) {
             e.printStackTrace();
         }
 
@@ -339,9 +336,20 @@ public class ToolboxController extends AbstractController {
 
             //将当前用户上传的花名册put到cache中，以备输出文件时读取
             studentListForSeatTableUploadByUserCache.put(userService.getSessionUserInfo().getId(), excel);
-        } catch (Exception e) {
+        } catch (InvalidFileTypeException | IOException e) {
             e.printStackTrace();
             map.put("msg", Constants.FAILURE);
+            return map;
+        } catch (ExcelTooManyRowsException e) {
+            e.printStackTrace();
+            map.put("msg", Constants.EXCEL_TOO_MANY_ROWS);
+            map.put("rowCountThreshold", e.getRowCountThreshold());
+            map.put("actualRowCount", e.getActualRowCount());
+            return map;
+        } catch (ExcelColumnNotFoundException e) {
+            e.printStackTrace();
+            map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
+            map.put("whatWrong", e.getWhatWrong());
             return map;
         }
 
@@ -437,6 +445,17 @@ public class ToolboxController extends AbstractController {
 
         ClassDetailedDto currentClass = classService.getClassDetailByClassId(missLessonStudentDetailedDto.getCurrentClassId());
 
+        if (originalClass == null) {
+            String msg="开补课单时未查到原班级！";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+        if (currentClass == null) {
+            String msg="开补课单时未查到补课班级！";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+
         missLessonStudentDetailedDto.setCurrentClassGrade(currentClass.getClassGrade());
         missLessonStudentDetailedDto.setCurrentClassSubject(currentClass.getClassSubject());
         missLessonStudentDetailedDto.setCurrentClassSimplifiedTime(currentClass.getClassSimplifiedTime());
@@ -446,7 +465,7 @@ public class ToolboxController extends AbstractController {
 
         MissedLessonExcel excel = null;
         try {
-            excel = new MissedLessonExcel(filePathProperties.getToolboxMissLessonTemplatePathAndName(currentCampus));
+            excel = new MissedLessonExcel(filePathProperties.getToolboxMissLessonTemplatePathAndName());
 
             if (Constants.ON.equals(sync)) {
                 //若打开自动同步
@@ -456,67 +475,17 @@ public class ToolboxController extends AbstractController {
                 }
 
                 //向原班助教和补课班助教发送消息
-                Long userFromId = userService.getSessionUserInfo().getId();
-
-                String originalAssistantWorkId = assistantService.getAssistantById(originalClass.getClassAssistantId()).getAssistantWorkId();
-                User originalUser = userService.getUserByWorkId(originalAssistantWorkId);
-                Long originalUserId = originalUser.getId();
-                UserMessage originalMessage = new UserMessage();
-                originalMessage.setUserId(originalUserId);
-                originalMessage.setUserFromId(userFromId);
-                originalMessage.setMessageTitle("你的班上有需要补课的学生");
-                StringBuffer originalMessageContent = new StringBuffer();
-                originalMessageContent.append("你的\"").append(originalClass.getClassName()).append("\"(上课时间：").append(originalClass.getClassSimplifiedTime()).append("，上课教室：").append(originalClass.getClassCampus() + originalClass.getClassroom() + "教").append(")上的学生<em>").append(missLessonStudentDetailedDto.getStudentName()).append("</em>需要补课。")
-                        .append("<br>" + "补课班号：").append(currentClass.getClassId())
-                        .append("<br>" + "补课班级名称：").append(currentClass.getClassName())
-                        .append("<br>" + "补课班级助教：").append(currentClass.getAssistantName())
-                        .append("<br>" + "补课班级任课教师：").append(currentClass.getTeacherName())
-                        .append("<br>" + "补课时间 ：").append(MyTimeUtils.dateToStringYMD(missLessonStudentDetailedDto.getDate()) + ", " + missLessonStudentDetailedDto.getCurrentClassSimplifiedTime())
-                        .append("<br>" + "补课班级上课教室：").append(currentClass.getClassCampus() + currentClass.getClassroom() + "教");
-                originalMessage.setMessageContent(originalMessageContent.toString());
-                originalMessage.setMessageTime(new Date());
-                if (UserMessageUtils.isValidUserMessageUpdateInfo(originalMessage)) {
-                    userMessageService.insertUserMessage(originalMessage);
-                }
-
-
-                String currentAssistantWorkId = assistantService.getAssistantById(currentClass.getClassAssistantId()).getAssistantWorkId();
-                User currentUser = userService.getUserByWorkId(currentAssistantWorkId);
-                Long currentUserId = currentUser.getId();
-                UserMessage currentMessage = new UserMessage();
-                currentMessage.setUserId(currentUserId);
-                currentMessage.setUserFromId(userFromId);
-                currentMessage.setMessageTitle("有学生补课到你的班上");
-                StringBuffer currentMessageContent = new StringBuffer();
-                currentMessageContent.append("学生<em>").append(missLessonStudentDetailedDto.getStudentName()).append("</em>补课到你的\"").append(currentClass.getClassName()).append("\"(上课时间：").append(currentClass.getClassSimplifiedTime()).append("，上课教室：").append(currentClass.getClassCampus() + currentClass.getClassroom() + "教)。")
-                        .append("<br>" + "补课日期：").append(MyTimeUtils.dateToStringYMD(missLessonStudentDetailedDto.getDate()))
-                        .append("<br>" + "原班号：").append(originalClass.getClassId())
-                        .append("<br>" + "原班级名称：").append(originalClass.getClassName())
-                        .append("<br>" + "原班级助教：").append(originalClass.getAssistantName())
-                        .append("<br>" + "原班级任课教师：").append(originalClass.getTeacherName());
-                currentMessage.setMessageContent(currentMessageContent.toString());
-                currentMessage.setMessageTime(new Date());
-                if (UserMessageUtils.isValidUserMessageUpdateInfo(currentMessage)) {
-                    userMessageService.insertUserMessage(currentMessage);
-                }
-
+                User originalUser = sendMessageToOriginalClassAssistant(missLessonStudentDetailedDto, originalClass, currentClass);
+                User currentUser = sendMessageToCurrentClassAssistant(missLessonStudentDetailedDto, originalClass, currentClass);
 
                 if (Constants.ON.equals(emailTip)) {
                     //如果打开邮件提醒
-                    String title = "AOWS-重要提醒";
-                    if (!StringUtils.isEmpty(originalUser.getUserEmail())) {
-                        String content1 = "你的班上有需要补课的学生！前往查看" + Constants.INDEX + "。";
-                        SendEmailUtils.sendConcurrentEncryptedEmail(originalUser.getUserEmail(), title, content1);
-                    }
-                    if (!StringUtils.isEmpty(currentUser.getUserEmail())) {
-                        String content2 = "有学生补课到你的班上！前往查看" + Constants.INDEX + "。";
-                        SendEmailUtils.sendConcurrentEncryptedEmail(currentUser.getUserEmail(), title, content2);
-                    }
+                    sendEmailToOiriginalAndCurrentClassAssistant(originalUser, currentUser);
                 }
             }
 
             //将读到的数据，修改到补课单模板表格中
-            excel.writeMissLesson(missLessonStudentDetailedDto);
+            excel.writeMissLesson(missLessonStudentDetailedDto, currentCampus);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InvalidFileTypeException e) {
@@ -534,6 +503,100 @@ public class ToolboxController extends AbstractController {
         }
 
         return Constants.SUCCESS;
+    }
+
+    /**
+     * 向原班级助教发送其班上有补课学生的消息
+     *
+     * @param missLessonStudentDetailedDto 补课学生的封装信息
+     * @param originalClass                原班级
+     * @param currentClass                 补课班级
+     * @return 返回原班助教的用户信息（用户对象）
+     */
+    private User sendMessageToOriginalClassAssistant(MissLessonStudentDetailedDto missLessonStudentDetailedDto, ClassDetailedDto originalClass, ClassDetailedDto currentClass) {
+        Long userFromId = userService.getSessionUserInfo().getId();
+
+        String originalAssistantWorkId = assistantService.getAssistantById(originalClass.getClassAssistantId()).getAssistantWorkId();
+        User originalUser = userService.getUserByWorkId(originalAssistantWorkId);
+        if (originalUser == null) {
+            return null;
+        }
+        Long originalUserId = originalUser.getId();
+        UserMessage originalMessage = new UserMessage();
+        originalMessage.setUserId(originalUserId);
+        originalMessage.setUserFromId(userFromId);
+        originalMessage.setMessageTitle("你的班上有需要补课的学生");
+        StringBuffer originalMessageContent = new StringBuffer();
+        originalMessageContent.append("你的\"").append(originalClass.getClassName()).append("\"(上课时间：").append(originalClass.getClassSimplifiedTime()).append("，上课教室：").append(originalClass.getClassCampus() + originalClass.getClassroom() + "教").append(")上的学生<em>").append(missLessonStudentDetailedDto.getStudentName()).append("</em>需要补课。")
+                .append("<br>" + "补课班号：").append(currentClass.getClassId())
+                .append("<br>" + "补课班级名称：").append(currentClass.getClassName())
+                .append("<br>" + "补课班级助教：").append(currentClass.getAssistantName())
+                .append("<br>" + "补课班级任课教师：").append(currentClass.getTeacherName())
+                .append("<br>" + "补课时间 ：").append(MyTimeUtils.dateToStringYMD(missLessonStudentDetailedDto.getDate()) + ", " + missLessonStudentDetailedDto.getCurrentClassSimplifiedTime())
+                .append("<br>" + "补课班级上课教室：").append(currentClass.getClassCampus() + currentClass.getClassroom() + "教");
+        originalMessage.setMessageContent(originalMessageContent.toString());
+        originalMessage.setMessageTime(new Date());
+        if (UserMessageUtils.isValidUserMessageUpdateInfo(originalMessage)) {
+            userMessageService.insertUserMessage(originalMessage);
+        }
+
+        return originalUser;
+    }
+
+    /**
+     * 向补课班级助教发送有补课学生补课到他的班级的消息
+     *
+     * @param missLessonStudentDetailedDto 补课学生的封装信息
+     * @param originalClass                原班级
+     * @param currentClass                 补课班级
+     * @return 返回补课助教的用户信息（用户对象）
+     */
+    private User sendMessageToCurrentClassAssistant(MissLessonStudentDetailedDto missLessonStudentDetailedDto, ClassDetailedDto originalClass, ClassDetailedDto currentClass) {
+        Long userFromId = userService.getSessionUserInfo().getId();
+
+        String currentAssistantWorkId = assistantService.getAssistantById(currentClass.getClassAssistantId()).getAssistantWorkId();
+        User currentUser = userService.getUserByWorkId(currentAssistantWorkId);
+        if (currentUser == null) {
+            return null;
+        }
+
+        Long currentUserId = currentUser.getId();
+        UserMessage currentMessage = new UserMessage();
+        currentMessage.setUserId(currentUserId);
+        currentMessage.setUserFromId(userFromId);
+        currentMessage.setMessageTitle("有学生补课到你的班上");
+        StringBuffer currentMessageContent = new StringBuffer();
+        currentMessageContent.append("学生<em>").append(missLessonStudentDetailedDto.getStudentName()).append("</em>补课到你的\"").append(currentClass.getClassName()).append("\"(上课时间：").append(currentClass.getClassSimplifiedTime()).append("，上课教室：").append(currentClass.getClassCampus() + currentClass.getClassroom() + "教)。")
+                .append("<br>" + "补课日期：").append(MyTimeUtils.dateToStringYMD(missLessonStudentDetailedDto.getDate()))
+                .append("<br>" + "原班号：").append(originalClass.getClassId())
+                .append("<br>" + "原班级名称：").append(originalClass.getClassName())
+                .append("<br>" + "原班级助教：").append(originalClass.getAssistantName())
+                .append("<br>" + "原班级任课教师：").append(originalClass.getTeacherName());
+        currentMessage.setMessageContent(currentMessageContent.toString());
+        currentMessage.setMessageTime(new Date());
+        if (UserMessageUtils.isValidUserMessageUpdateInfo(currentMessage)) {
+            userMessageService.insertUserMessage(currentMessage);
+        }
+
+        return currentUser;
+    }
+
+    /**
+     * 想原班级助教和补课班级助教发送必要的邮件通知
+     *
+     * @param originalUser 原班助教的用户信息（用户对象）
+     * @param currentUser  补课助教的用户信息（用户对象）
+     */
+    private void sendEmailToOiriginalAndCurrentClassAssistant(User originalUser, User currentUser) {
+        String title = "AOWS-重要提醒";
+        if (originalUser != null && !StringUtils.isEmpty(originalUser.getUserEmail())) {
+            String content1 = "你的班上有需要补课的学生！前往查看" + Constants.INDEX + "。";
+            SendEmailUtils.sendConcurrentEncryptedEmail(originalUser.getUserEmail(), title, content1);
+        }
+        if (currentUser != null && !StringUtils.isEmpty(currentUser.getUserEmail())) {
+            String content2 = "有学生补课到你的班上！前往查看" + Constants.INDEX + "。";
+            SendEmailUtils.sendConcurrentEncryptedEmail(currentUser.getUserEmail(), title, content2);
+        }
     }
 
     /**
@@ -663,6 +726,12 @@ public class ToolboxController extends AbstractController {
             e.printStackTrace();
             map.put("msg", Constants.FAILURE);
             return map;
+        } catch (ExcelTooManyRowsException e) {
+            e.printStackTrace();
+            map.put("msg", Constants.EXCEL_TOO_MANY_ROWS);
+            map.put("rowCountThreshold", e.getRowCountThreshold());
+            map.put("actualRowCount", e.getActualRowCount());
+            return map;
         }
 
         map.put("msg", Constants.SUCCESS);
@@ -742,6 +811,13 @@ public class ToolboxController extends AbstractController {
         } catch (ExcelColumnNotFoundException e) {
             e.printStackTrace();
             map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
+            map.put("whatWrong", e.getWhatWrong());
+            return map;
+        } catch (ExcelTooManyRowsException e) {
+            e.printStackTrace();
+            map.put("msg", Constants.EXCEL_TOO_MANY_ROWS);
+            map.put("rowCountThreshold", e.getRowCountThreshold());
+            map.put("actualRowCount", e.getActualRowCount());
             return map;
         }
 

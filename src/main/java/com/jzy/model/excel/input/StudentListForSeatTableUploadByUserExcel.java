@@ -2,8 +2,9 @@ package com.jzy.model.excel.input;
 
 import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.ExcelColumnNotFoundException;
+import com.jzy.manager.exception.ExcelTooManyRowsException;
 import com.jzy.manager.exception.InvalidFileTypeException;
-import com.jzy.model.excel.Excel;
+import com.jzy.model.excel.AbstractInputExcel;
 import com.jzy.model.excel.ExcelVersionEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,7 +27,7 @@ import java.util.List;
  **/
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class StudentListForSeatTableUploadByUserExcel extends Excel implements Serializable {
+public class StudentListForSeatTableUploadByUserExcel extends AbstractInputExcel implements Serializable {
     private static final long serialVersionUID = 7525649970044104312L;
 
     private static final String STUDENT_NAME_COLUMN = ExcelConstants.STUDENT_NAME_COLUMN_3;
@@ -41,6 +42,11 @@ public class StudentListForSeatTableUploadByUserExcel extends Excel implements S
      * 按顺序存储学员姓名列中的元素，该顺序将于座位表的先后顺序对应
      */
     private List<String> studentNames = new ArrayList<>();
+
+    /**
+     * 规定名称的列的索引位置，初始值为-1无效值，即表示还没找到
+     */
+    private int columnIndexOfStudentName = -1;
 
     public StudentListForSeatTableUploadByUserExcel() {
     }
@@ -66,29 +72,20 @@ public class StudentListForSeatTableUploadByUserExcel extends Excel implements S
      *
      * @return map类型成员变量studentNames
      * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
+     * @throws ExcelTooManyRowsException    行数超过规定值，将规定的上限值和实际值都传给异常对象
      */
-    public List<String> readStudentNames() throws ExcelColumnNotFoundException {
-        resetParam();
+    public List<String> readStudentNames() throws ExcelColumnNotFoundException, ExcelTooManyRowsException {
+        resetOutput();
 
         int sheetIndex = 0;
 
-        int targetRowColumnCount = this.getColumnCount(sheetIndex, startRow);
+        testRowCountValidityOfSheet(sheetIndex);
 
-        /**
+        /*
          * 学员姓名所在列
          */
-        int columnIndexOfStudentName = -1;
-        for (int i = 0; i < targetRowColumnCount; i++) {
-            if (STUDENT_NAME_COLUMN.equals(this.getValueAt(sheetIndex, startRow, i))) {
-                columnIndexOfStudentName = i;
-                break;
-            }
-        }
+        findColumnIndexOfSpecifiedName(sheetIndex);
 
-        if (columnIndexOfStudentName < 0) {
-            //列属性中有未匹配的属性名
-            throw new ExcelColumnNotFoundException("名单列属性中有未匹配的属性名");
-        }
 
         for (int i = startRow + 1; i < getRowCount(sheetIndex); i++) {
             // 遍历表格所有行
@@ -106,8 +103,36 @@ public class StudentListForSeatTableUploadByUserExcel extends Excel implements S
      * 重置当前工作表对象的临时存储成员变量
      */
     @Override
-    public void resetParam() {
+    public void resetOutput() {
         studentNames = new ArrayList<>();
     }
 
+    @Override
+    public void resetColumnIndex() {
+        columnIndexOfStudentName = -1;
+    }
+
+    @Override
+    protected void findColumnIndexOfSpecifiedName(int sheetIx) throws ExcelColumnNotFoundException {
+        resetColumnIndex();
+
+        int targetRowColumnCount = this.getColumnCount(sheetIx, startRow);
+        for (int i = 0; i < targetRowColumnCount; i++) {
+            if (STUDENT_NAME_COLUMN.equals(this.getValueAt(sheetIx, startRow, i))) {
+                columnIndexOfStudentName = i;
+                break;
+            }
+        }
+
+        testColumnNameValidity();
+    }
+
+    @Override
+    public boolean testColumnNameValidity() throws ExcelColumnNotFoundException {
+        if (columnIndexOfStudentName < 0) {
+            //列属性中有未匹配的属性名
+            throw new ExcelColumnNotFoundException(null, STUDENT_NAME_COLUMN);
+        }
+        return false;
+    }
 }

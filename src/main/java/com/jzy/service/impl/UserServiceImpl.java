@@ -157,7 +157,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         String emailMsg = "收到来自新东方优能中学助教工作平台的验证码：\n" + verifyCode + "\n有效时间: " + EmailVerifyCode.getValidTimeMinutes() + "分钟";
 
         // 邮件发送处理
-        SendEmailUtils.sendEncryptedEmail(emailAddress, emailMsg);
+        SendEmailUtils.sendConcurrentEncryptedEmail(emailAddress, emailMsg);
         //设置redis缓存
         ValueOperations<String, Object> vOps = redisTemplate.opsForValue();
         final String baseKey = RedisConstants.USER_VERIFYCODE_EMAIL_KEY;
@@ -514,9 +514,20 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         //执行插入
         result.setInsertCount(userMapper.insertUser(user));
 
-
-        Long id = getUserByName(user.getUserName()).getId();
         //向新用户发送欢迎消息
+        sendWelcomeMessageToUser(user);
+
+        return result;
+    }
+
+    /**
+     * 向新用户发送欢迎消息
+     *
+     * @param user 新用户
+     */
+    private void sendWelcomeMessageToUser(User user){
+        Long id = getUserByName(user.getUserName()).getId();
+
         UserMessage message = new UserMessage();
         message.setUserId(id);
         message.setUserFromId(Constants.ADMIN_USER_ID);
@@ -537,8 +548,6 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             userMessageService.insertUserMessage(message);
         }
 
-
-        return result;
     }
 
     /**
@@ -628,7 +637,10 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         User originalUser = getUserByWorkId(user.getUserWorkId());
         if (originalUser == null) {
-            //插入
+            /*
+              插入。如果用户目前没有给工号，那么insertUserWithUnrepeatedWorkId方法会处理好导入逻辑，
+              因为如果身份证等其他唯一字段有重复，insertUserWithUnrepeatedWorkId方法会直接return
+             */
             result.add(insertUserWithUnrepeatedWorkId(user));
         }
         result.setResult(Constants.SUCCESS);

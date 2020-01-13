@@ -223,7 +223,7 @@ public class Class extends BaseEntity {
      * @param classroom
      */
     public void setParsedClassroom(String classroom) {
-        this.classroom = MyStringUtils.getMaxLengthNumberSubstring(classroom);
+        this.classroom = MyStringUtils.getClassroomParsedSubString(classroom);
     }
 
     /**

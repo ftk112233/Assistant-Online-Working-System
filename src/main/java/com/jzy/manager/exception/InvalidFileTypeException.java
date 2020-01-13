@@ -8,6 +8,8 @@ package com.jzy.manager.exception;
  * @date 2019/10/30 13:01
  **/
 public class InvalidFileTypeException extends Exception {
+    private static final long serialVersionUID = 5972322191747094090L;
+
     public InvalidFileTypeException() {
     }
 

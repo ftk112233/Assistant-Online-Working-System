@@ -6,6 +6,7 @@ import com.jzy.dao.AssistantMapper;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.AssistantUtils;
+import com.jzy.manager.util.MyStringUtils;
 import com.jzy.model.dto.AssistantSearchCondition;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.UpdateResult;
@@ -231,16 +232,33 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
             }
         } else {
             //插入
-            Assistant tmp = getAssistantByName(assistant.getAssistantName());
-            while (tmp != null) {
-                //添加的姓名已存在，在后面加一个'1'
-                assistant.setAssistantName(tmp.getAssistantName() + "1");
-                tmp = getAssistantByName(assistant.getAssistantName());
-            }
+            /*
+                不再做重名检查，认为重名情况很少出现,出现了的后果仅仅是，查自己班级的时候会把那个重名的人的班一起查出来。
+                这个代价是可以接受的，因此采用“鸵鸟算法”。——2020/1/11
+             */
+//            Assistant tmp = getAssistantByName(assistant.getAssistantName());
+//            while (tmp != null) {
+//                //添加的姓名已存在，在后面加一个'1'
+//                assistant.setAssistantName(tmp.getAssistantName() + "1");
+//                tmp = getAssistantByName(assistant.getAssistantName());
+//            }
             result.add(insertAssistantWithUnrepeatedWorkId(assistant));
         }
         result.setResult(Constants.SUCCESS);
         return result;
+    }
+
+    /**
+     * 判断assistant的工号是否可能是32位uuid的形式
+     *
+     * @param assistant 输入助教对象
+     * @return 工号是否可能是uuid
+     */
+    private boolean workIdIsProbableUUID32(Assistant assistant) {
+        if (assistant == null) {
+            return false;
+        }
+        return MyStringUtils.isProbableUUID32(assistant.getAssistantWorkId());
     }
 
     @Override

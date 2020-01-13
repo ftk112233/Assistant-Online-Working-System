@@ -8,6 +8,8 @@ package com.jzy.manager.exception;
  * @date 2019/11/19 9:34
  **/
 public class InvalidParameterException extends RuntimeException {
+    private static final long serialVersionUID = -1534690918130787560L;
+
     public InvalidParameterException() {
     }
 

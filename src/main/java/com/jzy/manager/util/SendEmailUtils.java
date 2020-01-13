@@ -259,8 +259,4 @@ public class SendEmailUtils {
         }
 
     }
-
-    public static void main(String[] args) {
-        sendConcurrentEncryptedEmail("929703621@qq.com", "1", "222");
-    }
 }

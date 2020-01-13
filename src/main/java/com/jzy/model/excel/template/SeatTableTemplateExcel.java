@@ -2,7 +2,7 @@ package com.jzy.model.excel.template;
 
 import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
-import com.jzy.model.excel.Excel;
+import com.jzy.model.excel.AbstractTemplateExcel;
 import com.jzy.model.excel.ExcelVersionEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -20,8 +20,9 @@ import java.util.List;
  * @description 座位表模板的模型类
  * @date 2019/10/30 14:21
  **/
-public class SeatTableTemplateExcel extends Excel implements Serializable {
+public class SeatTableTemplateExcel extends AbstractTemplateExcel implements Serializable {
     private static final long serialVersionUID = -3764653590834120925L;
+
 
     public SeatTableTemplateExcel() {
     }
@@ -95,7 +96,7 @@ public class SeatTableTemplateExcel extends Excel implements Serializable {
                     int index = Integer.parseInt(value) - 1;
                     if (index < data.size()) {
                         //座位号值大于学生数量的座位不填
-                        this.setValueAt(targetSheetIndex, i, j, data.get(Integer.parseInt(value) - 1).getStudentName());
+                        this.setValueAt(targetSheetIndex, i, j, value+" "+data.get(Integer.parseInt(value) - 1).getStudentName());
                     }
                 }
             }

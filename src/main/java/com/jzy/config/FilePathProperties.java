@@ -78,12 +78,23 @@ public class FilePathProperties {
     }
 
     /**
-     * 工具箱指定校区的助教工作手册模板的目录
+     * 工具箱指定校区的助教工作手册模板的目录。
      *
+     *
+     * @param campus 校区
      * @return 目录
      */
     public String getToolboxAssistantTutorialTemplatePathAndName(String campus) {
         return getToolboxTemplatePath() + CampusEnum.getCampusEnumByNameString(campus) + SEPARATOR + FileUtils.TEMPLATES.get(1);
+    }
+
+    /**
+     * 工具箱指定校区的助教工作手册模板的目录
+     *
+     * @return 目录
+     */
+    public String getToolboxAssistantTutorialTemplatePathAndName() {
+        return getToolboxTemplatePath() + SEPARATOR + FileUtils.TEMPLATES.get(1);
     }
 
     /**
@@ -100,8 +111,8 @@ public class FilePathProperties {
      *
      * @return 目录
      */
-    public String getToolboxMissLessonTemplatePathAndName(String campus) {
-        return getToolboxTemplatePath() + CampusEnum.getCampusEnumByNameString(campus) + SEPARATOR + FileUtils.TEMPLATES.get(3);
+    public String getToolboxMissLessonTemplatePathAndName() {
+        return getToolboxTemplatePath()+ SEPARATOR + FileUtils.TEMPLATES.get(3);
     }
 
     /**

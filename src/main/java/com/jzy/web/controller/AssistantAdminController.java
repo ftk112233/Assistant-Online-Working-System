@@ -4,8 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
-import com.jzy.manager.exception.InvalidFileInputException;
-import com.jzy.manager.exception.InvalidParameterException;
+import com.jzy.manager.exception.*;
 import com.jzy.manager.util.AssistantUtils;
 import com.jzy.model.CampusEnum;
 import com.jzy.model.dto.AssistantSearchCondition;
@@ -27,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -223,9 +223,20 @@ public class AssistantAdminController extends AbstractController {
             UpdateResult assistantResult = assistantService.insertAndUpdateAssistantsFromExcel(excel.getAssistants());
             databaseInsertRowCount += (int) assistantResult.getInsertCount();
             databaseUpdateRowCount += (int) assistantResult.getUpdateCount();
-        } catch (Exception e) {
+        } catch (InvalidFileTypeException | IOException e) {
             e.printStackTrace();
             map.put("msg", Constants.FAILURE);
+            return map;
+        } catch (ExcelTooManyRowsException e) {
+            e.printStackTrace();
+            map.put("msg", Constants.EXCEL_TOO_MANY_ROWS);
+            map.put("rowCountThreshold", e.getRowCountThreshold());
+            map.put("actualRowCount", e.getActualRowCount());
+            return map;
+        } catch (ExcelColumnNotFoundException e) {
+            e.printStackTrace();
+            map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
+            map.put("whatWrong", e.getWhatWrong());
             return map;
         }
 

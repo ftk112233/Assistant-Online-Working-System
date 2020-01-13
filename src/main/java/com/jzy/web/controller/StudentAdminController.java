@@ -3,10 +3,8 @@ package com.jzy.web.controller;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jzy.manager.constant.Constants;
-import com.jzy.manager.exception.ExcelColumnNotFoundException;
-import com.jzy.manager.exception.InvalidFileInputException;
-import com.jzy.manager.exception.InvalidFileTypeException;
-import com.jzy.manager.exception.InvalidParameterException;
+import com.jzy.manager.exception.*;
+import com.jzy.manager.util.ClassUtils;
 import com.jzy.manager.util.StudentUtils;
 import com.jzy.manager.util.UserMessageUtils;
 import com.jzy.model.dto.*;
@@ -57,8 +55,8 @@ public class StudentAdminController extends AbstractController {
      */
     @RequestMapping("/import")
     @ResponseBody
-    public Map<String, Object> importExcel(@RequestParam(value = "file", required = false) MultipartFile file,@RequestParam(value = "deleteFirst",required = false) boolean deleteFirstChecked
-                                           ,@RequestParam(value = "type") Integer type) {
+    public Map<String, Object> importExcel(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "deleteFirst", required = false) boolean deleteFirstChecked, @RequestParam(value = "manualDeleteFirstCondition", required = false) boolean manualDeleteFirstConditionChecked
+            , @RequestParam(value = "type") Integer type, Class deleteCondition) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>();
         //返回layui规定的文件上传模块JSON格式
@@ -92,7 +90,7 @@ public class StudentAdminController extends AbstractController {
             if (type.equals(1)) {
                 try {
                     excel = new StudentListImportToDatabaseExcel(file.getInputStream(), ExcelVersionEnum.getVersion(file.getOriginalFilename()));
-                    excelEffectiveDataRowCount=excel.readStudentAndClassInfoFromExcel();
+                    excelEffectiveDataRowCount = excel.readStudentAndClassInfoFromExcel();
                 } catch (IOException e) {
                     e.printStackTrace();
                     map.put("msg", Constants.FAILURE);
@@ -100,33 +98,74 @@ public class StudentAdminController extends AbstractController {
                 } catch (ExcelColumnNotFoundException e) {
                     e.printStackTrace();
                     map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
+                    map.put("whatWrong", e.getWhatWrong());
                     return map;
                 } catch (InvalidFileTypeException e) {
                     e.printStackTrace();
                     map.put("msg", Constants.FAILURE);
                     return map;
+                } catch (ExcelTooManyRowsException e) {
+                    e.printStackTrace();
+                    map.put("msg", Constants.EXCEL_TOO_MANY_ROWS);
+                    map.put("rowCountThreshold", e.getRowCountThreshold());
+                    map.put("actualRowCount", e.getActualRowCount());
+                    return map;
                 }
 
                 try {
-                    UpdateResult studentResult=studentService.insertAndUpdateStudentsFromExcel(new ArrayList<>(excel.getStudents()));
+                    UpdateResult studentResult = studentService.insertAndUpdateStudentsFromExcel(new ArrayList<>(excel.getStudents()));
                     databaseInsertRowCount += (int) studentResult.getInsertCount();
                     databaseUpdateRowCount += (int) studentResult.getUpdateCount();
 
                     if (deleteFirstChecked) {
                         //如果开启先导后删
-                        if (excel.getStudentAndClassDetailedDtos().size() > 0) {
-                            StudentAndClassDetailedDto dto = excel.getStudentAndClassDetailedDtos().get(0);
-                            Class clazz=classService.getClassByClassId(dto.getClassId());
-                            StudentAndClassSearchCondition condition = new StudentAndClassSearchCondition();
-                            condition.setClassYear(clazz.getClassYear());
-                            condition.setClassSeason(clazz.getClassSeason());
-                            condition.setClassSubSeason(clazz.getClassSubSeason());
-                            condition.setClassCampus(clazz.getClassCampus());
-                            databaseDeleteRowCount += (int) studentAndClassService.deleteStudentAndClassesByCondition(condition).getDeleteCount();
+                        StudentAndClassSearchCondition condition = new StudentAndClassSearchCondition();
+
+                        if (manualDeleteFirstConditionChecked) {
+                            //如果手动选择删除条件
+                            if (deleteCondition == null || StringUtils.isEmpty(deleteCondition.getClassYear()) || !ClassUtils.isValidClassYear(deleteCondition.getClassYear())) {
+                                map.put("msg", "yearInvalid");
+                                return map;
+                            }
+
+                            if (StringUtils.isEmpty(deleteCondition.getClassSeason()) || !ClassUtils.isValidClassSeason(deleteCondition.getClassSeason())) {
+                                map.put("msg", "seasonInvalid");
+                                return map;
+                            }
+
+                            if (StringUtils.isEmpty(deleteCondition.getClassCampus()) || !ClassUtils.isValidClassCampus(deleteCondition.getClassCampus())) {
+                                map.put("msg", "campusInvalid");
+                                return map;
+                            }
+
+                            if (!ClassUtils.isValidClassSubSeason(deleteCondition.getClassSubSeason())) {
+                                map.put("msg", Constants.FAILURE);
+                                return map;
+                            }
+
+                            condition.setClassYear(deleteCondition.getClassYear());
+                            condition.setClassSeason(deleteCondition.getClassSeason());
+                            condition.setClassSubSeason(deleteCondition.getClassSubSeason());
+                            condition.setClassCampus(deleteCondition.getClassCampus());
+                        } else {
+                            //如果不手动选择删除条件，默认读取表格中第一条记录中的班级所在的"年份-季度-分期-校区"，并删除其下的学生上课记录
+                            if (excel.getStudentAndClassDetailedDtos().size() > 0) {
+                                StudentAndClassDetailedDto dto = excel.getStudentAndClassDetailedDtos().get(0);
+                                Class clazz = classService.getClassByClassId(dto.getClassId());
+
+                                condition.setClassYear(clazz.getClassYear());
+                                condition.setClassSeason(clazz.getClassSeason());
+                                condition.setClassSubSeason(clazz.getClassSubSeason());
+                                condition.setClassCampus(clazz.getClassCampus());
+                            } else {
+                                condition = null;
+                            }
                         }
+
+                        databaseDeleteRowCount += (int) studentAndClassService.deleteStudentAndClassesByCondition(condition).getDeleteCount();
                     }
 
-                    UpdateResult studentAndClassResult=studentAndClassService.insertAndUpdateStudentAndClassesFromExcel(excel.getStudentAndClassDetailedDtos());
+                    UpdateResult studentAndClassResult = studentAndClassService.insertAndUpdateStudentAndClassesFromExcel(excel.getStudentAndClassDetailedDtos());
                     databaseInsertRowCount += (int) studentAndClassResult.getInsertCount();
                     databaseUpdateRowCount += (int) studentAndClassResult.getUpdateCount();
                 } catch (Exception e) {
@@ -137,7 +176,7 @@ public class StudentAdminController extends AbstractController {
             } else if (type.equals(2)) {
                 try {
                     excel = new StudentListImportToDatabaseExcel(file.getInputStream(), ExcelVersionEnum.getVersion(file.getOriginalFilename()));
-                    excelEffectiveDataRowCount=excel.readStudentDetailInfoFromExcel();
+                    excelEffectiveDataRowCount = excel.readStudentDetailInfoFromExcel();
                 } catch (IOException e) {
                     e.printStackTrace();
                     map.put("msg", Constants.FAILURE);
@@ -145,15 +184,22 @@ public class StudentAdminController extends AbstractController {
                 } catch (ExcelColumnNotFoundException e) {
                     e.printStackTrace();
                     map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
+                    map.put("whatWrong", e.getWhatWrong());
                     return map;
                 } catch (InvalidFileTypeException e) {
                     e.printStackTrace();
                     map.put("msg", Constants.FAILURE);
                     return map;
+                } catch (ExcelTooManyRowsException e) {
+                    e.printStackTrace();
+                    map.put("msg", Constants.EXCEL_TOO_MANY_ROWS);
+                    map.put("rowCountThreshold", e.getRowCountThreshold());
+                    map.put("actualRowCount", e.getActualRowCount());
+                    return map;
                 }
 
                 try {
-                    UpdateResult studentResult=studentService.insertAndUpdateStudentsDetailedFromExcel(new ArrayList<>(excel.getStudents()));
+                    UpdateResult studentResult = studentService.insertAndUpdateStudentsDetailedFromExcel(new ArrayList<>(excel.getStudents()));
                     databaseInsertRowCount += (int) studentResult.getInsertCount();
                     databaseUpdateRowCount += (int) studentResult.getUpdateCount();
 
@@ -169,43 +215,54 @@ public class StudentAdminController extends AbstractController {
             SqlProceedSpeed speedOfDatabaseImport = new SqlProceedSpeed(databaseUpdateRowCount, databaseInsertRowCount, databaseDeleteRowCount, endTime - startTime);
             speedOfExcelImport.parseSpeed();
             speedOfDatabaseImport.parseSpeed();
-            map.put("excelSpeed",speedOfExcelImport);
-            map.put("databaseSpeed",speedOfDatabaseImport);
+            map.put("excelSpeed", speedOfExcelImport);
+            map.put("databaseSpeed", speedOfDatabaseImport);
 
             map.put("msg", Constants.SUCCESS);
 
             //向对应校区的用户发送通知消息
-            if (excel !=null && excel.getStudentAndClassDetailedDtos().size() > 0) {
+            if (excel != null && excel.getStudentAndClassDetailedDtos().size() > 0) {
                 StudentAndClassDetailedDto dto = excel.getStudentAndClassDetailedDtos().get(0);
                 Class clazz = classService.getClassByClassId(dto.getClassId());
-                clazz.setParsedClassYear();
-                String campus = clazz.getClassCampus();
-                if (!StringUtils.isEmpty(campus)) {
-                    List<Assistant> assistants = assistantService.listAssistantsByCampus(campus);
-                    List<Long> userIds = new ArrayList<>();
-                    for (Assistant assistant : assistants) {
-                        userIds.add(userService.getUserByWorkId(assistant.getAssistantWorkId()).getId());
-                    }
-
-                    for (Long userId : userIds) {
-                        UserMessage message = new UserMessage();
-                        message.setUserId(userId);
-                        message.setUserFromId(userService.getSessionUserInfo().getId());
-                        message.setMessageTitle("学员上课信息有变化");
-                        StringBuffer messageContent = new StringBuffer();
-                        messageContent.append("你的学管老师刚刚更新了" + clazz.getClassCampus() + "校区" + clazz.getClassYear() + "年" + clazz.getClassSeason() + "的学员上课信息。")
-                                .append("<br>点<a lay-href='/studentAndClass/admin/page' lay-text='上课信息'>这里</a>前往查看。");
-                        message.setMessageContent(messageContent.toString());
-                        message.setMessageTime(new Date());
-                        if (UserMessageUtils.isValidUserMessageUpdateInfo(message)) {
-                            userMessageService.insertUserMessage(message);
-                        }
-                    }
-                }
+                sendMessageToUser(clazz);
             }
         }
 
         return map;
+    }
+
+    /**
+     * 向指定校区的用户（助教）发送学生花名册更新的通知
+     *
+     * @param clazz 从更新的记录中选取一个班级为例，取其校区作为要通知的校区，clazz的其他信息也用于消息正文
+     */
+    private void sendMessageToUser(Class clazz) {
+        if (clazz != null) {
+            clazz.setParsedClassYear();
+            String campus = clazz.getClassCampus();
+            if (!StringUtils.isEmpty(campus)) {
+                List<Assistant> assistants = assistantService.listAssistantsByCampus(campus);
+                List<Long> userIds = new ArrayList<>();
+                for (Assistant assistant : assistants) {
+                    userIds.add(userService.getUserByWorkId(assistant.getAssistantWorkId()).getId());
+                }
+
+                for (Long userId : userIds) {
+                    UserMessage message = new UserMessage();
+                    message.setUserId(userId);
+                    message.setUserFromId(userService.getSessionUserInfo().getId());
+                    message.setMessageTitle("学员上课信息有变化");
+                    StringBuffer messageContent = new StringBuffer();
+                    messageContent.append("你的学管老师刚刚更新了" + clazz.getClassCampus() + "校区" + clazz.getClassYear() + "年" + clazz.getClassSeason() + "的学员上课信息。")
+                            .append("<br>点<a lay-href='/studentAndClass/admin/page' lay-text='上课信息'>这里</a>前往查看。");
+                    message.setMessageContent(messageContent.toString());
+                    message.setMessageTime(new Date());
+                    if (UserMessageUtils.isValidUserMessageUpdateInfo(message)) {
+                        userMessageService.insertUserMessage(message);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -254,10 +311,17 @@ public class StudentAdminController extends AbstractController {
         } catch (ExcelColumnNotFoundException e) {
             e.printStackTrace();
             map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
+            map.put("whatWrong", e.getWhatWrong());
             return map;
         } catch (InvalidFileTypeException e) {
             e.printStackTrace();
             map.put("msg", Constants.FAILURE);
+            return map;
+        } catch (ExcelTooManyRowsException e) {
+            e.printStackTrace();
+            map.put("msg", Constants.EXCEL_TOO_MANY_ROWS);
+            map.put("rowCountThreshold", e.getRowCountThreshold());
+            map.put("actualRowCount", e.getActualRowCount());
             return map;
         }
 

@@ -28,9 +28,11 @@
                                 <p>上传excel要求说明：<a
                                         href="${ctx}/toolbox/assistantAdministrator/downloadExample/5">查看范例</a></p>
                                 <ul>
-                                    <li>每张sheet的名字必须以教室门牌号（<b style="color:red">纯数字</b>）命名，如'301'</li>
+                                    <li>每张sheet的名字必须以教室门牌号（<b style="color:red">纯数字、或纯数字+一个字母</b>）命名，如'301'、'301A'...
+                                    </li>
                                     <li>每张sheet中的单元格对应当前教室的座位，单元格的值必须是数字，且第一个座位从1开始，以等差为1增加（1、2、3、4、...)。</li>
-                                    <li>每张sheet中<b style="color:red">除座位单元格为不要出现纯数字的单元格</b>，如讲台区域可以命名成"310讲台"，但不能命名成"310"!</li>
+                                    <li>每张sheet中<b style="color:red">除座位单元格外不要出现纯数字的单元格</b>，如讲台区域可以命名成"310讲台"，但不能命名成"310"!
+                                    </li>
                                     <li>该表的sheet应该涵盖当前校区所有可用的教室，系统将读取这些教室以及对应教室的座位容量到数据库！</li>
                                 </ul>
                             </div>
@@ -132,18 +134,23 @@
                         icon: 1
                         , time: 1000
                     });
-                } else if (res.msg === "campusInvalid"){
+                } else if (res.msg === "campusInvalid") {
                     return layer.msg('请选择正确的校区!', {
                         offset: '15px'
                         , icon: 2
                         , time: 2000
                     });
-                } else if (res.msg === "sheetNameError"){
-                    return layer.alert('sheet名不是纯数字!', {
+                } else if (res.msg === "sheetNameError") {
+                    return layer.alert('sheet名应该是教室!即，纯数字或者纯数字加一个字母。如312；312A；5201；5201A...', {
                         skin: 'layui-layer-lan'
-                        ,closeBtn: 0
+                        , closeBtn: 0
                     });
-                }else {
+                } else if (res.msg === "tooManyRows") {
+                    return layer.alert('输入表格的行数过多。最大行数限制：' + res.rowCountThreshold + '，实际行数：' + res.actualRowCount + '。尝试删除最后多余的空白行？“ctrl+shift+↓”，“右键”，“删除”，“整行”', {
+                        skin: 'layui-layer-lan'
+                        , closeBtn: 0
+                    });
+                } else {
                     return layer.msg('导入失败', {
                         offset: '15px'
                         , icon: 2

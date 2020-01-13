@@ -534,6 +534,55 @@ public class MyStringUtils {
     }
 
     /**
+     * 获得输入字串中合理的“教室”。最大的数字子串或最大的数字子串和它的下一个字母(如果下一个字符是字母的话）
+     * 如，
+     * 输入："YN 曹杨308教"；输出"308"
+     * 输入："YN 曹杨308A教"；输出"308A"
+     * 输入："13 YN 曹杨308AA教"；输出"308A"
+     *
+     * @param string
+     * @return
+     */
+    public static String getClassroomParsedSubString(String string) {
+        String result = "";
+        String maxLenNumberStr = getMaxLengthNumberSubstring(string);
+        if (StringUtils.isEmpty(maxLenNumberStr)) {
+            return maxLenNumberStr;
+        }
+
+        //最长数字子串下一个字符的index
+        int nextCharIdx = string.indexOf(maxLenNumberStr) + maxLenNumberStr.length();
+        if (nextCharIdx >= string.length()){
+            //最长数字子串已经是当前string的末尾
+            return maxLenNumberStr;
+        }
+
+        char nextChar = string.charAt(nextCharIdx);
+        if (isLetter(nextChar)) {
+//            下一个字符是字母的话
+            result = maxLenNumberStr + nextChar;
+        } else {
+            result = maxLenNumberStr;
+        }
+        return result;
+    }
+
+    /**
+     * 判断一个字符是否为字母
+     *
+     * @param c 输入字符
+     * @return
+     */
+    public static boolean isLetter(char c) {
+        if (((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
      * 获得输入字串中有效的时间区间串，如输入："(具体以课表为准)周六8:15-10:45(11.2,11.9休息,11.3,11.4上课)"
      * 输出: 8:15-10:45
      *
@@ -581,7 +630,20 @@ public class MyStringUtils {
         return result;
     }
 
+    /**
+     * 判断str子串是否可能是32位的uuid的形式
+     *
+     * @param str 输入字符串
+     * @return 是否可能是uuid
+     */
+    public static boolean isProbableUUID32(String str) {
+        if (str == null || str.length() != 32) {
+            return false;
+        }
+        return true;
+    }
+
     public static void main(String[] args) {
-        System.out.println(getMaxLengthNumberSubstring("540曹杨312教"));
+        System.out.println(MyStringUtils.isPassword("______"));
     }
 }

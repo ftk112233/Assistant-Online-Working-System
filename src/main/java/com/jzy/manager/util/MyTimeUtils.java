@@ -15,9 +15,11 @@ import java.util.Locale;
  * @Version 1.0
  **/
 public class MyTimeUtils {
-    private static final String FORMAT_YMD = "yyyy-MM-dd";
+    public static final String FORMAT_YMD = "yyyy-MM-dd";
 
-    private static final String FORMAT_YMDHMS = "yyyy-MM-dd HH:mm:ss";
+    public static final String FORMAT_YMDHMS = "yyyy-MM-dd HH:mm:ss";
+
+    public static final String FORMAT_YMDHMS_BACKUP = "yyyy/MM/dd HH:mm:ss";
 
     public static final long VALID_TIME_3_MIN = 180000;  //3分钟,180s
     public static final long VALID_TIME_5_MIN = 300000;  //5分钟,500s

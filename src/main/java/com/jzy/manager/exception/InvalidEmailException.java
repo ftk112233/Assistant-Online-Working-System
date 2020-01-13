@@ -8,6 +8,8 @@ package com.jzy.manager.exception;
  * @Version 1.0
  **/
 public class InvalidEmailException extends InvalidParameterException {
+    private static final long serialVersionUID = 7327152820328019248L;
+
     public InvalidEmailException() {
     }
 

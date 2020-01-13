@@ -12,7 +12,7 @@ import java.util.Date;
 /**
  * @ClassName MissLessonStudentDetailedDto
  * @Author JinZhiyun
- * @Description //TODO
+ * @Description 补课学生信息的dto对象
  * @Date 2019/11/28 13:54
  * @Version 1.0
  **/

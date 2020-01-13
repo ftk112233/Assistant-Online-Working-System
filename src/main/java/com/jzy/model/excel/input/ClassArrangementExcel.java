@@ -2,10 +2,11 @@ package com.jzy.model.excel.input;
 
 import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.ExcelColumnNotFoundException;
+import com.jzy.manager.exception.ExcelTooManyRowsException;
 import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.model.dto.ClassDetailedDto;
 import com.jzy.model.entity.Teacher;
-import com.jzy.model.excel.Excel;
+import com.jzy.model.excel.AbstractInputExcel;
 import com.jzy.model.excel.ExcelVersionEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,19 +30,14 @@ import java.util.Set;
  **/
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ClassArrangementExcel extends Excel {
+public class ClassArrangementExcel extends AbstractInputExcel {
     private static final long serialVersionUID = -877510467520953391L;
 
     private static final String TEACHER_NAME_COLUMN = ExcelConstants.TEACHER_NAME_COLUMN;
-
     private static final String ASSISTANT_NAME_COLUMN = ExcelConstants.ASSISTANT_NAME_COLUMN;
-
     private static final String CLASS_ID_COLUMN = ExcelConstants.CLASS_ID_COLUMN;
-
     private static final String CLASS_NAME_COLUMN = ExcelConstants.CLASS_NAME_COLUMN;
-
     private static final String CLASS_TIME_COLUMN = ExcelConstants.CLASS_TIME_COLUMN;
-
     private static final String CLASSROOM_COLUMN = ExcelConstants.CLASSROOM_COLUMN;
 
     public ClassArrangementExcel() {
@@ -79,49 +75,32 @@ public class ClassArrangementExcel extends Excel {
     private List<ClassDetailedDto> classDetailedDtos;
 
     /**
+     * 规定名称的列的索引位置，初始值为-1无效值，即表示还没找到
+     */
+    private int columnIndexOfTeacherName = -1;
+    private int columnIndexOfAssistantName = -1;
+    private int columnIndexOfClassId = -1;
+    private int columnIndexOfClassName = -1;
+    private int columnIndexOfClassTime = -1;
+    private int columnIndexOfClassroom = -1;
+
+    /**
      * 从学生花名册表中读取信息
      *  学生Student对象直接读出，教师teacher对象也直接读出，班级信息整体和学生、助教、教师封装成StudentAndClassDto
      *
      * @return 返回表格有效数据的行数
      * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
-     */
-    public int readClassDetailFromExcel() throws ExcelColumnNotFoundException {
-        resetParam();
+     * @throws ExcelTooManyRowsException 行数超过规定值，将规定的上限值和实际值都传给异常对象
+     * */
+    public int readClassDetailFromExcel() throws ExcelColumnNotFoundException, ExcelTooManyRowsException {
+        resetOutput();
+
         int sheetIx = 0;
 
-        // 先扫描第startRow行找到"班级编码"、"班级名次"等信息所在列的位置
-        int columnIndexOfTeacherName = -7, columnIndexOfAssistantName = -9, columnIndexOfClassId = -10, columnIndexOfClassName = -11, columnIndexOfClassTime = -12, columnIndexOfClassroom = -13;
-        int row0ColumnCount = this.getColumnCount(sheetIx, startRow); // 第startRow行的列数
-        for (int i = 0; i < row0ColumnCount; i++) {
-            String value = this.getValueAt(sheetIx, startRow, i);
-            switch (value) {
-                case TEACHER_NAME_COLUMN:
-                    columnIndexOfTeacherName = i;
-                    break;
-                case ASSISTANT_NAME_COLUMN:
-                    columnIndexOfAssistantName = i;
-                    break;
-                case CLASS_ID_COLUMN:
-                    columnIndexOfClassId = i;
-                    break;
-                case CLASS_NAME_COLUMN:
-                    columnIndexOfClassName = i;
-                    break;
-                case CLASS_TIME_COLUMN:
-                    columnIndexOfClassTime = i;
-                    break;
-                case CLASSROOM_COLUMN:
-                    columnIndexOfClassroom = i;
-                    break;
-                default:
-            }
-        }
+        testRowCountValidityOfSheet(sheetIx);
 
-        if (columnIndexOfTeacherName < 0 || columnIndexOfAssistantName < 0 || columnIndexOfClassId < 0 || columnIndexOfClassName < 0
-                || columnIndexOfClassTime < 0 || columnIndexOfClassroom < 0) {
-            //列属性中有未匹配的属性名
-            throw new ExcelColumnNotFoundException("助教排班表列属性中有未匹配的属性名");
-        }
+        // 先扫描第startRow行找到"班级编码"、"班级名次"等信息所在列的位置
+        findColumnIndexOfSpecifiedName(sheetIx);
 
         int effectiveDataRowCount=0;
 
@@ -163,12 +142,57 @@ public class ClassArrangementExcel extends Excel {
     }
 
     @Override
-    public void resetParam() {
+    public void resetOutput() {
         teachers = new HashSet<>();
         classDetailedDtos = new ArrayList<>();
     }
 
-    public static void main(String[] args) throws IOException, ExcelColumnNotFoundException, InvalidFileTypeException {
+    @Override
+    public void resetColumnIndex() {
+        columnIndexOfTeacherName = -1;
+        columnIndexOfAssistantName = -1;
+        columnIndexOfClassId = -1;
+        columnIndexOfClassName = -1;
+        columnIndexOfClassTime = -1;
+        columnIndexOfClassroom = -1;
+    }
+
+    @Override
+    protected void findColumnIndexOfSpecifiedName(int sheetIx) throws ExcelColumnNotFoundException {
+        resetColumnIndex();
+
+        int row0ColumnCount = this.getColumnCount(sheetIx, startRow); // 第startRow行的列数
+        for (int i = 0; i < row0ColumnCount; i++) {
+            String value = this.getValueAt(sheetIx, startRow, i);
+            if (value!=null) {
+                switch (value) {
+                    case TEACHER_NAME_COLUMN:
+                        columnIndexOfTeacherName = i;
+                        break;
+                    case ASSISTANT_NAME_COLUMN:
+                        columnIndexOfAssistantName = i;
+                        break;
+                    case CLASS_ID_COLUMN:
+                        columnIndexOfClassId = i;
+                        break;
+                    case CLASS_NAME_COLUMN:
+                        columnIndexOfClassName = i;
+                        break;
+                    case CLASS_TIME_COLUMN:
+                        columnIndexOfClassTime = i;
+                        break;
+                    case CLASSROOM_COLUMN:
+                        columnIndexOfClassroom = i;
+                        break;
+                    default:
+                }
+            }
+        }
+
+        testColumnNameValidity();
+    }
+
+    public static void main(String[] args) throws IOException, ExcelColumnNotFoundException, InvalidFileTypeException, ExcelTooManyRowsException {
         ClassArrangementExcel excel = new ClassArrangementExcel("D:\\aows_resources\\toolbox\\example\\曹杨秋季助教排班.xlsx");
         excel.readClassDetailFromExcel();
         for (Teacher teacher : excel.getTeachers()) {
@@ -177,5 +201,29 @@ public class ClassArrangementExcel extends Excel {
         for (ClassDetailedDto classDetailedDto : excel.getClassDetailedDtos()) {
             System.out.println(classDetailedDto);
         }
+    }
+
+    @Override
+    public boolean testColumnNameValidity() throws ExcelColumnNotFoundException {
+        if (columnIndexOfTeacherName < 0) {
+            throw new ExcelColumnNotFoundException(null, TEACHER_NAME_COLUMN);
+        }
+        if (columnIndexOfAssistantName < 0) {
+            throw new ExcelColumnNotFoundException(null, ASSISTANT_NAME_COLUMN);
+        }
+        if (columnIndexOfClassId < 0) {
+            throw new ExcelColumnNotFoundException(null, CLASS_ID_COLUMN);
+        }
+        if (columnIndexOfClassName < 0) {
+            throw new ExcelColumnNotFoundException(null, CLASS_NAME_COLUMN);
+        }
+        if (columnIndexOfClassTime < 0) {
+            throw new ExcelColumnNotFoundException(null, CLASS_TIME_COLUMN);
+        }
+        if (columnIndexOfClassroom < 0) {
+            throw new ExcelColumnNotFoundException(null, CLASSROOM_COLUMN);
+        }
+
+        return true;
     }
 }

@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
-import com.jzy.manager.exception.ExcelColumnNotFoundException;
-import com.jzy.manager.exception.InvalidFileInputException;
-import com.jzy.manager.exception.InvalidFileTypeException;
-import com.jzy.manager.exception.InvalidParameterException;
+import com.jzy.manager.exception.*;
 import com.jzy.manager.util.ClassUtils;
 import com.jzy.manager.util.UserMessageUtils;
 import com.jzy.model.CampusEnum;
@@ -80,12 +77,12 @@ public class ClassAdminController extends AbstractController {
             return map;
         }
 
-        if (clazz == null || StringUtils.isEmpty(clazz.getClassSeason()) || !ClassUtils.isValidClassSeason(clazz.getClassSeason())) {
+        if (StringUtils.isEmpty(clazz.getClassSeason()) || !ClassUtils.isValidClassSeason(clazz.getClassSeason())) {
             map.put("msg", "seasonInvalid");
             return map;
         }
 
-        if (!ClassUtils.isValidClassSeason(clazz.getClassSeason()) || !ClassUtils.isValidClassCampus(clazz.getClassCampus())) {
+        if (!ClassUtils.isValidClassSubSeason(clazz.getClassSubSeason()) || !ClassUtils.isValidClassCampus(clazz.getClassCampus())) {
             map.put("msg", Constants.FAILURE);
             return map;
         }
@@ -120,10 +117,17 @@ public class ClassAdminController extends AbstractController {
         } catch (ExcelColumnNotFoundException e) {
             e.printStackTrace();
             map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
+            map.put("whatWrong", e.getWhatWrong());
             return map;
         } catch (InvalidFileTypeException e) {
             e.printStackTrace();
             map.put("msg", Constants.FAILURE);
+            return map;
+        } catch (ExcelTooManyRowsException e) {
+            e.printStackTrace();
+            map.put("msg", Constants.EXCEL_TOO_MANY_ROWS);
+            map.put("rowCountThreshold", e.getRowCountThreshold());
+            map.put("actualRowCount", e.getActualRowCount());
             return map;
         }
 
@@ -180,29 +184,7 @@ public class ClassAdminController extends AbstractController {
             //向对应校区的用户发送通知消息
             if (classDetailedDtos.size() > 0) {
                 ClassDetailedDto classDetailedDto = classDetailedDtos.get(0);
-                String campus = classDetailedDto.getClassCampus();
-                if (!StringUtils.isEmpty(campus)) {
-                    List<Assistant> assistants = assistantService.listAssistantsByCampus(campus);
-                    List<Long> userIds = new ArrayList<>();
-                    for (Assistant assistant : assistants) {
-                        userIds.add(userService.getUserByWorkId(assistant.getAssistantWorkId()).getId());
-                    }
-
-                    for (Long userId : userIds) {
-                        UserMessage message = new UserMessage();
-                        message.setUserId(userId);
-                        message.setUserFromId(userService.getSessionUserInfo().getId());
-                        message.setMessageTitle("排班信息有变化");
-                        StringBuffer messageContent = new StringBuffer();
-                        messageContent.append("你的学管老师刚刚更新了" + classDetailedDto.getClassCampus() + "校区" + classDetailedDto.getClassYear() + "年" + classDetailedDto.getClassSeason() + "的排班表。")
-                                .append("<br>点<a lay-href='/class/admin/page' lay-text='班级信息'>这里</a>前往查看。");
-                        message.setMessageContent(messageContent.toString());
-                        message.setMessageTime(new Date());
-                        if (UserMessageUtils.isValidUserMessageUpdateInfo(message)) {
-                            userMessageService.insertUserMessage(message);
-                        }
-                    }
-                }
+                sendMessageToUser(classDetailedDto);
 
                 if (chooseSeason) {
                     //缓存当前的年份季度分期
@@ -220,6 +202,37 @@ public class ClassAdminController extends AbstractController {
         }
 
         return map;
+    }
+
+    /**
+     * 向指定校区的用户（助教）发送排班更新的通知
+     *
+     * @param clazz 从更新的记录中选取一个班级为例，取其校区作为要通知的校区，clazz的其他信息也用于消息正文
+     */
+    private void sendMessageToUser(Class clazz) {
+        String campus = clazz.getClassCampus();
+        if (!StringUtils.isEmpty(campus)) {
+            List<Assistant> assistants = assistantService.listAssistantsByCampus(campus);
+            List<Long> userIds = new ArrayList<>();
+            for (Assistant assistant : assistants) {
+                userIds.add(userService.getUserByWorkId(assistant.getAssistantWorkId()).getId());
+            }
+
+            for (Long userId : userIds) {
+                UserMessage message = new UserMessage();
+                message.setUserId(userId);
+                message.setUserFromId(userService.getSessionUserInfo().getId());
+                message.setMessageTitle("排班信息有变化");
+                StringBuffer messageContent = new StringBuffer();
+                messageContent.append("你的学管老师刚刚更新了" + clazz.getClassCampus() + "校区" + clazz.getClassYear() + "年" + clazz.getClassSeason() + "的排班表。")
+                        .append("<br>点<a lay-href='/class/admin/page' lay-text='班级信息'>这里</a>前往查看。");
+                message.setMessageContent(messageContent.toString());
+                message.setMessageTime(new Date());
+                if (UserMessageUtils.isValidUserMessageUpdateInfo(message)) {
+                    userMessageService.insertUserMessage(message);
+                }
+            }
+        }
     }
 
     /**

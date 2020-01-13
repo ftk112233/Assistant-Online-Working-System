@@ -8,6 +8,8 @@ package com.jzy.manager.exception;
  * @date 2019/11/15 9:35
  **/
 public class ImgCodeWrongException extends Exception{
+    private static final long serialVersionUID = 7569024686376807164L;
+
     public ImgCodeWrongException() {
     }
 

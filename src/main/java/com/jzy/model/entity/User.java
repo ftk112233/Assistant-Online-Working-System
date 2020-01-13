@@ -113,7 +113,7 @@ public class User extends BaseEntity {
     }
 
     /**
-     * 为新插入或修改过的user配置默认的头像
+     * 为新插入或修改过的user配置默认的头像。如果当前user对象icon字段为空才设置，这是与setDefaultUserIcon()的区别。
      */
     public void setNewDefaultUserIcon(){
         if (StringUtils.isEmpty(this.getUserIcon())) {

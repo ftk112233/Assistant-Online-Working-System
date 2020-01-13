@@ -8,6 +8,8 @@ package com.jzy.manager.exception;
  * @date 2019/11/19 18:38
  **/
 public class NoAuthorizationException extends Exception {
+    private static final long serialVersionUID = -3151125797867264685L;
+
     public NoAuthorizationException() {
     }
 

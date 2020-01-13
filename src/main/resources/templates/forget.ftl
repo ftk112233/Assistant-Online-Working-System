@@ -76,7 +76,7 @@
     </div>
 
     <div class="layui-trans layadmin-user-login-footer">
-        <p>© 2019 <a href="http://blog.kurochan.top/about/" target="_blank">kurochan.top</a></p>
+        <p>© 2019-2020 <a href="http://blog.kurochan.top/about/" target="_blank">kurochan.top</a> 版权所有 <a href="http://www.beian.miit.gov.cn" target="_blank">沪ICP备19043725号</a></p>
     </div>
 </div>
 

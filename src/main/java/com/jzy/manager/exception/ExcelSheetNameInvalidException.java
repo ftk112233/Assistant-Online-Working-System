@@ -8,6 +8,8 @@ package com.jzy.manager.exception;
  * @Version 1.0
  **/
 public class ExcelSheetNameInvalidException extends Exception {
+    private static final long serialVersionUID = 5739492594008242362L;
+
     public ExcelSheetNameInvalidException() {
     }
 

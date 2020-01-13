@@ -1,9 +1,12 @@
 package com.jzy.model.excel.input;
 
+import com.jzy.manager.exception.ExcelColumnNotFoundException;
 import com.jzy.manager.exception.ExcelSheetNameInvalidException;
+import com.jzy.manager.exception.ExcelTooManyRowsException;
 import com.jzy.manager.exception.InvalidFileTypeException;
+import com.jzy.manager.util.CampusAndClassroomUtils;
 import com.jzy.model.entity.CampusAndClassroom;
-import com.jzy.model.excel.Excel;
+import com.jzy.model.excel.AbstractInputExcel;
 import com.jzy.model.excel.ExcelVersionEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,7 +29,7 @@ import java.util.List;
  **/
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SeatTableTemplateInputExcel extends Excel implements Serializable {
+public class SeatTableTemplateInputExcel extends AbstractInputExcel implements Serializable {
     private static final long serialVersionUID = -4498593702973804852L;
 
     public SeatTableTemplateInputExcel() {
@@ -59,17 +62,20 @@ public class SeatTableTemplateInputExcel extends Excel implements Serializable {
      *
      * @return 所有校区和教室对象的封装集合
      * @throws IOException 处理excel时的io异常
-     * @throws ExcelSheetNameInvalidException 不合法的sheet名，这里指教室门牌号不是纯数字
+     * @throws ExcelSheetNameInvalidException 不合法的sheet名，这里指教室门牌号不合法
+     * @throws ExcelTooManyRowsException 行数超过规定值，将规定的上限值和实际值都传给异常对象
      */
-    public List<CampusAndClassroom> readSeatTable() throws IOException, ExcelSheetNameInvalidException {
-        resetParam();
+    public List<CampusAndClassroom> readSeatTable() throws IOException, ExcelSheetNameInvalidException, ExcelTooManyRowsException {
+        resetOutput();
+
+        testRowCountValidity();
 
         int sheetCount = this.getSheetCount();
         for (int i = 0; i < sheetCount; i++) {
             String classroom = this.getSheetName(i);
-            if (!StringUtils.isNumeric(classroom)) {
-                //如果sheet名（教室门牌号）不是纯数字
-                throw new ExcelSheetNameInvalidException("教室门牌号不是纯数字!");
+            if (!CampusAndClassroomUtils.isValidClassroom(classroom)) {
+                //如果sheet名（教室门牌号）不符合规范
+                throw new ExcelSheetNameInvalidException("教室门牌号不符合规范!");
             }
             CampusAndClassroom campusAndClassroom = new CampusAndClassroom();
             campusAndClassroom.setClassroom(classroom);
@@ -98,8 +104,17 @@ public class SeatTableTemplateInputExcel extends Excel implements Serializable {
     }
 
     @Override
-    public void resetParam() {
+    public void resetOutput() {
         campusAndClassrooms = new ArrayList<>();
     }
+
+    @Override
+    public void resetColumnIndex() {
+    }
+
+    @Override
+    protected void findColumnIndexOfSpecifiedName(int sheetIx) throws ExcelColumnNotFoundException {
+    }
+
 }
 

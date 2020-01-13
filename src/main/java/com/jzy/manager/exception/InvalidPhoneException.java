@@ -8,6 +8,8 @@ package com.jzy.manager.exception;
  * @Version 1.0
  **/
 public class InvalidPhoneException extends InvalidParameterException {
+    private static final long serialVersionUID = 8632987042944636323L;
+
     public InvalidPhoneException() {
     }
 

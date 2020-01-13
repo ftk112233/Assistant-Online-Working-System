@@ -20,11 +20,13 @@ import java.awt.image.BufferedImage;
  * @author JinZhiyun
  * @version 1.0
  * @ClassName CodeController
- * @description 所有验证码相关服务（图形验证码、邮箱验证码。。。）的控制器
- * 这些请求应该在shiro中配置为匿名访问
+ * @description 所有验证码相关服务（图形验证码。。。）的控制器
+ * 这些请求应该在shiro中配置为匿名访问。
+ * 图形验证码已被滑块验证取代。
  * @date 2019/11/14 14:35
  **/
 @Controller
+@Deprecated
 public class CodeController extends AbstractController {
     private final static Logger logger = LogManager.getLogger(CodeController.class);
 

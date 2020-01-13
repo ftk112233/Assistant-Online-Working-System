@@ -8,6 +8,8 @@ package com.jzy.manager.exception;
  * @Version 1.0
  **/
 public class InvalidFileInputException extends InvalidParameterException {
+    private static final long serialVersionUID = -1172599253380071577L;
+
     public InvalidFileInputException() {
     }
 

@@ -41,7 +41,7 @@
                         </div>
                         <div class="layui-form-item">
                             <label class="layui-form-label">黑魔法&nbsp; <i class="layui-icon layui-icon-tips"
-                                                                          lay-tips="开启'黑魔法'将自动从数据库中通过查询上面班号来解析班级的教师、助教、上课教室、上课时间等信息，且查询的学员按进班时间排序。如果系统上名单信息与最新名单有出入，请关闭此选项。"></i></label>
+                                                                         lay-tips="开启'黑魔法'将自动从数据库中通过查询上面班号来解析班级的教师、助教、上课教室、上课时间等信息，且查询的学员按进班时间排序。如果系统上名单信息与最新名单有出入，请关闭此选项。"></i></label>
                             <div class="layui-input-inline">
                                 <input type="checkbox" name="magic" lay-skin="switch" lay-text="ON|OFF"
                                        lay-filter="magic" checked>
@@ -80,14 +80,15 @@
                         <div class="layui-form-item" id="div-classroom">
                             <label class="layui-form-label">任课教师要求</label>
                             <div class="layui-input-inline">
-                                <textarea name="classTeacherRequirement" style="width: 400px; height: 100px;" class="layui-textarea"
+                                <textarea name="classTeacherRequirement" style="width: 400px; height: 100px;"
+                                          class="layui-textarea"
                                           lay-verType="tips" lay-verify="classTeacherRequirement"
                                           placeholder="带好笔记本和魔法棒"></textarea>
                             </div>
                         </div>
                         <div class="layui-form-item" id="div-button-upload" hidden="hidden">
                             <label class="layui-form-label">上传&nbsp;<i class="layui-icon layui-icon-tips"
-                                                                    lay-tips="上传学生花名册要求说明：<br>
+                                                                       lay-tips="上传学生花名册要求说明：<br>
                                                                 1、第1行所有列名属性中必须有以下列，其列名称必须与要求相符（如下所示）！！<br>
                                                                     ====班级编码 | 班级名称 | 学员编号 | 姓名 | 手机==== <br>
                                                                 2、名单中的学生应该是按进班时间排序的，这样在输出座位表时系统将会按表格中行的顺序填充座位"></i></label>
@@ -139,11 +140,12 @@
                         </div>
                         <div class="layui-form-item" id="div-button-upload">
                             <label class="layui-form-label">上传&nbsp;<i class="layui-icon layui-icon-tips"
-                                                                     lay-tips="上传学生名单要求说明：<br>
+                                                                       lay-tips="上传学生名单要求说明：<br>
                                                                 1、第1行所有列名属性中必须有名叫“学员姓名”的列，系统将按行的顺序填充座位表。"></i>
                             </label>
                             <div class="layui-input-block">
-                                <button class="layui-btn" lay-filter="upload_student_list_for_seat_table" style="background-color: #FFB800" id="upload_student_list_for_seat_table">上传学生名单
+                                <button class="layui-btn" lay-filter="upload_student_list_for_seat_table"
+                                        style="background-color: #FFB800" id="upload_student_list_for_seat_table">上传学生名单
                                 </button>
                             </div>
                         </div>
@@ -251,8 +253,7 @@
         upload.render({
             elem: '#upload_student_list'
             , url: '${ctx}/toolbox/assistant/uploadStudentList'
-            , data: {
-            }
+            , data: {}
             , accept: 'file' //普通文件
             , exts: 'xls|xlsx' //允许上传的文件后缀
             , before: function (obj) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
@@ -265,12 +266,17 @@
                         icon: 1
                         , time: 1000
                     });
-                } else if (res.msg === "excelColumnNotFound") {
-                    return layer.alert('表格中有列属性名不符合规范!', {
+                } else if (res.msg === "tooManyRows") {
+                    return layer.alert('输入表格的行数过多。最大行数限制：' + res.rowCountThreshold + '，实际行数：' + res.actualRowCount + '。尝试删除最后多余的空白行？“ctrl+shift+↓”，“右键”，“删除”，“整行”', {
                         skin: 'layui-layer-lan'
-                        ,closeBtn: 0
+                        , closeBtn: 0
                     });
-                }else {
+                } else if (res.msg === "excelColumnNotFound") {
+                    return layer.alert('未找到名称为"' + res.whatWrong + '"的列!', {
+                        skin: 'layui-layer-lan'
+                        , closeBtn: 0
+                    });
+                } else {
                     return layer.msg('上传失败', {
                         offset: '15px'
                         , icon: 2
@@ -292,8 +298,8 @@
             var field = obj.field;
             layer.load(1, {shade: [0.1, '#fff']}); //上传loading
 
-            location.href='${ctx}/toolbox/assistant/exportAssistantTutorialAndSeatTable?magic='+field.magic + '&classId='+field.classId+'&classCampus='+field.campus
-                    +'&classroom='+ field.classroom
+            location.href = '${ctx}/toolbox/assistant/exportAssistantTutorialAndSeatTable?magic=' + field.magic + '&classId=' + field.classId + '&classCampus=' + field.campus
+                    + '&classroom=' + field.classroom
             ;
             layer.closeAll('loading'); //关闭loading
         });
@@ -304,9 +310,9 @@
             var field = obj.field;
             layer.load(1, {shade: [0.1, '#fff']}); //上传loading
 
-            location.href='${ctx}/toolbox/assistant/exportAssistantTutorialWithoutSeatTable?magic='+field.magic+'&classCampus='+field.campus
-                + '&classId='+field.classId+'&classroom='+ field.classroom+'&classTime='+field.classTime+'&teacherName='+field.teacherName
-                +'&assistantName='+field.assistantName+'&classTeacherRequirement='+field.classTeacherRequirement;
+            location.href = '${ctx}/toolbox/assistant/exportAssistantTutorialWithoutSeatTable?magic=' + field.magic + '&classCampus=' + field.campus
+                    + '&classId=' + field.classId + '&classroom=' + field.classroom + '&classTime=' + field.classTime + '&teacherName=' + field.teacherName
+                    + '&assistantName=' + field.assistantName + '&classTeacherRequirement=' + field.classTeacherRequirement;
 
             layer.closeAll('loading'); //关闭loading
         });
@@ -344,8 +350,7 @@
         upload.render({
             elem: '#upload_student_list_for_seat_table'
             , url: '${ctx}/toolbox/assistant/uploadStudentListForSeatTable'
-            , data: {
-            }
+            , data: {}
             , accept: 'file' //普通文件
             , exts: 'xls|xlsx' //允许上传的文件后缀
             , before: function (obj) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
@@ -357,6 +362,16 @@
                     return layer.msg('上传成功', {
                         icon: 1
                         , time: 1000
+                    });
+                } else if (res.msg === "tooManyRows") {
+                    return layer.alert('输入表格的行数过多。最大行数限制：' + res.rowCountThreshold + '，实际行数：' + res.actualRowCount + '。尝试删除最后多余的空白行？“ctrl+shift+↓”，“右键”，“删除”，“整行”', {
+                        skin: 'layui-layer-lan'
+                        , closeBtn: 0
+                    });
+                } else if (res.msg === "excelColumnNotFound") {
+                    return layer.alert('未找到名称为"' + res.whatWrong + '"的列!', {
+                        skin: 'layui-layer-lan'
+                        , closeBtn: 0
                     });
                 } else {
                     return layer.msg('上传失败', {
@@ -381,8 +396,8 @@
             var field = obj.field;
             layer.load(1, {shade: [0.1, '#fff']}); //上传loading
 
-            location.href='${ctx}/toolbox/assistant/exportSeatTable?classCampus='+field.campus2
-                    +'&classroom='+ field.classroom2
+            location.href = '${ctx}/toolbox/assistant/exportSeatTable?classCampus=' + field.campus2
+                    + '&classroom=' + field.classroom2
             ;
 
             layer.closeAll('loading'); //关闭loading

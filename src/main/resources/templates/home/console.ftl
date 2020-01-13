@@ -356,6 +356,8 @@
                          data-anim="fade"
                          lay-filter="news">
                         <div carousel-item>
+                            <div><a href="http://blog.kurochan.top/2020/01/10/%E4%BC%98%E8%83%BD%E5%8A%A9%E6%95%99%E5%9C%A8%E7%BA%BF%E5%B7%A5%E4%BD%9C%E5%B9%B3%E5%8F%B0%E7%AE%A1%E7%90%86%E6%8C%87%E5%8D%97/" target="_blank"
+                                    class="layui-bg-blue">平台详细管理指南</a></div>
                             <div><a href="http://blog.kurochan.top/2020/01/01/%E8%A1%A8%E6%A0%BC%E5%AF%BC%E5%85%A5%E6%89%8B%E6%9C%BA%E9%80%9A%E8%AE%AF%E5%BD%95%E6%96%B9%E6%B3%95/" target="_blank" class="layui-bg-red">表格导入手机通讯录</a></div>
                             <div><a href="http://blog.kurochan.top/2020/01/01/%E4%BC%98%E8%83%BD%E5%8A%A9%E6%95%99%E5%9C%A8%E7%BA%BF%E5%B7%A5%E4%BD%9C%E5%B9%B3%E5%8F%B0%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/" target="_blank"
                                     class="layui-bg-green">平台详细使用指南</a></div>
@@ -412,7 +414,7 @@
         base: '${ctx}/plugins/layuiadmin/' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use(['index', 'user', 'layer', 'console', 'laydate', 'carousel'], function () {
+    }).use(['index', 'user', 'layer', 'console', 'laydate', 'carousel', 'flow'], function () {
         var $ = layui.$
                 , setter = layui.setter
                 , layer = layui.layer
@@ -423,7 +425,10 @@
                 , laydate = layui.laydate
                 , util = layui.util
                 , upload = layui.upload
-                , carousel = layui.carousel;
+                , carousel = layui.carousel
+                ,flow = layui.flow;
+
+        // flow.lazyimg();
 
         /**
          * 获取与当前时间最邻近的nextMonthDay天nextMonthHour时0分0秒的日期
@@ -529,8 +534,8 @@
                 thisTimer2 = timer;
             });
         };
-        //每月6号12点发工资
-        var nextPayDay = 6;
+        //每月8号12点发工资
+        var nextPayDay = 8;
         var nextPayHour = 12;
         var nextPayTime = getNextMonthDate(nextPayDay, nextPayHour);
         setCountdown2(nextPayTime[0], nextPayTime[1] - 1, nextPayTime[2], nextPayTime[3], nextPayTime[4], nextPayTime[5]);

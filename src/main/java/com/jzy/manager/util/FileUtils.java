@@ -37,7 +37,7 @@ public class FileUtils {
         EXAMPLES.put(6, "学校统计.xlsx");
         EXAMPLES.put(7, "学校统计_空.xlsx");
 
-        TEMPLATES.put(1, "教师和助教工作表5.0.xlsx");
+        TEMPLATES.put(1, "教师和助教工作表6.0.xlsx");
         TEMPLATES.put(2, "座位表.xlsx");
         TEMPLATES.put(3, "补课单.xlsx");
     }

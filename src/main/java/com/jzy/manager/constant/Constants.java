@@ -60,6 +60,8 @@ public class Constants {
 
     public static final String EXCEL_COLUMN_NOT_FOUND = "excelColumnNotFound";
 
+    public static final String EXCEL_TOO_MANY_ROWS = "tooManyRows";
+
     public static final String ON = "on";
 
     public static final String YES = "yes";
