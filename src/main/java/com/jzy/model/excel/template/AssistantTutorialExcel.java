@@ -7,6 +7,7 @@ import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
 import com.jzy.model.excel.AbstractTemplateExcel;
 import com.jzy.model.excel.ExcelVersionEnum;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.File;
@@ -26,23 +27,15 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
     private static final long serialVersionUID = 2416400649170324596L;
 
     private static final String CAMPUS_COLUMN = ExcelConstants.CAMPUS_COLUMN_2;
-
     private static final String CLASS_ID_COLUMN = ExcelConstants.CLASS_ID_COLUMN_3;
-
     private static final String TEACHER_NAME_COLUMN = ExcelConstants.TEACHER_NAME_COLUMN_3;
-
     private static final String ASSISTANT_NAME_COLUMN = ExcelConstants.ASSISTANT_NAME_COLUMN_3;
-
     private static final String STUDENT_ID_COLUMN = ExcelConstants.STUDENT_ID_COLUMN_2;
-
     private static final String STUDENT_NAME_COLUMN = ExcelConstants.STUDENT_NAME_COLUMN_2;
-
     private static final String STUDENT_PHONE_COLUMN = ExcelConstants.STUDENT_PHONE_COLUMN_2;
-
+    private static final String IS_OLD_STUDENT = ExcelConstants.IS_OLD_STUDENT;
     private static final String TEACHER_REQUIREMENT_COLUMN = ExcelConstants.TEACHER_REQUIREMENT_COLUMN;
-
-    public static final String STUDENT_SCHOOL_COLUMN = ExcelConstants.STUDENT_SCHOOL_COLUMN_2;
-
+    private static final String STUDENT_SCHOOL_COLUMN = ExcelConstants.STUDENT_SCHOOL_COLUMN_2;
     private static final String SUBJECTS_COLUMN = ExcelConstants.SUBJECTS_COLUMN;
 
     /**
@@ -90,14 +83,41 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
     }
 
     /**
+     * 根据学生在助教班上出现次数决定使用什么颜色填充单元格背景，返回对应颜色的index值
+     *
+     * @param count 学生在助教班上出现次数
+     * @return 对应颜色的index值
+     */
+    private short getBackGroundColorIndexByStudentOccurCount(int count){
+        if (count == 2){
+            //出现2次，绿色
+            return HSSFColor.LIGHT_GREEN.index;
+        }
+        if (count == 3){
+            //出现3次，蓝色
+            return HSSFColor.LIGHT_BLUE.index;
+        }
+        if (count == 4){
+            //出现4次，粉色
+            return HSSFColor.ROSE.index;
+        }
+        if (count >= 5){
+            //出现5次以上，红色
+            return HSSFColor.RED.index;
+        }
+
+        return -1;
+    }
+
+    /**
      * 修改制作开班电话表
      *
      * @param data 从数据库中读取到的信息或手动输入的表格中读到的信息，以及用户输入的信息
      * @return 写入成功与否
-     * @throws IOException 写excel的io异常
+     * @throws IOException                   写excel的io异常
      * @throws ClassTooManyStudentsException 班级的学生人数过多，不能写入模板表格。
-     *   这里由于模板中只给了100条空行用来放置要写入的数据。因此如果入参行数超过这个阈值会抛出此异常
-     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
+     *                                       这里由于模板中只给了100条空行用来放置要写入的数据。因此如果入参行数超过这个阈值会抛出此异常
+     * @throws ExcelColumnNotFoundException  列属性中有未匹配的属性名
      */
     public boolean writeClassStartSheet(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException, ClassTooManyStudentsException, ExcelColumnNotFoundException {
         // 获得班上学生总人数
@@ -108,11 +128,11 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
 
         int startRow = 0;
         // 先扫描第startRow行找到"校区"、"班号"、"教师姓名"等信息所在列的位置
-        int columnIndexOfCampus = -1, columnIndexOfClassId = -2, columnIndexOfTeacherName = -3, columnIndexOfAssistantName = -4, columnIndexOfStudentId = -7, columnIndexOfStudentName = -9, columnIndexOfStudentPhone = -10, columnIndexOfTeacherRequirement = -11,columnIndexOfStudentSchool = -11, columnIndexOfSubjects = -12;
+        int columnIndexOfCampus = -1, columnIndexOfClassId = -2, columnIndexOfTeacherName = -3, columnIndexOfAssistantName = -4, columnIndexOfStudentId = -7, columnIndexOfStudentName = -9, columnIndexOfStudentPhone = -10, columnIndexOfIsOldStudent = -10, columnIndexOfTeacherRequirement = -11, columnIndexOfStudentSchool = -11, columnIndexOfSubjects = -12;
         int row0ColumnCount = this.getColumnCount(CLASS_START_SHEET_INDEX, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
             String value = this.getValueAt(CLASS_START_SHEET_INDEX, startRow, i);
-            if (value!=null) {
+            if (value != null) {
                 switch (value) {
                     case CAMPUS_COLUMN:
                         columnIndexOfCampus = i;
@@ -134,6 +154,9 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
                         break;
                     case STUDENT_PHONE_COLUMN:
                         columnIndexOfStudentPhone = i;
+                        break;
+                    case IS_OLD_STUDENT:
+                        columnIndexOfIsOldStudent = i;
                         break;
                     case TEACHER_REQUIREMENT_COLUMN:
                         columnIndexOfTeacherRequirement = i;
@@ -158,8 +181,8 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
         }
 
 
-        for (int i = startRow; i < rowCountToSave+startRow; i++) {
-            StudentAndClassDetailedWithSubjectsDto object = data.get(i-startRow);
+        for (int i = startRow; i < rowCountToSave + startRow; i++) {
+            StudentAndClassDetailedWithSubjectsDto object = data.get(i - startRow);
             //遍历每行要填的学生上课信息对象
             // 填校区
             this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfCampus, object.getClassCampus());
@@ -173,8 +196,14 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
             this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentId, object.getStudentId());
             // 填学员姓名
             this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentName, object.getStudentName());
+            // 姓名背景色
+            this.updateCellBackgroundColor(CLASS_START_SHEET_INDEX, i+1, columnIndexOfStudentName, getBackGroundColorIndexByStudentOccurCount(object.getCountOfSpecifiedAssistant()));
+
             // 填学员联系方式
             this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentPhone, object.getStudentPhone());
+            // 填类别，是否老生
+            String isOld = object.isOldStudent() ? "老生" : "新生";
+            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfIsOldStudent, isOld);
             // 填任课教师要求
             this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfTeacherRequirement, object.getClassTeacherRequirement());
             // 填学校
@@ -195,10 +224,10 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
      *
      * @param data 从数据库中读取到的信息或手动输入的表格中读到的信息，以及用户输入的信息
      * @return 写入成功与否
-     * @throws IOException 写excel的io异常
+     * @throws IOException                   写excel的io异常
      * @throws ClassTooManyStudentsException 班级的学生人数过多，不能写入模板表格。
-     *   这里由于模板中只给了100条空行用来放置要写入的数据。因此如果入参行数超过这个阈值会抛出此异常
-     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
+     *                                       这里由于模板中只给了100条空行用来放置要写入的数据。因此如果入参行数超过这个阈值会抛出此异常
+     * @throws ExcelColumnNotFoundException  列属性中有未匹配的属性名
      */
     public boolean writeSignSheet(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException, ClassTooManyStudentsException, ExcelColumnNotFoundException {
         // 获得班上学生总人数
@@ -226,7 +255,7 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
         int row0ColumnCount = this.getColumnCount(SIGN_SHEET_INDEX, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
             String value = this.getValueAt(SIGN_SHEET_INDEX, startRow, i);
-            if (value!=null) {
+            if (value != null) {
                 switch (value) {
                     case STUDENT_ID_COLUMN:
                         columnIndexOfStudentId = i;
@@ -248,8 +277,8 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
         }
 
 
-        for (int i = startRow; i < rowCountToSave+startRow; i++) {
-            StudentAndClassDetailedWithSubjectsDto object = data.get(i-startRow);
+        for (int i = startRow; i < rowCountToSave + startRow; i++) {
+            StudentAndClassDetailedWithSubjectsDto object = data.get(i - startRow);
             //遍历每行要填的学生上课信息对象
             // 填学员编号
             this.setValueAt(SIGN_SHEET_INDEX, i + 1, columnIndexOfStudentId, object.getStudentId());
@@ -275,10 +304,10 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
      *
      * @param data 从数据库中读取到的信息或手动输入的表格中读到的信息，以及用户输入的信息
      * @return 写入成功与否
-     * @throws IOException 写excel的io异常
+     * @throws IOException                   写excel的io异常
      * @throws ClassTooManyStudentsException 班级的学生人数过多，不能写入模板表格。
-     *   这里由于模板中只给了100条空行用来放置要写入的数据。因此如果入参行数超过这个阈值会抛出此异常
-     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
+     *                                       这里由于模板中只给了100条空行用来放置要写入的数据。因此如果入参行数超过这个阈值会抛出此异常
+     * @throws ExcelColumnNotFoundException  列属性中有未匹配的属性名
      */
     public boolean writeCallbackSheet(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException, ClassTooManyStudentsException, ExcelColumnNotFoundException {
         // 获得班上学生总人数
@@ -289,11 +318,11 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
 
         int startRow = 0;
         // 先扫描第startRow行找到"校区"、"班号"、"教师姓名"等信息所在列的位置
-        int columnIndexOfCampus = -1, columnIndexOfClassId = -2, columnIndexOfTeacherName = -3, columnIndexOfAssistantName = -4, columnIndexOfStudentId = -7, columnIndexOfStudentName = -9;
+        int columnIndexOfCampus = -1, columnIndexOfClassId = -2, columnIndexOfTeacherName = -3, columnIndexOfAssistantName = -4, columnIndexOfStudentId = -7, columnIndexOfStudentName = -9, columnIndexOfIsOldStudent = -10;
         int row0ColumnCount = this.getColumnCount(CALLBACK_SHEET_INDEX, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
             String value = this.getValueAt(CALLBACK_SHEET_INDEX, startRow, i);
-            if (value!=null) {
+            if (value != null) {
                 switch (value) {
                     case CAMPUS_COLUMN:
                         columnIndexOfCampus = i;
@@ -313,6 +342,9 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
                     case STUDENT_NAME_COLUMN:
                         columnIndexOfStudentName = i;
                         break;
+                    case IS_OLD_STUDENT:
+                        columnIndexOfIsOldStudent = i;
+                        break;
                     default:
                 }
             }
@@ -325,8 +357,8 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
         }
 
 
-        for (int i = startRow; i < rowCountToSave+startRow; i++) {
-            StudentAndClassDetailedWithSubjectsDto object = data.get(i-startRow);
+        for (int i = startRow; i < rowCountToSave + startRow; i++) {
+            StudentAndClassDetailedWithSubjectsDto object = data.get(i - startRow);
             //遍历每行要填的学生上课信息对象
             // 填校区
             this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfCampus, object.getClassCampus());
@@ -340,6 +372,9 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
             this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfStudentId, object.getStudentId());
             // 填学员姓名
             this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfStudentName, object.getStudentName());
+            // 填类别，是否老生
+            String isOld = object.isOldStudent() ? "老生" : "新生";
+            this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfIsOldStudent, isOld);
         }
 
         // 删除多余行
@@ -355,7 +390,7 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
      * @param data 从花名册中读取到的信息以及用户输入的信息
      * @return 写入成功与否
      */
-    public boolean setSeatSheet(List<StudentAndClassDetailedWithSubjectsDto> data){
+    public boolean setSeatSheet(List<StudentAndClassDetailedWithSubjectsDto> data) {
         // TODO
         return true;
     }
@@ -365,10 +400,10 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
      *
      * @param data 从花名册或数据库中读取到的信息以及用户输入的信息
      * @return 写入成功与否
-     * @throws IOException 写excel的io异常
+     * @throws IOException                   写excel的io异常
      * @throws ClassTooManyStudentsException 班级的学生人数过多，不能写入模板表格。
-     *   这里由于模板中只给了100条空行用来放置要写入的数据。因此如果入参行数超过这个阈值会抛出此异常
-     * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名
+     *                                       这里由于模板中只给了100条空行用来放置要写入的数据。因此如果入参行数超过这个阈值会抛出此异常
+     * @throws ExcelColumnNotFoundException  列属性中有未匹配的属性名
      */
     public boolean writeAssistantTutorialWithoutSeatTable(List<StudentAndClassDetailedWithSubjectsDto> data) throws IOException, ExcelColumnNotFoundException, ClassTooManyStudentsException {
         return writeClassStartSheet(data) && writeSignSheet(data) && writeCallbackSheet(data);

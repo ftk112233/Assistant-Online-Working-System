@@ -68,7 +68,7 @@ public interface RoleAndPermissionService {
      * 2."roleAndPermRepeat"：(角色, 权限)组合已存在
      * 3."success": 更新成功
      */
-    String insertRoleAndPermission(RoleAndPermission roleAndPermission);
+    String insertOneRoleAndPermission(RoleAndPermission roleAndPermission);
 
     /**
      * 根据id删除一个角色权限

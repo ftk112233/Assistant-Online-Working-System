@@ -33,7 +33,7 @@
         <result column="class_student_count" property="classStudentsCount" jdbcType="BIGINT"/>
         <result column="classroom_capacity" property="classroomCapacity" jdbcType="INTEGER"/>
     </resultMap>
-    <insert id="insertClass" parameterType="com.jzy.model.dto.ClassDetailedDto">
+    <insert id="insertOneClass" parameterType="com.jzy.model.dto.ClassDetailedDto">
         insert into class
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="classId != null and classId!=''">

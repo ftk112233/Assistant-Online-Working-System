@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.ClassMapper;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.ClassUtils;
@@ -102,7 +103,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     }
 
     @Override
-    public UpdateResult insertClass(ClassDetailedDto classDetailedDto) {
+    public UpdateResult insertOneClass(ClassDetailedDto classDetailedDto) {
         if (classDetailedDto == null) {
             return new UpdateResult(Constants.FAILURE);
         }
@@ -148,21 +149,24 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
 
         classDetailedDto.setParsedClassTime(classDetailedDto.getClassTime());
 
-        long count = classMapper.insertClass(classDetailedDto);
+        long count = classMapper.insertOneClass(classDetailedDto);
         UpdateResult result = new UpdateResult(Constants.SUCCESS);
         result.setInsertCount(count);
         return result;
     }
 
     @Override
-    public UpdateResult insertAndUpdateClassesFromExcel(List<ClassDetailedDto> classDetailedDtos) throws InvalidParameterException {
+    public DefaultFromExcelUpdateResult insertAndUpdateClassesFromExcel(List<ClassDetailedDto> classDetailedDtos) {
         if (classDetailedDtos == null) {
             String msg = "insertAndUpdateClassesFromExcel方法输入classDetailedDto为null!";
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
 
-        UpdateResult result = new UpdateResult();
+        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(Constants.SUCCESS);
+        String teacherNameKeyword = ExcelConstants.TEACHER_NAME_COLUMN;
+        String classIdKeyword = ExcelConstants.CLASS_ID_COLUMN;
+        InvalidData invalidData = new InvalidData(teacherNameKeyword, classIdKeyword);
         for (ClassDetailedDto classDetailedDto : classDetailedDtos) {
             if (ClassUtils.isValidClassInfo(classDetailedDto)) {
                 UpdateResult resultTmp = insertAndUpdateOneClassFromExcel(classDetailedDto);
@@ -170,10 +174,13 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
             } else {
                 String msg = "输入助教排班表中读取到的classDetailedDtos不合法！";
                 logger.error(msg);
-                throw new InvalidParameterException(msg);
+                result.setResult(Constants.EXCEL_INVALID_DATA);
+                invalidData.putValue(teacherNameKeyword, classDetailedDto.getTeacherName());
+                invalidData.putValue(classIdKeyword, classDetailedDto.getClassId());
             }
         }
-        result.setResult(Constants.SUCCESS);
+
+        result.setInvalidData(invalidData);
         return result;
     }
 
@@ -186,6 +193,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
      *
      * @param classDetailedDto 班级的详细信息
      * @return (更新结果, 更新记录数)
+     * @throws InvalidParameterException 不合法的入参异常
      */
     private UpdateResult insertAndUpdateOneClassFromExcel(ClassDetailedDto classDetailedDto) throws InvalidParameterException {
         if (classDetailedDto == null) {
@@ -217,7 +225,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
         PageHelper.startPage(myPage.getPageNum(), myPage.getPageSize());
         List<ClassDetailedDto> classDetailedDtos = classMapper.listClasses(condition);
 
-        CurrentClassSeason classSeason = getCurrentClassSeason();
+        ClassSeasonDto classSeason = getCurrentClassSeason();
         Class current = new Class();
         current.setClassYear(classSeason.getClassYear());
         current.setClassSeason(classSeason.getClassSeason());
@@ -326,12 +334,12 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     }
 
     @Override
-    public CurrentClassSeason getCurrentClassSeason() {
-        CurrentClassSeason currentClassSeason = new CurrentClassSeason();
+    public ClassSeasonDto getCurrentClassSeason() {
+        ClassSeasonDto currentClassSeason = new ClassSeasonDto();
         String key = RedisConstants.CURRENT_SEASON_KEY;
         if (redisTemplate.hasKey(key)) {
             //缓存中有
-            return (CurrentClassSeason) valueOps.get(key);
+            return (ClassSeasonDto) valueOps.get(key);
         }
         //缓存中无，采用默认策略
         currentClassSeason.setClassYear(ClassUtils.getCurrentYear());
@@ -340,7 +348,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     }
 
     @Override
-    public void updateCurrentClassSeason(CurrentClassSeason classSeason) {
+    public void updateCurrentClassSeason(ClassSeasonDto classSeason) {
         if (classSeason == null) {
             return;
         }

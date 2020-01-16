@@ -36,7 +36,15 @@ public interface StudentMapper {
      * @param student 添加学生的信息
      * @return 更新记录数
      */
-    long insertStudent(Student student);
+    long insertOneStudent(Student student);
+
+    /**
+     * 批量添加学生
+     *
+     * @param students 添加学生的信息集合
+     * @return 更新记录数
+     */
+    long insertManyStudents(List<Student> students);
 
     /**
      * 修改学生信息学员编号修改

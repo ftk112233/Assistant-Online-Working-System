@@ -1,5 +1,7 @@
 package com.jzy.manager.constant;
 
+import com.jzy.model.dto.ClassSeasonDto;
+
 /**
  * @author JinZhiyun
  * @version 1.0
@@ -60,14 +62,14 @@ public class ModelConstants {
 
     /**
      * 值为当前年份所对应的model键
-     *      改用对象{@link com.jzy.model.dto.CurrentClassSeason}包装
+     *      改用对象{@link ClassSeasonDto}包装
      */
     @Deprecated
     public static final String CURRENT_YEAR_MODEL_KEY = "currentYear";
 
     /**
      * 值为当前季度所对应的model键
-     *      改用对象{@link com.jzy.model.dto.CurrentClassSeason}包装
+     *      改用对象{@link ClassSeasonDto}包装
      */
     @Deprecated
     public static final String CURRENT_SEASON_MODEL_KEY = "currentSeason";

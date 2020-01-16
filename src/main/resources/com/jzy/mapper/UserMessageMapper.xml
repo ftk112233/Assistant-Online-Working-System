@@ -25,7 +25,7 @@
         <result column="user_from_icon" property="userFromIcon" jdbcType="VARCHAR"/>
         <result column="user_from" property="userFrom" jdbcType="VARCHAR"/>
     </resultMap>
-    <insert id="insertUserMessage" parameterType="com.jzy.model.entity.UserMessage">
+    <insert id="insertOneUserMessage" parameterType="com.jzy.model.entity.UserMessage">
         insert into user_message
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="userId != null">
@@ -73,6 +73,20 @@
                 #{messageRemark},
             </if>
         </trim>
+    </insert>
+    <insert id="insertManyUserMessages">
+        insert into user_message ( user_id, user_from_id, message_title, message_content, message_picture, message_time, message_remark)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.userId},
+            #{item.userFromId},
+            #{item.messageTitle},
+            #{item.messageContent},
+            #{item.messagePicture},
+            #{item.messageTime},
+            #{item.messageRemark}
+            )
+        </foreach>
     </insert>
     <update id="updateUserMessageReadById">
         update user_message um set um.read='1' where um.id=#{id}

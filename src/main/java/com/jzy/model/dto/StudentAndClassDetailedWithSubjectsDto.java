@@ -23,4 +23,14 @@ public class StudentAndClassDetailedWithSubjectsDto extends StudentAndClassDetai
      * 当前学生的所有在读学科
      */
     private List<String> subjects;
+
+    /**
+     * 当前学员是否是老生，即之前季度上过课
+     */
+    private boolean oldStudent;
+
+    /**
+     * 该学生当前季度下在指定助教带的所有班上的出现次数
+     */
+    private int countOfSpecifiedAssistant;
 }

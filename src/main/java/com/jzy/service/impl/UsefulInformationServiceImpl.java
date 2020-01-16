@@ -205,7 +205,7 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
     }
 
     @Override
-    public String insertUsefulInformation(UsefulInformation information) {
+    public String insertOneUsefulInformation(UsefulInformation information) {
         if (information == null) {
             return Constants.FAILURE;
         }
@@ -229,7 +229,7 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
             information.setImage(null);
         }
 
-        usefulInformationMapper.insertUsefulInformation(information);
+        usefulInformationMapper.insertOneUsefulInformation(information);
         return Constants.SUCCESS;
     }
 

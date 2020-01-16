@@ -44,7 +44,7 @@ public interface TeacherMapper {
      * @param teacher 新添加教师的信息
      * @return 更新记录数
      */
-    long insertTeacher(Teacher teacher);
+    long insertOneTeacher(Teacher teacher);
 
     /**
      * 修改教师信息由工号修改

@@ -137,7 +137,7 @@ public class StudentAndClassAdminController extends AbstractController {
             throw new InvalidParameterException(msg);
         }
 
-        map.put("data", studentAndClassService.insertStudentAndClass(studentAndClassDetailedDto).getResult());
+        map.put("data", studentAndClassService.insertOneStudentAndClass(studentAndClassDetailedDto).getResult());
 
         return map;
     }

@@ -16,7 +16,7 @@
         <result column="student_school" property="studentSchool" jdbcType="VARCHAR"/>
         <result column="student_remark" property="studentRemark" jdbcType="VARCHAR"/>
     </resultMap>
-    <insert id="insertStudent" parameterType="com.jzy.model.entity.Student">
+    <insert id="insertOneStudent" parameterType="com.jzy.model.entity.Student">
         insert into student
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="studentId != null and studentId!=''">
@@ -64,6 +64,19 @@
                 #{studentRemark},
             </if>
         </trim>
+    </insert>
+    <insert id="insertManyStudents">
+        insert into student ( student_id, student_name, student_sex, student_phone, student_phone_backup, student_school, student_remark )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.studentId},
+            #{item.studentName},
+            #{item.studentSex},
+            #{item.studentPhone},
+            #{item.studentPhoneBackup},
+            #{item.studentSchool},
+            #{item.studentRemark})
+        </foreach>
     </insert>
     <update id="updateStudentByStudentId" parameterType="com.jzy.model.entity.Student">
         update student

@@ -5,7 +5,7 @@ import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
 import com.jzy.manager.constant.RedisConstants;
 import com.jzy.model.CampusEnum;
-import com.jzy.model.dto.CurrentClassSeason;
+import com.jzy.model.dto.ClassSeasonDto;
 import com.jzy.model.entity.Class;
 import com.jzy.model.entity.User;
 import com.jzy.model.vo.Announcement;
@@ -129,7 +129,7 @@ public class SystemController extends AbstractController {
      */
     @RequestMapping("/intelliClassSeason/update")
     @ResponseBody
-    public Map<String, Object> updateIntelliClassSeason(CurrentClassSeason classSeason) {
+    public Map<String, Object> updateIntelliClassSeason(ClassSeasonDto classSeason) {
         Map<String, Object> map = new HashMap<>(1);
 
         classService.updateCurrentClassSeason(classSeason);

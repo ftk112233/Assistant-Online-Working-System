@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.StudentAndClassMapper;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.StudentAndClassUtils;
 import com.jzy.model.dto.*;
@@ -63,7 +64,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
     }
 
     @Override
-    public UpdateResult insertStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto) {
+    public UpdateResult insertOneStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto) {
         if (studentAndClassDetailedDto == null) {
             return new UpdateResult(Constants.FAILURE);
         }
@@ -74,6 +75,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
 
         return insertUnrepeatedStudentAndClass(studentAndClassDetailedDto);
     }
+
 
     /**
      * 插入学员号不重复的学员报班信息
@@ -100,11 +102,10 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
         }
 
         UpdateResult result = new UpdateResult(Constants.SUCCESS);
-        long count = studentAndClassMapper.insertStudentAndClass(studentAndClassDetailedDto);
+        long count = studentAndClassMapper.insertOneStudentAndClass(studentAndClassDetailedDto);
         result.setInsertCount(count);
         return result;
     }
-
 
     @Override
     public UpdateResult updateStudentAndClassByStudentIdAndClassId(StudentAndClassDetailedDto studentAndClassDetailedDto) {
@@ -118,25 +119,94 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
     }
 
     @Override
-    public UpdateResult insertAndUpdateStudentAndClassesFromExcel(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos) throws InvalidParameterException {
+    public DefaultFromExcelUpdateResult insertAndUpdateStudentAndClassesFromExcel(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos) {
         if (studentAndClassDetailedDtos == null) {
             String msg = "insertAndUpdateStudentAndClassesFromExcel方法输入studentAndClassDetailedDtos为null!";
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
-        UpdateResult result = new UpdateResult();
 
+        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(Constants.SUCCESS);
+        String studentIdKeyword = ExcelConstants.STUDENT_ID_COLUMN;
+        String classIdKeyword = ExcelConstants.CLASS_ID_COLUMN_2;
+        InvalidData invalidData = new InvalidData(studentIdKeyword, classIdKeyword);
+
+
+        List<StudentAndClassDetailedDto> studentAndClassesToInsert=new ArrayList<>();
         for (StudentAndClassDetailedDto studentAndClassDetailedDto : studentAndClassDetailedDtos) {
             if (StudentAndClassUtils.isValidStudentAndClassDetailedDtoInfo(studentAndClassDetailedDto)) {
-                UpdateResult resultTmp = insertAndUpdateOneStudentAndClassFromExcel(studentAndClassDetailedDto);
-                result.add(resultTmp);
+                Long count = countStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto.getStudentId(), studentAndClassDetailedDto.getClassId());
+                if (count > 0) {
+                    //记录已存在，更新
+                    /*
+                    不做是否修改过判断，规范是死的，人是活的。
+                    不是说偷懒，而是常见业务场景中，都会开启先删后导，这样的判断也没有太大必要
+                     */
+                    result.add(updateStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto));
+                } else {
+                    //插入
+                    studentAndClassesToInsert.add(studentAndClassDetailedDto);
+                }
             } else {
                 String msg = "输入学生花名册表中读取到的studentAndClassDetailedDtos不合法!";
                 logger.error(msg);
-                throw new InvalidParameterException(msg);
+                result.setResult(Constants.EXCEL_INVALID_DATA);
+                invalidData.putValue(studentIdKeyword, studentAndClassDetailedDto.getStudentId());
+                invalidData.putValue(classIdKeyword, studentAndClassDetailedDto.getClassId());
             }
         }
-        result.setResult(Constants.SUCCESS);
+
+
+        //插入
+        result.add(insertManyUnrepeatedStudentAndClasses(studentAndClassesToInsert));
+
+        result.setInvalidData(invalidData);
+        return result;
+    }
+
+    /**
+     * 插入多个学生报班记录，这些记录的学员号和班号都是不冲突的。
+     *
+     * @param studentAndClassDetailedDtos 学员上课信息集合
+     * @return (更新结果, 更新记录数)
+     * 1."failure"：错误入参等异常
+     * 2."studentNotExist": 学员不存在
+     * 3."classNotExist": 班级不存在
+     * 4."success": 更新成功
+     */
+    private UpdateResult insertManyUnrepeatedStudentAndClasses(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos) {
+        if (studentAndClassDetailedDtos == null || studentAndClassDetailedDtos.size() == 0) {
+            return new UpdateResult(Constants.FAILURE);
+        }
+
+        /*
+         *  真正要插入的学生上课记录dtosToInsert。
+         *  因为入参集合中可能出现班号或学员号在系统中不存在的记录，所以遍历整体集合跳过这些记录，然后将其他有效的记录添加到dtosToInsert
+         */
+        List<StudentAndClassDetailedDto> dtosToInsert=new ArrayList<>();
+        for (StudentAndClassDetailedDto dto : studentAndClassDetailedDtos) {
+            if (dto == null) {
+                return new UpdateResult(Constants.FAILURE);
+            }
+
+            Student student = studentService.getStudentByStudentId(dto.getStudentId());
+            if (student == null) {
+                //学员号不存在
+                continue;
+            }
+
+            Class clazz = classService.getClassByClassId(dto.getClassId());
+            if (clazz == null) {
+                //班号不存在
+                continue;
+            }
+
+            dtosToInsert.add(dto);
+        }
+
+        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        long count = studentAndClassMapper.insertManyStudentAndClasses(dtosToInsert);
+        result.setInsertCount(count);
         return result;
     }
 
@@ -147,10 +217,13 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
      * else
      * 根据学员号和班号更新
      *
+     * 对于插入改用批量插入的方式，sql的执行效率更高。详见insertAndUpdateStudentAndClassesFromExcel()具体内容
+     *
      * @param studentAndClassDetailedDto 要更新的学员上课记录
      * @return 更新结果
      * @throws InvalidParameterException 不合法的入参异常
      */
+    @Deprecated
     private UpdateResult insertAndUpdateOneStudentAndClassFromExcel(StudentAndClassDetailedDto studentAndClassDetailedDto) throws InvalidParameterException {
         if (studentAndClassDetailedDto == null) {
             String msg = "insertAndUpdateOneStudentAndClassFromExcel方法输入studentAndClassDetailedDto为null!";
@@ -254,7 +327,8 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
      * @param classId 班级编码
      * @return 结果用 {@link StudentAndClassDetailedDto} 的子类 {@link StudentAndClassDetailedWithSubjectsDto} 返回，子类和父类字段的差集都先空着
      */
-    private List<StudentAndClassDetailedWithSubjectsDto> listStudentAndClassesByClassId(String classId) {
+    @Override
+    public List<StudentAndClassDetailedWithSubjectsDto> listStudentAndClassesByClassId(String classId) {
         return StringUtils.isEmpty(classId) ? new ArrayList<>() : studentAndClassMapper.listStudentAndClassesByClassId(classId);
     }
 
@@ -265,20 +339,39 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
         for (StudentAndClassDetailedWithSubjectsDto dto : dtos) {
             StudentAndClassSearchCondition condition = new StudentAndClassSearchCondition();
             condition.setStudentId(dto.getStudentId());
+            //查出当前学生迄今为止所有的上课记录
+            List<StudentAndClassDetailedDto> allRecords = studentAndClassMapper.listStudentAndClassesWithSubjectsByStudentId(condition);
+            ClassSeasonDto currentSeason=classService.getCurrentClassSeason();
+            for (StudentAndClassDetailedDto record:allRecords){
+                ClassSeasonDto recordSeason=new ClassSeasonDto(record.getClassYear(),record.getClassSeason(), record.getClassSubSeason());
+                if (recordSeason.compareTo(currentSeason)<0){
+                    //如果该学生的上课记录中有季度时间节点在当前季度之前的，表示该学生之前上过课，是老生
+                    dto.setOldStudent(true);
+                    break;
+                }
+            }
+
+            //===============================================//
             condition.setClassYear(dto.getClassYear());
             condition.setClassSeason(dto.getClassSeason());
             condition.setClassSubSeason(dto.getClassSubSeason());
             //查出当前年份-季度下该学生的所有上课记录
-            List<StudentAndClassDetailedDto> tmps = studentAndClassMapper.listStudentAndClassesWithSubjectsByStudentId(condition);
+            List<StudentAndClassDetailedDto> recordsInCurrentSeason = studentAndClassMapper.listStudentAndClassesWithSubjectsByStudentId(condition);
 
             List<String> subjects = new ArrayList<>();
-            for (StudentAndClassDetailedDto tmp : tmps) {
-                if (!StringUtils.isEmpty(tmp.getClassSubject())) {
-                    subjects.add(tmp.getClassSubject());
+            for (StudentAndClassDetailedDto record : recordsInCurrentSeason) {
+                if (!StringUtils.isEmpty(record.getClassSubject())) {
+                    subjects.add(record.getClassSubject());
                 }
             }
             //读取设置该学生所有修读的学科
             dto.setSubjects(subjects);
+
+            //===============================================//
+            condition.setAssistantName(dto.getAssistantName());
+            //查出当前季度该学生在当前助教所有班级中出现次数
+            long count=studentAndClassMapper.countStudentAndClassBySeasonAndAssistant(condition);
+            dto.setCountOfSpecifiedAssistant((int) count);
         }
         return dtos;
     }

@@ -36,7 +36,7 @@ public interface MissLessonStudentMapper {
      * @param missLessonStudentDetailedDto 新添加补课学生
      * @return 更新记录数
      */
-    long insertMissLessonStudent(MissLessonStudentDetailedDto missLessonStudentDetailedDto);
+    long insertOneMissLessonStudent(MissLessonStudentDetailedDto missLessonStudentDetailedDto);
 
     /**
      * 删除一个补课学生记录

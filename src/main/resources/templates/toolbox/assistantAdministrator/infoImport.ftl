@@ -91,6 +91,7 @@
                                         2)密码：身份证号
                                     </li>
                                 </ul>
+                                <p  style="color:red">'助教长'角色没有'信息管理>用户信息'查询编辑权限，如果想要查看用户信息，请使用校区公共'学管'账号——用户名/密码都是：校区名拼音(汉字间下划线间隔)。如，曹杨校区公共账号：cao_yang。</p>
                             </div>
                             <div class="layui-form layui-timeline-content" style="margin-bottom: 20px;">
                                 <input type="checkbox" name="read_step1" id="read_step1" lay-skin="primary"
@@ -111,9 +112,9 @@
                                 <p>这一步中，如果您是在原来的基础上更新排班表且有取消的班级<b
                                         style="color: red;">（根据我的经验一般很少有这种情况，如原班级有4个：a、b、c、d，现在只有a、b、c；如果仅仅是修改或是新增，可以跳过此小步）</b>
                                     ，<b style="color: red;">必须先前往：信息管理>班级信息</b>，查询出当前<b
-                                            style="color: red;">年份-季度-校区</b>的班级记录，全部删除后，再执行以下步骤(<b style="color: red;">或勾选'先删后导'选项，推荐！</b>)。为什么要这样做？
+                                            style="color: red;">年份-季度-校区</b>的班级记录，全部删除后，再执行以下步骤(<b style="color: red;">或勾选'先删后导'选项</b>)。为什么要这样做？
                                     因为系统更新的原则：对于新的班级执行插入；对于修改过的班级执行更新；而对于已经不再有效的班级，系统无法从excel中悉知，因此需要先删除这些特例!<b
-                                            style="color: red;">删除了班级后，其下的所有学生上课记录也将删除，因此如果执行了这一带删除的操作，必须再执行STEP3！</b>
+                                            style="color: red;">删除了班级后，其下的所有学生上课记录也将删除，因此如果执行了这一带删除的操作，必须再执行STEP3！同时这些班级下的补课记录也会被删除。因此我不推荐你勾选'先删后导'这种会把原来有用的班级也删除的操作，而是去管理页面手动的删除那些个'不再有效的班级'。</b>
                                 </p>
                                 <p>上传excel要求说明：<a
                                         href="${ctx}/toolbox/assistantAdministrator/downloadExample/2">查看范例</a></p>
@@ -424,6 +425,16 @@
                         skin: 'layui-layer-molv' //样式类名
                         , closeBtn: 0
                     });
+                } else if (res.msg === "invalidData") {
+                    return layer.alert('需要引起注意！' + '<br>' +
+                            '总耗时：' + res.excelSpeed.parsedTime + '<br>' +
+                            '导入表格记录数：' + res.excelSpeed.count + '条；平均速度：' + res.excelSpeed.parsedSpeed + '。<br>' +
+                            '变更数据库记录数：删除' + res.databaseSpeed.deleteCount + '条；插入' + res.databaseSpeed.insertCount
+                            + '条；更新' + res.databaseSpeed.updateCount + '条；平均速度：' + res.databaseSpeed.parsedSpeed + '。' + '<br>' +
+                            '不合法而未被更新的记录：' + res.invalidCount + '条。所在位置[(列名=值),...]：' + res.whatInvalid, {
+                        skin: 'layui-layer-lan' //样式类名
+                        , closeBtn: 0
+                    });
                 } else if (res.msg === "tooManyRows") {
                     return layer.alert('输入表格的行数过多。最大行数限制：' + res.rowCountThreshold + '，实际行数：' + res.actualRowCount + '。尝试删除最后多余的空白行？“ctrl+shift+↓”，“右键”，“删除”，“整行”', {
                         skin: 'layui-layer-lan'
@@ -443,7 +454,7 @@
             }
             , error: function () {
                 layer.closeAll('loading'); //关闭loading
-                return layer.alert('导入失败!', {
+                return layer.alert('导入失败!检查数据准确性？', {
                     skin: 'layui-layer-lan'
                     , closeBtn: 0
                 });
@@ -575,6 +586,16 @@
                         skin: 'layui-layer-lan'
                         , closeBtn: 0
                     });
+                } else if (res.msg === "invalidData") {
+                    return layer.alert('需要引起注意！' + '<br>' +
+                            '总耗时：' + res.excelSpeed.parsedTime + '<br>' +
+                            '导入表格记录数：' + res.excelSpeed.count + '条；平均速度：' + res.excelSpeed.parsedSpeed + '。<br>' +
+                            '变更数据库记录数：删除' + res.databaseSpeed.deleteCount + '条；插入' + res.databaseSpeed.insertCount
+                            + '条；更新' + res.databaseSpeed.updateCount + '条；平均速度：' + res.databaseSpeed.parsedSpeed + '。' + '<br>' +
+                            '不合法而未被更新的记录：' + res.invalidCount + '条。所在位置[(列名=值),...]：' + res.whatInvalid, {
+                        skin: 'layui-layer-lan' //样式类名
+                        , closeBtn: 0
+                    });
                 } else {
                     return layer.alert('导入失败!', {
                         skin: 'layui-layer-lan'
@@ -584,7 +605,7 @@
             }
             , error: function () {
                 layer.closeAll('loading'); //关闭loading
-                return layer.alert('导入失败!', {
+                return layer.alert('导入失败!检查数据准确性？', {
                     skin: 'layui-layer-lan'
                     , closeBtn: 0
                 });
@@ -726,6 +747,16 @@
                         skin: 'layui-layer-lan'
                         , closeBtn: 0
                     });
+                } else if (res.msg === "invalidData") {
+                    return layer.alert('需要引起注意！' + '<br>' +
+                            '总耗时：' + res.excelSpeed.parsedTime + '<br>' +
+                            '导入表格记录数：' + res.excelSpeed.count + '条；平均速度：' + res.excelSpeed.parsedSpeed + '。<br>' +
+                            '变更数据库记录数：删除' + res.databaseSpeed.deleteCount + '条；插入' + res.databaseSpeed.insertCount
+                            + '条；更新' + res.databaseSpeed.updateCount + '条；平均速度：' + res.databaseSpeed.parsedSpeed + '。' + '<br>' +
+                            '不合法而未被更新的记录：' + res.invalidCount + '条。所在位置[(列名=值),...]：' + res.whatInvalid, {
+                        skin: 'layui-layer-lan' //样式类名
+                        , closeBtn: 0
+                    });
                 } else {
                     return layer.alert('导入失败!', {
                         skin: 'layui-layer-lan'
@@ -735,7 +766,7 @@
             }
             , error: function () {
                 layer.closeAll('loading'); //关闭loading
-                return layer.alert('导入失败!', {
+                return layer.alert('导入失败!检查数据准确性？', {
                     skin: 'layui-layer-lan'
                     , closeBtn: 0
                 });
@@ -786,8 +817,18 @@
                         skin: 'layui-layer-lan'
                         , closeBtn: 0
                     });
+                } else if (res.msg === "invalidData") {
+                    return layer.alert('需要引起注意！' + '<br>' +
+                            '总耗时：' + res.excelSpeed.parsedTime + '<br>' +
+                            '导入表格记录数：' + res.excelSpeed.count + '条；平均速度：' + res.excelSpeed.parsedSpeed + '。<br>' +
+                            '变更数据库记录数：删除' + res.databaseSpeed.deleteCount + '条；插入' + res.databaseSpeed.insertCount
+                            + '条；更新' + res.databaseSpeed.updateCount + '条；平均速度：' + res.databaseSpeed.parsedSpeed + '。' + '<br>' +
+                            '不合法而未被更新的记录：' + res.invalidCount + '条。所在位置[(列名=值),...]：' + res.whatInvalid, {
+                        skin: 'layui-layer-lan' //样式类名
+                        , closeBtn: 0
+                    });
                 } else {
-                    return layer.alert('导入失败!', {
+                    return layer.alert('导入失败!检查数据准确性？', {
                         skin: 'layui-layer-lan'
                         , closeBtn: 0
                     });
@@ -844,8 +885,18 @@
                         skin: 'layui-layer-lan'
                         , closeBtn: 0
                     });
+                } else if (res.msg === "invalidData") {
+                    return layer.alert('需要引起注意！' + '<br>' +
+                            '总耗时：' + res.excelSpeed.parsedTime + '<br>' +
+                            '导入表格记录数：' + res.excelSpeed.count + '条；平均速度：' + res.excelSpeed.parsedSpeed + '。<br>' +
+                            '变更数据库记录数：删除' + res.databaseSpeed.deleteCount + '条；插入' + res.databaseSpeed.insertCount
+                            + '条；更新' + res.databaseSpeed.updateCount + '条；平均速度：' + res.databaseSpeed.parsedSpeed + '。' + '<br>' +
+                            '不合法而未被更新的记录：' + res.invalidCount + '条。所在位置[(列名=值),...]：' + res.whatInvalid, {
+                        skin: 'layui-layer-lan' //样式类名
+                        , closeBtn: 0
+                    });
                 } else {
-                    return layer.alert('导入失败!', {
+                    return layer.alert('导入失败!检查数据准确性？', {
                         skin: 'layui-layer-lan'
                         , closeBtn: 0
                     });

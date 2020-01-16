@@ -1,7 +1,7 @@
 package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jzy.manager.exception.InvalidParameterException;
+import com.jzy.model.dto.DefaultFromExcelUpdateResult;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.StudentSearchCondition;
 import com.jzy.model.dto.UpdateResult;
@@ -72,7 +72,7 @@ public interface StudentService {
      * 2."studentIdRepeat"：学员号冲突
      * 3."success": 更新成功
      */
-    UpdateResult insertStudent(Student student);
+    UpdateResult insertOneStudent(Student student);
 
     /**
      * 根据从excel中读取到的students信息（包括手机等字段），更新插入多个。根据学员编号判断：
@@ -83,9 +83,8 @@ public interface StudentService {
      *
      * @param students 读取到的学生信息
      * @return 更新结果
-     * @throws InvalidParameterException 不合法的入参异常
      */
-    UpdateResult insertAndUpdateStudentsDetailedFromExcel(List<Student> students) throws InvalidParameterException;
+    DefaultFromExcelUpdateResult insertAndUpdateStudentsDetailedFromExcel(List<Student> students);
 
     /**
      * 根据从excel中读取到的students信息（就学号姓名，不包括手机等字段），更新插入多个。根据学员编号判断：
@@ -96,9 +95,8 @@ public interface StudentService {
      *
      * @param students 只含学号、姓名的学生信息集合
      * @return 更新结果
-     * @throws InvalidParameterException 不合法的入参异常
      */
-    UpdateResult insertAndUpdateStudentsFromExcel(List<Student> students) throws InvalidParameterException;
+    DefaultFromExcelUpdateResult insertAndUpdateStudentsFromExcel(List<Student> students);
 
     /**
      * 根据从excel中读取到的students学校信息，更新多个。根据学员编号判断：
@@ -109,9 +107,8 @@ public interface StudentService {
      *
      * @param students 只含学号、学校的学生信息集合
      * @return 更新结果
-     * @throws InvalidParameterException 不合法的入参异常
      */
-    UpdateResult insertAndUpdateStudentsSchoolsFromExcel(List<Student> students) throws InvalidParameterException;
+    DefaultFromExcelUpdateResult insertAndUpdateStudentsSchoolsFromExcel(List<Student> students);
 
     /**
      * 查询学员个人信息

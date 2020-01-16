@@ -35,12 +35,14 @@ public class RedisOperationImpl implements RedisOperation {
     @Autowired
     private ZSetOperations<String, Object> zSetOps;
 
+    @Override
     public void expireKey(String key) {
         if (!StringUtils.isEmpty(key)) {
             redisTemplate.expire(key, 0, TimeUnit.SECONDS);
         }
     }
 
+    @Override
     public void deleteHashByKey(String key, String hashKey) {
         if (hashOps.hasKey(key, hashKey)) {
             //缓存中有

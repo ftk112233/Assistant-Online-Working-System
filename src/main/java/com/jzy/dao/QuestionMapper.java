@@ -60,7 +60,7 @@ public interface QuestionMapper {
      * @param question 添加问题的封装
      * @return 更新记录数
      */
-    long insertQuestion(Question question);
+    long insertOneQuestion(Question question);
 
     /**
      * 查出所有问题个数

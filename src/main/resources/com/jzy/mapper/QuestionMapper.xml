@@ -19,7 +19,7 @@
     <resultMap id="QuestionWithCreatorResultMap" type="com.jzy.model.dto.QuestionWithCreatorDto" extends="BaseResultMap">
         <result column="creator_name" property="creatorName" jdbcType="VARCHAR"/>
     </resultMap>
-    <insert id="insertQuestion" parameterType="com.jzy.model.entity.Question">
+    <insert id="insertOneQuestion" parameterType="com.jzy.model.entity.Question">
         insert into question
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="content != null and content!=''">

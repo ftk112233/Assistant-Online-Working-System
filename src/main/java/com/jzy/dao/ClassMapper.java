@@ -45,7 +45,7 @@ public interface ClassMapper {
      * @param classDetailedDto 新添加班级的信息
      * @return 更新记录数
      */
-    long insertClass(ClassDetailedDto classDetailedDto);
+    long insertOneClass(ClassDetailedDto classDetailedDto);
 
     /**
      * 返回符合条件的班级信息分页结果

@@ -85,6 +85,8 @@ public class ExcelConstants {
 
     public static final String STUDENT_PHONE_COLUMN_2 = "家长联系方式";
 
+    public static final String IS_OLD_STUDENT = "类别※";
+
     public static final String TEACHER_REQUIREMENT_COLUMN = "任课教师的要求";
 
     public static final String STUDENT_SCHOOL_COLUMN_2 = "学校";

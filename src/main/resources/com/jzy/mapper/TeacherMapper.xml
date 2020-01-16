@@ -14,7 +14,7 @@
         <result column="teacher_phone" property="teacherPhone" jdbcType="VARCHAR"/>
         <result column="teacher_remark" property="teacherRemark" jdbcType="VARCHAR"/>
     </resultMap>
-    <insert id="insertTeacher" parameterType="com.jzy.model.entity.Teacher">
+    <insert id="insertOneTeacher" parameterType="com.jzy.model.entity.Teacher">
         insert into teacher
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="teacherWorkId != null and teacherWorkId!=''">

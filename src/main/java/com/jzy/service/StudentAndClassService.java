@@ -1,7 +1,6 @@
 package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.model.dto.*;
 import com.jzy.model.dto.echarts.GroupedByGradeAndTypeObjectTotal;
 import com.jzy.model.dto.echarts.GroupedBySubjectAndTypeObjectTotal;
@@ -47,7 +46,7 @@ public interface StudentAndClassService {
      * 4."classNotExist": 班级不存在
      * 5."success": 更新成功
      */
-    UpdateResult insertStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto);
+    UpdateResult insertOneStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto);
 
     /**
      * 根据当前学员号和报班班号更新，报班情况
@@ -68,9 +67,8 @@ public interface StudentAndClassService {
      *
      * @param studentAndClassDetailedDtos 要更新的学员上课记录
      * @return 更新结果
-     * @throws InvalidParameterException 不合法的入参异常
      */
-    UpdateResult insertAndUpdateStudentAndClassesFromExcel(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos) throws InvalidParameterException;
+    DefaultFromExcelUpdateResult insertAndUpdateStudentAndClassesFromExcel(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos);
 
     /**
      * 查询学员上课信息的ajax交互。其中classYear
@@ -110,7 +108,15 @@ public interface StudentAndClassService {
     long deleteManyStudentAndClassesByIds(List<Long> ids);
 
     /**
-     * 根据班级编码查询班级的所有学生及班级的详细信息，包括该学生在当前班级id所解析到的年份、季度下所修读的所有学科
+     * 根据班级编码查询班级的所有学生及班级的详细信息。
+     *
+     * @param classId 班级编码
+     * @return 结果用 {@link StudentAndClassDetailedDto} 的子类 {@link StudentAndClassDetailedWithSubjectsDto} 返回，子类和父类字段的差集都先空着
+     */
+    List<StudentAndClassDetailedWithSubjectsDto> listStudentAndClassesByClassId(String classId);
+
+    /**
+     * 根据班级编码查询班级的所有学生及班级的详细信息，包括该学生在当前班级id所解析到的年份、季度下所修读的所有学科，还有判断当前学生是否是老生。
      *
      * @param classId 班级编码
      * @return 带当前学员所有在读学科的学员上课记录 {@link StudentAndClassDetailedWithSubjectsDto}

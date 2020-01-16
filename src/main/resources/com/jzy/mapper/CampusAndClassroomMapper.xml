@@ -13,7 +13,7 @@
         <result column="classroom_capacity" property="classroomCapacity" jdbcType="INTEGER"/>
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
     </resultMap>
-    <insert id="insertCampusAndClassroom" parameterType="com.jzy.model.entity.CampusAndClassroom">
+    <insert id="insertOneCampusAndClassroom" parameterType="com.jzy.model.entity.CampusAndClassroom">
         insert into campus_classroom
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="campus != null and campus!=''">

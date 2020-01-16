@@ -55,5 +55,5 @@ public interface CampusAndClassroomService {
      * 2."campusAndClassroomRepeat"：校区和教室组合已存在
      * 3."success": 更新成功
      */
-    String insertCampusAndClassroom(CampusAndClassroom campusAndClassroom);
+    String insertOneCampusAndClassroom(CampusAndClassroom campusAndClassroom);
 }

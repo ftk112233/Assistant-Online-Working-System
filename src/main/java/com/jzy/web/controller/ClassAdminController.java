@@ -20,6 +20,7 @@ import com.jzy.model.vo.ResultMap;
 import com.jzy.model.vo.Speed;
 import com.jzy.model.vo.SqlProceedSpeed;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.StrBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -131,10 +132,9 @@ public class ClassAdminController extends AbstractController {
             return map;
         }
 
+        String msg = Constants.SUCCESS;
         try {
-            UpdateResult teacherResult = teacherService.insertAndUpdateTeachersFromExcel(new ArrayList<>(excel.getTeachers()));
-            databaseInsertRowCount += (int) teacherResult.getInsertCount();
-            databaseUpdateRowCount += (int) teacherResult.getUpdateCount();
+            DefaultFromExcelUpdateResult r = teacherService.insertAndUpdateTeachersFromExcel(new ArrayList<>(excel.getTeachers()));
 
             List<ClassDetailedDto> classDetailedDtos = excel.getClassDetailedDtos();
             for (ClassDetailedDto classDetailedDto : classDetailedDtos) {
@@ -168,9 +168,17 @@ public class ClassAdminController extends AbstractController {
             }
 
             //插入&更新
-            UpdateResult classResult = classService.insertAndUpdateClassesFromExcel(classDetailedDtos);
-            databaseInsertRowCount += (int) classResult.getInsertCount();
-            databaseUpdateRowCount += (int) classResult.getUpdateCount();
+            DefaultFromExcelUpdateResult classResult = classService.insertAndUpdateClassesFromExcel(classDetailedDtos);
+            r.merge(classResult);
+
+            if (Constants.EXCEL_INVALID_DATA.equals(r.getResult())) {
+                map.put("invalidCount", r.getMaxInvalidCount());
+                map.put("whatInvalid", r.showValidData());
+                msg = r.getResult();
+            }
+
+            databaseInsertRowCount += (int) r.getInsertCount();
+            databaseUpdateRowCount += (int) r.getUpdateCount();
 
 
             long endTime = System.currentTimeMillis(); //获取结束时间
@@ -184,23 +192,24 @@ public class ClassAdminController extends AbstractController {
             //向对应校区的用户发送通知消息
             if (classDetailedDtos.size() > 0) {
                 ClassDetailedDto classDetailedDto = classDetailedDtos.get(0);
+
                 sendMessageToUser(classDetailedDto);
 
                 if (chooseSeason) {
                     //缓存当前的年份季度分期
-                    CurrentClassSeason currentClassSeason = new CurrentClassSeason(classDetailedDto.getClassYear(), classDetailedDto.getClassSeason(), classDetailedDto.getClassSubSeason());
+                    ClassSeasonDto currentClassSeason = new ClassSeasonDto(classDetailedDto.getClassYear(), classDetailedDto.getClassSeason(), classDetailedDto.getClassSubSeason());
                     classService.updateCurrentClassSeason(currentClassSeason);
                 }
             }
 
 
-            map.put("msg", Constants.SUCCESS);
         } catch (Exception e) {
             e.printStackTrace();
             map.put("msg", Constants.FAILURE);
             return map;
         }
 
+        map.put("msg", msg);
         return map;
     }
 
@@ -209,29 +218,34 @@ public class ClassAdminController extends AbstractController {
      *
      * @param clazz 从更新的记录中选取一个班级为例，取其校区作为要通知的校区，clazz的其他信息也用于消息正文
      */
-    private void sendMessageToUser(Class clazz) {
+    private void sendMessageToUser(Class clazz) throws Exception {
         String campus = clazz.getClassCampus();
         if (!StringUtils.isEmpty(campus)) {
             List<Assistant> assistants = assistantService.listAssistantsByCampus(campus);
             List<Long> userIds = new ArrayList<>();
             for (Assistant assistant : assistants) {
-                userIds.add(userService.getUserByWorkId(assistant.getAssistantWorkId()).getId());
+                User user=userService.getUserByWorkId(assistant.getAssistantWorkId());
+                if (user != null) {
+                    userIds.add(user.getId());
+                }
             }
 
+            List<UserMessage> messages = new ArrayList<>();
             for (Long userId : userIds) {
                 UserMessage message = new UserMessage();
                 message.setUserId(userId);
                 message.setUserFromId(userService.getSessionUserInfo().getId());
                 message.setMessageTitle("排班信息有变化");
-                StringBuffer messageContent = new StringBuffer();
+                StringBuilder messageContent = new StringBuilder();
                 messageContent.append("你的学管老师刚刚更新了" + clazz.getClassCampus() + "校区" + clazz.getClassYear() + "年" + clazz.getClassSeason() + "的排班表。")
                         .append("<br>点<a lay-href='/class/admin/page' lay-text='班级信息'>这里</a>前往查看。");
                 message.setMessageContent(messageContent.toString());
                 message.setMessageTime(new Date());
                 if (UserMessageUtils.isValidUserMessageUpdateInfo(message)) {
-                    userMessageService.insertUserMessage(message);
+                    messages.add(message);
                 }
             }
+            userMessageService.insertManyUserMessages(messages);
         }
     }
 
@@ -346,7 +360,7 @@ public class ClassAdminController extends AbstractController {
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
-        map.put("data", classService.insertClass(classDetailedDto).getResult());
+        map.put("data", classService.insertOneClass(classDetailedDto).getResult());
 
         return map;
     }

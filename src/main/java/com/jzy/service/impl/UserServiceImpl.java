@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.UserMapper;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.constant.SessionConstants;
 import com.jzy.manager.exception.InvalidEmailException;
@@ -433,7 +434,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     }
 
     @Override
-    public UpdateResult insertUser(User user) {
+    public UpdateResult insertOneUser(User user) {
         if (user == null) {
             return new UpdateResult(Constants.FAILURE);
         }
@@ -512,7 +513,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         UpdateResult result = new UpdateResult(Constants.SUCCESS);
         //执行插入
-        result.setInsertCount(userMapper.insertUser(user));
+        result.setInsertCount(userMapper.insertOneUser(user));
 
         //向新用户发送欢迎消息
         sendWelcomeMessageToUser(user);
@@ -525,7 +526,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
      *
      * @param user 新用户
      */
-    private void sendWelcomeMessageToUser(User user){
+    private void sendWelcomeMessageToUser(User user) {
         Long id = getUserByName(user.getUserName()).getId();
 
         UserMessage message = new UserMessage();
@@ -545,7 +546,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         message.setWelcomePicture();
         message.setMessageTime(new Date());
         if (UserMessageUtils.isValidUserMessageUpdateInfo(message)) {
-            userMessageService.insertUserMessage(message);
+            userMessageService.insertOneUserMessage(message);
         }
 
     }
@@ -595,23 +596,27 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     }
 
     @Override
-    public UpdateResult insertAndUpdateUsersFromExcel(List<User> users) throws InvalidParameterException {
+    public DefaultFromExcelUpdateResult insertAndUpdateUsersFromExcel(List<User> users) {
         if (users == null) {
             String msg = "insertAndUpdateUsersFromExcel方法输入用户users为null!";
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
-        UpdateResult result = new UpdateResult();
+        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(Constants.SUCCESS);
+        String userRealNameKeyword = ExcelConstants.REAL_NAME_COLUMN;
+        InvalidData invalidData = new InvalidData(userRealNameKeyword);
         for (User user : users) {
             if (UserUtils.isValidUserUpdateInfo(user)) {
                 result.add(insertAndUpdateOneUserFromExcel(user));
             } else {
                 String msg = "表格输入用户user不合法!";
                 logger.error(msg);
-                throw new InvalidParameterException(msg);
+                result.setResult(Constants.EXCEL_INVALID_DATA);
+                invalidData.putValue(userRealNameKeyword, user.getUserRealName());
             }
         }
-        result.setResult(Constants.SUCCESS);
+        result.setInvalidData(invalidData);
+
         return result;
     }
 

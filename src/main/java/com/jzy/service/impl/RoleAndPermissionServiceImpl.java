@@ -106,7 +106,7 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
     }
 
     @Override
-    public String insertRoleAndPermission(RoleAndPermission roleAndPermission) {
+    public String insertOneRoleAndPermission(RoleAndPermission roleAndPermission) {
         if (roleAndPermission == null) {
             return Constants.FAILURE;
         }
@@ -115,7 +115,7 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
             return ROLE_AND_PERM_REPEAT;
         }
 
-        roleAndPermissionMapper.insertRoleAndPermission(roleAndPermission);
+        roleAndPermissionMapper.insertOneRoleAndPermission(roleAndPermission);
         return Constants.SUCCESS;
     }
 

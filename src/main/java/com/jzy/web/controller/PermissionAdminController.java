@@ -134,7 +134,7 @@ public class PermissionAdminController extends AbstractController {
                 logger.error(msg);
                 throw new InvalidParameterException(msg);
             }
-            result = roleAndPermissionService.insertRoleAndPermission(rap);
+            result = roleAndPermissionService.insertOneRoleAndPermission(rap);
             if ("roleAndPermRepeat".equals(result)) {
                 map.put("data", result);
                 return map;

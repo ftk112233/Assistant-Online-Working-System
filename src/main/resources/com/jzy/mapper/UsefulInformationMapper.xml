@@ -15,7 +15,7 @@
         <result column="sequence" property="sequence" jdbcType="BIGINT"/>
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
     </resultMap>
-    <insert id="insertUsefulInformation" parameterType="com.jzy.model.entity.UsefulInformation">
+    <insert id="insertOneUsefulInformation" parameterType="com.jzy.model.entity.UsefulInformation">
         insert into useful_information
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="title != null and title!=''">

@@ -4,11 +4,10 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.TeacherMapper;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.TeacherUtils;
-import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.TeacherSearchCondition;
-import com.jzy.model.dto.UpdateResult;
+import com.jzy.model.dto.*;
 import com.jzy.model.entity.Teacher;
 import com.jzy.service.TeacherService;
 import org.apache.commons.lang3.StringUtils;
@@ -33,12 +32,12 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
     /**
      * 表示工号冲突
      */
-    private final static String WORK_ID_REPEAT="workIdRepeat";
+    private final static String WORK_ID_REPEAT = "workIdRepeat";
 
     /**
      * 表示姓名冲突
      */
-    private final static String NAME_REPEAT="nameRepeat";
+    private final static String NAME_REPEAT = "nameRepeat";
 
     @Autowired
     private TeacherMapper teacherMapper;
@@ -59,7 +58,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
     }
 
     @Override
-    public UpdateResult insertTeacher(Teacher teacher) {
+    public UpdateResult insertOneTeacher(Teacher teacher) {
         if (getTeacherByName(teacher.getTeacherName()) != null) {
             //添加的姓名已存在
             return new UpdateResult(NAME_REPEAT);
@@ -84,15 +83,15 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
         if (StringUtils.isEmpty(teacher.getTeacherSex())) {
             teacher.setTeacherSex(null);
         }
-        long count=teacherMapper.insertTeacher(teacher);
-        UpdateResult result=new UpdateResult(Constants.SUCCESS);
+        long count = teacherMapper.insertOneTeacher(teacher);
+        UpdateResult result = new UpdateResult(Constants.SUCCESS);
         result.setInsertCount(count);
         return result;
     }
 
     @Override
     public String updateTeacherByWorkId(Teacher teacher) {
-        if (teacher == null){
+        if (teacher == null) {
             return Constants.FAILURE;
         }
         Teacher originalTeacher = getTeacherByWorkId(teacher.getTeacherWorkId());
@@ -101,7 +100,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
 
     @Override
     public String updateTeacherByWorkId(Teacher originalTeacher, Teacher newTeacher) {
-        if (originalTeacher == null || newTeacher == null){
+        if (originalTeacher == null || newTeacher == null) {
             return Constants.FAILURE;
         }
         if (!originalTeacher.getTeacherName().equals(newTeacher.getTeacherName())) {
@@ -112,7 +111,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
             }
         }
 
-        if (newTeacher.equalsExceptBaseParams(originalTeacher)){
+        if (newTeacher.equalsExceptBaseParams(originalTeacher)) {
             //判断输入对象的对应字段是否未做任何修改
             return Constants.UNCHANGED;
         }
@@ -121,19 +120,30 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
     }
 
     @Override
-    public UpdateResult insertAndUpdateTeachersFromExcel(List<Teacher> teachers) throws InvalidParameterException {
-        UpdateResult result=new UpdateResult();
+    public DefaultFromExcelUpdateResult insertAndUpdateTeachersFromExcel(List<Teacher> teachers) {
+        if (teachers == null) {
+            String msg = "insertAndUpdateTeachersFromExcel方法输入教师teachers为null!";
+            logger.error(msg);
+            throw new InvalidParameterException(msg);
+        }
+
+        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(Constants.SUCCESS);
+        String teacherNameKeyword = ExcelConstants.TEACHER_NAME_COLUMN;
+        String classIdKeyword = ExcelConstants.CLASS_ID_COLUMN;
+        InvalidData invalidData = new InvalidData(teacherNameKeyword, classIdKeyword);
         for (Teacher teacher : teachers) {
             if (TeacherUtils.isValidTeacherInfo(teacher)) {
-                UpdateResult resultTmp=insertAndUpdateOneTeacherFromExcel(teacher);
-                result.add(resultTmp);
+                result.add(insertAndUpdateOneTeacherFromExcel(teacher));
             } else {
                 String msg = "输入排班表中读取到的teacher不合法!";
                 logger.error(msg);
-                throw new InvalidParameterException(msg);
+                result.setResult(Constants.EXCEL_INVALID_DATA);
+                invalidData.putValue(teacherNameKeyword, teacher.getTeacherName());
+                invalidData.putValue(classIdKeyword, null);
             }
         }
-        result.setResult(Constants.SUCCESS);
+
+        result.setInvalidData(invalidData);
         return result;
     }
 
@@ -152,14 +162,14 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
             throw new InvalidParameterException(msg);
         }
 
-        UpdateResult result=new UpdateResult();
+        UpdateResult result = new UpdateResult();
 
         /*
            TODO
          * 由于目前版本从表格只能读取教师姓名字段，所以不用工号做重名校验。只要当前名字不存在，即插入
          */
         if (getTeacherByName(teacher.getTeacherName()) == null) {
-            long insertCount=insertTeacherWithUnrepeatedName(teacher).getInsertCount();
+            long insertCount = insertTeacherWithUnrepeatedName(teacher).getInsertCount();
             result.setInsertCount(insertCount);
         }
         result.setResult(Constants.SUCCESS);
@@ -208,7 +218,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
             teacher.setTeacherSex(null);
         }
 
-        if (teacher.equalsExceptBaseParams(originalTeacher)){
+        if (teacher.equalsExceptBaseParams(originalTeacher)) {
             //判断输入对象的对应字段是否未做任何修改
             return Constants.UNCHANGED;
         }
@@ -227,7 +237,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
 
     @Override
     public long deleteManyTeachersByIds(List<Long> ids) {
-        if (ids == null ||ids.size() == 0){
+        if (ids == null || ids.size() == 0) {
             return 0;
         }
         return teacherMapper.deleteManyTeachersByIds(ids);

@@ -25,7 +25,7 @@ public class DefaultExcel extends Excel {
     /**
      * 默认的表格最大行数限制
      */
-    protected static final int DEFAULT_MAX_ROW_COUNT = 100000;
+    protected static final int DEFAULT_MAX_ROW_COUNT = 30000;
 
     public DefaultExcel() {
     }

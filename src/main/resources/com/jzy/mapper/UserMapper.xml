@@ -32,7 +32,7 @@
         <result column="campus" property="campus" jdbcType="VARCHAR"/>
     </resultMap>
 
-    <insert id="insertUser" parameterType="com.jzy.model.entity.User">
+    <insert id="insertOneUser" parameterType="com.jzy.model.entity.User">
         insert into user
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="userWorkId != null and userWorkId!=''">

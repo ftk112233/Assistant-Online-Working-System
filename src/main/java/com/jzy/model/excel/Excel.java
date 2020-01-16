@@ -319,15 +319,17 @@ public abstract class Excel implements Serializable, Resettable, ExcelValidity {
     /**
      * 设置cell 样式
      *
-     * @param sheetIx  指定 Sheet 页，从 0 开始
+     * @param sheetIx 指定 Sheet 页，从 0 开始
+     * @param rowIndex 指定行，从 0 开始
      * @param colIndex 指定列，从 0 开始
+     * @param style 要设置样式
      * @return
      * @throws IOException
      */
     public boolean setStyle(int sheetIx, int rowIndex, int colIndex, CellStyle style) throws IOException {
         Sheet sheet = workbook.getSheetAt(sheetIx);
         // sheet.autoSizeColumn(colIndex, true);// 设置列宽度自适应
-        sheet.setColumnWidth(colIndex, 4000);
+//        sheet.setColumnWidth(colIndex, 4000);
 
         Cell cell = sheet.getRow(rowIndex).getCell(colIndex);
         cell.setCellStyle(style);
@@ -336,45 +338,80 @@ public abstract class Excel implements Serializable, Resettable, ExcelValidity {
     }
 
     /**
+     * 获得cell样式
      *
+     * @param sheetIx 指定 Sheet 页，从 0 开始
+     * @param rowIndex 行索引
+     * @param colIndex 列索引
+     * @return cell样式
+     * @throws IOException
+     */
+    public CellStyle getStyle(int sheetIx, int rowIndex, int colIndex) throws IOException {
+        Sheet sheet = workbook.getSheetAt(sheetIx);
+
+        Cell cell = sheet.getRow(rowIndex).getCell(colIndex);
+
+        return cell.getCellStyle();
+    }
+
+    /**
+     * 设置单元格背景颜色，但不改变单元格原有样式
+     *
+     * @param sheetIx 指定 Sheet 页，从 0 开始
+     * @param rowIndex 行索引
+     * @param colIndex 列索引
+     * @param colorIndex 颜色的索引值
+     * @return
+     * @throws IOException
+     */
+    public boolean updateCellBackgroundColor(int sheetIx, int rowIndex, int colIndex, short colorIndex) throws IOException {
+        CellStyle cellStyle = getWorkbook().createCellStyle();
+        cellStyle.cloneStyleFrom(getStyle(sheetIx, rowIndex, colIndex));
+        cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);  //填充单元格
+        cellStyle.setFillForegroundColor(colorIndex);
+        setStyle(sheetIx, rowIndex, colIndex, cellStyle);
+
+        return true;
+    }
+
+    /**
      * 设置样式
      *
-     * @param type
-     *            1：标题 2：第一行
+     * @param type 1：标题 2：第一行
      * @return
      */
-    // public CellStyle makeStyle(int type) {
-    // CellStyle style = workbook.createCellStyle();
-    //
-    // DataFormat format = workbook.createDataFormat();
-    // style.setDataFormat(format.getFormat("@"));// // 内容样式 设置单元格内容格式是文本
-    // style.setAlignment(CellStyle.ALIGN_CENTER);// 内容居中
-    //
-    // // style.setBorderTop(CellStyle.BORDER_THIN);// 边框样式
-    // // style.setBorderRight(CellStyle.BORDER_THIN);
-    // // style.setBorderBottom(CellStyle.BORDER_THIN);
-    // // style.setBorderLeft(CellStyle.BORDER_THIN);
-    //
-    // Font font = workbook.createFont();// 文字样式
-    //
-    // if (type == 1) {
-    // // style.setFillForegroundColor(HSSFColor.LIGHT_BLUE.index);//颜色样式
-    // // 前景颜色
-    // // style.setFillBackgroundColor(HSSFColor.LIGHT_BLUE.index);//背景色
-    // // style.setFillPattern(CellStyle.ALIGN_FILL);// 填充方式
-    // font.setBold(true);
-    // font.setFontHeight((short) 500);
-    // }
-    //
-    // if (type == 2) {
-    // font.setBold(true);
-    // font.setFontHeight((short) 300);
-    // }
-    //
-    // style.setFont(font);
-    //
-    // return style;
-    // }
+    public CellStyle makeStyle(int type) {
+        CellStyle style = workbook.createCellStyle();
+
+        DataFormat format = workbook.createDataFormat();
+        style.setDataFormat(format.getFormat("@"));// // 内容样式 设置单元格内容格式是文本
+        style.setAlignment(CellStyle.ALIGN_CENTER);// 内容居中
+
+        // style.setBorderTop(CellStyle.BORDER_THIN);// 边框样式
+        // style.setBorderRight(CellStyle.BORDER_THIN);
+        // style.setBorderBottom(CellStyle.BORDER_THIN);
+        // style.setBorderLeft(CellStyle.BORDER_THIN);
+
+        Font font = workbook.createFont();// 文字样式
+
+        if (type == 1) {
+            // style.setFillForegroundColor(HSSFColor.LIGHT_BLUE.index);//颜色样式
+            // 前景颜色
+            // style.setFillBackgroundColor(HSSFColor.LIGHT_BLUE.index);//背景色
+            // style.setFillPattern(CellStyle.ALIGN_FILL);// 填充方式
+            font.setBold(true);
+            font.setFontHeight((short) 500);
+        }
+
+        if (type == 2) {
+            font.setBold(true);
+            font.setFontHeight((short) 300);
+        }
+
+        style.setFont(font);
+
+        return style;
+    }
 
     /**
      * 合并单元格

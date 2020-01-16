@@ -31,7 +31,7 @@ public class MyTest extends BaseTest {
             user.setNewDefaultUserIcon();
             user.setDefaultUserIcon();
             user.setUserRemark(campusEnum.getName()+"校区公共账号");
-            userService.insertUser(user);
+            userService.insertOneUser(user);
         }
     }
 

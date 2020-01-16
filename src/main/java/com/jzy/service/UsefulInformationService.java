@@ -139,7 +139,7 @@ public interface UsefulInformationService {
      * 2."belongToAndSequenceRepeat"：归属和序号值组合冲突
      * 3."success": 更新成功
      */
-    String insertUsefulInformation(UsefulInformation information);
+    String insertOneUsefulInformation(UsefulInformation information);
 
     /**
      * 删除一个常用信息。删除消息的同时删除配图文件。

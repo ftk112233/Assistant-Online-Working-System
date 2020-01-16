@@ -156,7 +156,7 @@ public class MissLessonStudentAdminController extends AbstractController {
             throw new InvalidParameterException(msg);
         }
 
-        map.put("data", missLessonStudentService.insertMissLessonStudent(missLessonStudentDetailedDto));
+        map.put("data", missLessonStudentService.insertOneMissLessonStudent(missLessonStudentDetailedDto));
         return map;
     }
 

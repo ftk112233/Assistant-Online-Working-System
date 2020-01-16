@@ -12,7 +12,7 @@
         <id column="perm" property="perm" jdbcType="VARCHAR"/>
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
     </resultMap>
-    <insert id="insertRoleAndPermission" parameterType="com.jzy.model.entity.RoleAndPermission">
+    <insert id="insertOneRoleAndPermission" parameterType="com.jzy.model.entity.RoleAndPermission">
         insert into role_permisson
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="role != null and role!=''">

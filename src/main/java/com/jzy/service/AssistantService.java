@@ -1,8 +1,8 @@
 package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.model.dto.AssistantSearchCondition;
+import com.jzy.model.dto.DefaultFromExcelUpdateResult;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.UpdateResult;
 import com.jzy.model.entity.Assistant;
@@ -59,7 +59,7 @@ public interface AssistantService {
      * 3."nameRepeat"：姓名冲突
      * 4."success": 更新成功
      */
-    UpdateResult insertAssistant(Assistant assistant);
+    UpdateResult insertOneAssistant(Assistant assistant);
 
     /**
      * 修改助教信息由id修改
@@ -107,9 +107,8 @@ public interface AssistantService {
      *
      * @param assistants 输入的助教集合
      * @return (更新结果，更新记录数)
-     * @throws InvalidParameterException 不合法输入助教list
      */
-    UpdateResult insertAndUpdateAssistantsFromExcel(List<Assistant> assistants) throws InvalidParameterException;
+    DefaultFromExcelUpdateResult insertAndUpdateAssistantsFromExcel(List<Assistant> assistants);
 
     /**
      * 返回符合条件的助教信息分页结果

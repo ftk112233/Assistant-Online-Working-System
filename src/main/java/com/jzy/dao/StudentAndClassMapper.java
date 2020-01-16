@@ -24,31 +24,39 @@ public interface StudentAndClassMapper {
      *
      * @param studentId 学员编号
      * @param classId   班号
-     * @return
+     * @return 指定学员编号和班号的记录数
      */
     Long countStudentAndClassByStudentIdAndClassId(@Param("studentId") String studentId, @Param("classId") String classId);
 
     /**
      * 插入一个学生报班记录
      *
-     * @param studentAndClassDetailedDto
-     * @return
+     * @param studentAndClassDetailedDto 学员上课信息
+     * @return 更新记录数
      */
-    long insertStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto);
+    long insertOneStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto);
+
+    /**
+     * 插入多个学生报班记录
+     *
+     * @param studentAndClassDetailedDtos 学员上课信息集合
+     * @return 更新记录数
+     */
+    long insertManyStudentAndClasses(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos);
 
     /**
      * 根据当前学员号和报班班号更新，报班情况
      *
-     * @param studentAndClassDetailedDto
-     * @return
+     * @param studentAndClassDetailedDto 学员上课信息
+     * @return 更新记录数
      */
     long updateStudentAndClassByStudentIdAndClassId(StudentAndClassDetailedDto studentAndClassDetailedDto);
 
     /**
-     * 返回符合条件的学生上课信息分页结果
+     * 返回符合条件的学生上课信息
      *
      * @param condition 查询条件入参
-     * @return
+     * @return 学生上课信息集合
      */
     List<StudentAndClassDetailedDto> listStudentAndClasses(StudentAndClassSearchCondition condition);
 
@@ -56,7 +64,7 @@ public interface StudentAndClassMapper {
      * 根据id查询StudentAndClass
      *
      * @param id 学员上课对象的自增主键id
-     * @return
+     * @return 学生上课信息
      */
     StudentAndClass getStudentAndClassById(Long id);
 
@@ -99,6 +107,14 @@ public interface StudentAndClassMapper {
      * @return 所有上课详细信息
      */
     List<StudentAndClassDetailedDto> listStudentAndClassesWithSubjectsByStudentId(StudentAndClassSearchCondition condition);
+
+    /**
+     * 查询指定学生在指定季度和助教带的班级中出现的次数
+     *
+     * @param condition 学员号, 当前年份-季度，助教姓名等信息
+     * @return 指定学生出现的次数
+     */
+    long countStudentAndClassBySeasonAndAssistant(StudentAndClassSearchCondition condition);
 
     /**
      * 条件删除多个学生上课记录

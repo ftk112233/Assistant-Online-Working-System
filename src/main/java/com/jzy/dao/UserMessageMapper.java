@@ -110,5 +110,13 @@ public interface UserMessageMapper {
      * @param userMessage 新添加的消息
      * @return 更新记录数
      */
-    long insertUserMessage(UserMessage userMessage);
+    long insertOneUserMessage(UserMessage userMessage);
+
+    /**
+     * 批量添加消息
+     *
+     * @param userMessages 新添加的消息集合
+     * @return 更新记录数
+     */
+    long insertManyUserMessages(List<UserMessage> userMessages);
 }

@@ -1,7 +1,6 @@
 package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.model.dto.*;
 import com.jzy.model.entity.Class;
 
@@ -76,7 +75,7 @@ public interface ClassService {
      * 4."assistantNotExist"：助教不存在
      * 5."success": 更新成功
      */
-    UpdateResult insertClass(ClassDetailedDto classDetailedDto);
+    UpdateResult insertOneClass(ClassDetailedDto classDetailedDto);
 
     /**
      * 根据从excel中读取到的classDetailedDtos信息，更新插入多个。根据班号判断：
@@ -88,7 +87,7 @@ public interface ClassService {
      * @param classDetailedDtos 班级的详细信息
      * @return (更新结果, 更新记录数)
      */
-    UpdateResult insertAndUpdateClassesFromExcel(List<ClassDetailedDto> classDetailedDtos) throws InvalidParameterException;
+    DefaultFromExcelUpdateResult insertAndUpdateClassesFromExcel(List<ClassDetailedDto> classDetailedDtos);
 
     /**
      * 查询班级信息的ajax交互。
@@ -161,12 +160,12 @@ public interface ClassService {
      *
      * @return 年份-季度-分期的封装对象
      */
-    CurrentClassSeason getCurrentClassSeason();
+    ClassSeasonDto getCurrentClassSeason();
 
     /**
      * 修改当前校历
      */
-    void updateCurrentClassSeason(CurrentClassSeason classSeason);
+    void updateCurrentClassSeason(ClassSeasonDto classSeason);
 
     /**
      * 从缓存中清除当前校历

@@ -69,7 +69,7 @@ public interface UsefulInformationMapper {
      * @param information 新添加常用信息
      * @return 更新记录数
      */
-    long insertUsefulInformation(UsefulInformation information);
+    long insertOneUsefulInformation(UsefulInformation information);
 
     /**
      * 删除一个常用信息

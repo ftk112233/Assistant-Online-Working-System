@@ -129,7 +129,7 @@ public interface QuestionService {
      * 2."questionContentRepeat"：问题内容已存在
      * 3."success": 更新成功
      */
-    String insertQuestion(Question question);
+    String insertOneQuestion(Question question);
 
     /**
      * 删除一个问题

@@ -125,7 +125,7 @@ public interface UserMessageService {
      * @return 1."failure"：错误入参等异常
      * 2."success": 更新成功
      */
-    String insertUserMessage(UserMessage userMessage);
+    String insertOneUserMessage(UserMessage userMessage);
 
     /**
      * 上传消息图片附件
@@ -152,6 +152,7 @@ public interface UserMessageService {
      * @param userMessages 插入的消息列表
      * @return 1."failure"：错误入参等异常
      * 2."success": 更新成功
+     * @throws Exception 消息图片文件操作时发生的异常
      */
     String insertManyUserMessages(List<UserMessage> userMessages) throws Exception;
 }

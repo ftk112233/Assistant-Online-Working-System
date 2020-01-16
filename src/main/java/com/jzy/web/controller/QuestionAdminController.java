@@ -126,7 +126,7 @@ public class QuestionAdminController extends AbstractController {
             question.setCreatorId(userService.getSessionUserInfo().getId());
         }
 
-        map.put("data", questionService.insertQuestion(question));
+        map.put("data", questionService.insertOneQuestion(question));
 
         return map;
     }

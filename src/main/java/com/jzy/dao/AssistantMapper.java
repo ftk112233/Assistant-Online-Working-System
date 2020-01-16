@@ -44,7 +44,7 @@ public interface AssistantMapper {
      * @param assistant 新添加助教的信息
      * @return 更新记录数
      */
-    long insertAssistant(Assistant assistant);
+    long insertOneAssistant(Assistant assistant);
 
     /**
      * 修改助教信息由id修改

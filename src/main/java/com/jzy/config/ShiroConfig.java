@@ -124,6 +124,7 @@ public class ShiroConfig {
         permissions.put("/student/admin/update*", "perms[student:admin:update]"); //编辑学员个人信息的权限，助教长以上级别才有
         permissions.put("/student/admin/insert*", "perms[student:admin:insert]"); //添加学员个人信息的权限，助教长以上级别才有
         permissions.put("/student/admin/delete*", "perms[student:admin:delete]"); //删除学员个人信息的权限，助教长以上级别才有
+        permissions.put("/student/admin/importSchool", "perms[student:admin:importSchool]"); //excel导入学员学校的权限，助教以上级别才有
         permissions.put("/student/admin/import*", "perms[student:admin:import]"); //excel导入学员个人信息的权限，助教长以上级别才有
         permissions.put("/missLessonStudent/admin/update*", "perms[missLessonStudent:admin:update]"); //编辑补课学员信息的权限，助教长以上级别才有
         permissions.put("/missLessonStudent/admin/insert*", "perms[missLessonStudent:admin:insert]"); //添加补课学员信息的权限，助教长以上级别才有

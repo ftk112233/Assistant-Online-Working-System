@@ -41,7 +41,7 @@
         <result column="date" property="date" jdbcType="DATE"/>
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
     </resultMap>
-    <insert id="insertMissLessonStudent" parameterType="com.jzy.model.dto.MissLessonStudentDetailedDto">
+    <insert id="insertOneMissLessonStudent" parameterType="com.jzy.model.dto.MissLessonStudentDetailedDto">
         insert into miss_lesson_student
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="studentId != null and studentId!=''">

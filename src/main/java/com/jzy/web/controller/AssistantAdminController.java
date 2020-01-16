@@ -4,19 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
-import com.jzy.manager.exception.*;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.AssistantUtils;
 import com.jzy.model.CampusEnum;
 import com.jzy.model.dto.AssistantSearchCondition;
 import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.UpdateResult;
 import com.jzy.model.entity.Assistant;
-import com.jzy.model.excel.Excel;
-import com.jzy.model.excel.ExcelVersionEnum;
-import com.jzy.model.excel.input.AssistantInfoExcel;
 import com.jzy.model.vo.ResultMap;
-import com.jzy.model.vo.Speed;
-import com.jzy.model.vo.SqlProceedSpeed;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -24,9 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +64,7 @@ public class AssistantAdminController extends AbstractController {
 
     /**
      * 重定向到编辑助教iframe子页面并返回相应model。
-     *  其中被编辑的助教信息中select的元素不能通过layui iframe直接赋值，因此经由后台model传值
+     * 其中被编辑的助教信息中select的元素不能通过layui iframe直接赋值，因此经由后台model传值
      *
      * @param model
      * @param assistant 当前要被编辑的助教信息
@@ -123,7 +115,7 @@ public class AssistantAdminController extends AbstractController {
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
-        map.put("data", assistantService.insertAssistant(assistant).getResult());
+        map.put("data", assistantService.insertOneAssistant(assistant).getResult());
 
         return map;
     }
@@ -177,80 +169,6 @@ public class AssistantAdminController extends AbstractController {
         Map<String, Object> map = new HashMap(1);
         assistantService.deleteAssistantsByCondition(condition);
         map.put("data", Constants.SUCCESS);
-        return map;
-    }
-
-
-    /**
-     * 表格导入助教
-     *
-     * @param file 上传的表格
-     * @return [更新结果, [更新条数，速度]]
-     */
-    @RequestMapping("/import")
-    @ResponseBody
-    public Map<String, Object> importExcel(@RequestParam(value = "file", required = false) MultipartFile file) {
-        Map<String, Object> map2 = new HashMap<>(1);
-        Map<String, Object> map = new HashMap<>();
-        //返回layui规定的文件上传模块JSON格式
-        map.put("code", 0);
-        map2.put("src", "");
-        map.put("data", map2);
-
-        if (file == null || file.isEmpty()) {
-            String msg = "上传文件为空";
-            logger.error(msg);
-            throw new InvalidFileInputException(msg);
-        }
-
-
-        if (!Excel.isExcel(file.getOriginalFilename())) {
-            String msg = "上传文件不是excel";
-            logger.error(msg);
-            throw new InvalidFileInputException(msg);
-        }
-
-        long startTime = System.currentTimeMillis();   //获取开始时间
-        int excelEffectiveDataRowCount = 0; //表格有效数据行数
-        int databaseUpdateRowCount = 0; //数据库更新记录数
-        int databaseInsertRowCount = 0; //数据库插入记录数
-        int databaseDeleteRowCount = 0; //数据库删除记录数
-
-        AssistantInfoExcel excel = null;
-        try {
-            excel = new AssistantInfoExcel(file.getInputStream(), ExcelVersionEnum.getVersion(file.getOriginalFilename()));
-            excelEffectiveDataRowCount = excel.readAssistants();
-            UpdateResult assistantResult = assistantService.insertAndUpdateAssistantsFromExcel(excel.getAssistants());
-            databaseInsertRowCount += (int) assistantResult.getInsertCount();
-            databaseUpdateRowCount += (int) assistantResult.getUpdateCount();
-        } catch (InvalidFileTypeException | IOException e) {
-            e.printStackTrace();
-            map.put("msg", Constants.FAILURE);
-            return map;
-        } catch (ExcelTooManyRowsException e) {
-            e.printStackTrace();
-            map.put("msg", Constants.EXCEL_TOO_MANY_ROWS);
-            map.put("rowCountThreshold", e.getRowCountThreshold());
-            map.put("actualRowCount", e.getActualRowCount());
-            return map;
-        } catch (ExcelColumnNotFoundException e) {
-            e.printStackTrace();
-            map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
-            map.put("whatWrong", e.getWhatWrong());
-            return map;
-        }
-
-        long endTime = System.currentTimeMillis(); //获取结束时间
-        Speed speedOfExcelImport = new Speed(excelEffectiveDataRowCount, endTime - startTime);
-        SqlProceedSpeed speedOfDatabaseImport = new SqlProceedSpeed(databaseUpdateRowCount, databaseInsertRowCount, databaseDeleteRowCount, endTime - startTime);
-        speedOfExcelImport.parseSpeed();
-        speedOfDatabaseImport.parseSpeed();
-
-
-        map.put("excelSpeed", speedOfExcelImport);
-        map.put("databaseSpeed", speedOfDatabaseImport);
-
-        map.put("msg", Constants.SUCCESS);
         return map;
     }
 }

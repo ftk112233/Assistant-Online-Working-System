@@ -7,7 +7,6 @@ import com.github.pagehelper.PageInfo;
 import com.jzy.dao.QuestionMapper;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.RedisConstants;
-import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.exception.NoMoreQuestionsException;
 import com.jzy.manager.exception.QuestionNotExistException;
 import com.jzy.manager.util.CodeUtils;
@@ -207,7 +206,7 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
     }
 
     @Override
-    public String insertQuestion(Question question) {
+    public String insertOneQuestion(Question question) {
         if (question == null) {
             return Constants.FAILURE;
         }
@@ -216,7 +215,7 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
             return QUESTION_CONTENT_REPEAT;
         }
 
-        questionMapper.insertQuestion(question);
+        questionMapper.insertOneQuestion(question);
         return Constants.SUCCESS;
     }
 

@@ -3,7 +3,6 @@ package com.jzy.service;
 import com.github.pagehelper.PageInfo;
 import com.jzy.manager.exception.InvalidEmailException;
 import com.jzy.manager.exception.InvalidFileInputException;
-import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.model.dto.*;
 import com.jzy.model.entity.User;
 import org.springframework.web.multipart.MultipartFile;
@@ -223,7 +222,7 @@ public interface UserService {
      * 6. "phoneRepeat"：电话重复
      * 7."success": 更新成功
      */
-    UpdateResult insertUser(User user);
+    UpdateResult insertOneUser(User user);
 
     /**
      * 根据id删除一个用户。
@@ -252,9 +251,8 @@ public interface UserService {
      *
      * @param users 要更新的用户信息集合
      * @return 更新结果
-     * @throws InvalidParameterException 不合法的入参异常
      */
-    UpdateResult insertAndUpdateUsersFromExcel(List<User> users) throws InvalidParameterException;
+    DefaultFromExcelUpdateResult insertAndUpdateUsersFromExcel(List<User> users);
 
     /**
      * 根据工号更新用户信息

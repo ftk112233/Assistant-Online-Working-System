@@ -7,8 +7,8 @@ import com.jzy.manager.constant.ModelConstants;
 import com.jzy.manager.exception.*;
 import com.jzy.manager.util.UserUtils;
 import com.jzy.model.RoleEnum;
+import com.jzy.model.dto.DefaultFromExcelUpdateResult;
 import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.UpdateResult;
 import com.jzy.model.dto.UserSearchCondition;
 import com.jzy.model.entity.User;
 import com.jzy.model.excel.Excel;
@@ -221,7 +221,7 @@ public class UserAdminController extends AbstractController {
      */
     @RequestMapping("/insert")
     @ResponseBody
-    public Map<String, Object> insert(User user){
+    public Map<String, Object> insert(User user) {
         Map<String, Object> map = new HashMap<>(1);
 
         if (!UserUtils.isValidUserInsertInfo(user)) {
@@ -230,7 +230,7 @@ public class UserAdminController extends AbstractController {
             throw new InvalidParameterException(msg);
         }
 
-        map.put("data", userService.insertUser(user).getResult());
+        map.put("data", userService.insertOneUser(user).getResult());
 
         return map;
     }
@@ -384,30 +384,37 @@ public class UserAdminController extends AbstractController {
                 return map;
             }
 
+            String msg = Constants.SUCCESS;
+            DefaultFromExcelUpdateResult r = new DefaultFromExcelUpdateResult();
             if (type.equals(1)) {
                 try {
-                    UpdateResult useResult = userService.insertAndUpdateUsersFromExcel(excel.getUsers());
-                    databaseInsertRowCount += (int) useResult.getInsertCount();
-                    databaseUpdateRowCount += (int) useResult.getUpdateCount();
+                    r = userService.insertAndUpdateUsersFromExcel(excel.getUsers());
                 } catch (Exception e) {
                     e.printStackTrace();
                     map.put("msg", Constants.FAILURE);
                     return map;
                 }
             } else if (type.equals(2)) {
+                DefaultFromExcelUpdateResult userResult = null;
+                DefaultFromExcelUpdateResult assistantResult = null;
                 try {
-                    UpdateResult userResult = userService.insertAndUpdateUsersFromExcel(excel.getUsers());
-                    databaseInsertRowCount += (int) userResult.getInsertCount();
-                    databaseUpdateRowCount += (int) userResult.getUpdateCount();
+                    userResult = userService.insertAndUpdateUsersFromExcel(excel.getUsers());
+                    assistantResult = assistantService.insertAndUpdateAssistantsFromExcel(excel.getAssistants());
+                    r = userResult.merge(assistantResult);
 
-                    UpdateResult assistantResult = assistantService.insertAndUpdateAssistantsFromExcel(excel.getAssistants());
-                    databaseInsertRowCount += (int) assistantResult.getInsertCount();
-                    databaseUpdateRowCount += (int) assistantResult.getUpdateCount();
                 } catch (Exception e) {
                     e.printStackTrace();
                     map.put("msg", Constants.FAILURE);
                     return map;
                 }
+            }
+
+            databaseInsertRowCount += (int) r.getInsertCount();
+            databaseUpdateRowCount += (int) r.getUpdateCount();
+            if (Constants.EXCEL_INVALID_DATA.equals(r.getResult())) {
+                map.put("invalidCount", r.getMaxInvalidCount());
+                map.put("whatInvalid", r.showValidData());
+                msg = r.getResult();
             }
 
             long endTime = System.currentTimeMillis(); //获取结束时间
@@ -422,7 +429,7 @@ public class UserAdminController extends AbstractController {
             map.put("excelSpeed", speedOfExcelImport);
             map.put("databaseSpeed", speedOfDatabaseImport);
 
-            map.put("msg", Constants.SUCCESS);
+            map.put("msg", msg);
         }
 
 

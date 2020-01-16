@@ -106,7 +106,7 @@ public class TeacherAdminController extends AbstractController {
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
-        map.put("data", teacherService.insertTeacher(teacher).getResult());
+        map.put("data", teacherService.insertOneTeacher(teacher).getResult());
 
         return map;
     }

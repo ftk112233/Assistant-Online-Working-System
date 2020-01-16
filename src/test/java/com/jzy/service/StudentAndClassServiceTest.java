@@ -30,7 +30,7 @@ public class StudentAndClassServiceTest extends BaseTest {
 
     @Test
     public void insertAndUpdateStudentAndClassesFromExcel() throws Exception {
-        StudentListImportToDatabaseExcel excel = new StudentListImportToDatabaseExcel("D:\\aows_resources\\toolbox\\example\\秋下花名册.xls");
+        StudentListImportToDatabaseExcel excel = new StudentListImportToDatabaseExcel("C:\\Users\\92970\\Desktop\\花名册1.xlsx");
         excel.readStudentAndClassInfoFromExcel();
         studentAndClassService.insertAndUpdateStudentAndClassesFromExcel(excel.getStudentAndClassDetailedDtos());
 
@@ -69,4 +69,5 @@ public class StudentAndClassServiceTest extends BaseTest {
         condition.setClassSeason("秋下");
         System.out.println(studentAndClassService.countStudentsGroupByClassSubjectAndType(condition));
     }
+
 }

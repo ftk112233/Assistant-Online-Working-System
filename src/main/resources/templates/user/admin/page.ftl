@@ -115,23 +115,6 @@
                                                                 4、其他：<br>
                                                                     1)导入用户后，密码默认初始化为身份证，用以初次登陆<br>
                                                                                         "></i>
-                &nbsp;
-                <button class="layui-btn layuiadmin-btn-comm" data-type="batchdel" style="background-color: #01AAED"
-                        id="import-user-and-assistant"><i class="layui-icon">&#xe67c;</i>导入用户和助教
-                </button>
-                <i class="layui-icon layui-icon-tips" lay-tips="上传excel要求说明：<br>
-                                                                1、第1行、第2行与导入无关。有效内容从第3行开始，第3行为列名属性：序号、部门、校区、姓名、员工号等......<br>
-                                                                2、第3行所有列名属性中系统将读取以下名称的列导入数据库，这些列的先后顺序无关，但列名称必须与要求相符（如下所示）！！<br>
-                                                                    ====部门、校区、姓名、员工号、身份证号、手机号码、备注====<br>
-                                                                3、第四行开始是数据:<br>
-                                                                    1)员工号必须唯一且准确<br>
-                                                                    2)身份证号必须唯一且准确<br>
-                                                                    3)手机号必须唯一且准确<br>
-                                                                    4)确保您当前要导入校区的助教信息表中没有姓名相同的助教，否则请联系系统管理员<br>
-                                                                4、其他：<br>
-                                                                    1)姓名导入助教表中时，对于重名助教会在重名的名字后面加'1'以区别<br>
-                                                                    2)导入用户后，密码默认初始化为身份证，用以初次登陆<br>
-                                                                                        "></i>
             </div>
             <table id="userTable" lay-filter="LAY-app-content-comm"></table>
             <script type="text/html" id="table-content-list1">
@@ -142,9 +125,9 @@
             </script>
         </div>
         <script type="text/html" id="imgTpl">
-                <div style="cursor: pointer;" onclick="show_img(this)">
-                    <img src="${ctx}/user/showIcon?userIcon={{ d.userIcon }}" style="height:50px;" id="icon">
-                </div>
+            <div style="cursor: pointer;" onclick="show_img(this)">
+                <img src="${ctx}/user/showIcon?userIcon={{ d.userIcon }}" style="height:50px;" id="icon">
+            </div>
 
         </script>
     </div>
@@ -180,7 +163,7 @@
                 , laytpl = layui.laytpl
                 , upload = layui.upload;
 
-        show_img =function(t) {
+        show_img = function (t) {
             var t = $(t).find("img");
             //页面层
             layer.open({
@@ -193,55 +176,6 @@
                 content: '<div style="text-align:center"><img style="height:600px;" src="' + $(t).attr('src') + '" /></div>'
             });
         };
-
-        upload.render({
-            elem: '#import-user-and-assistant'
-            , url: '${ctx}/user/admin/import'
-            , data: {
-                //上传用户和助教
-                type: 2
-            }
-            , accept: 'file' //普通文件
-            , exts: 'xls|xlsx' //允许上传的文件后缀
-            , before: function (obj) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
-                layer.load(1, {shade: [0.1, '#fff']}); //上传loading
-            }
-            , done: function (res) {//返回值接收
-                layer.closeAll('loading'); //关闭loading
-                if (res.msg === "success") {
-                    return layer.alert('导入成功！' + '<br>' +
-                            '总耗时：' + res.excelSpeed.parsedTime + '<br>' +
-                            '导入表格记录数：' + res.excelSpeed.count + '条；平均速度：' + res.excelSpeed.parsedSpeed + '。<br>' +
-                            '变更数据库记录数：删除' + res.databaseSpeed.deleteCount + '条；插入' + res.databaseSpeed.insertCount
-                            + '条；更新' + res.databaseSpeed.updateCount + '条；平均速度：' + res.databaseSpeed.parsedSpeed + '。', {
-                        skin: 'layui-layer-molv' //样式类名
-                        , closeBtn: 0
-                    });
-                }else if (res.msg === "tooManyRows") {
-                    return layer.alert('输入表格的行数过多。最大行数限制：' + res.rowCountThreshold + '，实际行数：' + res.actualRowCount + '。尝试删除最后多余的空白行？“ctrl+shift+↓”，“右键”，“删除”，“整行”', {
-                        skin: 'layui-layer-lan'
-                        , closeBtn: 0
-                    });
-                } else if (res.msg === "excelColumnNotFound") {
-                    return layer.alert('未找到名称为"' + res.whatWrong + '"的列!', {
-                        skin: 'layui-layer-lan'
-                        , closeBtn: 0
-                    });
-                } else {
-                    return layer.alert('导入失败!', {
-                        skin: 'layui-layer-lan'
-                        , closeBtn: 0
-                    });
-                }
-            }
-            , error: function () {
-                layer.closeAll('loading'); //关闭loading
-                return layer.alert('导入失败!', {
-                    skin: 'layui-layer-lan'
-                    , closeBtn: 0
-                });
-            }
-        });
 
 
         upload.render({
@@ -267,18 +201,28 @@
                         skin: 'layui-layer-molv' //样式类名
                         , closeBtn: 0
                     });
-                }else if (res.msg === "tooManyRows") {
+                } else if (res.msg === "tooManyRows") {
                     return layer.alert('输入表格的行数过多。最大行数限制：' + res.rowCountThreshold + '，实际行数：' + res.actualRowCount + '。尝试删除最后多余的空白行？“ctrl+shift+↓”，“右键”，“删除”，“整行”', {
                         skin: 'layui-layer-lan'
                         , closeBtn: 0
                     });
-                } else if (res.msg === "excelColumnNotFound") {
-                    return layer.alert('未找到名称为"' + res.whatWrong + '"的列!', {
+                } else if (res.msg === "invalidData") {
+                    return layer.alert('需要引起注意！' + '<br>' +
+                            '总耗时：' + res.excelSpeed.parsedTime + '<br>' +
+                            '导入表格记录数：' + res.excelSpeed.count + '条；平均速度：' + res.excelSpeed.parsedSpeed + '。<br>' +
+                            '变更数据库记录数：删除' + res.databaseSpeed.deleteCount + '条；插入' + res.databaseSpeed.insertCount
+                            + '条；更新' + res.databaseSpeed.updateCount + '条；平均速度：' + res.databaseSpeed.parsedSpeed + '。' + '<br>' +
+                            '不合法而未被更新的记录：' + res.invalidCount + '条。所在位置[(列名=值),...]：' + res.whatInvalid, {
+                        skin: 'layui-layer-lan' //样式类名
+                        , closeBtn: 0
+                    });
+                } else if (res.msg === "invalidData") {
+                    return layer.alert('表格中存在不合法的数据!', {
                         skin: 'layui-layer-lan'
                         , closeBtn: 0
                     });
-                }else {
-                    return layer.alert('导入失败!', {
+                } else {
+                    return layer.alert('导入失败!检查数据准确性？', {
                         skin: 'layui-layer-lan'
                         , closeBtn: 0
                     });
@@ -627,7 +571,7 @@
                     ,
                     title: '编辑用户'
                     ,
-                    content: '${ctx}/user/admin/updateForm?id=' + data.id + '&userRole=' + data.userRole+'&userIcon=' + data.userIcon
+                    content: '${ctx}/user/admin/updateForm?id=' + data.id + '&userRole=' + data.userRole + '&userIcon=' + data.userIcon
                     ,
                     maxmin: true
                     ,
@@ -646,7 +590,7 @@
                                 , userIdCard: field.idCard
                                 , userName: field.userName
                                 , userRealName: field.userRealName
-                                , userIcon :field.hiddenIconUrl
+                                , userIcon: field.hiddenIconUrl
                                 , userRole: field.userRole
                                 , userEmail: field.userEmail
                                 , userPhone: field.userPhone
@@ -685,7 +629,7 @@
                                         return layer.msg('对不起，该电话已存在！');
                                     } else if (data.data === "unchanged") {
                                         return layer.msg('未做任何修改');
-                                    }else {
+                                    } else {
                                         return layer.msg('未知错误');
                                     }
                                 }

@@ -68,7 +68,7 @@ public class MissLessonStudentServiceImpl extends AbstractServiceImpl implements
     }
 
     @Override
-    public String insertMissLessonStudent(MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
+    public String insertOneMissLessonStudent(MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
         if (missLessonStudentDetailedDto == null) {
             return Constants.FAILURE;
         }
@@ -83,7 +83,7 @@ public class MissLessonStudentServiceImpl extends AbstractServiceImpl implements
             return CURRENT_CLASS_NOT_EXIST;
         }
 
-        missLessonStudentMapper.insertMissLessonStudent(missLessonStudentDetailedDto);
+        missLessonStudentMapper.insertOneMissLessonStudent(missLessonStudentDetailedDto);
         return Constants.SUCCESS;
     }
 

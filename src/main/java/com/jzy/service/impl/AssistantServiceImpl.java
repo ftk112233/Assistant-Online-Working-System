@@ -4,12 +4,11 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.AssistantMapper;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.AssistantUtils;
 import com.jzy.manager.util.MyStringUtils;
-import com.jzy.model.dto.AssistantSearchCondition;
-import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.UpdateResult;
+import com.jzy.model.dto.*;
 import com.jzy.model.entity.Assistant;
 import com.jzy.service.AssistantService;
 import org.apache.commons.lang3.StringUtils;
@@ -70,7 +69,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     }
 
     @Override
-    public UpdateResult insertAssistant(Assistant assistant) {
+    public UpdateResult insertOneAssistant(Assistant assistant) {
         if (assistant == null) {
             return new UpdateResult(Constants.FAILURE);
         }
@@ -106,7 +105,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
         }
 
         UpdateResult result = new UpdateResult(Constants.SUCCESS);
-        result.setInsertCount(assistantMapper.insertAssistant(assistant));
+        result.setInsertCount(assistantMapper.insertOneAssistant(assistant));
         return result;
     }
 
@@ -183,23 +182,27 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     }
 
     @Override
-    public UpdateResult insertAndUpdateAssistantsFromExcel(List<Assistant> assistants) throws InvalidParameterException {
+    public DefaultFromExcelUpdateResult insertAndUpdateAssistantsFromExcel(List<Assistant> assistants){
         if (assistants == null) {
             String msg = "insertAndUpdateAssistantsFromExcel方法输入助教assistant为null!";
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
-        UpdateResult result = new UpdateResult();
+        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(Constants.SUCCESS);
+        String userRealNameKeyword = ExcelConstants.REAL_NAME_COLUMN;
+        InvalidData invalidData = new InvalidData(userRealNameKeyword);
         for (Assistant assistant : assistants) {
             if (AssistantUtils.isValidAssistantInfo(assistant)) {
                 result.add(insertAndUpdateOneAssistantFromExcel(assistant));
             } else {
                 String msg = "表格输入的助教assistant不合法!";
                 logger.error(msg);
-                throw new InvalidParameterException(msg);
+                result.setResult(Constants.EXCEL_INVALID_DATA);
+                invalidData.putValue(userRealNameKeyword, assistant.getAssistantName());
             }
         }
-        result.setResult(Constants.SUCCESS);
+        result.setInvalidData(invalidData);
+
         return result;
     }
 
@@ -213,6 +216,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
      *
      * @param assistant 输入的助教
      * @return (更新结果 ， 更新记录数)
+     * @throws InvalidParameterException 不合法输入助教
      */
     private UpdateResult insertAndUpdateOneAssistantFromExcel(Assistant assistant) throws InvalidParameterException {
         if (assistant == null) {

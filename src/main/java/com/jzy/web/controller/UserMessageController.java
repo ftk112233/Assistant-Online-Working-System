@@ -295,7 +295,7 @@ public class UserMessageController extends AbstractController {
             throw new InvalidParameterException(msg);
         }
 
-        map.put("data", userMessageService.insertUserMessage(message));
+        map.put("data", userMessageService.insertOneUserMessage(message));
 
         return map;
     }

@@ -62,6 +62,8 @@ public class Constants {
 
     public static final String EXCEL_TOO_MANY_ROWS = "tooManyRows";
 
+    public static final String EXCEL_INVALID_DATA = "invalidData";
+
     public static final String ON = "on";
 
     public static final String YES = "yes";

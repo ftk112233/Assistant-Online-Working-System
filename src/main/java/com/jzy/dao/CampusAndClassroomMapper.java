@@ -44,7 +44,7 @@ public interface CampusAndClassroomMapper {
      * @param campusAndClassroom 要插入的对象
      * @return 更新记录数
      */
-    long insertCampusAndClassroom(CampusAndClassroom campusAndClassroom);
+    long insertOneCampusAndClassroom(CampusAndClassroom campusAndClassroom);
 
     /**
      * 根据校区查询相应教室

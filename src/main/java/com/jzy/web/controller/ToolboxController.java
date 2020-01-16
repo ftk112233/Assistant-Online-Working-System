@@ -258,7 +258,7 @@ public class ToolboxController extends AbstractController {
 
             if (Constants.ON.equals(magic)) {
                 //若打开黑魔法，从数据库解析
-                results = studentAndClassService.listStudentAndClassesWithSubjectsByClassId(classDetailedDto.getClassId());
+                results = studentAndClassService.listStudentAndClassesByClassId(classDetailedDto.getClassId());
 
             } else {
                 Long id = userService.getSessionUserInfo().getId();
@@ -471,7 +471,7 @@ public class ToolboxController extends AbstractController {
                 //若打开自动同步
                 //数据添加补课学生记录
                 if (MissLessonStudentUtils.isValidMissLessonStudentUpdateInfo(missLessonStudentDetailedDto)) {
-                    missLessonStudentService.insertMissLessonStudent(missLessonStudentDetailedDto);
+                    missLessonStudentService.insertOneMissLessonStudent(missLessonStudentDetailedDto);
                 }
 
                 //向原班助教和补课班助教发送消息
@@ -537,7 +537,7 @@ public class ToolboxController extends AbstractController {
         originalMessage.setMessageContent(originalMessageContent.toString());
         originalMessage.setMessageTime(new Date());
         if (UserMessageUtils.isValidUserMessageUpdateInfo(originalMessage)) {
-            userMessageService.insertUserMessage(originalMessage);
+            userMessageService.insertOneUserMessage(originalMessage);
         }
 
         return originalUser;
@@ -575,7 +575,7 @@ public class ToolboxController extends AbstractController {
         currentMessage.setMessageContent(currentMessageContent.toString());
         currentMessage.setMessageTime(new Date());
         if (UserMessageUtils.isValidUserMessageUpdateInfo(currentMessage)) {
-            userMessageService.insertUserMessage(currentMessage);
+            userMessageService.insertOneUserMessage(currentMessage);
         }
 
         return currentUser;
@@ -702,7 +702,7 @@ public class ToolboxController extends AbstractController {
                 campusAndClassroom.setCampus(classCampus);
                 //插入数据库
                 if (CampusAndClassroomUtils.isValidCampusAndClassroomUpdateInfo(campusAndClassroom)) {
-                    campusAndClassroomService.insertCampusAndClassroom(campusAndClassroom);
+                    campusAndClassroomService.insertOneCampusAndClassroom(campusAndClassroom);
                 } else {
                     logger.error("上传模板失败");
                     map.put("msg", Constants.FAILURE);

@@ -16,7 +16,7 @@
         <result column="assistant_phone" property="assistantPhone" jdbcType="VARCHAR"/>
         <result column="assistant_remark" property="assistantRemark" jdbcType="VARCHAR"/>
     </resultMap>
-    <insert id="insertAssistant" parameterType="com.jzy.model.entity.Assistant">
+    <insert id="insertOneAssistant" parameterType="com.jzy.model.entity.Assistant">
         insert into assistant
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="assistantWorkId != null and assistantWorkId!=''">

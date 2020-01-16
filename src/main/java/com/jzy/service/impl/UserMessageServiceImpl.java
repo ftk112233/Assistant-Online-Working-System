@@ -150,13 +150,26 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
     }
 
     @Override
-    public String insertUserMessage(UserMessage userMessage) {
+    public String insertOneUserMessage(UserMessage userMessage) {
         if (userMessage == null) {
             return Constants.FAILURE;
         }
         /*
          * 用户上传的图片的处理
          */
+        dealWithUserMessagePictureByRenaming(userMessage);
+
+        userMessageMapper.insertOneUserMessage(userMessage);
+        return Constants.SUCCESS;
+    }
+
+    /**
+     * 用户上传的图片的处理。对用户上传的图片：如果不是欢迎图片，就要做重命名。
+     *
+     * @param userMessage 用户消息对象入参
+     * @return 处理过图片字段的入参用户消息对象直接返回
+     */
+    private UserMessage dealWithUserMessagePictureByRenaming(UserMessage userMessage) {
         if (!userMessage.isWelcomePicture()) {
             //如果不是欢迎图片，就要做重命名
             if (!StringUtils.isEmpty(userMessage.getMessagePicture())) {
@@ -171,9 +184,7 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
             }
         }
 
-
-        userMessageMapper.insertUserMessage(userMessage);
-        return Constants.SUCCESS;
+        return userMessage;
     }
 
     @Override
@@ -189,7 +200,6 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
             logger.error(msg);
             throw new InvalidFileInputException(msg);
         }
-
 
         String originalFilename = file.getOriginalFilename();
         String idStr;
@@ -215,11 +225,27 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
             return Constants.FAILURE;
         }
 
+        /*
+         * 用户上传的图片的处理
+         */
+        dealWithUserMessagesPicturesByCopyingAndDelete(userMessages);
+
+        //插入
+        userMessageMapper.insertManyUserMessages(userMessages);
+
+        return Constants.SUCCESS;
+    }
+
+    /**
+     * 对于批量的用户消息，对用户上传的图片的处理。
+     * 对用户上传的图片：如果不是欢迎图片，就先对发送方的图片复制，最后再将原图删除。
+     *
+     * @param userMessages 批量用户消息对象入参
+     * @return 处理过图片字段的入参批量用户消息对象直接返回
+     */
+    private List<UserMessage> dealWithUserMessagesPicturesByCopyingAndDelete(List<UserMessage> userMessages) throws Exception {
         String originalFile = "";
         for (UserMessage message : userMessages) {
-            /*
-             * 用户上传的图片的处理
-             */
             if (!StringUtils.isEmpty(message.getMessagePicture())) {
                 //如果用户上传了新图片
                 //将上传的新图片文件重名为含日期时间的newUserIconName，该新文件名用来保存到数据库
@@ -231,8 +257,6 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
             } else {
                 message.setMessagePicture(null);
             }
-
-            userMessageMapper.insertUserMessage(message);
         }
 
         //删除原来上传的文件
@@ -240,6 +264,6 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
             FileUtils.deleteFile(filePathProperties.getUserMessagePictureDirectory() + originalFile);
         }
 
-        return Constants.SUCCESS;
+        return userMessages;
     }
 }

@@ -76,7 +76,7 @@ public class CampusAndClassroomServiceImpl extends AbstractServiceImpl implement
     }
 
     @Override
-    public String insertCampusAndClassroom(CampusAndClassroom campusAndClassroom) {
+    public String insertOneCampusAndClassroom(CampusAndClassroom campusAndClassroom) {
         if (campusAndClassroom == null) {
             return Constants.FAILURE;
         }
@@ -85,7 +85,7 @@ public class CampusAndClassroomServiceImpl extends AbstractServiceImpl implement
             return CAMPUS_AND_CLASSROOM_REPEAT;
         }
 
-        campusAndClassroomMapper.insertCampusAndClassroom(campusAndClassroom);
+        campusAndClassroomMapper.insertOneCampusAndClassroom(campusAndClassroom);
         return Constants.SUCCESS;
     }
 }

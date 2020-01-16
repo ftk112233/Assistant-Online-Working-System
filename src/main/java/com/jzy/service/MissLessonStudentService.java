@@ -46,7 +46,7 @@ public interface MissLessonStudentService {
      * 3."currentClassNotExist"：补课班号不存在
      * 4."success": 更新成功
      */
-    String insertMissLessonStudent(MissLessonStudentDetailedDto missLessonStudentDetailedDto);
+    String insertOneMissLessonStudent(MissLessonStudentDetailedDto missLessonStudentDetailedDto);
 
     /**
      * 删除一个补课学生记录

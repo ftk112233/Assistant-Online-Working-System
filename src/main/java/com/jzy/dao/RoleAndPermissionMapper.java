@@ -61,7 +61,7 @@ public interface RoleAndPermissionMapper {
      * @param roleAndPermission 新添加角色权限的信息
      * @return 更新记录数
      */
-    long insertRoleAndPermission(RoleAndPermission roleAndPermission);
+    long insertOneRoleAndPermission(RoleAndPermission roleAndPermission);
 
     /**
      * 根据id删除一个角色权限

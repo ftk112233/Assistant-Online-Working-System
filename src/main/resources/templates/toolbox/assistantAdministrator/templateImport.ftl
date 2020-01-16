@@ -151,7 +151,7 @@
                         , closeBtn: 0
                     });
                 } else {
-                    return layer.msg('导入失败', {
+                    return layer.msg('导入失败！检查数据准确性？', {
                         offset: '15px'
                         , icon: 2
                         , time: 2000

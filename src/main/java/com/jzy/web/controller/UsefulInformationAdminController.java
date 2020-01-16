@@ -233,7 +233,7 @@ public class UsefulInformationAdminController extends AbstractController {
             throw new InvalidParameterException(msg);
         }
 
-        map.put("data", usefulInformationService.insertUsefulInformation(information));
+        map.put("data", usefulInformationService.insertOneUsefulInformation(information));
 
         return map;
     }

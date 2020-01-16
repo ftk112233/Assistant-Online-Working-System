@@ -130,7 +130,7 @@ public interface UserMapper {
      * @param user 新用户信息
      * @return 更新记录数
      */
-    long insertUser(User user);
+    long insertOneUser(User user);
 
     /**
      * 根据id删除一个用户

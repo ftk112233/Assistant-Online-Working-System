@@ -8,10 +8,8 @@ import com.jzy.manager.util.ClassUtils;
 import com.jzy.manager.util.StudentUtils;
 import com.jzy.manager.util.UserMessageUtils;
 import com.jzy.model.dto.*;
-import com.jzy.model.entity.Assistant;
+import com.jzy.model.entity.*;
 import com.jzy.model.entity.Class;
-import com.jzy.model.entity.Student;
-import com.jzy.model.entity.UserMessage;
 import com.jzy.model.excel.Excel;
 import com.jzy.model.excel.ExcelVersionEnum;
 import com.jzy.model.excel.input.StudentListImportToDatabaseExcel;
@@ -87,6 +85,8 @@ public class StudentAdminController extends AbstractController {
         if (type != null) {
             StudentListImportToDatabaseExcel excel = null;
 
+            String msg = Constants.SUCCESS;
+            DefaultFromExcelUpdateResult r = new DefaultFromExcelUpdateResult();
             if (type.equals(1)) {
                 try {
                     excel = new StudentListImportToDatabaseExcel(file.getInputStream(), ExcelVersionEnum.getVersion(file.getOriginalFilename()));
@@ -113,9 +113,7 @@ public class StudentAdminController extends AbstractController {
                 }
 
                 try {
-                    UpdateResult studentResult = studentService.insertAndUpdateStudentsFromExcel(new ArrayList<>(excel.getStudents()));
-                    databaseInsertRowCount += (int) studentResult.getInsertCount();
-                    databaseUpdateRowCount += (int) studentResult.getUpdateCount();
+                    r = studentService.insertAndUpdateStudentsFromExcel(new ArrayList<>(excel.getStudents()));
 
                     if (deleteFirstChecked) {
                         //如果开启先导后删
@@ -165,9 +163,9 @@ public class StudentAdminController extends AbstractController {
                         databaseDeleteRowCount += (int) studentAndClassService.deleteStudentAndClassesByCondition(condition).getDeleteCount();
                     }
 
-                    UpdateResult studentAndClassResult = studentAndClassService.insertAndUpdateStudentAndClassesFromExcel(excel.getStudentAndClassDetailedDtos());
-                    databaseInsertRowCount += (int) studentAndClassResult.getInsertCount();
-                    databaseUpdateRowCount += (int) studentAndClassResult.getUpdateCount();
+                    DefaultFromExcelUpdateResult studentAndClassResult = studentAndClassService.insertAndUpdateStudentAndClassesFromExcel(excel.getStudentAndClassDetailedDtos());
+                    r.merge(studentAndClassResult);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     map.put("msg", Constants.FAILURE);
@@ -199,16 +197,22 @@ public class StudentAdminController extends AbstractController {
                 }
 
                 try {
-                    UpdateResult studentResult = studentService.insertAndUpdateStudentsDetailedFromExcel(new ArrayList<>(excel.getStudents()));
-                    databaseInsertRowCount += (int) studentResult.getInsertCount();
-                    databaseUpdateRowCount += (int) studentResult.getUpdateCount();
-
+                    r = studentService.insertAndUpdateStudentsDetailedFromExcel(new ArrayList<>(excel.getStudents()));
                 } catch (Exception e) {
                     e.printStackTrace();
                     map.put("msg", Constants.FAILURE);
                     return map;
                 }
             }
+
+            if (Constants.EXCEL_INVALID_DATA.equals(r.getResult())) {
+                map.put("invalidCount", r.getMaxInvalidCount());
+                map.put("whatInvalid", r.showValidData());
+                msg = r.getResult();
+            }
+
+            databaseInsertRowCount += (int) r.getInsertCount();
+            databaseUpdateRowCount += (int) r.getUpdateCount();
 
             long endTime = System.currentTimeMillis(); //获取结束时间
             Speed speedOfExcelImport = new Speed(excelEffectiveDataRowCount, endTime - startTime);
@@ -218,13 +222,19 @@ public class StudentAdminController extends AbstractController {
             map.put("excelSpeed", speedOfExcelImport);
             map.put("databaseSpeed", speedOfDatabaseImport);
 
-            map.put("msg", Constants.SUCCESS);
+            map.put("msg", msg);
 
             //向对应校区的用户发送通知消息
             if (excel != null && excel.getStudentAndClassDetailedDtos().size() > 0) {
                 StudentAndClassDetailedDto dto = excel.getStudentAndClassDetailedDtos().get(0);
                 Class clazz = classService.getClassByClassId(dto.getClassId());
-                sendMessageToUser(clazz);
+                try {
+                    sendMessageToUser(clazz);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    map.put("msg", Constants.FAILURE);
+                    return map;
+                }
             }
         }
 
@@ -236,7 +246,7 @@ public class StudentAdminController extends AbstractController {
      *
      * @param clazz 从更新的记录中选取一个班级为例，取其校区作为要通知的校区，clazz的其他信息也用于消息正文
      */
-    private void sendMessageToUser(Class clazz) {
+    private void sendMessageToUser(Class clazz) throws Exception {
         if (clazz != null) {
             clazz.setParsedClassYear();
             String campus = clazz.getClassCampus();
@@ -244,23 +254,28 @@ public class StudentAdminController extends AbstractController {
                 List<Assistant> assistants = assistantService.listAssistantsByCampus(campus);
                 List<Long> userIds = new ArrayList<>();
                 for (Assistant assistant : assistants) {
-                    userIds.add(userService.getUserByWorkId(assistant.getAssistantWorkId()).getId());
+                    User user=userService.getUserByWorkId(assistant.getAssistantWorkId());
+                    if (user != null) {
+                        userIds.add(user.getId());
+                    }
                 }
 
+                List<UserMessage> messages = new ArrayList<>();
                 for (Long userId : userIds) {
                     UserMessage message = new UserMessage();
                     message.setUserId(userId);
                     message.setUserFromId(userService.getSessionUserInfo().getId());
                     message.setMessageTitle("学员上课信息有变化");
-                    StringBuffer messageContent = new StringBuffer();
+                    StringBuilder messageContent = new StringBuilder();
                     messageContent.append("你的学管老师刚刚更新了" + clazz.getClassCampus() + "校区" + clazz.getClassYear() + "年" + clazz.getClassSeason() + "的学员上课信息。")
                             .append("<br>点<a lay-href='/studentAndClass/admin/page' lay-text='上课信息'>这里</a>前往查看。");
                     message.setMessageContent(messageContent.toString());
                     message.setMessageTime(new Date());
                     if (UserMessageUtils.isValidUserMessageUpdateInfo(message)) {
-                        userMessageService.insertUserMessage(message);
+                        messages.add(message);
                     }
                 }
+                userMessageService.insertManyUserMessages(messages);
             }
         }
     }
@@ -325,8 +340,17 @@ public class StudentAdminController extends AbstractController {
             return map;
         }
 
+        String msg = Constants.SUCCESS;
         try {
-            UpdateResult result = studentService.insertAndUpdateStudentsSchoolsFromExcel(excel.getStudents());
+            DefaultFromExcelUpdateResult result = studentService.insertAndUpdateStudentsSchoolsFromExcel(excel.getStudents());
+
+            if (Constants.EXCEL_INVALID_DATA.equals(result.getResult())) {
+                map.put("invalidCount", result.getMaxInvalidCount());
+                map.put("whatInvalid", result.showValidData());
+                msg = result.getResult();
+            }
+
+
             databaseInsertRowCount += (int) result.getInsertCount();
             databaseUpdateRowCount += (int) result.getUpdateCount();
 
@@ -338,8 +362,8 @@ public class StudentAdminController extends AbstractController {
             map.put("excelSpeed", speedOfExcelImport);
             map.put("databaseSpeed", speedOfDatabaseImport);
 
-            map.put("msg", Constants.SUCCESS);
-        } catch (Exception e) {
+            map.put("msg", msg);
+        }  catch (Exception e) {
             e.printStackTrace();
             map.put("msg", Constants.FAILURE);
             return map;
@@ -425,7 +449,7 @@ public class StudentAdminController extends AbstractController {
             throw new InvalidParameterException(msg);
         }
 
-        map.put("data", studentService.insertStudent(student).getResult());
+        map.put("data", studentService.insertOneStudent(student).getResult());
 
         return map;
     }
