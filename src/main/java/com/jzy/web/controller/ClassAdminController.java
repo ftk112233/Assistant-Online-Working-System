@@ -20,7 +20,6 @@ import com.jzy.model.vo.ResultMap;
 import com.jzy.model.vo.Speed;
 import com.jzy.model.vo.SqlProceedSpeed;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.StrBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -111,7 +110,7 @@ public class ClassAdminController extends AbstractController {
         try {
             excel = new ClassArrangementExcel(file.getInputStream(), ExcelVersionEnum.getVersion(file.getOriginalFilename()));
             excelEffectiveDataRowCount = excel.readClassDetailFromExcel();
-        } catch (IOException e) {
+        } catch (IOException | InvalidFileTypeException e) {
             e.printStackTrace();
             map.put("msg", Constants.FAILURE);
             return map;
@@ -119,10 +118,6 @@ public class ClassAdminController extends AbstractController {
             e.printStackTrace();
             map.put("msg", Constants.EXCEL_COLUMN_NOT_FOUND);
             map.put("whatWrong", e.getWhatWrong());
-            return map;
-        } catch (InvalidFileTypeException e) {
-            e.printStackTrace();
-            map.put("msg", Constants.FAILURE);
             return map;
         } catch (ExcelTooManyRowsException e) {
             e.printStackTrace();
@@ -192,7 +187,6 @@ public class ClassAdminController extends AbstractController {
             //向对应校区的用户发送通知消息
             if (classDetailedDtos.size() > 0) {
                 ClassDetailedDto classDetailedDto = classDetailedDtos.get(0);
-
                 sendMessageToUser(classDetailedDto);
 
                 if (chooseSeason) {
@@ -201,8 +195,6 @@ public class ClassAdminController extends AbstractController {
                     classService.updateCurrentClassSeason(currentClassSeason);
                 }
             }
-
-
         } catch (Exception e) {
             e.printStackTrace();
             map.put("msg", Constants.FAILURE);

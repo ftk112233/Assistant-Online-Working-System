@@ -188,4 +188,9 @@ public class ModelConstants {
      * 跳转批量发送消息页面时，存放的被发送方id列表信息的model键
      */
     public static final String USER_SEND_TO_IDS_MODEL_KEY = "userSendToIds";
+
+    /**
+     * 跳转做表班号入参不存在提示页面时，错误班号的model键
+     */
+    public static final String WRONG_CLASS_ID = "wrongClassId";
 }

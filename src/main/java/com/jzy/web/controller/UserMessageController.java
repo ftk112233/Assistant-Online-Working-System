@@ -396,9 +396,7 @@ public class UserMessageController extends AbstractController {
         if (!Constants.ON.equals(hide)) {
             //未开匿名
             userId = userService.getSessionUserInfo().getId();
-//            message.setUserFromId(userId);
         }
-//        message.setMessageTime(new Date());
 
         List<Long> idsParsed = JSON.parseArray(ids, Long.class);
 
@@ -458,9 +456,7 @@ public class UserMessageController extends AbstractController {
         if (!Constants.ON.equals(hide)) {
             //未开匿名
             userId = userService.getSessionUserInfo().getId();
-//            message.setUserFromId(userId);
         }
-//        message.setMessageTime(new Date());
 
         List<User> users = userService.listAllUsers();
 

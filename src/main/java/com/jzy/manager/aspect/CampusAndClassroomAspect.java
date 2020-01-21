@@ -22,9 +22,9 @@ public class CampusAndClassroomAspect {
     @Autowired
     private RedisOperation redisOperation;
 
-    @Pointcut("execution(* com.jzy.service.impl.CampusAndClassroomServiceImpl.insert*(..)) " +
-            "|| execution(* com.jzy.service.impl.CampusAndClassroomServiceImpl.update*(..))" +
-            "|| execution(* com.jzy.service.impl.CampusAndClassroomServiceImpl.delete*(..))")
+    @Pointcut("execution(* com.jzy.service.CampusAndClassroomService.insert*(..)) " +
+            "|| execution(* com.jzy.service.CampusAndClassroomService.update*(..))" +
+            "|| execution(* com.jzy.service.CampusAndClassroomService.delete*(..))")
     public void updatePoints() {
     }
 

@@ -42,6 +42,7 @@
                         <br>
                         <div class="layui-timeline-content layui-text">
                             <h3 class="layui-timeline-title">分享学生学校统计</h3>
+                            <p><em>大家做完开班工作后，可以将你们统计好的学生学校分享到网站上，下次导出表格时这些学生就都有学校， 不用再问家长啦。</em></p>
                             <p>上传excel要求说明：<a
                                     href="${ctx}/toolbox/assistantAdministrator/downloadExample/6">查看范例</a></p>
                             <ul>

@@ -197,8 +197,11 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
             // 填学员姓名
             this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentName, object.getStudentName());
             // 姓名背景色
-            this.updateCellBackgroundColor(CLASS_START_SHEET_INDEX, i+1, columnIndexOfStudentName, getBackGroundColorIndexByStudentOccurCount(object.getCountOfSpecifiedAssistant()));
-
+            int count=object.getCountOfSpecifiedAssistant();
+            if (count > 1) {
+                //如果同一助教半夏出现次数大于1才改填充色
+                this.updateCellBackgroundColor(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentName, getBackGroundColorIndexByStudentOccurCount(object.getCountOfSpecifiedAssistant()));
+            }
             // 填学员联系方式
             this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentPhone, object.getStudentPhone());
             // 填类别，是否老生

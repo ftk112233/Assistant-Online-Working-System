@@ -290,6 +290,8 @@ public class AuthenticationController extends AbstractController {
               success标志默认false，可以不写
              */
             result.setSuccess(false);
+
+            int wrongTimes = 1;
             if (!redisTemplate.hasKey(key)) {
                 //如果当前用户名没有登录失败次数的缓存，设为第一次登录失败
                 valueOps.set(key, "1");
@@ -298,10 +300,9 @@ public class AuthenticationController extends AbstractController {
                   登录失败次数加一，这里没有使用increment方法
                   因为redisTemplate配置中value序列化使用了GenericJackson2JsonRedisSerializer，这会导致该方法报String转换错误
                  */
-                int wrongTimes = Integer.parseInt((String) valueOps.get(key));
+                wrongTimes = Integer.parseInt((String) valueOps.get(key));
                 valueOps.set(key, wrongTimes + 1 + "");
             }
-            int wrongTimes = Integer.parseInt((String) valueOps.get(key));
             result.setWrongTimes(wrongTimes);
 
             //设置当前用户登录错误的缓存有效期15分钟
@@ -506,12 +507,7 @@ public class AuthenticationController extends AbstractController {
                     subject.login(token);
                     //登录成功，设置用户信息到session。注意这里的用户应该是游客！
                     User guest = new User();
-                    guest.setId(Constants.GUEST_ID);
-                    guest.setUserWorkId(UUID.randomUUID().toString());
-                    guest.setUserName(UUID.randomUUID().toString());
-                    guest.setUserRealName(CodeUtils.randomCodes());
-                    guest.setUserRole(RoleEnum.GUEST.getRole());
-                    guest.setDefaultUserIcon();
+                    setGuestSessionInfo(guest);
                     session.setAttribute(SessionConstants.USER_INFO_SESSION_KEY, guest);
                     map.put("data", Constants.SUCCESS);
                 } catch (AuthenticationException e) {
@@ -530,6 +526,25 @@ public class AuthenticationController extends AbstractController {
             map.put("data", Constants.UNKNOWN_ERROR);
         }
         return map;
+    }
+
+    /**
+     * 设置登录成功后游客的session中user信息
+     *
+     * @param newGuest 登录成功后的新游客用户对象
+     * @return 设置好信息后的游客用户对象
+     */
+    private User setGuestSessionInfo(User newGuest) {
+        if (newGuest == null) {
+            newGuest = new User();
+        }
+        newGuest.setId(Constants.GUEST_ID);
+        newGuest.setUserWorkId(UUID.randomUUID().toString());
+        newGuest.setUserName(UUID.randomUUID().toString());
+        newGuest.setUserRealName(CodeUtils.randomCodes());
+        newGuest.setUserRole(RoleEnum.GUEST.getRole());
+        newGuest.setDefaultUserIcon();
+        return newGuest;
     }
 
 }

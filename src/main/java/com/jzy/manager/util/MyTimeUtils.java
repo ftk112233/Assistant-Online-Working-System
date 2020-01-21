@@ -1,11 +1,13 @@
 package com.jzy.manager.util;
 
+import com.jzy.model.dto.MissLessonStudentDetailedDto;
+import com.jzy.model.dto.MissManyDaysLessonStudentDetailedDto;
+import org.apache.commons.lang3.time.DateUtils;
+
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * @author JinZhiyun
@@ -154,6 +156,13 @@ public class MyTimeUtils {
         return stringToDate(strDate, FORMAT_YMDHMS);
     }
 
+    /**
+     * 将短时间格式字符串转换为时间，手动指定格式
+     *
+     * @param strDate 短时间格式字符串
+     * @param formatStr format格式化字符串
+     * @return date时间
+     */
     public static Date stringToDate(String strDate, String formatStr) {
         SimpleDateFormat formatter = new SimpleDateFormat(formatStr);
         ParsePosition pos = new ParsePosition(0);
@@ -204,5 +213,125 @@ public class MyTimeUtils {
         Calendar cal = Calendar.getInstance();
         int day = cal.get(Calendar.DATE);
         return day;
+    }
+
+    /**
+     * 获得date下一天的日期
+     *
+     * @param date 指定日期
+     * @return 指定日期下一天的日期
+     */
+    public static Date getNextDay(Date date) {
+        return getFutureDay(date, 1);
+    }
+
+    /**
+     * 获取date的daysInterval天后的日期
+     *
+     * @param date 指定date
+     * @param daysInterval 多少天后
+     * @return daysInterval天后的日期
+     */
+    public static Date getFutureDay(Date date, int daysInterval) {
+        if (date == null){
+            return null;
+        }
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        int day1 = c.get(Calendar.DATE);
+        c.set(Calendar.DATE, day1 +daysInterval);
+
+        return c.getTime();
+    }
+
+    /**
+     * 获取指定天的前一天
+     *
+     * @param date 指定日期
+     * @return 指定日期前一天的日期
+     */
+    public static Date getLastDay(Date date) {
+        return getFutureDay(date, -1);
+    }
+
+    /**
+     * 获取date的daysInterval天前的日期
+     *
+     * @param date 指定date
+     * @param daysInterval 多少天前
+     * @return daysInterval天前的日期
+     */
+    public static Date getPastDay(Date date, int daysInterval) {
+        return getFutureDay(date, 0-daysInterval);
+    }
+
+    /**
+     * 判断d1和d2是否是同一天
+     *
+     * @param d1 日期1
+     * @param d2 日期2
+     * @return 是否是同一天
+     */
+    public static boolean isSameDay(Date d1, Date d2){
+        return DateUtils.isSameDay(d1, d2);
+    }
+
+    /**
+     * 获取startDay和endDay之间的所有日期
+     *
+     * @param startDay 起始天
+     * @param endDay 结束天
+     * @return 区间的所有日期
+     */
+    public static List<Date> getDaysBetween(Date startDay, Date endDay){
+        List<Date> days=new ArrayList<>();
+
+        if (startDay == null){
+            return days;
+        }
+
+        if (endDay == null){
+            //endDay为空，默认只返回startDay
+            days.add(startDay);
+            return days;
+        }
+
+        if (endDay.before(startDay)){
+            //如果终止日期小于起始日期，返回空列表
+            return days;
+        }
+
+        Date d=startDay;
+        do{
+            days.add(d);
+            d=getNextDay(d);
+        } while (!d.after(endDay));
+
+        return days;
+    }
+
+    public static void main(String[] args) {
+        String day = "2018-03-19";
+        Calendar c = Calendar.getInstance();
+        Date date = null;
+        try {
+            date = new SimpleDateFormat("yy-MM-dd").parse(day);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        c.setTime(date);
+        int day1 = c.get(Calendar.DATE);
+        c.set(Calendar.DATE, day1 - 1);
+
+        String dayAfter = new SimpleDateFormat("yyyy-MM-dd").format(c.getTime());
+        System.out.println(dayAfter);
+
+
+        Date end=stringToDateYMD("2018-3-10");
+        System.out.println(getDaysBetween(date, null));
+        System.out.println(getDaysBetween(date, end).size());
+
+        MissManyDaysLessonStudentDetailedDto dto=new MissManyDaysLessonStudentDetailedDto();
+        MissLessonStudentDetailedDto dto1=dto;
     }
 }

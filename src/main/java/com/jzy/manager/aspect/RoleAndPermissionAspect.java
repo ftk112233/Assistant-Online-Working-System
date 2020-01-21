@@ -22,9 +22,9 @@ public class RoleAndPermissionAspect {
     @Autowired
     private RedisOperation redisOperation;
 
-    @Pointcut("execution(* com.jzy.service.impl.RoleAndPermissionServiceImpl.insert*(..)) " +
-            "|| execution(* com.jzy.service.impl.RoleAndPermissionServiceImpl.update*(..))" +
-            "|| execution(* com.jzy.service.impl.RoleAndPermissionServiceImpl.delete*(..))")
+    @Pointcut("execution(* com.jzy.service.RoleAndPermissionService.insert*(..)) " +
+            "|| execution(* com.jzy.service.RoleAndPermissionService.update*(..))" +
+            "|| execution(* com.jzy.service.RoleAndPermissionService.delete*(..))")
     public void updatePoints() {
     }
 

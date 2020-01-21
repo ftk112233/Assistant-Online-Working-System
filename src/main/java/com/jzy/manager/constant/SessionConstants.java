@@ -1,7 +1,5 @@
 package com.jzy.manager.constant;
 
-import com.google.code.kaptcha.Constants;
-
 /**
  * @author JinZhiyun
  * @version 1.0
@@ -16,7 +14,7 @@ public class SessionConstants {
     /**
      * KAPTCHA图形验证码session的键
      */
-    public static final String KAPTCHA_SESSION_KEY = Constants.KAPTCHA_SESSION_KEY;
+    public static final String KAPTCHA_SESSION_KEY = com.google.code.kaptcha.Constants.KAPTCHA_SESSION_KEY;
 
     /**
      * 用户登录信息session的键

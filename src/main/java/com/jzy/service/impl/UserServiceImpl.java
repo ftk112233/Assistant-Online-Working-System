@@ -533,7 +533,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         message.setUserId(id);
         message.setUserFromId(Constants.ADMIN_USER_ID);
         message.setMessageTitle("欢迎使用AOWS-优能助教在线工作平台");
-        StringBuffer messageContent = new StringBuffer();
+        StringBuilder messageContent = new StringBuilder();
         messageContent.append(user.getUserRole() + "-" + user.getUserRealName()).append("，欢迎使用AOWS-优能助教在线工作平台！")
                 .append("<br>为了您的账号安全，请尽快修改默认密码。也推荐绑定安全邮箱便于找回密码以及安全验证！")
                 .append("<br>常用功能：")

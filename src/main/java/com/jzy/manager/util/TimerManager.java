@@ -68,7 +68,7 @@ public class TimerManager {
     /**
      * 开启一个每天执行一次的定时任务线程，默认执行时间每天凌晨两点
      *
-     * @param task
+     * @param task 任务
      */
     public static void startDailyTask(TimerTask task) {
         startDailyTask(task, TASK_HOUR_2, TASK_MINUTE_0, TASK_SECOND_0);
@@ -79,7 +79,7 @@ public class TimerManager {
      *
      * @param date 第一次执行定时任务的时间
      * @param num  下一次执行任务增加的天数
-     * @return
+     * @return num天后的date
      */
     private static Date addDay(Date date, int num) {
         Calendar startDT = Calendar.getInstance();

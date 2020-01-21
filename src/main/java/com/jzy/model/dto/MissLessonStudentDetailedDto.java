@@ -120,7 +120,6 @@ public class MissLessonStudentDetailedDto extends BaseEntity {
      */
     private String currentTeacherName;
 
-
     /**
      * 补课的日期
      */
@@ -132,5 +131,4 @@ public class MissLessonStudentDetailedDto extends BaseEntity {
      * 备注，可以为空，或不超过500个字符
      */
     private String remark;
-
 }

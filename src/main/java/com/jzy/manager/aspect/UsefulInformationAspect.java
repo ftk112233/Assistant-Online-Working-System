@@ -22,14 +22,15 @@ public class UsefulInformationAspect {
     @Autowired
     private RedisOperation redisOperation;
 
-    @Pointcut("execution(* com.jzy.service.impl.UsefulInformationServiceImpl.insert*(..)) " +
-            "|| execution(* com.jzy.service.impl.UsefulInformationServiceImpl.update*(..))" +
-            "|| execution(* com.jzy.service.impl.UsefulInformationServiceImpl.delete*(..))")
+    @Pointcut("execution(* com.jzy.service.UsefulInformationService.insert*(..)) " +
+            "|| execution(* com.jzy.service.UsefulInformationService.update*(..))" +
+            "|| execution(* com.jzy.service.UsefulInformationService.delete*(..))")
     public void updatePoints() {
     }
 
     /**
      * 在CampusAndClassroom被更新后，清空redis缓存
+     *
      * @param jp
      */
     @AfterReturning("updatePoints()")

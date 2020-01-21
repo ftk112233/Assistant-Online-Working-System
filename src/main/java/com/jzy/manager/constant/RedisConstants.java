@@ -33,7 +33,6 @@ public class RedisConstants {
      */
     public static final String USER_LOGIN_FAIL_KEY = USER_LOGIN_KEY + ":fail";
 
-
     /**
      * 用户的验证码根键
      */
@@ -75,10 +74,10 @@ public class RedisConstants {
      */
     public static final long USEFUL_INFORMATION_EXPIRE = 21;
 
-        /**
-     * 用户登陆成功ip的缓存的过期时间，60天
+    /**
+     * 用户登陆成功ip的缓存的过期时间，30天
      */
-    public static final long USER_LOGIN_IP_EXPIRE = 60;
+    public static final long USER_LOGIN_IP_EXPIRE = 30;
 
     /**
      * 当前季度的缓存的键

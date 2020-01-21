@@ -100,6 +100,7 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/resetLoginQuestion", "anon"); //游客登录页面换问题请求
         filterChainDefinitionMap.put("/loginTestByQuestion", "anon"); //通过问题登入请求验证
 
+        filterChainDefinitionMap.put("/druid/**", "anon"); //druid
         /*=======================================================*/
         /**
          * 授权拦截

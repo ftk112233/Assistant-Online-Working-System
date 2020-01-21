@@ -61,31 +61,36 @@ public class ClassController extends AbstractController {
      */
     @RequestMapping("/getClassesLikeClassId")
     @ResponseBody
-    public Map<String , Object> getClassesLikeClassId(@RequestParam(value = "keywords", required = false) String classId) {
-        Map<String , Object> map=new HashMap<>(3);
+    public Map<String, Object> getClassesLikeClassId(@RequestParam(value = "keywords", required = false) String classId) {
+        Map<String, Object> map = new HashMap<>(3);
         map.put("code", 0);
         map.put("msg", "");
 
         classId = StringUtils.upperCase(classId);
-        List<Class> classes=classService.listClassesLikeClassId(classId);
-        List<ClassIdSearchResult> results=new ArrayList<>();
+        List<Class> classes = classService.listClassesLikeClassId(classId);
+        List<ClassIdSearchResult> results = new ArrayList<>();
         //按常识上的开课时间有近至远排序
         Collections.sort(classes, Class.CLASS_YEAR_SEASON_SUB_SEASON_COMPARATOR_DESC);
 
-        for (Class clazz:classes){
+        for (Class clazz : classes) {
             clazz.setParsedClassYear();
-            if (clazz.getClassYear() == null){
+            if (clazz.getClassYear() == null) {
                 clazz.setClassYear("");
             }
-            if (clazz.getClassSeason() == null){
+            if (clazz.getClassSeason() == null) {
                 clazz.setClassSeason("");
             }
-            if (clazz.getClassSubSeason() == null){
+            if (clazz.getClassSubSeason() == null) {
                 clazz.setClassSubSeason("");
             }
 
-            String name=clazz.getClassYear()+clazz.getClassSeason()+clazz.getClassSubSeason()+'_'+clazz.getClassName();
-            ClassIdSearchResult result=new ClassIdSearchResult(clazz.getClassId(), name);
+            String season = clazz.getClassYear() + clazz.getClassSeason() + clazz.getClassSubSeason();
+            season = StringUtils.isEmpty(season) ? "" : season + "_";
+
+            String campus = StringUtils.isEmpty(clazz.getClassCampus()) ? "" : clazz.getClassCampus() + "_";
+
+            String name = season + campus + clazz.getClassName();
+            ClassIdSearchResult result = new ClassIdSearchResult(clazz.getClassId(), name);
             results.add(result);
         }
         map.put("data", results);
