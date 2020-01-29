@@ -43,6 +43,22 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
     private TeacherMapper teacherMapper;
 
     @Override
+    public boolean isRepeatedTeacherWorkId(Teacher teacher) {
+        if (teacher == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return getTeacherByWorkId(teacher.getTeacherWorkId()) != null;
+    }
+
+    @Override
+    public boolean isRepeatedTeacherName(Teacher teacher) {
+        if (teacher == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return getTeacherByName(teacher.getTeacherName()) != null;
+    }
+
+    @Override
     public Teacher getTeacherById(Long id) {
         return id == null ? null : teacherMapper.getTeacherById(id);
     }
@@ -70,12 +86,12 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
     /**
      * 插入姓名不重复的教师信息
      *
-     * @param teacher
-     * @return
+     * @param teacher 要插入的教师对象
+     * @return (更新结果, 更新记录数)
      */
     private UpdateResult insertTeacherWithUnrepeatedName(Teacher teacher) {
         //新工号不为空
-        if (getTeacherByWorkId(teacher.getTeacherWorkId()) != null) {
+        if (isRepeatedTeacherWorkId(teacher)) {
             //添加的工号已存在
             return new UpdateResult(WORK_ID_REPEAT);
         }
@@ -103,12 +119,9 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
         if (originalTeacher == null || newTeacher == null) {
             return Constants.FAILURE;
         }
-        if (!originalTeacher.getTeacherName().equals(newTeacher.getTeacherName())) {
+        if (isModifiedAndRepeatedTeacherName(originalTeacher, newTeacher)) {
             //姓名修改过了，判断是否与已存在的姓名冲突
-            if (getTeacherByName(newTeacher.getTeacherName()) != null) {
-                //添加的姓名已存在
-                return NAME_REPEAT;
-            }
+            return NAME_REPEAT;
         }
 
         if (newTeacher.equalsExceptBaseParams(originalTeacher)) {
@@ -118,6 +131,45 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
         teacherMapper.updateTeacherByWorkId(newTeacher);
         return Constants.SUCCESS;
     }
+
+    /**
+     * 判断当前要更新的教师的姓名是否修改过且重复。
+     * 只有相较于原来的教师修改过且与数据库中重复才返回false
+     *
+     * @param originalTeacher 用来比较的原来的教师
+     * @param newTeacher      要更新的教师
+     * @return 姓名是否修改过且重复
+     */
+    private boolean isModifiedAndRepeatedTeacherName(Teacher originalTeacher, Teacher newTeacher) {
+        if (!originalTeacher.getTeacherName().equals(newTeacher.getTeacherName())) {
+            //姓名修改过了，判断是否与已存在的姓名冲突
+            if (isRepeatedTeacherName(newTeacher)) {
+                //添加的姓名已存在
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断当前要更新的教师的工号是否修改过且重复。
+     * 只有相较于原来的教师修改过且与数据库中重复才返回false
+     *
+     * @param originalTeacher 用来比较的原来的教师
+     * @param newTeacher      要更新的教师
+     * @return 工号是否修改过且重复
+     */
+    private boolean isModifiedAndRepeatedTeacherWorkId(Teacher originalTeacher, Teacher newTeacher) {
+        if (!newTeacher.getTeacherWorkId().equals(originalTeacher.getTeacherWorkId())) {
+            //工号修改过了，判断是否与已存在的工号冲突
+            if (isRepeatedTeacherWorkId(newTeacher)) {
+                //修改后的工号已存在
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     @Override
     public DefaultFromExcelUpdateResult insertAndUpdateTeachersFromExcel(List<Teacher> teachers) {
@@ -168,7 +220,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
            TODO
          * 由于目前版本从表格只能读取教师姓名字段，所以不用工号做重名校验。只要当前名字不存在，即插入
          */
-        if (getTeacherByName(teacher.getTeacherName()) == null) {
+        if (!isRepeatedTeacherName(teacher)) {
             long insertCount = insertTeacherWithUnrepeatedName(teacher).getInsertCount();
             result.setInsertCount(insertCount);
         }
@@ -195,23 +247,18 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
 
         if (!StringUtils.isEmpty(teacher.getTeacherWorkId())) {
             //新工号不为空
-            if (!teacher.getTeacherWorkId().equals(originalTeacher.getTeacherWorkId())) {
+            if (isModifiedAndRepeatedTeacherWorkId(originalTeacher, teacher)) {
                 //工号修改过了，判断是否与已存在的工号冲突
-                if (getTeacherByWorkId(teacher.getTeacherWorkId()) != null) {
-                    //修改后的工号已存在
-                    return WORK_ID_REPEAT;
-                }
+                return WORK_ID_REPEAT;
             }
         } else {
             teacher.setTeacherWorkId(null);
         }
 
-        if (!teacher.getTeacherName().equals(originalTeacher.getTeacherName())) {
+        if (isModifiedAndRepeatedTeacherName(originalTeacher, teacher)) {
             //姓名修改过了，判断是否与已存在的姓名冲突
-            if (getTeacherByName(teacher.getTeacherName()) != null) {
-                //修改后的姓名已存在
-                return NAME_REPEAT;
-            }
+            return NAME_REPEAT;
+
         }
 
         if (StringUtils.isEmpty(teacher.getTeacherSex())) {

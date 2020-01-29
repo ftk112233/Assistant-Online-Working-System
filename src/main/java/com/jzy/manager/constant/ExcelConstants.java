@@ -7,7 +7,7 @@ package com.jzy.manager.constant;
  * @Date 2019/11/20 18:18
  * @Version 1.0
  **/
-public class ExcelConstants {
+public final class ExcelConstants {
     private ExcelConstants() {
     }
 

@@ -19,6 +19,30 @@ import java.util.List;
  **/
 public interface StudentAndClassService {
     /**
+     * 判断输入学生报班对象的角色和权限是否与数据库中已有的有冲突
+     *
+     * @param studentAndClassDetailedDto 要判断的学生报班对象
+     * @return 学生报班记录是否冲突
+     */
+    boolean isRepeatedStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto);
+
+    /**
+     * 判断输入学生报班对象学员号是否存在
+     *
+     * @param studentAndClassDetailedDto 要判断的学生报班详细信息
+     * @return 学员号是否存在
+     */
+    boolean existStudentId(StudentAndClassDetailedDto studentAndClassDetailedDto);
+
+    /**
+     * 判断输入学生报班对象班号是否存在
+     *
+     * @param studentAndClassDetailedDto 要判断的学生报班详细信息
+     * @return 班号是否存在
+     */
+    boolean existClassId(StudentAndClassDetailedDto studentAndClassDetailedDto);
+
+    /**
      * 根据id查询StudentAndClass
      *
      * @param id 学员上课对象的自增主键id

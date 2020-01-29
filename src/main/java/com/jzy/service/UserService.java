@@ -18,6 +18,46 @@ import java.util.List;
  **/
 public interface UserService {
     /**
+     * 判断输入user对象的工号是否与数据库中已有的有冲突
+     *
+     * @param user 要判断的用户
+     * @return 工号是否冲突
+     */
+    boolean isRepeatedUserWorkId(User user);
+
+    /**
+     * 判断输入user对象的身份证是否与数据库中已有的有冲突
+     *
+     * @param user 要判断的用户
+     * @return 身份证是否冲突
+     */
+    boolean isRepeatedUserIdCard(User user);
+
+    /**
+     * 判断输入user对象的用户名是否与数据库中已有的有冲突
+     *
+     * @param user 要判断的用户
+     * @return 用户名是否冲突
+     */
+    boolean isRepeatedUserName(User user);
+
+    /**
+     * 判断输入user对象的邮箱是否与数据库中已有的有冲突
+     *
+     * @param user 要判断的用户
+     * @return 邮箱是否冲突
+     */
+    boolean isRepeatedUserEmail(User user);
+
+    /**
+     * 判断输入user对象的电话是否与数据库中已有的有冲突
+     *
+     * @param user 要判断的用户
+     * @return 电话是否冲突
+     */
+    boolean isRepeatedUserPhone(User user);
+
+    /**
      * 根据用户表自增主键id查询出用户信息
      *
      * @param id 用户表自增主键

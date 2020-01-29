@@ -25,3 +25,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+/example_hidden/

@@ -16,6 +16,14 @@ import java.util.List;
  **/
 public interface RoleAndPermissionService {
     /**
+     * 判断输入角色权限对象的角色和权限是否与数据库中已有的有冲突
+     *
+     * @param roleAndPermission 要判断的角色权限对象
+     * @return 角色和权限是否冲突
+     */
+    boolean isRepeatedRoleAndPermission(RoleAndPermission roleAndPermission);
+
+    /**
      * 根据角色查询权限
      *
      * @param role 角色

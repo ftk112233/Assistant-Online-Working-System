@@ -7,7 +7,6 @@ import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.AssistantUtils;
-import com.jzy.manager.util.MyStringUtils;
 import com.jzy.model.dto.*;
 import com.jzy.model.entity.Assistant;
 import com.jzy.service.AssistantService;
@@ -45,6 +44,22 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     private AssistantMapper assistantMapper;
 
     @Override
+    public boolean isRepeatedAssistantWorkId(Assistant assistant) {
+        if (assistant == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return getAssistantByWorkId(assistant.getAssistantWorkId()) != null;
+    }
+
+    @Override
+    public boolean isRepeatedAssistantName(Assistant assistant) {
+        if (assistant == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return getAssistantByName(assistant.getAssistantName()) != null;
+    }
+
+    @Override
     public Assistant getAssistantById(Long id) {
         return id == null ? null : assistantMapper.getAssistantById(id);
     }
@@ -69,12 +84,17 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     }
 
     @Override
+    public List<Assistant> listAssistantsByClassSeasonAndCampus(ClassSeasonDto classSeasonDto, String campus) {
+        return assistantMapper.listAssistantsByClassSeasonAndCampus(classSeasonDto, campus);
+    }
+
+    @Override
     public UpdateResult insertOneAssistant(Assistant assistant) {
         if (assistant == null) {
             return new UpdateResult(Constants.FAILURE);
         }
         //新工号不为空
-        if (getAssistantByWorkId(assistant.getAssistantWorkId()) != null) {
+        if (isRepeatedAssistantWorkId(assistant)) {
             //添加的工号已存在
             return new UpdateResult(WORK_ID_REPEAT);
         }
@@ -95,7 +115,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
         if (assistant == null) {
             return new UpdateResult(Constants.FAILURE);
         }
-        if (getAssistantByName(assistant.getAssistantName()) != null) {
+        if (isRepeatedAssistantName(assistant)) {
             //添加的姓名已存在
             return new UpdateResult(NAME_REPEAT);
         }
@@ -121,23 +141,16 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
 
         if (!StringUtils.isEmpty(assistant.getAssistantWorkId())) {
             //新工号不为空
-            if (!assistant.getAssistantWorkId().equals(originalAssistant.getAssistantWorkId())) {
-                //工号修改过了，判断是否与已存在的工号冲突
-                if (getAssistantByWorkId(assistant.getAssistantWorkId()) != null) {
-                    //修改后的工号已存在
-                    return WORK_ID_REPEAT;
-                }
+            if (isModifiedAndRepeatedAssistantWorkId(originalAssistant, assistant)) {
+                return WORK_ID_REPEAT;
             }
         } else {
             assistant.setAssistantWorkId(null);
         }
 
-        if (!assistant.getAssistantName().equals(originalAssistant.getAssistantName())) {
-            //姓名修改过了，判断是否与已存在的姓名冲突
-            if (getAssistantByName(assistant.getAssistantName()) != null) {
-                //修改后的姓名已存在
-                return NAME_REPEAT;
-            }
+        if (isModifiedAndRepeatedAssistantName(originalAssistant, assistant)) {
+            //姓名修改过了，修改后的姓名已存在
+            return NAME_REPEAT;
         }
 
         if (StringUtils.isEmpty(assistant.getAssistantSex())) {
@@ -151,6 +164,44 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
 
         assistantMapper.updateAssistantInfo(assistant);
         return Constants.SUCCESS;
+    }
+
+    /**
+     * 判断当前要更新的newAssistant的工号是否修改过且重复。
+     * 只有相较于originalAssistant修改过且与数据库中重复才返回false
+     *
+     * @param originalAssistant 用来比较的原来的助教
+     * @param newAssistant      要更新的助教
+     * @return 工号是否修改过且重复
+     */
+    private boolean isModifiedAndRepeatedAssistantWorkId(Assistant originalAssistant, Assistant newAssistant) {
+        if (!newAssistant.getAssistantWorkId().equals(originalAssistant.getAssistantWorkId())) {
+            //工号修改过了，判断是否与已存在的工号冲突
+            if (isRepeatedAssistantWorkId(newAssistant)) {
+                //修改后的工号已存在
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断当前要更新的newAssistant的姓名是否修改过且重复。
+     * 只有相较于originalAssistant修改过且与数据库中重复才返回false
+     *
+     * @param originalAssistant 用来比较的原来的助教
+     * @param newAssistant      要更新的助教
+     * @return 姓名是否修改过且重复
+     */
+    private boolean isModifiedAndRepeatedAssistantName(Assistant originalAssistant, Assistant newAssistant) {
+        if (!newAssistant.getAssistantName().equals(originalAssistant.getAssistantName())) {
+            //姓名修改过了，判断是否与已存在的姓名冲突
+            if (isRepeatedAssistantName(newAssistant)) {
+                //修改后的姓名已存在
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -168,12 +219,9 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
             return new UpdateResult(Constants.FAILURE);
         }
 
-        if (!newAssistant.getAssistantName().equals(originalAssistant.getAssistantName())) {
-            //姓名修改过了，判断是否与已存在的姓名冲突
-            if (getAssistantByName(newAssistant.getAssistantName()) != null) {
-                //修改后的姓名已存在
-                return new UpdateResult(NAME_REPEAT);
-            }
+        if (isModifiedAndRepeatedAssistantName(originalAssistant, newAssistant)) {
+            //姓名修改过了，修改后的姓名已存在
+            return new UpdateResult(NAME_REPEAT);
         }
 
         UpdateResult result = new UpdateResult(Constants.SUCCESS);
@@ -182,7 +230,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     }
 
     @Override
-    public DefaultFromExcelUpdateResult insertAndUpdateAssistantsFromExcel(List<Assistant> assistants){
+    public DefaultFromExcelUpdateResult insertAndUpdateAssistantsFromExcel(List<Assistant> assistants) {
         if (assistants == null) {
             String msg = "insertAndUpdateAssistantsFromExcel方法输入助教assistant为null!";
             logger.error(msg);
@@ -250,19 +298,6 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
         }
         result.setResult(Constants.SUCCESS);
         return result;
-    }
-
-    /**
-     * 判断assistant的工号是否可能是32位uuid的形式
-     *
-     * @param assistant 输入助教对象
-     * @return 工号是否可能是uuid
-     */
-    private boolean workIdIsProbableUUID32(Assistant assistant) {
-        if (assistant == null) {
-            return false;
-        }
-        return MyStringUtils.isProbableUUID32(assistant.getAssistantWorkId());
     }
 
     @Override

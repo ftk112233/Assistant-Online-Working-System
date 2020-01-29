@@ -1,10 +1,7 @@
 package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jzy.model.dto.DefaultFromExcelUpdateResult;
-import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.StudentSearchCondition;
-import com.jzy.model.dto.UpdateResult;
+import com.jzy.model.dto.*;
 import com.jzy.model.entity.Student;
 
 import java.util.List;
@@ -17,6 +14,14 @@ import java.util.List;
  * @date 2019/11/14 23:31
  **/
 public interface StudentService {
+    /**
+     * 判断输入学生对象的student是否与数据库中已有的有冲突
+     *
+     * @param student 要判断的学生对象
+     * @return 学员号是否冲突
+     */
+    boolean isRepeatedStudentId(Student student);
+
     /**
      * 根据主键id修改查询学生
      *

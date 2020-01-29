@@ -51,6 +51,46 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     private ClassMapper classMapper;
 
     @Override
+    public boolean isRepeatedClassId(Class clazz) {
+        if (clazz == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return getClassByClassId(clazz.getClassId()) != null;
+    }
+
+    @Override
+    public boolean existClassTeacher(ClassDetailedDto classDetailedDto) {
+        if (classDetailedDto == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+
+        if (!StringUtils.isEmpty(classDetailedDto.getTeacherName())) {
+            //修改后的教师姓名不为空
+            if (teacherService.getTeacherByName(classDetailedDto.getTeacherName()) == null) {
+                //修改后的教师姓名不存在
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean existClassAssistant(ClassDetailedDto classDetailedDto) {
+        if (classDetailedDto == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+
+        if (!StringUtils.isEmpty(classDetailedDto.getAssistantName())) {
+            //修改后的助教姓名不为空
+            if (assistantService.getAssistantByName(classDetailedDto.getAssistantName()) == null) {
+                //修改后的助教姓名不存在
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
     public Class getClassById(Long id) {
         return id == null ? null : classMapper.getClassById(id);
     }
@@ -108,14 +148,13 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
             return new UpdateResult(Constants.FAILURE);
         }
         //新班号不为空
-        if (getClassByClassId(classDetailedDto.getClassId()) != null) {
+        if (isRepeatedClassId(classDetailedDto)) {
             //添加的班号已存在
             return new UpdateResult(CLASS_ID_REPEAT);
         }
 
         return insertClassWithUnrepeatedClassId(classDetailedDto);
     }
-
 
     /**
      * 插入班号不重复的班级信息
@@ -130,21 +169,14 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
         if (classDetailedDto == null) {
             return new UpdateResult(Constants.FAILURE);
         }
-        if (!StringUtils.isEmpty(classDetailedDto.getTeacherName())) {
-            //修改后的教师姓名不为空
-            if (teacherService.getTeacherByName(classDetailedDto.getTeacherName()) == null) {
-                //修改后的教师姓名不存在
-                return new UpdateResult(TEACHER_NOT_EXIST);
-
-            }
+        if (!existClassTeacher(classDetailedDto)) {
+            //修改后的教师姓名不为空，且教师姓名不存在
+            return new UpdateResult(TEACHER_NOT_EXIST);
         }
 
-        if (!StringUtils.isEmpty(classDetailedDto.getAssistantName())) {
-            //修改后的助教姓名不为空
-            if (assistantService.getAssistantByName(classDetailedDto.getAssistantName()) == null) {
-                //修改后的助教姓名不存在
-                return new UpdateResult(ASSISTANT_NOT_EXIST);
-            }
+        if (!existClassAssistant(classDetailedDto)) {
+            //修改后的助教不为空，且助教姓名不存在
+            return new UpdateResult(ASSISTANT_NOT_EXIST);
         }
 
         classDetailedDto.setParsedClassTime(classDetailedDto.getClassTime());
@@ -231,7 +263,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
         current.setClassSeason(classSeason.getClassSeason());
         current.setClassSubSeason(classSeason.getClassSubSeason());
 
-        for (ClassDetailedDto classDetailedDto: classDetailedDtos) {
+        for (ClassDetailedDto classDetailedDto : classDetailedDtos) {
             if (!StringUtils.isEmpty(classDetailedDto.getClassYear())) {
                 classDetailedDto.setParsedClassYear();
             }
@@ -270,28 +302,19 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
         }
 
         //班号不为空
-        if (!classDetailedDto.getClassId().equals(originalClass.getClassId())) {
-            //班号修改过了，判断是否与已存在的工号冲突
-            if (getClassByClassId(classDetailedDto.getClassId()) != null) {
-                //修改后的班号已存在
-                return CLASS_ID_REPEAT;
-            }
+        if (isModifiedAndRepeatedClassId(originalClass, classDetailedDto)) {
+            //班号修改过了，判断是否与已存在的工号冲突，且修改后的班号已存在
+            return CLASS_ID_REPEAT;
         }
 
-        if (!StringUtils.isEmpty(classDetailedDto.getTeacherName())) {
-            //修改后的教师姓名不为空
-            if (teacherService.getTeacherByName(classDetailedDto.getTeacherName()) == null) {
-                //修改后的教师姓名不存在
-                return TEACHER_NOT_EXIST;
-            }
+        if (!existClassTeacher(classDetailedDto)) {
+            //修改后的教师姓名不为空，且教师姓名不存在
+            return TEACHER_NOT_EXIST;
         }
 
-        if (!StringUtils.isEmpty(classDetailedDto.getAssistantName())) {
-            //修改后的助教姓名不为空
-            if (assistantService.getAssistantByName(classDetailedDto.getAssistantName()) == null) {
-                //修改后的助教姓名不存在
-                return ASSISTANT_NOT_EXIST;
-            }
+        if (!existClassAssistant(classDetailedDto)) {
+            //修改后的助教不为空，且助教姓名不存在
+            return ASSISTANT_NOT_EXIST;
         }
 
         classDetailedDto.setParsedClassTime(classDetailedDto.getClassTime());
@@ -304,6 +327,26 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
 
         classMapper.updateClassInfo(classDetailedDto);
         return Constants.SUCCESS;
+    }
+
+    /**
+     * 判断当前要更新的班级的班号是否修改过且重复。
+     * 只有相较于原来的班级修改过且与数据库中重复才返回false
+     *
+     * @param originalClass 用来比较的原来的班级
+     * @param newClass      要更新的班级
+     * @return 班号是否修改过且重复
+     */
+    private boolean isModifiedAndRepeatedClassId(Class originalClass, Class newClass) {
+        //班号不为空
+        if (!newClass.getClassId().equals(originalClass.getClassId())) {
+            //班号修改过了，判断是否与已存在的工号冲突
+            if (getClassByClassId(newClass.getClassId()) != null) {
+                //修改后的班号已存在
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

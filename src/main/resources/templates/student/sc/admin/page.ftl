@@ -18,7 +18,8 @@
         <div class="layui-form layui-card-header layuiadmin-card-header-auto">
             <div class="layui-form-item" id="form">
                 <div class="layui-inline">
-                    <label class="layui-form-label">年份-季度</label>
+                    <label class="layui-form-label">年份-季度<a style="color: blue"
+                                                            lay-tips="一般情况系统会根据校历缓存自动勾选合适的'年份-季度-分期'。如果当前自动选择的'年份-季度-分期'与实际开课的不符，请联系学管或助教长修改'智能校历'；当下，你可以先手动选择正确的来完成正常查询。">(与实际不符?)</a></label>
                     <div class="layui-input-inline">
                         <input type="text" class="layui-input" placeholder="yyyy" id="year" name="year">
                     </div>

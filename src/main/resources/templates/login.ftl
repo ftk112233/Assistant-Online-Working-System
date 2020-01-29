@@ -94,6 +94,7 @@
 <script src="${ctx}/custom/js/external/jquery-3.3.1.min.js"></script>
 <script src="${ctx}/custom/js/myButton.js"></script>
 
+<script src="${ctx}/custom/js/console.js"></script>
 <script src="${ctx}/plugins/layuiadmin/layui/layui.js"></script>
 <script>
     // kaptcha验证码的更新

@@ -1,10 +1,7 @@
 package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jzy.model.dto.AssistantSearchCondition;
-import com.jzy.model.dto.DefaultFromExcelUpdateResult;
-import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.UpdateResult;
+import com.jzy.model.dto.*;
 import com.jzy.model.entity.Assistant;
 
 import java.util.List;
@@ -17,6 +14,22 @@ import java.util.List;
  * @date 2019/11/14 23:27
  **/
 public interface AssistantService {
+    /**
+     * 判断输入助教对象的工号是否与数据库中已有的有冲突
+     *
+     * @param assistant 要判断的助教
+     * @return 工号是否冲突
+     */
+    boolean isRepeatedAssistantWorkId(Assistant assistant);
+
+    /**
+     * 判断输入助教对象的姓名是否与数据库中已有的有冲突
+     *
+     * @param assistant 要判断的助教
+     * @return 姓名是否冲突
+     */
+    boolean isRepeatedAssistantName(Assistant assistant);
+
     /**
      * 根据助教id查询出助教信息
      *
@@ -48,6 +61,15 @@ public interface AssistantService {
      * @return 指定校区的全部助教
      */
     List<Assistant> listAssistantsByCampus(String campus);
+
+    /**
+     * 根据开课的年份季度分期和助教校区查询出助教信息。如果某入参为空，该字段不作为sql查询约束
+     *
+     * @param classSeasonDto 开课的年份季度分期
+     * @param campus 助教校区
+     * @return 指定开课的年份季度分期和校区的全部助教
+     */
+    List<Assistant> listAssistantsByClassSeasonAndCampus(ClassSeasonDto classSeasonDto, String campus);
 
     /**
      * 添加一个助教

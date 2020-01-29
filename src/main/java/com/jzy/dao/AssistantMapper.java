@@ -1,6 +1,7 @@
 package com.jzy.dao;
 
 import com.jzy.model.dto.AssistantSearchCondition;
+import com.jzy.model.dto.ClassSeasonDto;
 import com.jzy.model.entity.Assistant;
 import org.apache.ibatis.annotations.Param;
 
@@ -101,4 +102,13 @@ public interface AssistantMapper {
      * @return 指定校区的全部助教
      */
     List<Assistant> listAssistantsByCampus(@Param("campus") String campus);
+
+    /**
+     * 根据开课的年份季度分期和助教校区查询出助教信息。如果某入参为空，该字段不作为sql查询约束
+     *
+     * @param classSeasonDto 开课的年份季度分期
+     * @param campus 助教校区
+     * @return 指定开课的年份季度分期和校区的全部助教
+     */
+    List<Assistant> listAssistantsByClassSeasonAndCampus(@Param("classSeasonDto") ClassSeasonDto classSeasonDto, @Param("campus") String campus);
 }

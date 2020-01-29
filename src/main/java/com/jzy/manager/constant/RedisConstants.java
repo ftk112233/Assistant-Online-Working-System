@@ -7,7 +7,7 @@ package com.jzy.manager.constant;
  * @description redis相关常量
  * @date 2019/11/15 21:55
  **/
-public class RedisConstants {
+public final class RedisConstants {
     private RedisConstants() {
     }
 

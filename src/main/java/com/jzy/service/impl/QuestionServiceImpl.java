@@ -7,6 +7,7 @@ import com.github.pagehelper.PageInfo;
 import com.jzy.dao.QuestionMapper;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.RedisConstants;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.exception.NoMoreQuestionsException;
 import com.jzy.manager.exception.QuestionNotExistException;
 import com.jzy.manager.util.CodeUtils;
@@ -39,15 +40,23 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
     /**
      * 表示问题的内容重复
      */
-    private final static String QUESTION_CONTENT_REPEAT="questionContentRepeat";
+    private final static String QUESTION_CONTENT_REPEAT = "questionContentRepeat";
 
     /**
      * 表示至少需要一个问题
      */
-    private final static String AT_LEAST_ONE_NEEDED="atLeastOneQuestionNeeded";
+    private final static String AT_LEAST_ONE_NEEDED = "atLeastOneQuestionNeeded";
 
     @Autowired
     private QuestionMapper questionMapper;
+
+    @Override
+    public boolean isRepeatedQuestionContent(Question question) {
+        if (question == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return getQuestionByContent(question.getContent()) != null;
+    }
 
     @Override
     public Question getQuestionById(Long id) {
@@ -130,11 +139,11 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
 
     @Override
     public boolean isCorrectAnswer(String questionContent, String answerInput) throws QuestionNotExistException {
-        if (StringUtils.isEmpty(answerInput)){
+        if (StringUtils.isEmpty(answerInput)) {
             return false;
         }
 
-        if (listAllQuestions().size() == 0) {
+        if (countAllQuestions() == 0) {
             //数据库没问题，即使用的是默认问题
             return QuestionUtils.isCorrectAnswerOfDefaultQuestion(answerInput);
         }
@@ -188,12 +197,9 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
         if (originalQuestion == null) {
             return Constants.FAILURE;
         }
-        if (!originalQuestion.getContent().equals(question.getContent())) {
+        if (isModifiedAndRepeatedQuestionContent(originalQuestion, question)) {
             //问题内容改过了，判断是否与已存在的记录冲突
-            if (getQuestionByContent(question.getContent()) != null) {
-                //修改后的问题已存在
-                return QUESTION_CONTENT_REPEAT;
-            }
+            return QUESTION_CONTENT_REPEAT;
         }
 
         if (question.equalsExceptBaseParamsAndTrueAnswerAndCreatorId(originalQuestion)) {
@@ -205,12 +211,31 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
         return Constants.SUCCESS;
     }
 
+    /**
+     * 判断当前要更新的问题的内容是否修改过且重复。
+     * 只有相较于原来的问题修改过且与数据库中重复才返回false
+     *
+     * @param originalQuestion 用来比较的原来的问题
+     * @param newQuestion      要更新的问题
+     * @return 问题的内容是否修改过且重复
+     */
+    private boolean isModifiedAndRepeatedQuestionContent(Question originalQuestion, Question newQuestion) {
+        if (!originalQuestion.getContent().equals(newQuestion.getContent())) {
+            //问题内容改过了，判断是否与已存在的记录冲突
+            if (isRepeatedQuestionContent(newQuestion)) {
+                //修改后的问题已存在
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public String insertOneQuestion(Question question) {
         if (question == null) {
             return Constants.FAILURE;
         }
-        if (getQuestionByContent(question.getContent()) != null) {
+        if (isRepeatedQuestionContent(question)) {
             //修改后的问题已存在
             return QUESTION_CONTENT_REPEAT;
         }
@@ -229,8 +254,8 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
             return new UpdateResult(AT_LEAST_ONE_NEEDED);
         }
 
-        long count=questionMapper.deleteOneQuestionById(id);
-        UpdateResult result= new UpdateResult(Constants.SUCCESS);
+        long count = questionMapper.deleteOneQuestionById(id);
+        UpdateResult result = new UpdateResult(Constants.SUCCESS);
         result.setDeleteCount(count);
         return result;
     }
@@ -245,8 +270,8 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
             return new UpdateResult(AT_LEAST_ONE_NEEDED);
         }
 
-        long count=questionMapper.deleteManyQuestionsByIds(ids);
-        UpdateResult result= new UpdateResult(Constants.SUCCESS);
+        long count = questionMapper.deleteManyQuestionsByIds(ids);
+        UpdateResult result = new UpdateResult(Constants.SUCCESS);
         result.setDeleteCount(count);
         return result;
     }

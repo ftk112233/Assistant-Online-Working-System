@@ -18,6 +18,22 @@ import java.util.List;
  **/
 public interface TeacherService {
     /**
+     * 判断输入教师对象的工号是否与数据库中已有的有冲突
+     *
+     * @param teacher 要判断的教师
+     * @return 工号是否冲突
+     */
+    boolean isRepeatedTeacherWorkId(Teacher teacher);
+
+    /**
+     * 判断输入教师对象的姓名是否与数据库中已有的有冲突
+     *
+     * @param teacher 要判断的教师
+     * @return 姓名是否冲突
+     */
+    boolean isRepeatedTeacherName(Teacher teacher);
+
+    /**
      * 根据教师id查询教师
      *
      * @param id 教师id

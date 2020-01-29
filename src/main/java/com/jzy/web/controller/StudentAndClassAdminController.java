@@ -7,6 +7,7 @@ import com.jzy.manager.constant.ModelConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.StudentAndClassUtils;
 import com.jzy.model.CampusEnum;
+import com.jzy.model.dto.ClassSeasonDto;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.StudentAndClassDetailedDto;
 import com.jzy.model.dto.StudentAndClassSearchCondition;
@@ -41,9 +42,7 @@ public class StudentAndClassAdminController extends AbstractController {
      * @return
      */
     @RequestMapping("/page")
-    public String page(Model model, @RequestParam(value = "classId", required = false) String classId) {
-        model.addAttribute(ModelConstants.CURRENT_ClASS_SEASON_MODEL_KEY, classService.getCurrentClassSeason());
-
+    public String page(Model model, Class clazz) {
         model.addAttribute(ModelConstants.CAMPUS_NAMES_MODEL_KEY, JSON.toJSONString(CampusEnum.getCampusNamesList()));
         model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(Class.SEASONS));
         model.addAttribute(ModelConstants.SUB_SEASONS_MODEL_KEY, JSON.toJSONString(Class.SUB_SEASONS));
@@ -51,7 +50,16 @@ public class StudentAndClassAdminController extends AbstractController {
         model.addAttribute(ModelConstants.SUBJECTS_MODEL_KEY, JSON.toJSONString(Class.SUBJECTS));
         model.addAttribute(ModelConstants.TYPES_MODEL_KEY, JSON.toJSONString(Class.TYPES));
 
-        model.addAttribute(ModelConstants.CLASS_ID_MODEL_KEY, classId);
+        model.addAttribute(ModelConstants.CLASS_ID_MODEL_KEY, clazz.getClassId());
+
+        ClassSeasonDto currentClassSeason = classService.getCurrentClassSeason();
+        if (!StringUtils.isEmpty(clazz.getClassId())) {
+            //如果是从'查看该班学生'跳转而来的，手动将指定班级的'年份-季度-分期'set好
+            currentClassSeason.setClassYear(clazz.getClassYear());
+            currentClassSeason.setClassSeason(clazz.getClassSeason());
+            currentClassSeason.setClassSubSeason(clazz.getClassSubSeason());
+        }
+        model.addAttribute(ModelConstants.CURRENT_ClASS_SEASON_MODEL_KEY, currentClassSeason);
         return "student/sc/admin/page";
     }
 

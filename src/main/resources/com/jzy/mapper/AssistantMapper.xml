@@ -22,22 +22,22 @@
             <if test="assistantWorkId != null and assistantWorkId!=''">
                 assistant_work_id,
             </if>
-            <if test="assistantName != null and assistantName!=''" >
+            <if test="assistantName != null and assistantName!=''">
                 assistant_name,
             </if>
-            <if test="assistantSex != null and assistantSex!=''" >
+            <if test="assistantSex != null and assistantSex!=''">
                 assistant_sex,
             </if>
-            <if test="assistantDepart != null and assistantDepart!=''" >
+            <if test="assistantDepart != null and assistantDepart!=''">
                 assistant_depart,
             </if>
-            <if test="assistantCampus != null and assistantCampus!=''" >
+            <if test="assistantCampus != null and assistantCampus!=''">
                 assistant_campus,
             </if>
-            <if test="assistantPhone != null and assistantPhone!=''" >
+            <if test="assistantPhone != null and assistantPhone!=''">
                 assistant_phone,
             </if>
-            <if test="assistantRemark != null and assistantRemark!=''" >
+            <if test="assistantRemark != null and assistantRemark!=''">
                 assistant_remark,
             </if>
         </trim>
@@ -45,22 +45,22 @@
             <if test="assistantWorkId != null and assistantWorkId!=''">
                 #{assistantWorkId},
             </if>
-            <if test="assistantName != null and assistantName!=''" >
+            <if test="assistantName != null and assistantName!=''">
                 #{assistantName},
             </if>
-            <if test="assistantSex != null and assistantSex!=''" >
+            <if test="assistantSex != null and assistantSex!=''">
                 #{assistantSex},
             </if>
-            <if test="assistantDepart != null and assistantDepart!=''" >
+            <if test="assistantDepart != null and assistantDepart!=''">
                 #{assistantDepart},
             </if>
-            <if test="assistantCampus != null and assistantCampus!=''" >
+            <if test="assistantCampus != null and assistantCampus!=''">
                 #{assistantCampus},
             </if>
-            <if test="assistantPhone != null and assistantPhone!=''" >
+            <if test="assistantPhone != null and assistantPhone!=''">
                 #{assistantPhone},
             </if>
-            <if test="assistantRemark != null and assistantRemark!=''" >
+            <if test="assistantRemark != null and assistantRemark!=''">
                 #{assistantRemark},
             </if>
         </trim>
@@ -189,6 +189,25 @@
     </select>
     <select id="listAssistantsByCampus" resultMap="BaseResultMap">
         select * from assistant where assistant_campus=#{campus}
+    </select>
+    <select id="listAssistantsByClassSeasonAndCampus" resultMap="BaseResultMap">
+        select aa.* from assistant aa where aa.id in (select distinct a.id from assistant a, class c
+        <where>
+            a.id=c.class_assistant_id
+            <if test="campus != null and campus!=''">
+                and c.class_campus=#{campus}
+            </if>
+            <if test="classSeasonDto.classYear != null and classSeasonDto.classYear!=''">
+                and c.class_year=#{classSeasonDto.classYear}
+            </if>
+            <if test="classSeasonDto.classSeason != null and classSeasonDto.classSeason!=''">
+                and c.class_season=#{classSeasonDto.classSeason}
+            </if>
+            <if test="classSeasonDto.classSubSeason != null and classSeasonDto.classSubSeason!=''">
+                and c.class_sub_season=#{classSeasonDto.classSubSeason}
+            </if>
+        </where>
+        )
     </select>
 
 </mapper>

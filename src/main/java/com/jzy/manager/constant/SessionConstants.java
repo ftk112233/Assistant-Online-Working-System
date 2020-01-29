@@ -7,7 +7,7 @@ package com.jzy.manager.constant;
  * @description 会话信息的常量类
  * @date 2019/11/14 23:20
  **/
-public class SessionConstants {
+public final class SessionConstants {
     private SessionConstants() {
     }
 

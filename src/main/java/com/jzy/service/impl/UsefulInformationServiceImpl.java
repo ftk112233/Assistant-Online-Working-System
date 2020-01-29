@@ -8,6 +8,7 @@ import com.jzy.dao.UsefulInformationMapper;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.exception.InvalidFileInputException;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.FileUtils;
 import com.jzy.model.CampusEnum;
 import com.jzy.model.dto.MyPage;
@@ -45,10 +46,18 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
     /**
      * 归属和序号值组合冲突
      */
-    private final static String BELONG_TO_AND_SEQUENCE_REPEAT="belongToAndSequenceRepeat";
+    private final static String BELONG_TO_AND_SEQUENCE_REPEAT = "belongToAndSequenceRepeat";
 
     @Autowired
     private UsefulInformationMapper usefulInformationMapper;
+
+    @Override
+    public boolean isRepeatedBelongToAndSequence(UsefulInformation usefulInformation) {
+        if (usefulInformation == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return getUsefulInformationByBelongToAndSequence(usefulInformation.getBelongTo(), usefulInformation.getSequence()) != null;
+    }
 
     @Override
     public UsefulInformation getUsefulInformationById(Long id) {
@@ -114,7 +123,7 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
 
     @Override
     public Long getRecommendedSequence(String belongTo) {
-        if (StringUtils.isEmpty(belongTo)){
+        if (StringUtils.isEmpty(belongTo)) {
             return null;
         }
         Long currentMaxSequence = usefulInformationMapper.getRecommendedSequence(belongTo);
@@ -168,40 +177,91 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
         if (originalInformation == null) {
             return Constants.FAILURE;
         }
-        if (!originalInformation.getBelongTo().equals(information.getBelongTo())
-                || !originalInformation.getSequence().equals(information.getSequence())) {
+        if (isModifiedAndRepeatedBelongToAndSequence(originalInformation, information)) {
             //所属类别或序号修改过了，判断是否与已存在的记录冲突
-            if (getUsefulInformationByBelongToAndSequence(information.getBelongTo(), information.getSequence()) != null) {
-                //修改后的类别或序号已存在
-                return BELONG_TO_AND_SEQUENCE_REPEAT;
-            }
+            return BELONG_TO_AND_SEQUENCE_REPEAT;
         }
 
         /*
          * 用户上传的配图的处理
          */
-        if (!StringUtils.isEmpty(information.getImage())) {
-            //如果用户上传了新配图
-            if (!originalInformation.isDefaultImage()) {
-                //如果原来的配图不是默认配图，需要将原来的配图删除
-                FileUtils.deleteFile(filePathProperties.getUsefulInformationImageDirectory() + originalInformation.getImage());
-            }
-            //将上传的新文件重名为含日期时间的newImageName，该新文件名用来保存到数据库
-            String newImageName = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss").format(new Date()) + "_" + information.getImage();
-            FileUtils.renameByName(filePathProperties.getUsefulInformationImageDirectory(), information.getImage(), newImageName);
-            information.setImage(newImageName);
-        } else {
-            //仍设置原配图
-            information.setImage(originalInformation.getImage());
-        }
+        dealWithUpdatingUsefulInformationImage(originalInformation, information);
 
-        if (originalInformation.equalsExceptBaseParams(information)){
+        if (originalInformation.equalsExceptBaseParams(information)) {
             //未修改
             return Constants.UNCHANGED;
         }
 
         usefulInformationMapper.updateUsefulInformationInfo(information);
         return Constants.SUCCESS;
+    }
+
+    /**
+     * 判断当前要更新的常用信息是否修改过且重复。
+     * 只有相较于原来的常用信息修改过且与数据库中重复才返回false
+     *
+     * @param originalInformation 用来比较的原来的常用信息
+     * @param newInformation      要更新的常用信息
+     * @return 常用信息的归属和序号是否修改过且重复
+     */
+    private boolean isModifiedAndRepeatedBelongToAndSequence(UsefulInformation originalInformation, UsefulInformation newInformation) {
+        if (!originalInformation.getBelongTo().equals(newInformation.getBelongTo())
+                || !originalInformation.getSequence().equals(newInformation.getSequence())) {
+            //所属类别或序号修改过了，判断是否与已存在的记录冲突
+            if (isRepeatedBelongToAndSequence(newInformation)) {
+                //修改后的类别或序号已存在
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 更新常用信息时对配图的处理。先删除，再重命名
+     *
+     * @param originalInformation 原来的常用信息
+     * @param newInformation      更新后的常用信息
+     */
+    private void dealWithUpdatingUsefulInformationImage(UsefulInformation originalInformation, UsefulInformation newInformation) {
+        if (!StringUtils.isEmpty(newInformation.getImage())) {
+            //如果用户上传了新配图
+            //删除原信息配图
+            deleteInformationImage(originalInformation);
+            //重命名新信息的缓存的图片文件名
+            renameInformationImage(newInformation);
+        } else {
+            //仍设置原配图
+            newInformation.setImage(originalInformation.getImage());
+        }
+    }
+
+    /**
+     * 对入参information，删除它在硬盘上保存的配图文件（如果有且不是默认图片的话）。
+     *
+     * @param information 要更新的信息
+     */
+    private void deleteInformationImage(UsefulInformation information) {
+        if (!StringUtils.isEmpty(information.getImage())) {
+            if (!information.isDefaultImage()) {
+                //如果原来的配图不是默认配图，需要将原来的配图删除
+                FileUtils.deleteFile(filePathProperties.getUsefulInformationImageDirectory() + information.getImage());
+            }
+        }
+    }
+
+    /**
+     * 对要更新的信息的配图，重命名新信息的缓存的图片文件名。
+     *
+     * @param information 要更新的信息
+     * @return 重命名后的新图片文件名
+     */
+    private String renameInformationImage(UsefulInformation information) {
+        //将上传的新文件重名为含日期时间的newImageName，该新文件名用来保存到数据库
+        String newImageName = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss").format(new Date()) + "_" + information.getImage();
+        FileUtils.renameByName(filePathProperties.getUsefulInformationImageDirectory(), information.getImage(), newImageName);
+        information.setImage(newImageName);
+
+        return newImageName;
     }
 
     @Override
@@ -211,7 +271,7 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
         }
 
         //所属类别或序号修改过了，判断是否与已存在的记录冲突
-        if (getUsefulInformationByBelongToAndSequence(information.getBelongTo(), information.getSequence()) != null) {
+        if (isRepeatedBelongToAndSequence(information)) {
             //修改后的类别或序号已存在
             return BELONG_TO_AND_SEQUENCE_REPEAT;
         }
@@ -219,18 +279,25 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
         /*
          * 用户上传的配图的处理
          */
+        dealWithInsertingUsefulInformationImage(information);
+
+        usefulInformationMapper.insertOneUsefulInformation(information);
+        return Constants.SUCCESS;
+    }
+
+    /**
+     * 插入常用信息时对配图的处理。重命名
+     *
+     * @param information 插入的常用信息
+     */
+    private void dealWithInsertingUsefulInformationImage(UsefulInformation information) {
         if (!StringUtils.isEmpty(information.getImage())) {
             //如果用户上传了新配图
-            //将上传的新文件重名为含日期时间的newImageName，该新文件名用来保存到数据库
-            String newImageName = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss").format(new Date()) + "_" + information.getImage();
-            FileUtils.renameByName(filePathProperties.getUsefulInformationImageDirectory(), information.getImage(), newImageName);
-            information.setImage(newImageName);
+            renameInformationImage(information);
         } else {
             information.setImage(null);
         }
 
-        usefulInformationMapper.insertOneUsefulInformation(information);
-        return Constants.SUCCESS;
     }
 
     @Override
@@ -240,7 +307,7 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
         }
 
         //删除本地配图文件
-        deleteImageById(id);
+        deleteInformationImageById(id);
 
         return usefulInformationMapper.deleteOneUsefulInformationById(id);
     }
@@ -253,7 +320,7 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
 
         for (Long id : ids) {
             //删除本地配图文件
-            deleteImageById(id);
+            deleteInformationImageById(id);
         }
 
         return usefulInformationMapper.deleteManyUsefulInformationByIds(ids);
@@ -264,18 +331,13 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
      *
      * @param id 常用信息的id
      */
-    private void deleteImageById(Long id) {
+    private void deleteInformationImageById(Long id) {
         UsefulInformation information = getUsefulInformationById(id);
         if (information != null) {
             /*
              * 删除配图
              */
-            if (!StringUtils.isEmpty(information.getImage())) {
-                if (!information.isDefaultImage()) {
-                    //如果原来的配图不是默认配图，需要将原来的配图删除
-                    FileUtils.deleteFile(filePathProperties.getUsefulInformationImageDirectory() + information.getImage());
-                }
-            }
+            deleteInformationImage(information);
         }
     }
 }

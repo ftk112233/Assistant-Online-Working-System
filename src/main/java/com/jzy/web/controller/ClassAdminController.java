@@ -45,20 +45,20 @@ public class ClassAdminController extends AbstractController {
     private final static Logger logger = LogManager.getLogger(ClassAdminController.class);
 
     /**
-     * 导入排班表。
+     * 导入排班表：
      * 读取用户上传的excel，先进行输入参数的校验。
      * 如果入参无问题，读取excel中数据，
      * 而后由是否开启自动解析，取读出数据中的一条做进一步解析处理；
      * 再开始'先删后导'，如果开启了先删后导，把对应'年份-季度-分期-校区'的班级的信息先删除；
      * 删除完成后调用classService对应方法将excel中读取到的数据执行更新&插入数据库。
      * 如果没有任何异常，将更新结果——表格和数据库的[更新条数，速度]计算封装传回前端。
-     * 最后更新完成后需向对应班级所在校区用户发送消息通知；以及将'智能校历'缓存值redis
+     * 最后更新完成后需向对应班级所在校区用户发送消息通知；以及将'智能校历'缓存置redis
      *
-     * @param file 上传的文件
+     * @param file                上传的文件
      * @param parseClassIdChecked 是否开启自动解析
-     * @param deleteFirstChecked 是否开启先删后导
-     * @param chooseSeason 是否开启智能校历
-     * @param clazz 开班年份、季度、分期、校区信息的封装
+     * @param deleteFirstChecked  是否开启先删后导
+     * @param chooseSeason        是否开启智能校历
+     * @param clazz               开班年份、季度、分期、校区信息的封装
      * @return [更新结果, [更新条数，速度]]
      */
     @RequestMapping("/import")
@@ -206,17 +206,18 @@ public class ClassAdminController extends AbstractController {
     }
 
     /**
-     * 向指定校区的用户（助教）发送排班更新的通知
+     * 向指定开课年份季度分期和校区的用户（助教）发送排班更新的通知
      *
-     * @param clazz 从更新的记录中选取一个班级为例，取其校区作为要通知的校区，clazz的其他信息也用于消息正文
+     * @param clazz 从更新的记录中选取一个班级为例，取其开课年份季度分期和校区作为要通知的校区，clazz的其他信息也用于消息正文
      */
     private void sendMessageToUser(Class clazz) throws Exception {
         String campus = clazz.getClassCampus();
         if (!StringUtils.isEmpty(campus)) {
-            List<Assistant> assistants = assistantService.listAssistantsByCampus(campus);
+            ClassSeasonDto classSeasonDto = new ClassSeasonDto(clazz.getClassYear(), clazz.getClassSeason(), clazz.getClassSubSeason());
+            List<Assistant> assistants = assistantService.listAssistantsByClassSeasonAndCampus(classSeasonDto, campus);
             List<Long> userIds = new ArrayList<>();
             for (Assistant assistant : assistants) {
-                User user=userService.getUserByWorkId(assistant.getAssistantWorkId());
+                User user = userService.getUserByWorkId(assistant.getAssistantWorkId());
                 if (user != null) {
                     userIds.add(user.getId());
                 }
@@ -295,7 +296,7 @@ public class ClassAdminController extends AbstractController {
 
     /**
      * 重定向到编辑班级iframe子页面并返回相应model
-     *  其中被编辑的信息中select的元素不能通过layui iframe直接赋值，因此经由后台model传值
+     * 其中被编辑的信息中select的元素不能通过layui iframe直接赋值，因此经由后台model传值
      *
      * @param model
      * @param clazz 当前要被编辑的班级信息
@@ -417,7 +418,7 @@ public class ClassAdminController extends AbstractController {
      * @return
      */
     @RequestMapping("/getPreviewClassInfo")
-    public String getPreviewClassInfo(Model model, @RequestParam(value = "classId",required = false) String classId) {
+    public String getPreviewClassInfo(Model model, @RequestParam(value = "classId", required = false) String classId) {
         ClassDetailedDto classDetailedDto = classService.getClassDetailByClassId(classId);
         if (classDetailedDto == null) {
             classDetailedDto = new ClassDetailedDto();

@@ -9,7 +9,7 @@ import com.jzy.model.dto.ClassSeasonDto;
  * @description springmvc的model的key
  * @date 2019/11/19 16:50
  **/
-public class ModelConstants {
+public final class ModelConstants {
     private ModelConstants() {
     }
 

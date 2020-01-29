@@ -242,16 +242,17 @@ public class StudentAdminController extends AbstractController {
     }
 
     /**
-     * 向指定校区的用户（助教）发送学生花名册更新的通知
+     *  向指定开课年份季度分期和校区的用户（助教）发送学生花名册更新的通知
      *
-     * @param clazz 从更新的记录中选取一个班级为例，取其校区作为要通知的校区，clazz的其他信息也用于消息正文
+     * @param clazz 从更新的记录中选取一个班级为例，取其开课年份季度分期和校区作为要通知的校区，clazz的其他信息也用于消息正文
      */
     private void sendMessageToUser(Class clazz) throws Exception {
         if (clazz != null) {
             clazz.setParsedClassYear();
             String campus = clazz.getClassCampus();
             if (!StringUtils.isEmpty(campus)) {
-                List<Assistant> assistants = assistantService.listAssistantsByCampus(campus);
+                ClassSeasonDto classSeasonDto = new ClassSeasonDto(clazz.getClassYear(), clazz.getClassSeason(), clazz.getClassSubSeason());
+                List<Assistant> assistants = assistantService.listAssistantsByClassSeasonAndCampus(classSeasonDto, campus);
                 List<Long> userIds = new ArrayList<>();
                 for (Assistant assistant : assistants) {
                     User user=userService.getUserByWorkId(assistant.getAssistantWorkId());

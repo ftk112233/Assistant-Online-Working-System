@@ -10,7 +10,7 @@ import java.util.List;
  * @description 公共的常量类
  * @date 2019/11/18 12:59
  **/
-public class Constants {
+public final class Constants {
     private Constants() {
     }
 

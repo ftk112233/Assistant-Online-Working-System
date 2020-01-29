@@ -7,6 +7,7 @@ import com.github.pagehelper.PageInfo;
 import com.jzy.dao.RoleAndPermissionMapper;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.RedisConstants;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.RoleAndPermissionSearchCondition;
 import com.jzy.model.entity.RoleAndPermission;
@@ -34,25 +35,33 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
     /**
      * 表示(角色, 权限)组合冲突
      */
-    private final static String ROLE_AND_PERM_REPEAT="roleAndPermRepeat";
+    private final static String ROLE_AND_PERM_REPEAT = "roleAndPermRepeat";
 
     @Autowired
     private RoleAndPermissionMapper roleAndPermissionMapper;
 
     @Override
+    public boolean isRepeatedRoleAndPermission(RoleAndPermission roleAndPermission) {
+        if (roleAndPermission == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return getByRoleAndPerm(roleAndPermission.getRole(), roleAndPermission.getPerm()) != null;
+    }
+
+    @Override
     public List<String> listPermsByRole(String role) {
-        if (StringUtils.isEmpty(role)){
+        if (StringUtils.isEmpty(role)) {
             return new ArrayList<>();
         }
 
-        String key=RedisConstants.ROLE_AND_PERMS_KEY;
+        String key = RedisConstants.ROLE_AND_PERMS_KEY;
         if (hashOps.hasKey(key, role)) {
             //缓存中有
-            String permsJSON= (String) hashOps.get(key, role);
+            String permsJSON = (String) hashOps.get(key, role);
             return JSONArray.parseArray(permsJSON, String.class);
         } else {
             //缓存中无，从数据库查
-            List<String> perms= roleAndPermissionMapper.listPermsByRole(role);
+            List<String> perms = roleAndPermissionMapper.listPermsByRole(role);
             //添加缓存
             hashOps.put(key, role, JSON.toJSONString(perms));
             return perms;
@@ -81,16 +90,12 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
             return Constants.FAILURE;
         }
 
-        if (!roleAndPermission.getRole().equals(originalRoleAndPermission.getRole())
-                || !roleAndPermission.getPerm().equals(originalRoleAndPermission.getPerm())) {
+        if (isModifiedAndRepeatedRoleAndPermission(originalRoleAndPermission, roleAndPermission)) {
             //角色或权限修改过了，判断是否与已存在的记录冲突
-            if (getByRoleAndPerm(roleAndPermission.getRole(), roleAndPermission.getPerm()) != null) {
-                //修改后的角色和权限已存在
-                return ROLE_AND_PERM_REPEAT;
-            }
+            return ROLE_AND_PERM_REPEAT;
         }
 
-        if (roleAndPermission.equalsExceptBaseParams(originalRoleAndPermission)){
+        if (roleAndPermission.equalsExceptBaseParams(originalRoleAndPermission)) {
             //未修改
             return Constants.UNCHANGED;
         }
@@ -98,6 +103,26 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
         //执行更新
         roleAndPermissionMapper.updateRoleAndPermissionInfo(roleAndPermission);
         return Constants.SUCCESS;
+    }
+
+    /**
+     * 判断当前要更新的角色权限是否修改过且重复。
+     * 只有相较于原来的角色权限修改过且与数据库中重复才返回false
+     *
+     * @param originalRoleAndPermission 用来比较的原来的角色权限
+     * @param newRoleAndPermission      要更新的角色权限
+     * @return 角色权限的内容是否修改过且重复
+     */
+    private boolean isModifiedAndRepeatedRoleAndPermission(RoleAndPermission originalRoleAndPermission, RoleAndPermission newRoleAndPermission) {
+        if (!newRoleAndPermission.getRole().equals(originalRoleAndPermission.getRole())
+                || !newRoleAndPermission.getPerm().equals(originalRoleAndPermission.getPerm())) {
+            //角色或权限修改过了，判断是否与已存在的记录冲突
+            if (isRepeatedRoleAndPermission(newRoleAndPermission)) {
+                //修改后的角色和权限已存在
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -110,7 +135,7 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
         if (roleAndPermission == null) {
             return Constants.FAILURE;
         }
-        if (getByRoleAndPerm(roleAndPermission.getRole(), roleAndPermission.getPerm()) != null) {
+        if (isRepeatedRoleAndPermission(roleAndPermission)) {
             //角色和权限已存在
             return ROLE_AND_PERM_REPEAT;
         }
@@ -129,7 +154,7 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
 
     @Override
     public long deleteManyRoleAndPermissionsByIds(List<Long> ids) {
-        if (ids == null ||ids.size() == 0){
+        if (ids == null || ids.size() == 0) {
             return 0;
         }
         return roleAndPermissionMapper.deleteManyRoleAndPermissionsByIds(ids);

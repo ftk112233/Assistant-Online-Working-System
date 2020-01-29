@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.MissLessonStudentMapper;
 import com.jzy.manager.constant.Constants;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.model.dto.MissLessonStudentDetailedDto;
 import com.jzy.model.dto.MissLessonStudentSearchCondition;
 import com.jzy.model.dto.MyPage;
@@ -41,6 +42,24 @@ public class MissLessonStudentServiceImpl extends AbstractServiceImpl implements
     private MissLessonStudentMapper missLessonStudentMapper;
 
     @Override
+    public boolean existOriginalClass(MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
+        if (missLessonStudentDetailedDto == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+
+        return classService.getClassByClassId(missLessonStudentDetailedDto.getOriginalClassId()) != null;
+    }
+
+    @Override
+    public boolean existCurrentClass(MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
+        if (missLessonStudentDetailedDto == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+
+        return classService.getClassByClassId(missLessonStudentDetailedDto.getCurrentClassId()) != null;
+    }
+
+    @Override
     public PageInfo<MissLessonStudentDetailedDto> listMissLessonStudents(MyPage myPage, MissLessonStudentSearchCondition condition) {
         PageHelper.startPage(myPage.getPageNum(), myPage.getPageSize());
         List<MissLessonStudentDetailedDto> students = missLessonStudentMapper.listMissLessonStudents(condition);
@@ -53,12 +72,12 @@ public class MissLessonStudentServiceImpl extends AbstractServiceImpl implements
             return Constants.FAILURE;
         }
 
-        if (classService.getClassByClassId(missLessonStudentDetailedDto.getOriginalClassId()) == null) {
+        if (!existOriginalClass(missLessonStudentDetailedDto)) {
             //原班号不存在
             return ORIGINAL_CLASS_NOT_EXIST;
         }
 
-        if (classService.getClassByClassId(missLessonStudentDetailedDto.getCurrentClassId()) == null) {
+        if (!existCurrentClass(missLessonStudentDetailedDto)) {
             //补课班号不存在
             return CURRENT_CLASS_NOT_EXIST;
         }
@@ -73,12 +92,12 @@ public class MissLessonStudentServiceImpl extends AbstractServiceImpl implements
             return Constants.FAILURE;
         }
 
-        if (classService.getClassByClassId(missLessonStudentDetailedDto.getOriginalClassId()) == null) {
+        if (!existOriginalClass(missLessonStudentDetailedDto)) {
             //原班号不存在
             return ORIGINAL_CLASS_NOT_EXIST;
         }
 
-        if (classService.getClassByClassId(missLessonStudentDetailedDto.getCurrentClassId()) == null) {
+        if (!existCurrentClass(missLessonStudentDetailedDto)) {
             //补课班号不存在
             return CURRENT_CLASS_NOT_EXIST;
         }

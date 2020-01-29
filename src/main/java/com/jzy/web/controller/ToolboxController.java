@@ -69,14 +69,14 @@ public class ToolboxController extends AbstractController {
     private static Map<Long, StudentSchoolExcel> studentSchoolUploadCache = new HashMap<>();
 
     static {
-        //每天定时清理cache
-        TimerManager.startDailyTask(new TimerTask() {
-            @Override
-            public void run() {
-                ToolboxController.clearCache();
-                logger.info("定时清理ToolboxController的cache执行！----" + MyTimeUtils.dateToStringYMDHMS(new Date()));
-            }
-        });
+        //每天定时清理cache，改用springboot定时任务
+//        TimerManager.startDailyTask(new TimerTask() {
+//            @Override
+//            public void run() {
+//                ToolboxController.clearCache();
+//                logger.info("定时清理ToolboxController的cache执行！----" + MyTimeUtils.dateToStringYMDHMS(new Date()));
+//            }
+//        });
     }
 
     /**

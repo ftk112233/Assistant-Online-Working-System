@@ -73,6 +73,46 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     private UserMapper userMapper;
 
     @Override
+    public boolean isRepeatedUserWorkId(User user) {
+        if (user == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return getUserByWorkId(user.getUserWorkId()) != null;
+    }
+
+    @Override
+    public boolean isRepeatedUserIdCard(User user) {
+        if (user == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return getUserByIdCard(user.getUserIdCard()) != null;
+    }
+
+    @Override
+    public boolean isRepeatedUserName(User user) {
+        if (user == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return getUserByName(user.getUserName()) != null;
+    }
+
+    @Override
+    public boolean isRepeatedUserEmail(User user) {
+        if (user == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return getUserByEmail(user.getUserEmail()) != null;
+    }
+
+    @Override
+    public boolean isRepeatedUserPhone(User user) {
+        if (user == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return getUserByPhone(user.getUserPhone()) != null;
+    }
+
+    @Override
     public User getUserById(Long id) {
         return id == null ? null : userMapper.getUserById(id);
     }
@@ -250,45 +290,24 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         if (!StringUtils.isEmpty(user.getUserIdCard())) {
             //新身份证不为空
-            if (!user.getUserIdCard().equals(originalUser.getUserIdCard())) {
+            if (isModifiedAndRepeatedUserIdCard(originalUser, user)) {
                 //身份证修改过了，判断是否与已存在的身份证冲突
-                if (getUserByIdCard(user.getUserIdCard()) != null) {
-                    //修改后的身份证已存在
-                    return ID_CARD_REPEAT;
-                }
+                return ID_CARD_REPEAT;
             }
         } else {
             user.setUserIdCard(null);
         }
 
-
-        if (!originalUser.getUserName().equals(user.getUserName())) {
-            //如果用户名被修改过了
-            if (getUserByName(user.getUserName()) != null) {
-                return NAME_REPEAT;
-            }
+        if (isModifiedAndRepeatedUserName(originalUser, user)) {
+            return NAME_REPEAT;
         }
 
-        /**
+        /*
          * 用户上传的头像的处理
          */
-        if (!StringUtils.isEmpty(user.getUserIcon())) {
-            //如果用户上传了新头像
-            if (!originalUser.isDefaultUserIcon()) {
-                //如果用户原来的头像不是默认头像，需要将原来的头像删除
-                FileUtils.deleteFile(filePathProperties.getUploadUserIconPath() + originalUser.getUserIcon());
-            }
-            //将上传的新头像文件重名为含日期时间的newUserIconName，该新文件名用来保存到数据库
-            String newUserIconName = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss").format(new Date()) + "_" + user.getUserIcon();
-            FileUtils.renameByName(filePathProperties.getUploadUserIconPath(), user.getUserIcon(), newUserIconName);
-            user.setUserIcon(newUserIconName);
-        } else {
-            //仍设置原头像
-            user.setUserIcon(originalUser.getUserIcon());
-        }
+        dealWithUpdatingUserIcon(originalUser, user);
 
-        if (StringUtils.equals(user.getUserName(), originalUser.getUserName()) && StringUtils.equals(user.getUserRealName(), originalUser.getUserRealName())
-                && StringUtils.equals(user.getUserIdCard(), originalUser.getUserIdCard()) && StringUtils.equals(user.getUserIcon(), originalUser.getUserIcon())) {
+        if (isUnchangedUserOwnInfo(originalUser, user)) {
             //判断输入对象的对应字段是否未做任何修改
             return Constants.UNCHANGED;
         }
@@ -296,6 +315,103 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         //执行更新
         userMapper.updateOwnInfo(user);
         return Constants.SUCCESS;
+    }
+
+    /**
+     * 更新用户信息时对头像的处理。先删除，再重命名
+     *
+     * @param originalUser 原来的用户信息
+     * @param newUser      更新后的用户信息
+     */
+    private void dealWithUpdatingUserIcon(User originalUser, User newUser) {
+        if (!StringUtils.isEmpty(newUser.getUserIcon())) {
+            //如果用户上传了新头像
+            //删除原头像，如果有的话
+            deleteUserIcon(originalUser);
+            //重命名新的头像缓存的图片文件名
+            renameInformationImage(newUser);
+        } else {
+            //仍设置原头像
+            newUser.setUserIcon(originalUser.getUserIcon());
+        }
+    }
+
+    /**
+     * 对入参用户，删除它在硬盘上保存的头像图片文件（如果有且不是默认图片的话）。
+     *
+     * @param user 指定的用户
+     */
+    private void deleteUserIcon(User user) {
+        if (!StringUtils.isEmpty(user.getUserIcon())) {
+            if (!user.isDefaultUserIcon()) {
+                //如果用户原来的头像不是默认头像，需要将原来的头像删除
+                FileUtils.deleteFile(filePathProperties.getUploadUserIconPath() + user.getUserIcon());
+            }
+        }
+    }
+
+    /**
+     * 对要更新的用户的头像，重命名新的头像缓存的图片文件名。
+     *
+     * @param user 指定要更新的用户
+     * @return 重命名后的新图片文件名
+     */
+    private String renameInformationImage(User user) {
+        //将上传的新头像文件重名为含日期时间的newUserIconName，该新文件名用来保存到数据库
+        String newUserIconName = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss").format(new Date()) + "_" + user.getUserIcon();
+        FileUtils.renameByName(filePathProperties.getUploadUserIconPath(), user.getUserIcon(), newUserIconName);
+        user.setUserIcon(newUserIconName);
+
+        return newUserIconName;
+    }
+
+    /**
+     * 判断当前要更新的用户的身份证是否修改过且重复。
+     * 只有相较于原来的用户修改过且与数据库中重复才返回false
+     *
+     * @param originalUser 用来比较的原来的用户
+     * @param newUser      要更新的用户
+     * @return 身份证是否修改过且重复
+     */
+    private boolean isModifiedAndRepeatedUserIdCard(User originalUser, User newUser) {
+        if (!newUser.getUserIdCard().equals(originalUser.getUserIdCard())) {
+            //身份证修改过了，判断是否与已存在的身份证冲突
+            if (isRepeatedUserIdCard(newUser)) {
+                //修改后的身份证已存在
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断当前要更新的用户的用户名是否修改过且重复。
+     * 只有相较于原来的用户修改过且与数据库中重复才返回false
+     *
+     * @param originalUser 用来比较的原来的用户
+     * @param newUser      要更新的用户
+     * @return 用户名是否修改过且重复
+     */
+    private boolean isModifiedAndRepeatedUserName(User originalUser, User newUser) {
+        if (!originalUser.getUserName().equals(newUser.getUserName())) {
+            //如果用户名被修改过了
+            if (isRepeatedUserName(newUser)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断用户更新自己资料时，相应字段是否有修改
+     *
+     * @param originalUser 原用户信息
+     * @param newUser      修改后的用户信息
+     * @return 是否有修改
+     */
+    private boolean isUnchangedUserOwnInfo(User originalUser, User newUser) {
+        return StringUtils.equals(newUser.getUserName(), originalUser.getUserName()) && StringUtils.equals(newUser.getUserRealName(), originalUser.getUserRealName())
+                && StringUtils.equals(newUser.getUserIdCard(), originalUser.getUserIdCard()) && StringUtils.equals(newUser.getUserIcon(), originalUser.getUserIcon());
     }
 
     @Override
@@ -344,12 +460,9 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         if (!StringUtils.isEmpty(user.getUserWorkId())) {
             //新工号不为空
-            if (!user.getUserWorkId().equals(originalUser.getUserWorkId())) {
+            if (isModifiedAndRepeatedUserWorkId(originalUser, user)) {
                 //工号修改过了，判断是否与已存在的工号冲突
-                if (getUserByWorkId(user.getUserWorkId()) != null) {
-                    //修改后的工号已存在
-                    return WORK_ID_REPEAT;
-                }
+                return WORK_ID_REPEAT;
             }
 
         } else {
@@ -358,33 +471,24 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         if (!StringUtils.isEmpty(user.getUserIdCard())) {
             //新身份证不为空
-            if (!user.getUserIdCard().equals(originalUser.getUserIdCard())) {
+            if (isModifiedAndRepeatedUserIdCard(originalUser, user)) {
                 //身份证修改过了，判断是否与已存在的身份证冲突
-                if (getUserByIdCard(user.getUserIdCard()) != null) {
-                    //修改后的身份证已存在
-                    return ID_CARD_REPEAT;
-                }
+                return ID_CARD_REPEAT;
             }
         } else {
             user.setUserIdCard(null);
         }
 
-        if (!user.getUserName().equals(originalUser.getUserName())) {
+        if (isModifiedAndRepeatedUserName(originalUser, user)) {
             //用户名修改过了，判断是否与已存在的用户名冲突
-            if (getUserByName(user.getUserName()) != null) {
-                //修改后的用户名已存在
-                return NAME_REPEAT;
-            }
+            return NAME_REPEAT;
         }
 
         if (!StringUtils.isEmpty(user.getUserEmail())) {
             //新邮箱不为空
-            if (!user.getUserEmail().equals(originalUser.getUserEmail())) {
+            if (isModifiedAndRepeatedUserEmail(originalUser, user)) {
                 //邮箱修改过了，判断是否与已存在的邮箱冲突
-                if (getUserByEmail(user.getUserEmail()) != null) {
-                    //修改后的邮箱已存在
-                    return EMAIL_REPEAT;
-                }
+                return EMAIL_REPEAT;
             }
         } else {
             user.setUserEmail(null);
@@ -392,12 +496,9 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         if (!StringUtils.isEmpty(user.getUserPhone())) {
             //新手机不为空
-            if (!user.getUserPhone().equals(originalUser.getUserPhone())) {
+            if (isModifiedAndRepeatedUserPhone(originalUser, user)) {
                 //电话修改过了，判断是否与已存在的电话冲突
-                if (getUserByPhone(user.getUserPhone()) != null) {
-                    //修改后的电话已存在
-                    return PHONE_REPEAT;
-                }
+                return PHONE_REPEAT;
             }
         } else {
             user.setUserPhone(null);
@@ -406,31 +507,86 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         /*
          * 用户上传的头像的处理
          */
-        if (!StringUtils.isEmpty(user.getUserIcon())) {
-            //如果用户上传了新头像
-            if (!originalUser.isDefaultUserIcon()) {
-                //如果用户原来的头像不是默认头像，需要将原来的头像删除
-                FileUtils.deleteFile(filePathProperties.getUploadUserIconPath() + originalUser.getUserIcon());
-            }
-            //将上传的新头像文件重名为含日期时间的newUserIconName，该新文件名用来保存到数据库
-            String newUserIconName = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss").format(new Date()) + "_" + user.getUserIcon();
-            FileUtils.renameByName(filePathProperties.getUploadUserIconPath(), user.getUserIcon(), newUserIconName);
-            user.setUserIcon(newUserIconName);
-        } else {
-            //仍设置原头像
-            user.setUserIcon(originalUser.getUserIcon());
-        }
+        dealWithUpdatingUserIcon(originalUser, user);
 
-        if (StringUtils.equals(user.getUserWorkId(), originalUser.getUserWorkId()) && StringUtils.equals(user.getUserName(), originalUser.getUserName()) && StringUtils.equals(user.getUserRealName(), originalUser.getUserRealName())
-                && StringUtils.equals(user.getUserIdCard(), originalUser.getUserIdCard()) && StringUtils.equals(user.getUserRole(), originalUser.getUserRole()) && StringUtils.equals(user.getUserIcon(), originalUser.getUserIcon())
-                && StringUtils.equals(user.getUserEmail(), originalUser.getUserEmail()) && StringUtils.equals(user.getUserPhone(), originalUser.getUserPhone())
-                && StringUtils.equals(user.getUserRemark(), originalUser.getUserRemark())) {
+        if (isUnchangedUserInfo(originalUser, user)) {
             //判断输入对象的对应字段是否未做任何修改
             return Constants.UNCHANGED;
         }
 
         userMapper.updateUserInfo(user);
         return Constants.SUCCESS;
+    }
+
+    /**
+     * 判断当前要更新的用户的工号是否修改过且重复。
+     * 只有相较于原来的用户修改过且与数据库中重复才返回false
+     *
+     * @param originalUser 用来比较的原来的用户
+     * @param newUser      要更新的用户
+     * @return 工号是否修改过且重复
+     */
+    private boolean isModifiedAndRepeatedUserWorkId(User originalUser, User newUser) {
+        if (!originalUser.getUserWorkId().equals(newUser.getUserWorkId())) {
+            //如果用户名被修改过了
+            if (isRepeatedUserWorkId(newUser)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断当前要更新的用户的邮箱是否修改过且重复。
+     * 只有相较于原来的用户修改过且与数据库中重复才返回false
+     *
+     * @param originalUser 用来比较的原来的用户
+     * @param newUser      要更新的用户
+     * @return 邮箱是否修改过且重复
+     */
+    private boolean isModifiedAndRepeatedUserEmail(User originalUser, User newUser) {
+        if (!newUser.getUserEmail().equals(originalUser.getUserEmail())) {
+            //邮箱修改过了，判断是否与已存在的邮箱冲突
+            if (isRepeatedUserEmail(newUser)) {
+                //修改后的邮箱已存在
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断当前要更新的用户的电话是否修改过且重复。
+     * 只有相较于原来的用户修改过且与数据库中重复才返回false
+     *
+     * @param originalUser 用来比较的原来的用户
+     * @param newUser      要更新的用户
+     * @return 电话是否修改过且重复
+     */
+    private boolean isModifiedAndRepeatedUserPhone(User originalUser, User newUser) {
+        if (!newUser.getUserPhone().equals(originalUser.getUserPhone())) {
+            //电话修改过了，判断是否与已存在的电话冲突
+            if (isRepeatedUserPhone(newUser)) {
+                //修改后的电话已存在
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * 判断用户更新自己资料时，相应字段是否有修改
+     *
+     * @param originalUser 原用户信息
+     * @param newUser      修改后的用户信息
+     * @return 是否有修改
+     */
+    private boolean isUnchangedUserInfo(User originalUser, User newUser) {
+        return StringUtils.equals(newUser.getUserWorkId(), originalUser.getUserWorkId()) && StringUtils.equals(newUser.getUserName(), originalUser.getUserName()) && StringUtils.equals(newUser.getUserRealName(), originalUser.getUserRealName())
+                && StringUtils.equals(newUser.getUserIdCard(), originalUser.getUserIdCard()) && StringUtils.equals(newUser.getUserRole(), originalUser.getUserRole()) && StringUtils.equals(newUser.getUserIcon(), originalUser.getUserIcon())
+                && StringUtils.equals(newUser.getUserEmail(), originalUser.getUserEmail()) && StringUtils.equals(newUser.getUserPhone(), originalUser.getUserPhone())
+                && StringUtils.equals(newUser.getUserRemark(), originalUser.getUserRemark());
     }
 
     @Override
@@ -440,7 +596,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         }
         if (!StringUtils.isEmpty(user.getUserWorkId())) {
             //新工号不为空
-            if (getUserByWorkId(user.getUserWorkId()) != null) {
+            if (isRepeatedUserWorkId(user)) {
                 //添加的工号已存在
                 return new UpdateResult(WORK_ID_REPEAT);
             }
@@ -450,7 +606,6 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         return insertUserWithUnrepeatedWorkId(user);
     }
-
 
     /**
      * 插入工号不重复的用户信息
@@ -469,7 +624,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         }
         if (!StringUtils.isEmpty(user.getUserIdCard())) {
             //新身份证不为空
-            if (getUserByIdCard(user.getUserIdCard()) != null) {
+            if (isRepeatedUserIdCard(user)) {
                 //添加的身份证已存在
                 return new UpdateResult(ID_CARD_REPEAT);
             }
@@ -478,14 +633,14 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         }
 
 
-        if (getUserByName(user.getUserName()) != null) {
+        if (isRepeatedUserName(user)) {
             //添加的用户名已存在
             return new UpdateResult(NAME_REPEAT);
         }
 
         if (!StringUtils.isEmpty(user.getUserEmail())) {
             //新邮箱不为空
-            if (getUserByEmail(user.getUserEmail()) != null) {
+            if (isRepeatedUserEmail(user)) {
                 //添加的邮箱已存在
                 return new UpdateResult(EMAIL_REPEAT);
             }
@@ -495,7 +650,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         if (!StringUtils.isEmpty(user.getUserPhone())) {
             //新手机不为空
-            if (getUserByPhone(user.getUserPhone()) != null) {
+            if (isRepeatedUserPhone(user)) {
                 //添加的电话已存在
                 return new UpdateResult(PHONE_REPEAT);
             }
@@ -554,20 +709,15 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     /**
      * 根据用户id删除用户头像文件
      *
-     * @param id
+     * @param id 用户id
      */
-    private void deleteUserIconFileById(Long id) {
+    private void deleteUserIconById(Long id) {
         User user = getUserById(id);
         if (user != null) {
             /*
              * 删除用户头像文件
              */
-            if (!StringUtils.isEmpty(user.getUserIcon())) {
-                if (!user.isDefaultUserIcon()) {
-                    //如果用户原来的头像不是默认头像，需要将原来的头像删除
-                    FileUtils.deleteFile(filePathProperties.getUploadUserIconPath() + user.getUserIcon());
-                }
-            }
+            deleteUserIcon(user);
         }
     }
 
@@ -578,7 +728,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             return 0;
         }
 
-        deleteUserIconFileById(id);
+        deleteUserIconById(id);
 
         return userMapper.deleteOneUserById(id);
     }
@@ -590,7 +740,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         }
 
         for (Long id : ids) {
-            deleteUserIconFileById(id);
+            deleteUserIconById(id);
         }
         return userMapper.deleteManyUsersByIds(ids);
     }
@@ -640,8 +790,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         UpdateResult result = new UpdateResult();
 
-        User originalUser = getUserByWorkId(user.getUserWorkId());
-        if (originalUser == null) {
+        if (!isRepeatedUserWorkId(user)) {
             /*
               插入。如果用户目前没有给工号，那么insertUserWithUnrepeatedWorkId方法会处理好导入逻辑，
               因为如果身份证等其他唯一字段有重复，insertUserWithUnrepeatedWorkId方法会直接return
@@ -669,33 +818,24 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         if (!StringUtils.isEmpty(newUser.getUserIdCard())) {
             //新身份证不为空
-            if (!newUser.getUserIdCard().equals(originalUser.getUserIdCard())) {
+            if (isModifiedAndRepeatedUserIdCard(originalUser, newUser)) {
                 //身份证修改过了，判断是否与已存在的身份证冲突
-                if (getUserByIdCard(newUser.getUserIdCard()) != null) {
-                    //修改后的身份证已存在
-                    return ID_CARD_REPEAT;
-                }
+                return ID_CARD_REPEAT;
             }
         } else {
             newUser.setUserIdCard(null);
         }
 
-        if (!newUser.getUserName().equals(originalUser.getUserName())) {
+        if (isModifiedAndRepeatedUserName(originalUser, newUser)) {
             //用户名修改过了，判断是否与已存在的用户名冲突
-            if (getUserByName(newUser.getUserName()) != null) {
-                //修改后的用户名已存在
-                return NAME_REPEAT;
-            }
+            return NAME_REPEAT;
         }
 
         if (!StringUtils.isEmpty(newUser.getUserEmail())) {
             //新邮箱不为空
-            if (!newUser.getUserEmail().equals(originalUser.getUserEmail())) {
+            if (isModifiedAndRepeatedUserEmail(originalUser, newUser)) {
                 //邮箱修改过了，判断是否与已存在的邮箱冲突
-                if (getUserByEmail(newUser.getUserEmail()) != null) {
-                    //修改后的邮箱已存在
-                    return EMAIL_REPEAT;
-                }
+                return EMAIL_REPEAT;
             }
         } else {
             newUser.setUserEmail(null);
@@ -703,12 +843,9 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         if (!StringUtils.isEmpty(newUser.getUserPhone())) {
             //新手机不为空
-            if (!newUser.getUserPhone().equals(originalUser.getUserPhone())) {
+            if (isModifiedAndRepeatedUserPhone(originalUser, newUser)) {
                 //电话修改过了，判断是否与已存在的电话冲突
-                if (getUserByPhone(newUser.getUserPhone()) != null) {
-                    //修改后的电话已存在
-                    return PHONE_REPEAT;
-                }
+                return PHONE_REPEAT;
             }
         } else {
             newUser.setUserPhone(null);

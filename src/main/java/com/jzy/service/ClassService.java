@@ -15,6 +15,30 @@ import java.util.List;
  **/
 public interface ClassService {
     /**
+     * 判断输入班级对象的班号是否与数据库中已有的有冲突
+     *
+     * @param clazz 要判断的班级
+     * @return 班号是否冲突
+     */
+    boolean isRepeatedClassId(Class clazz);
+
+    /**
+     * 判断输入班级对象指定的教师是否存在
+     *
+     * @param classDetailedDto 要判断的班级详细信息
+     * @return 班级指定的教师是否存在
+     */
+    boolean existClassTeacher(ClassDetailedDto classDetailedDto);
+
+    /**
+     * 判断输入班级对象指定的助教是否存在
+     *
+     * @param classDetailedDto 要判断的班级详细信息
+     * @return 班级指定的助教是否存在
+     */
+    boolean existClassAssistant(ClassDetailedDto classDetailedDto);
+
+    /**
      * 根据班级id查询班级
      *
      * @param id 班级id
@@ -164,6 +188,8 @@ public interface ClassService {
 
     /**
      * 修改当前校历
+     *
+     * @param classSeason 修改后的年份季度分期
      */
     void updateCurrentClassSeason(ClassSeasonDto classSeason);
 

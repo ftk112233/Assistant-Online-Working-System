@@ -36,6 +36,14 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
     private StudentMapper studentMapper;
 
     @Override
+    public boolean isRepeatedStudentId(Student student) {
+        if (student == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return getStudentByStudentId(student.getStudentId()) != null;
+    }
+
+    @Override
     public Student getStudentById(Long id) {
         return id == null ? null : studentMapper.getStudentById(id);
     }
@@ -89,7 +97,7 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
         if (student == null) {
             return new UpdateResult(Constants.FAILURE);
         }
-        if (getStudentByStudentId(student.getStudentId()) != null) {
+        if (isRepeatedStudentId(student)) {
             //添加的学号号已存在
             return new UpdateResult(STUDENT_ID_REPEAT);
         }
@@ -121,10 +129,10 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
     }
 
     /**
-     * 批量插入学生,，但这些学生的学员编号不做冲突校验。因此要求入参必须不存在学员号重复的情况
+     * 批量插入学生，但这些学生的学员编号不做冲突校验。因此要求入参必须不存在学员号重复的情况
      *
-     * @param students
-     * @return
+     * @param students 批量插入的学生
+     * @return (更新结果, 更细记录数)
      */
     private UpdateResult insertManyStudentsWithUnrepeatedStudentId(List<Student> students) {
         if (students == null || students.size() == 0) {
@@ -404,12 +412,9 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
             return Constants.FAILURE;
         }
 
-        if (!student.getStudentId().equals(originalStudent.getStudentId())) {
+        if (isModifiedAndRepeatedStudentId(originalStudent, student)) {
             //学员号修改过了，判断是否与已存在的学员号冲突
-            if (getStudentByStudentId(student.getStudentId()) != null) {
-                //修改后的学员号已存在
-                return STUDENT_ID_REPEAT;
-            }
+            return STUDENT_ID_REPEAT;
         }
 
         if (StringUtils.isEmpty(student.getStudentSex())) {
@@ -423,6 +428,25 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
 
         studentMapper.updateStudentInfo(student);
         return Constants.SUCCESS;
+    }
+
+    /**
+     * 判断当前要更新的学生学员号是否修改过且重复。
+     * 只有相较于原来的学生修改过且与数据库中重复才返回false
+     *
+     * @param originalStudent 用来比较的原来的学生
+     * @param newStudent      要更新的学生
+     * @return 学员号的内容是否重复且修改过
+     */
+    private boolean isModifiedAndRepeatedStudentId(Student originalStudent, Student newStudent) {
+        if (!newStudent.getStudentId().equals(originalStudent.getStudentId())) {
+            //学员号修改过了，判断是否与已存在的学员号冲突
+            if (isRepeatedStudentId(newStudent)) {
+                //修改后的学员号已存在
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

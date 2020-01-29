@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.jzy.dao.CampusAndClassroomMapper;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.RedisConstants;
+import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.model.entity.CampusAndClassroom;
 import com.jzy.service.CampusAndClassroomService;
 import org.apache.commons.lang3.StringUtils;
@@ -30,10 +31,18 @@ public class CampusAndClassroomServiceImpl extends AbstractServiceImpl implement
     /**
      * 校区和教室组合已存在
      */
-    private final static String CAMPUS_AND_CLASSROOM_REPEAT="campusAndClassroomRepeat";
+    private final static String CAMPUS_AND_CLASSROOM_REPEAT = "campusAndClassroomRepeat";
 
     @Autowired
     private CampusAndClassroomMapper campusAndClassroomMapper;
+
+    @Override
+    public boolean isRepeatedCampusAndClassroom(CampusAndClassroom campusAndClassroom) {
+        if (campusAndClassroom == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return getByCampusAndClassroom(campusAndClassroom.getCampus(), campusAndClassroom.getClassroom()) != null;
+    }
 
     @Override
     public CampusAndClassroom getCampusAndClassroomById(Long id) {
@@ -64,8 +73,6 @@ public class CampusAndClassroomServiceImpl extends AbstractServiceImpl implement
         return (StringUtils.isEmpty(campus) || StringUtils.isEmpty(classroom)) ? null : campusAndClassroomMapper.getByCampusAndClassroom(campus, classroom);
     }
 
-
-
     @Override
     public long deleteCampusAndClassroomsByCampus(String campus) {
         if (StringUtils.isEmpty(campus)) {
@@ -80,7 +87,7 @@ public class CampusAndClassroomServiceImpl extends AbstractServiceImpl implement
         if (campusAndClassroom == null) {
             return Constants.FAILURE;
         }
-        if (getByCampusAndClassroom(campusAndClassroom.getCampus(), campusAndClassroom.getClassroom()) != null) {
+        if (isRepeatedCampusAndClassroom(campusAndClassroom)) {
             //已存在
             return CAMPUS_AND_CLASSROOM_REPEAT;
         }

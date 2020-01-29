@@ -16,6 +16,22 @@ import java.util.List;
  **/
 public interface MissLessonStudentService {
     /**
+     * 判断输入补课学生对象的原班级是否存在
+     *
+     * @param missLessonStudentDetailedDto 要判断的补课学生详细信息
+     * @return 补课学生对象的原班级是否存在
+     */
+    boolean existOriginalClass(MissLessonStudentDetailedDto missLessonStudentDetailedDto);
+
+    /**
+     * 判断输入补课学生对象的补课班级是否存在
+     *
+     * @param missLessonStudentDetailedDto 要判断的补课学生详细信息
+     * @return 补课学生对象的补课班级是否存在
+     */
+    boolean existCurrentClass(MissLessonStudentDetailedDto missLessonStudentDetailedDto);
+
+    /**
      * 查询补课学员信息
      *
      * @param myPage    分页{页号，每页数量}

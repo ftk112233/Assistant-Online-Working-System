@@ -128,12 +128,7 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
             /*
              * 删除图片
              */
-            if (!message.isWelcomePicture()) {
-                //不是欢迎图片
-                if (!StringUtils.isEmpty(message.getMessagePicture())) {
-                    FileUtils.deleteFile(filePathProperties.getUserMessagePictureDirectory() + message.getMessagePicture());
-                }
-            }
+            deleteUserMessagePicture(message);
         }
     }
 
@@ -157,7 +152,7 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
         /*
          * 用户上传的图片的处理
          */
-        dealWithUserMessagePictureByRenaming(userMessage);
+        dealWithInsertingUserMessagePicture(userMessage);
 
         userMessageMapper.insertOneUserMessage(userMessage);
         return Constants.SUCCESS;
@@ -169,15 +164,12 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
      * @param userMessage 用户消息对象入参
      * @return 处理过图片字段的入参用户消息对象直接返回
      */
-    private UserMessage dealWithUserMessagePictureByRenaming(UserMessage userMessage) {
+    private UserMessage dealWithInsertingUserMessagePicture(UserMessage userMessage) {
         if (!userMessage.isWelcomePicture()) {
             //如果不是欢迎图片，就要做重命名
             if (!StringUtils.isEmpty(userMessage.getMessagePicture())) {
                 //如果用户上传了新图片
-                //将上传的新图片文件重名为含日期时间的newUserIconName，该新文件名用来保存到数据库
-                String newPicture = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss").format(new Date()) + "_" + userMessage.getMessagePicture();
-                FileUtils.renameByName(filePathProperties.getUserMessagePictureDirectory(), userMessage.getMessagePicture(), newPicture);
-                userMessage.setMessagePicture(newPicture);
+                renameUserMessagePicture(userMessage);
             } else {
                 //仍设置原头像
                 userMessage.setMessagePicture(null);
@@ -185,6 +177,35 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
         }
 
         return userMessage;
+    }
+
+    /**
+     * 对入参userMessage，删除它在硬盘上保存的配图文件（如果有且不是默认图片的话）。
+     *
+     * @param userMessage 用户消息对象
+     */
+    private void deleteUserMessagePicture(UserMessage userMessage) {
+        if (!userMessage.isWelcomePicture()) {
+            //不是欢迎图片
+            if (!StringUtils.isEmpty(userMessage.getMessagePicture())) {
+                FileUtils.deleteFile(filePathProperties.getUserMessagePictureDirectory() + userMessage.getMessagePicture());
+            }
+        }
+    }
+
+    /**
+     * 重命名新消息的缓存的图片文件名。
+     *
+     * @param userMessage 用户消息对象
+     * @return 重命名后的新图片文件名
+     */
+    private String renameUserMessagePicture(UserMessage userMessage) {
+        //将上传的新图片文件重名为含日期时间的newUserIconName，该新文件名用来保存到数据库
+        String newPicture = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss").format(new Date()) + "_" + userMessage.getMessagePicture();
+        FileUtils.renameByName(filePathProperties.getUserMessagePictureDirectory(), userMessage.getMessagePicture(), newPicture);
+        userMessage.setMessagePicture(newPicture);
+
+        return newPicture;
     }
 
     @Override

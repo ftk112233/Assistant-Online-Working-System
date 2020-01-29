@@ -10,7 +10,6 @@ import com.jzy.manager.util.StudentAndClassUtils;
 import com.jzy.model.dto.*;
 import com.jzy.model.dto.echarts.*;
 import com.jzy.model.entity.Class;
-import com.jzy.model.entity.Student;
 import com.jzy.model.entity.StudentAndClass;
 import com.jzy.model.vo.echarts.NamesAndValues;
 import com.jzy.service.StudentAndClassService;
@@ -54,6 +53,30 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
     private StudentAndClassMapper studentAndClassMapper;
 
     @Override
+    public boolean isRepeatedStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto) {
+        if (studentAndClassDetailedDto == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return countStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto.getStudentId(), studentAndClassDetailedDto.getClassId()) > 0;
+    }
+
+    @Override
+    public boolean existStudentId(StudentAndClassDetailedDto studentAndClassDetailedDto) {
+        if (studentAndClassDetailedDto == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return studentService.getStudentByStudentId(studentAndClassDetailedDto.getStudentId()) != null;
+    }
+
+    @Override
+    public boolean existClassId(StudentAndClassDetailedDto studentAndClassDetailedDto) {
+        if (studentAndClassDetailedDto == null) {
+            throw new InvalidParameterException("输入对象不能为空");
+        }
+        return classService.getClassByClassId(studentAndClassDetailedDto.getClassId()) != null;
+    }
+
+    @Override
     public StudentAndClass getStudentAndClassById(Long id) {
         return id == null ? null : studentAndClassMapper.getStudentAndClassById(id);
     }
@@ -68,7 +91,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
         if (studentAndClassDetailedDto == null) {
             return new UpdateResult(Constants.FAILURE);
         }
-        if (countStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto.getStudentId(), studentAndClassDetailedDto.getClassId()) > 0) {
+        if (isRepeatedStudentAndClass(studentAndClassDetailedDto)) {
             //重复报班
             return new UpdateResult(STUDENT_AND_CLASS_EXIST);
         }
@@ -89,14 +112,12 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
         if (studentAndClassDetailedDto == null) {
             return new UpdateResult(Constants.FAILURE);
         }
-        Student student = studentService.getStudentByStudentId(studentAndClassDetailedDto.getStudentId());
-        if (student == null) {
+        if (!existStudentId(studentAndClassDetailedDto)) {
             //学员号不存在
             return new UpdateResult(STUDENT_NOT_EXIST);
         }
 
-        Class clazz = classService.getClassByClassId(studentAndClassDetailedDto.getClassId());
-        if (clazz == null) {
+        if (!existClassId(studentAndClassDetailedDto)) {
             //班号不存在
             return new UpdateResult(CLASS_NOT_EXIST);
         }
@@ -132,11 +153,10 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
         InvalidData invalidData = new InvalidData(studentIdKeyword, classIdKeyword);
 
 
-        List<StudentAndClassDetailedDto> studentAndClassesToInsert=new ArrayList<>();
+        List<StudentAndClassDetailedDto> studentAndClassesToInsert = new ArrayList<>();
         for (StudentAndClassDetailedDto studentAndClassDetailedDto : studentAndClassDetailedDtos) {
             if (StudentAndClassUtils.isValidStudentAndClassDetailedDtoInfo(studentAndClassDetailedDto)) {
-                Long count = countStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto.getStudentId(), studentAndClassDetailedDto.getClassId());
-                if (count > 0) {
+                if (isRepeatedStudentAndClass(studentAndClassDetailedDto)) {
                     //记录已存在，更新
                     /*
                     不做是否修改过判断，规范是死的，人是活的。
@@ -183,20 +203,18 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
          *  真正要插入的学生上课记录dtosToInsert。
          *  因为入参集合中可能出现班号或学员号在系统中不存在的记录，所以遍历整体集合跳过这些记录，然后将其他有效的记录添加到dtosToInsert
          */
-        List<StudentAndClassDetailedDto> dtosToInsert=new ArrayList<>();
+        List<StudentAndClassDetailedDto> dtosToInsert = new ArrayList<>();
         for (StudentAndClassDetailedDto dto : studentAndClassDetailedDtos) {
             if (dto == null) {
                 return new UpdateResult(Constants.FAILURE);
             }
 
-            Student student = studentService.getStudentByStudentId(dto.getStudentId());
-            if (student == null) {
+            if (!existStudentId(dto)) {
                 //学员号不存在
                 continue;
             }
 
-            Class clazz = classService.getClassByClassId(dto.getClassId());
-            if (clazz == null) {
+            if (!existClassId(dto)) {
                 //班号不存在
                 continue;
             }
@@ -216,7 +234,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
      * 执行插入
      * else
      * 根据学员号和班号更新
-     *
+     * <p>
      * 对于插入改用批量插入的方式，sql的执行效率更高。详见insertAndUpdateStudentAndClassesFromExcel()具体内容
      *
      * @param studentAndClassDetailedDto 要更新的学员上课记录
@@ -233,8 +251,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
 
         UpdateResult result = new UpdateResult();
 
-        Long count = countStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto.getStudentId(), studentAndClassDetailedDto.getClassId());
-        if (count > 0) {
+        if (isRepeatedStudentAndClass(studentAndClassDetailedDto)) {
             //记录已存在，更新
             /*
             不做是否修改过判断，规范是死的，人是活的。
@@ -277,15 +294,14 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
         if (!studentAndClassDetailedDto.getStudentId().equals(originalStudentId)
                 || !studentAndClassDetailedDto.getClassId().equals(originalClassId)) {
             //学员号和班号中的一个修改过了，判断是否与已存在的<学员号, 班号>冲突
-            if (countStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto.getStudentId(), studentAndClassDetailedDto.getClassId()) > 0) {
+            if (isRepeatedStudentAndClass(studentAndClassDetailedDto)) {
                 //修改后的上课记录已存在
                 return STUDENT_AND_CLASS_EXIST;
             }
 
             if (!studentAndClassDetailedDto.getStudentId().equals(originalStudentId)) {
                 //学员号修改过了
-                Student student = studentService.getStudentByStudentId(studentAndClassDetailedDto.getStudentId());
-                if (student == null) {
+                if (!existStudentId(studentAndClassDetailedDto)) {
                     //学员号不存在
                     return STUDENT_NOT_EXIST;
                 }
@@ -293,8 +309,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
 
             if (!studentAndClassDetailedDto.getClassId().equals(originalClassId)) {
                 //班号修改过了
-                Class clazz = classService.getClassByClassId(studentAndClassDetailedDto.getClassId());
-                if (clazz == null) {
+                if (!existClassId(studentAndClassDetailedDto)) {
                     //班号不存在
                     return CLASS_NOT_EXIST;
                 }
@@ -321,12 +336,6 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
         return studentAndClassMapper.deleteManyStudentAndClassesByIds(ids);
     }
 
-    /**
-     * 根据班级编码查询班级的所有学生及班级的详细信息。
-     *
-     * @param classId 班级编码
-     * @return 结果用 {@link StudentAndClassDetailedDto} 的子类 {@link StudentAndClassDetailedWithSubjectsDto} 返回，子类和父类字段的差集都先空着
-     */
     @Override
     public List<StudentAndClassDetailedWithSubjectsDto> listStudentAndClassesByClassId(String classId) {
         return StringUtils.isEmpty(classId) ? new ArrayList<>() : studentAndClassMapper.listStudentAndClassesByClassId(classId);
@@ -341,10 +350,10 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
             condition.setStudentId(dto.getStudentId());
             //查出当前学生迄今为止所有的上课记录
             List<StudentAndClassDetailedDto> allRecords = studentAndClassMapper.listStudentAndClassesWithSubjectsByStudentId(condition);
-            ClassSeasonDto currentSeason=classService.getCurrentClassSeason();
-            for (StudentAndClassDetailedDto record:allRecords){
-                ClassSeasonDto recordSeason=new ClassSeasonDto(record.getClassYear(),record.getClassSeason(), record.getClassSubSeason());
-                if (recordSeason.compareTo(currentSeason)<0){
+            ClassSeasonDto currentSeason = classService.getCurrentClassSeason();
+            for (StudentAndClassDetailedDto record : allRecords) {
+                ClassSeasonDto recordSeason = new ClassSeasonDto(record.getClassYear(), record.getClassSeason(), record.getClassSubSeason());
+                if (recordSeason.compareTo(currentSeason) < 0) {
                     //如果该学生的上课记录中有季度时间节点在当前季度之前的，表示该学生之前上过课，是老生
                     dto.setOldStudent(true);
                     break;
@@ -370,7 +379,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
             //===============================================//
             condition.setAssistantName(dto.getAssistantName());
             //查出当前季度该学生在当前助教所有班级中出现次数
-            long count=studentAndClassMapper.countStudentAndClassBySeasonAndAssistant(condition);
+            long count = studentAndClassMapper.countStudentAndClassBySeasonAndAssistant(condition);
             dto.setCountOfSpecifiedAssistant((int) count);
         }
         return dtos;

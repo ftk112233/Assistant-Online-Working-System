@@ -20,6 +20,14 @@ import java.util.List;
  **/
 public interface QuestionService {
     /**
+     * 判断输入问题对象的内容是否与数据库中已有的有冲突
+     *
+     * @param question 要判断的问题
+     * @return 内容是否冲突
+     */
+    boolean isRepeatedQuestionContent(Question question);
+
+    /**
      * 根据id查询问题
      *
      * @param id 主键id

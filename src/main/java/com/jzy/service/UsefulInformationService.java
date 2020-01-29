@@ -18,6 +18,14 @@ import java.util.List;
  **/
 public interface UsefulInformationService {
     /**
+     * 判断输入常用信息对象的常用信息是否与数据库中已有的有冲突
+     *
+     * @param usefulInformation 要判断的常用信息
+     * @return 归属和序号是否冲突
+     */
+    boolean isRepeatedBelongToAndSequence(UsefulInformation usefulInformation);
+
+    /**
      * 根据id查询当前常用信息
      *
      * @param id 主键id

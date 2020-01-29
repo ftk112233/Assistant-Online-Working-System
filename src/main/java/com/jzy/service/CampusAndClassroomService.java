@@ -13,6 +13,14 @@ import java.util.List;
  **/
 public interface CampusAndClassroomService {
     /**
+     * 判断输入校区教室对象的校区和教室是否与数据库中已有的有冲突
+     *
+     * @param campusAndClassroom 要判断的校区教室对象
+     * @return 校区和教室是否冲突
+     */
+    boolean isRepeatedCampusAndClassroom(CampusAndClassroom campusAndClassroom);
+
+    /**
      * 根据id获取校区及教室
      *
      * @param id 主键id

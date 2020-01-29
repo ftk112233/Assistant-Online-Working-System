@@ -290,6 +290,7 @@
 </div>
 <script src="${ctx}/custom/js/img.js"></script>
 
+<script src="${ctx}/custom/js/console.js"></script>
 <script src="${ctx}/plugins/layuiadmin/layui/layui.js"></script>
 <script>
     layui.config({
