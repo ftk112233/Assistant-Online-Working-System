@@ -85,7 +85,7 @@ public class StudentAdminController extends AbstractController {
         if (type != null) {
             StudentListImportToDatabaseExcel excel = null;
 
-            String msg = Constants.SUCCESS;
+            String msg = SUCCESS;
             DefaultFromExcelUpdateResult r = new DefaultFromExcelUpdateResult();
             if (type.equals(1)) {
                 try {
@@ -93,7 +93,7 @@ public class StudentAdminController extends AbstractController {
                     excelEffectiveDataRowCount = excel.readStudentAndClassInfoFromExcel();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    map.put("msg", Constants.FAILURE);
+                    map.put("msg", FAILURE);
                     return map;
                 } catch (ExcelColumnNotFoundException e) {
                     e.printStackTrace();
@@ -102,7 +102,7 @@ public class StudentAdminController extends AbstractController {
                     return map;
                 } catch (InvalidFileTypeException e) {
                     e.printStackTrace();
-                    map.put("msg", Constants.FAILURE);
+                    map.put("msg", FAILURE);
                     return map;
                 } catch (ExcelTooManyRowsException e) {
                     e.printStackTrace();
@@ -137,7 +137,7 @@ public class StudentAdminController extends AbstractController {
                             }
 
                             if (!ClassUtils.isValidClassSubSeason(deleteCondition.getClassSubSeason())) {
-                                map.put("msg", Constants.FAILURE);
+                                map.put("msg", FAILURE);
                                 return map;
                             }
 
@@ -168,7 +168,7 @@ public class StudentAdminController extends AbstractController {
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    map.put("msg", Constants.FAILURE);
+                    map.put("msg", FAILURE);
                     return map;
                 }
             } else if (type.equals(2)) {
@@ -177,7 +177,7 @@ public class StudentAdminController extends AbstractController {
                     excelEffectiveDataRowCount = excel.readStudentDetailInfoFromExcel();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    map.put("msg", Constants.FAILURE);
+                    map.put("msg", FAILURE);
                     return map;
                 } catch (ExcelColumnNotFoundException e) {
                     e.printStackTrace();
@@ -186,7 +186,7 @@ public class StudentAdminController extends AbstractController {
                     return map;
                 } catch (InvalidFileTypeException e) {
                     e.printStackTrace();
-                    map.put("msg", Constants.FAILURE);
+                    map.put("msg", FAILURE);
                     return map;
                 } catch (ExcelTooManyRowsException e) {
                     e.printStackTrace();
@@ -200,7 +200,7 @@ public class StudentAdminController extends AbstractController {
                     r = studentService.insertAndUpdateStudentsDetailedFromExcel(new ArrayList<>(excel.getStudents()));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    map.put("msg", Constants.FAILURE);
+                    map.put("msg", FAILURE);
                     return map;
                 }
             }
@@ -232,7 +232,7 @@ public class StudentAdminController extends AbstractController {
                     sendMessageToUser(clazz);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    map.put("msg", Constants.FAILURE);
+                    map.put("msg", FAILURE);
                     return map;
                 }
             }
@@ -322,7 +322,7 @@ public class StudentAdminController extends AbstractController {
             excelEffectiveDataRowCount = excel.readStudentsSchoolsFromExcel();
         } catch (IOException e) {
             e.printStackTrace();
-            map.put("msg", Constants.FAILURE);
+            map.put("msg", FAILURE);
             return map;
         } catch (ExcelColumnNotFoundException e) {
             e.printStackTrace();
@@ -331,7 +331,7 @@ public class StudentAdminController extends AbstractController {
             return map;
         } catch (InvalidFileTypeException e) {
             e.printStackTrace();
-            map.put("msg", Constants.FAILURE);
+            map.put("msg", FAILURE);
             return map;
         } catch (ExcelTooManyRowsException e) {
             e.printStackTrace();
@@ -341,7 +341,7 @@ public class StudentAdminController extends AbstractController {
             return map;
         }
 
-        String msg = Constants.SUCCESS;
+        String msg = SUCCESS;
         try {
             DefaultFromExcelUpdateResult result = studentService.insertAndUpdateStudentsSchoolsFromExcel(excel.getStudents());
 
@@ -366,7 +366,7 @@ public class StudentAdminController extends AbstractController {
             map.put("msg", msg);
         }  catch (Exception e) {
             e.printStackTrace();
-            map.put("msg", Constants.FAILURE);
+            map.put("msg", FAILURE);
             return map;
         }
 
@@ -467,7 +467,7 @@ public class StudentAdminController extends AbstractController {
         Map<String, Object> map = new HashMap(1);
 
         studentService.deleteOneStudentById(id);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -488,7 +488,7 @@ public class StudentAdminController extends AbstractController {
             ids.add(student.getId());
         }
         studentService.deleteManyStudentsByIds(ids);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -503,7 +503,7 @@ public class StudentAdminController extends AbstractController {
     public Map<String, Object> deleteByCondition(StudentSearchCondition condition) {
         Map<String, Object> map = new HashMap(1);
         studentService.deleteStudentsByCondition(condition);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 }

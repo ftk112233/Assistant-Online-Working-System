@@ -56,7 +56,7 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
     @Override
     public UpdateResult updateStudentByStudentId(Student student) {
         if (student == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         if (StringUtils.isEmpty(student.getStudentSex())) {
             student.setStudentSex(null);
@@ -64,38 +64,38 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
         long count = studentMapper.updateStudentByStudentId(student);
         UpdateResult result = new UpdateResult();
         result.setUpdateCount(count);
-        result.setResult(Constants.SUCCESS);
+        result.setResult(SUCCESS);
         return result;
     }
 
     @Override
     public UpdateResult updateStudentNameAndPhoneByStudentId(Student student) {
         if (student == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         long count = studentMapper.updateStudentNameAndPhoneByStudentId(student);
         UpdateResult result = new UpdateResult();
         result.setUpdateCount(count);
-        result.setResult(Constants.SUCCESS);
+        result.setResult(SUCCESS);
         return result;
     }
 
     @Override
     public UpdateResult updateStudentSchoolByStudentId(Student student) {
         if (student == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         long count = studentMapper.updateStudentSchoolByStudentId(student);
         UpdateResult result = new UpdateResult();
         result.setUpdateCount(count);
-        result.setResult(Constants.SUCCESS);
+        result.setResult(SUCCESS);
         return result;
     }
 
     @Override
     public UpdateResult insertOneStudent(Student student) {
         if (student == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         if (isRepeatedStudentId(student)) {
             //添加的学号号已存在
@@ -115,7 +115,7 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
      */
     private UpdateResult insertStudentWithUnrepeatedStudentId(Student student) {
         if (student == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         UpdateResult result = new UpdateResult();
         if (StringUtils.isEmpty(student.getStudentSex())) {
@@ -124,7 +124,7 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
 
         long count = studentMapper.insertOneStudent(student);
         result.setInsertCount(count);
-        result.setResult(Constants.SUCCESS);
+        result.setResult(SUCCESS);
         return result;
     }
 
@@ -136,12 +136,12 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
      */
     private UpdateResult insertManyStudentsWithUnrepeatedStudentId(List<Student> students) {
         if (students == null || students.size() == 0) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
 
         for (Student student : students) {
             if (student == null) {
-                return new UpdateResult(Constants.FAILURE);
+                return new UpdateResult(FAILURE);
             }
 
             if (StringUtils.isEmpty(student.getStudentSex())) {
@@ -149,7 +149,7 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
             }
         }
 
-        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(SUCCESS);
         long count = studentMapper.insertManyStudents(students);
         result.setInsertCount(count);
         return result;
@@ -163,7 +163,7 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
             throw new InvalidParameterException(msg);
         }
 
-        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(Constants.SUCCESS);
+        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(SUCCESS);
         String studentIdKeyword = ExcelConstants.STUDENT_ID_COLUMN;
         String studentPhoneKeyword = ExcelConstants.STUDENT_PHONE_COLUMN;
         InvalidData invalidData = new InvalidData(studentIdKeyword, studentPhoneKeyword);
@@ -218,7 +218,7 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
             throw new InvalidParameterException(msg);
         }
 
-        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(SUCCESS);
 
         Student originalStudent = getStudentByStudentId(student.getStudentId());
         if (originalStudent != null) {
@@ -243,7 +243,7 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
             throw new InvalidParameterException(msg);
         }
 
-        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(Constants.SUCCESS);
+        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(SUCCESS);
         String studentIdKeyword = ExcelConstants.STUDENT_ID_COLUMN;
         String classIdKeyword = ExcelConstants.CLASS_ID_COLUMN_2;
         InvalidData invalidData = new InvalidData(studentIdKeyword, classIdKeyword);
@@ -310,7 +310,7 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
         } else {
             result.add(insertStudentWithUnrepeatedStudentId(student));
         }
-        result.setResult(Constants.SUCCESS);
+        result.setResult(SUCCESS);
         return result;
     }
 
@@ -322,7 +322,7 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
             throw new InvalidParameterException(msg);
         }
 
-        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(Constants.SUCCESS);
+        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(SUCCESS);
         String studentIdKeyword = ExcelConstants.STUDENT_ID_COLUMN;
         String studentSchoolKeyword = ExcelConstants.STUDENT_SCHOOL_COLUMN;
         InvalidData invalidData = new InvalidData(studentIdKeyword, studentSchoolKeyword);
@@ -391,7 +391,7 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
             result.add(insertStudentWithUnrepeatedStudentId(student));
         }
 
-        result.setResult(Constants.SUCCESS);
+        result.setResult(SUCCESS);
         return result;
     }
 
@@ -405,11 +405,11 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
     @Override
     public String updateStudentInfo(Student student) {
         if (student == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         Student originalStudent = getStudentById(student.getId());
         if (originalStudent == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
 
         if (isModifiedAndRepeatedStudentId(originalStudent, student)) {
@@ -423,11 +423,11 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
 
         if (originalStudent.equalsExceptBaseParams(student)) {
             //未修改
-            return Constants.UNCHANGED;
+            return UNCHANGED;
         }
 
         studentMapper.updateStudentInfo(student);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     /**

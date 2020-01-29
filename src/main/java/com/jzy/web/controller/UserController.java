@@ -1,6 +1,5 @@
 package com.jzy.web.controller;
 
-import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.SessionConstants;
 import com.jzy.manager.exception.InvalidEmailException;
 import com.jzy.manager.exception.InvalidParameterException;
@@ -160,7 +159,7 @@ public class UserController extends AbstractController {
             map.put("data", "oldPasswordWrong");
         } else {
             userService.updatePasswordById(userInfoSession.getId(), userInfoSession.getUserSalt(), userNewPassword);
-            map.put("data", Constants.SUCCESS);
+            map.put("data", SUCCESS);
         }
 
         return map;
@@ -249,7 +248,7 @@ public class UserController extends AbstractController {
                 map.put("data", "newEmailExist");
             } else {
                 userService.updateEmailById(userInfoSession.getId(), newEmail);
-                map.put("data", Constants.SUCCESS);
+                map.put("data", SUCCESS);
             }
         }
 
@@ -292,7 +291,7 @@ public class UserController extends AbstractController {
             map.put("data", "newEmailExist");
         } else {
             userService.updateEmailById(userInfoSession.getId(), userNewEmail);
-            map.put("data", Constants.SUCCESS);
+            map.put("data", SUCCESS);
         }
 
         return map;
@@ -328,7 +327,7 @@ public class UserController extends AbstractController {
         }
 
         userService.updatePhoneById(userInfoSession.getId(), userNewPhone);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 

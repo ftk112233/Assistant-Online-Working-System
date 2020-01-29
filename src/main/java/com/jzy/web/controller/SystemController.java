@@ -81,7 +81,7 @@ public class SystemController extends AbstractController {
             }
         }
 
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -102,7 +102,7 @@ public class SystemController extends AbstractController {
             hashOps.delete(RedisConstants.ANNOUNCEMENT_SYSTEM_KEY, user.getId().toString());
         }
 
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -134,7 +134,7 @@ public class SystemController extends AbstractController {
 
         classService.updateCurrentClassSeason(classSeason);
 
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -150,7 +150,7 @@ public class SystemController extends AbstractController {
 
         classService.deleteCurrentClassSeason();
 
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 }

@@ -157,11 +157,11 @@ public class ToolboxController extends AbstractController {
             studentListUploadByUserCache.put(id, excel);
         } catch (InvalidFileTypeException e) {
             e.printStackTrace();
-            map.put("msg", Constants.FAILURE);
+            map.put("msg", FAILURE);
             return map;
         } catch (IOException e) {
             e.printStackTrace();
-            map.put("msg", Constants.FAILURE);
+            map.put("msg", FAILURE);
             return map;
         } catch (ExcelColumnNotFoundException e) {
             e.printStackTrace();
@@ -176,7 +176,7 @@ public class ToolboxController extends AbstractController {
             return map;
         }
 
-        map.put("msg", Constants.SUCCESS);
+        map.put("msg", SUCCESS);
         return map;
     }
 
@@ -235,7 +235,7 @@ public class ToolboxController extends AbstractController {
             logger.error(msg);
         }
 
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     /**
@@ -288,7 +288,7 @@ public class ToolboxController extends AbstractController {
             logger.error(msg);
         }
 
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
 
@@ -331,7 +331,7 @@ public class ToolboxController extends AbstractController {
             studentListForSeatTableUploadByUserCache.put(userService.getSessionUserInfo().getId(), excel);
         } catch (InvalidFileTypeException | IOException e) {
             e.printStackTrace();
-            map.put("msg", Constants.FAILURE);
+            map.put("msg", FAILURE);
             return map;
         } catch (ExcelTooManyRowsException e) {
             e.printStackTrace();
@@ -346,7 +346,7 @@ public class ToolboxController extends AbstractController {
             return map;
         }
 
-        map.put("msg", Constants.SUCCESS);
+        map.put("msg", SUCCESS);
         return map;
     }
 
@@ -395,7 +395,7 @@ public class ToolboxController extends AbstractController {
             logger.error(msg);
         }
 
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     /**
@@ -448,7 +448,7 @@ public class ToolboxController extends AbstractController {
             return map;
         }
 
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -534,7 +534,7 @@ public class ToolboxController extends AbstractController {
             e.printStackTrace();
         }
 
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     /**
@@ -690,9 +690,9 @@ public class ToolboxController extends AbstractController {
             e.printStackTrace();
             String msg = "downloadExample下载文件失败";
             logger.error(msg);
-            return Constants.FAILURE;
+            return FAILURE;
         }
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     /**
@@ -756,7 +756,7 @@ public class ToolboxController extends AbstractController {
                     campusAndClassroomService.insertOneCampusAndClassroom(campusAndClassroom);
                 } else {
                     logger.error("上传模板失败");
-                    map.put("msg", Constants.FAILURE);
+                    map.put("msg", FAILURE);
                     return map;
                 }
             }
@@ -771,11 +771,11 @@ public class ToolboxController extends AbstractController {
             return map;
         } catch (InvalidFileTypeException e) {
             e.printStackTrace();
-            map.put("msg", Constants.FAILURE);
+            map.put("msg", FAILURE);
             return map;
         } catch (IOException e) {
             e.printStackTrace();
-            map.put("msg", Constants.FAILURE);
+            map.put("msg", FAILURE);
             return map;
         } catch (ExcelTooManyRowsException e) {
             e.printStackTrace();
@@ -785,7 +785,7 @@ public class ToolboxController extends AbstractController {
             return map;
         }
 
-        map.put("msg", Constants.SUCCESS);
+        map.put("msg", SUCCESS);
         return map;
     }
 
@@ -853,11 +853,11 @@ public class ToolboxController extends AbstractController {
 
         } catch (IOException e) {
             e.printStackTrace();
-            map.put("msg", Constants.FAILURE);
+            map.put("msg", FAILURE);
             return map;
         } catch (InvalidFileTypeException e) {
             e.printStackTrace();
-            map.put("msg", Constants.FAILURE);
+            map.put("msg", FAILURE);
             return map;
         } catch (ExcelColumnNotFoundException e) {
             e.printStackTrace();
@@ -872,7 +872,7 @@ public class ToolboxController extends AbstractController {
             return map;
         }
 
-        map.put("msg", Constants.SUCCESS);
+        map.put("msg", SUCCESS);
         return map;
     }
 
@@ -903,10 +903,10 @@ public class ToolboxController extends AbstractController {
             e.printStackTrace();
             String msg = "downloadStudentSchool下载文件失败";
             logger.error(msg);
-            return Constants.FAILURE;
+            return FAILURE;
         }
 
 
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 }

@@ -134,10 +134,10 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     @Override
     public UpdateResult updateClassByClassId(ClassDetailedDto classDetailedDto) {
         if (classDetailedDto == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         long count = classMapper.updateClassByClassId(classDetailedDto);
-        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(SUCCESS);
         result.setUpdateCount(count);
         return result;
     }
@@ -145,7 +145,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     @Override
     public UpdateResult insertOneClass(ClassDetailedDto classDetailedDto) {
         if (classDetailedDto == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         //新班号不为空
         if (isRepeatedClassId(classDetailedDto)) {
@@ -167,7 +167,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
      */
     private UpdateResult insertClassWithUnrepeatedClassId(ClassDetailedDto classDetailedDto) {
         if (classDetailedDto == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         if (!existClassTeacher(classDetailedDto)) {
             //修改后的教师姓名不为空，且教师姓名不存在
@@ -182,7 +182,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
         classDetailedDto.setParsedClassTime(classDetailedDto.getClassTime());
 
         long count = classMapper.insertOneClass(classDetailedDto);
-        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(SUCCESS);
         result.setInsertCount(count);
         return result;
     }
@@ -195,7 +195,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
             throw new InvalidParameterException(msg);
         }
 
-        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(Constants.SUCCESS);
+        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(SUCCESS);
         String teacherNameKeyword = ExcelConstants.TEACHER_NAME_COLUMN;
         String classIdKeyword = ExcelConstants.CLASS_ID_COLUMN;
         InvalidData invalidData = new InvalidData(teacherNameKeyword, classIdKeyword);
@@ -234,7 +234,7 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
             throw new InvalidParameterException(msg);
         }
 
-        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(SUCCESS);
 
         ClassDetailedDto originalClass = getClassDetailByClassId(classDetailedDto.getClassId());
         if (originalClass != null) {
@@ -294,11 +294,11 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     @Override
     public String updateClassInfo(ClassDetailedDto classDetailedDto) {
         if (classDetailedDto == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         ClassDetailedDto originalClass = getClassDetailById(classDetailedDto.getId());
         if (originalClass == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
 
         //班号不为空
@@ -322,11 +322,11 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
 
         if (originalClass.equalsExceptBaseParamsAndAssistantIdAndTeacherId(classDetailedDto)) {
             //判断输入对象的对应字段是否未做任何修改
-            return Constants.UNCHANGED;
+            return UNCHANGED;
         }
 
         classMapper.updateClassInfo(classDetailedDto);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     /**
@@ -368,10 +368,10 @@ public class ClassServiceImpl extends AbstractServiceImpl implements ClassServic
     @Override
     public UpdateResult deleteClassesByCondition(ClassSearchCondition condition) {
         if (condition == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         long count = classMapper.deleteClassesByCondition(condition);
-        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(SUCCESS);
         result.setDeleteCount(count);
         return result;
     }

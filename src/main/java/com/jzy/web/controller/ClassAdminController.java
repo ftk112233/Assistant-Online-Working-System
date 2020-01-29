@@ -83,7 +83,7 @@ public class ClassAdminController extends AbstractController {
         }
 
         if (!ClassUtils.isValidClassSubSeason(clazz.getClassSubSeason()) || !ClassUtils.isValidClassCampus(clazz.getClassCampus())) {
-            map.put("msg", Constants.FAILURE);
+            map.put("msg", FAILURE);
             return map;
         }
 
@@ -112,7 +112,7 @@ public class ClassAdminController extends AbstractController {
             excelEffectiveDataRowCount = excel.readClassDetailFromExcel();
         } catch (IOException | InvalidFileTypeException e) {
             e.printStackTrace();
-            map.put("msg", Constants.FAILURE);
+            map.put("msg", FAILURE);
             return map;
         } catch (ExcelColumnNotFoundException e) {
             e.printStackTrace();
@@ -127,7 +127,7 @@ public class ClassAdminController extends AbstractController {
             return map;
         }
 
-        String msg = Constants.SUCCESS;
+        String msg = SUCCESS;
         try {
             DefaultFromExcelUpdateResult r = teacherService.insertAndUpdateTeachersFromExcel(new ArrayList<>(excel.getTeachers()));
 
@@ -197,7 +197,7 @@ public class ClassAdminController extends AbstractController {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            map.put("msg", Constants.FAILURE);
+            map.put("msg", FAILURE);
             return map;
         }
 
@@ -370,7 +370,7 @@ public class ClassAdminController extends AbstractController {
         Map<String, Object> map = new HashMap(1);
 
         classService.deleteOneClassById(id);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -391,7 +391,7 @@ public class ClassAdminController extends AbstractController {
             ids.add(classDetailedDto.getId());
         }
         classService.deleteManyClassesByIds(ids);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 

@@ -2,7 +2,6 @@ package com.jzy.web.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
-import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.RoleAndPermissionUtils;
@@ -127,7 +126,7 @@ public class PermissionAdminController extends AbstractController {
 
         List<RoleAndPermission> roleAndPermissions = roleCheckbox.getRoleAndPermissions(roleAndPermission);
 
-        String result = Constants.FAILURE;
+        String result = FAILURE;
         for (RoleAndPermission rap : roleAndPermissions) {
             if (!RoleAndPermissionUtils.isValidRoleAndPermissionInsertInfo(rap)) {
                 String msg = "insert方法错误入参";
@@ -157,7 +156,7 @@ public class PermissionAdminController extends AbstractController {
         Map<String, Object> map = new HashMap(1);
 
         roleAndPermissionService.deleteOneRoleAndPermissionById(id);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -178,7 +177,7 @@ public class PermissionAdminController extends AbstractController {
             ids.add(roleAndPermission.getId());
         }
         roleAndPermissionService.deleteManyRoleAndPermissionsByIds(ids);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 }

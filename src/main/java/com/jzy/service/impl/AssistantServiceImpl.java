@@ -91,7 +91,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     @Override
     public UpdateResult insertOneAssistant(Assistant assistant) {
         if (assistant == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         //新工号不为空
         if (isRepeatedAssistantWorkId(assistant)) {
@@ -113,7 +113,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
      */
     private UpdateResult insertAssistantWithUnrepeatedWorkId(Assistant assistant) {
         if (assistant == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         if (isRepeatedAssistantName(assistant)) {
             //添加的姓名已存在
@@ -124,7 +124,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
             assistant.setAssistantSex(null);
         }
 
-        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(SUCCESS);
         result.setInsertCount(assistantMapper.insertOneAssistant(assistant));
         return result;
     }
@@ -132,11 +132,11 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     @Override
     public String updateAssistantInfo(Assistant assistant) {
         if (assistant == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         Assistant originalAssistant = getAssistantById(assistant.getId());
         if (originalAssistant == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
 
         if (!StringUtils.isEmpty(assistant.getAssistantWorkId())) {
@@ -159,11 +159,11 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
 
         if (assistant.equalsExceptBaseParams(originalAssistant)) {
             //判断输入对象的对应字段是否未做任何修改
-            return Constants.UNCHANGED;
+            return UNCHANGED;
         }
 
         assistantMapper.updateAssistantInfo(assistant);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     /**
@@ -207,7 +207,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     @Override
     public UpdateResult updateAssistantByWorkId(Assistant assistant) {
         if (assistant == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         Assistant originalAssistant = getAssistantByWorkId(assistant.getAssistantWorkId());
         return updateAssistantByWorkId(originalAssistant, assistant);
@@ -216,7 +216,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
     @Override
     public UpdateResult updateAssistantByWorkId(Assistant originalAssistant, Assistant newAssistant) {
         if (originalAssistant == null || newAssistant == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
 
         if (isModifiedAndRepeatedAssistantName(originalAssistant, newAssistant)) {
@@ -224,7 +224,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
             return new UpdateResult(NAME_REPEAT);
         }
 
-        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(SUCCESS);
         result.setUpdateCount(assistantMapper.updateAssistantByWorkId(newAssistant));
         return result;
     }
@@ -236,7 +236,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
-        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(Constants.SUCCESS);
+        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(SUCCESS);
         String userRealNameKeyword = ExcelConstants.REAL_NAME_COLUMN;
         InvalidData invalidData = new InvalidData(userRealNameKeyword);
         for (Assistant assistant : assistants) {
@@ -296,7 +296,7 @@ public class AssistantServiceImpl extends AbstractServiceImpl implements Assista
 //            }
             result.add(insertAssistantWithUnrepeatedWorkId(assistant));
         }
-        result.setResult(Constants.SUCCESS);
+        result.setResult(SUCCESS);
         return result;
     }
 

@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.UsefulInformationMapper;
-import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.exception.InvalidFileInputException;
 import com.jzy.manager.exception.InvalidParameterException;
@@ -171,11 +170,11 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
     @Override
     public String updateUsefulInformationInfo(UsefulInformation information) {
         if (information == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         UsefulInformation originalInformation = getUsefulInformationById(information.getId());
         if (originalInformation == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         if (isModifiedAndRepeatedBelongToAndSequence(originalInformation, information)) {
             //所属类别或序号修改过了，判断是否与已存在的记录冲突
@@ -189,11 +188,11 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
 
         if (originalInformation.equalsExceptBaseParams(information)) {
             //未修改
-            return Constants.UNCHANGED;
+            return UNCHANGED;
         }
 
         usefulInformationMapper.updateUsefulInformationInfo(information);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     /**
@@ -267,7 +266,7 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
     @Override
     public String insertOneUsefulInformation(UsefulInformation information) {
         if (information == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
 
         //所属类别或序号修改过了，判断是否与已存在的记录冲突
@@ -282,7 +281,7 @@ public class UsefulInformationServiceImpl extends AbstractServiceImpl implements
         dealWithInsertingUsefulInformationImage(information);
 
         usefulInformationMapper.insertOneUsefulInformation(information);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     /**

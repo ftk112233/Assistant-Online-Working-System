@@ -1,6 +1,7 @@
 package com.jzy.web.controller;
 
 import com.jzy.config.FilePathProperties;
+import com.jzy.manager.constant.Constants;
 import com.jzy.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;
@@ -19,6 +20,14 @@ import org.springframework.stereotype.Controller;
  **/
 @Controller
 public abstract class AbstractController {
+    protected static final String SUCCESS = Constants.SUCCESS;
+
+    protected static final String FAILURE = Constants.FAILURE;
+
+    protected static final String UNCHANGED = Constants.UNCHANGED;
+
+    protected static final String UNKNOWN_ERROR = Constants.UNKNOWN_ERROR;
+
     @Autowired
     protected UserService userService;
 

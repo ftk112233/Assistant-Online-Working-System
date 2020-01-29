@@ -264,7 +264,7 @@ public class UserAdminController extends AbstractController {
             return map;
         }
         userService.deleteOneUserById(id);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -302,7 +302,7 @@ public class UserAdminController extends AbstractController {
             ids.add(user.getId());
         }
         userService.deleteManyUsersByIds(ids);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -365,7 +365,7 @@ public class UserAdminController extends AbstractController {
                 excelEffectiveDataRowCount = excel.readUsersAndAssistantsFromExcel();
             } catch (IOException e) {
                 e.printStackTrace();
-                map.put("msg", Constants.FAILURE);
+                map.put("msg", FAILURE);
                 return map;
             } catch (ExcelColumnNotFoundException e) {
                 e.printStackTrace();
@@ -374,7 +374,7 @@ public class UserAdminController extends AbstractController {
                 return map;
             } catch (InvalidFileTypeException e) {
                 e.printStackTrace();
-                map.put("msg", Constants.FAILURE);
+                map.put("msg", FAILURE);
                 return map;
             } catch (ExcelTooManyRowsException e) {
                 e.printStackTrace();
@@ -384,14 +384,14 @@ public class UserAdminController extends AbstractController {
                 return map;
             }
 
-            String msg = Constants.SUCCESS;
+            String msg = SUCCESS;
             DefaultFromExcelUpdateResult r = new DefaultFromExcelUpdateResult();
             if (type.equals(1)) {
                 try {
                     r = userService.insertAndUpdateUsersFromExcel(excel.getUsers());
                 } catch (Exception e) {
                     e.printStackTrace();
-                    map.put("msg", Constants.FAILURE);
+                    map.put("msg", FAILURE);
                     return map;
                 }
             } else if (type.equals(2)) {
@@ -404,7 +404,7 @@ public class UserAdminController extends AbstractController {
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    map.put("msg", Constants.FAILURE);
+                    map.put("msg", FAILURE);
                     return map;
                 }
             }

@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.QuestionMapper;
-import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.exception.NoMoreQuestionsException;
@@ -191,11 +190,11 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
     @Override
     public String updateQuestionInfo(Question question) {
         if (question == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         Question originalQuestion = getQuestionById(question.getId());
         if (originalQuestion == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         if (isModifiedAndRepeatedQuestionContent(originalQuestion, question)) {
             //问题内容改过了，判断是否与已存在的记录冲突
@@ -204,11 +203,11 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
 
         if (question.equalsExceptBaseParamsAndTrueAnswerAndCreatorId(originalQuestion)) {
             //未修改
-            return Constants.UNCHANGED;
+            return UNCHANGED;
         }
         //执行更新
         questionMapper.updateQuestionInfo(question);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     /**
@@ -233,7 +232,7 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
     @Override
     public String insertOneQuestion(Question question) {
         if (question == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         if (isRepeatedQuestionContent(question)) {
             //修改后的问题已存在
@@ -241,13 +240,13 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
         }
 
         questionMapper.insertOneQuestion(question);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     @Override
     public UpdateResult deleteOneQuestionById(Long id) {
         if (id == null) {
-            return new UpdateResult(Constants.SUCCESS);
+            return new UpdateResult(SUCCESS);
         }
 
         if (countAllQuestions() <= 1) {
@@ -255,7 +254,7 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
         }
 
         long count = questionMapper.deleteOneQuestionById(id);
-        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(SUCCESS);
         result.setDeleteCount(count);
         return result;
     }
@@ -263,7 +262,7 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
     @Override
     public UpdateResult deleteManyQuestionsByIds(List<Long> ids) {
         if (ids == null || ids.size() == 0) {
-            return new UpdateResult(Constants.SUCCESS);
+            return new UpdateResult(SUCCESS);
         }
 
         if (countAllQuestions() <= ids.size()) {
@@ -271,7 +270,7 @@ public class QuestionServiceImpl extends AbstractServiceImpl implements Question
         }
 
         long count = questionMapper.deleteManyQuestionsByIds(ids);
-        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(SUCCESS);
         result.setDeleteCount(count);
         return result;
     }

@@ -285,7 +285,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     public String updateOwnInfo(User user) {
         User originalUser = getSessionUserInfo();
         if (user == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
 
         if (!StringUtils.isEmpty(user.getUserIdCard())) {
@@ -309,12 +309,12 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         if (isUnchangedUserOwnInfo(originalUser, user)) {
             //判断输入对象的对应字段是否未做任何修改
-            return Constants.UNCHANGED;
+            return UNCHANGED;
         }
 
         //执行更新
         userMapper.updateOwnInfo(user);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     /**
@@ -449,13 +449,13 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     @Override
     public String updateUserInfo(User user) {
         if (user == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
 
         User originalUser = getUserById(user.getId());
 
         if (originalUser == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
 
         if (!StringUtils.isEmpty(user.getUserWorkId())) {
@@ -511,11 +511,11 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 
         if (isUnchangedUserInfo(originalUser, user)) {
             //判断输入对象的对应字段是否未做任何修改
-            return Constants.UNCHANGED;
+            return UNCHANGED;
         }
 
         userMapper.updateUserInfo(user);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     /**
@@ -592,7 +592,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     @Override
     public UpdateResult insertOneUser(User user) {
         if (user == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         if (!StringUtils.isEmpty(user.getUserWorkId())) {
             //新工号不为空
@@ -620,7 +620,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
      */
     private UpdateResult insertUserWithUnrepeatedWorkId(User user) {
         if (user == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         if (!StringUtils.isEmpty(user.getUserIdCard())) {
             //新身份证不为空
@@ -666,7 +666,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         user.setNewDefaultUserIcon();
 
 
-        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(SUCCESS);
         //执行插入
         result.setInsertCount(userMapper.insertOneUser(user));
 
@@ -752,7 +752,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
             logger.error(msg);
             throw new InvalidParameterException(msg);
         }
-        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(Constants.SUCCESS);
+        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(SUCCESS);
         String userRealNameKeyword = ExcelConstants.REAL_NAME_COLUMN;
         InvalidData invalidData = new InvalidData(userRealNameKeyword);
         for (User user : users) {
@@ -797,14 +797,14 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
              */
             result.add(insertUserWithUnrepeatedWorkId(user));
         }
-        result.setResult(Constants.SUCCESS);
+        result.setResult(SUCCESS);
         return result;
     }
 
     @Override
     public String updateUserByWorkId(User user) {
         if (user == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         User originalUser = getUserByWorkId(user.getUserWorkId());
         return updateUserByWorkId(originalUser, user);
@@ -813,7 +813,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
     @Override
     public String updateUserByWorkId(User originalUser, User newUser) {
         if (originalUser == null || newUser == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
 
         if (!StringUtils.isEmpty(newUser.getUserIdCard())) {
@@ -855,17 +855,17 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
 //        if (StringUtils.equals(originalUser.getUserName(), originalUser.getUserName()) && StringUtils.equals(originalUser.getUserRealName(), originalUser.getUserRealName())
 //                && StringUtils.equals(user.getUserIdCard(), originalUser.getUserIdCard()) && StringUtils.equals(user.getUserIcon(), originalUser.getUserIcon())){
 //            //判断输入对象的对应字段是否未做任何修改
-//            return Constants.UNCHANGED;
+//            return UNCHANGED;
 //        }
 
         userMapper.updateUserByWorkId(newUser);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     @Override
     public String deleteUsersByCondition(UserSearchCondition condition) {
         if (condition == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         User userSession = getSessionUserInfo();
 
@@ -887,7 +887,7 @@ public class UserServiceImpl extends AbstractServiceImpl implements UserService 
         }
 
         deleteManyUsersByIds(ids);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     @Override

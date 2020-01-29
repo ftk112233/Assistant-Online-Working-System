@@ -2,7 +2,6 @@ package com.jzy.web.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
-import com.jzy.manager.constant.Constants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.MissLessonStudentUtils;
 import com.jzy.model.dto.MissLessonStudentDetailedDto;
@@ -172,7 +171,7 @@ public class MissLessonStudentAdminController extends AbstractController {
         Map<String, Object> map = new HashMap(1);
 
         missLessonStudentService.deleteOneMissLessonStudentById(id);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -193,7 +192,7 @@ public class MissLessonStudentAdminController extends AbstractController {
             ids.add(dto.getId());
         }
         missLessonStudentService.deleteManyMissLessonStudentsByIds(ids);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -208,7 +207,7 @@ public class MissLessonStudentAdminController extends AbstractController {
     public Map<String, Object> deleteByCondition(MissLessonStudentSearchCondition condition) {
         Map<String, Object> map = new HashMap(1);
         missLessonStudentService.deleteMissLessonStudentsByCondition(condition);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 }

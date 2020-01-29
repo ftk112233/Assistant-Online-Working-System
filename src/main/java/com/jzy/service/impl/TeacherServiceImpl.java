@@ -100,7 +100,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
             teacher.setTeacherSex(null);
         }
         long count = teacherMapper.insertOneTeacher(teacher);
-        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(SUCCESS);
         result.setInsertCount(count);
         return result;
     }
@@ -108,7 +108,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
     @Override
     public String updateTeacherByWorkId(Teacher teacher) {
         if (teacher == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         Teacher originalTeacher = getTeacherByWorkId(teacher.getTeacherWorkId());
         return updateTeacherByWorkId(originalTeacher, teacher);
@@ -117,7 +117,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
     @Override
     public String updateTeacherByWorkId(Teacher originalTeacher, Teacher newTeacher) {
         if (originalTeacher == null || newTeacher == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         if (isModifiedAndRepeatedTeacherName(originalTeacher, newTeacher)) {
             //姓名修改过了，判断是否与已存在的姓名冲突
@@ -126,10 +126,10 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
 
         if (newTeacher.equalsExceptBaseParams(originalTeacher)) {
             //判断输入对象的对应字段是否未做任何修改
-            return Constants.UNCHANGED;
+            return UNCHANGED;
         }
         teacherMapper.updateTeacherByWorkId(newTeacher);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     /**
@@ -179,7 +179,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
             throw new InvalidParameterException(msg);
         }
 
-        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(Constants.SUCCESS);
+        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(SUCCESS);
         String teacherNameKeyword = ExcelConstants.TEACHER_NAME_COLUMN;
         String classIdKeyword = ExcelConstants.CLASS_ID_COLUMN;
         InvalidData invalidData = new InvalidData(teacherNameKeyword, classIdKeyword);
@@ -224,7 +224,7 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
             long insertCount = insertTeacherWithUnrepeatedName(teacher).getInsertCount();
             result.setInsertCount(insertCount);
         }
-        result.setResult(Constants.SUCCESS);
+        result.setResult(SUCCESS);
         return result;
     }
 
@@ -238,11 +238,11 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
     @Override
     public String updateTeacherInfo(Teacher teacher) {
         if (teacher == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         Teacher originalTeacher = getTeacherById(teacher.getId());
         if (originalTeacher == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
 
         if (!StringUtils.isEmpty(teacher.getTeacherWorkId())) {
@@ -267,11 +267,11 @@ public class TeacherServiceImpl extends AbstractServiceImpl implements TeacherSe
 
         if (teacher.equalsExceptBaseParams(originalTeacher)) {
             //判断输入对象的对应字段是否未做任何修改
-            return Constants.UNCHANGED;
+            return UNCHANGED;
         }
 
         teacherMapper.updateTeacherInfo(teacher);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     @Override

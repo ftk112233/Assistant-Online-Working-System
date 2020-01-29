@@ -3,7 +3,6 @@ package com.jzy.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.UserMessageMapper;
-import com.jzy.manager.constant.Constants;
 import com.jzy.manager.exception.InvalidFileInputException;
 import com.jzy.manager.util.FileUtils;
 import com.jzy.model.dto.MyPage;
@@ -147,7 +146,7 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
     @Override
     public String insertOneUserMessage(UserMessage userMessage) {
         if (userMessage == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         /*
          * 用户上传的图片的处理
@@ -155,7 +154,7 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
         dealWithInsertingUserMessagePicture(userMessage);
 
         userMessageMapper.insertOneUserMessage(userMessage);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     /**
@@ -243,7 +242,7 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
     @Override
     public String insertManyUserMessages(List<UserMessage> userMessages) throws Exception {
         if (userMessages == null || userMessages.size() == 0) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
 
         /*
@@ -254,7 +253,7 @@ public class UserMessageServiceImpl extends AbstractServiceImpl implements UserM
         //插入
         userMessageMapper.insertManyUserMessages(userMessages);
 
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     /**

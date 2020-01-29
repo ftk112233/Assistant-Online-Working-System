@@ -1,6 +1,7 @@
 package com.jzy.service.impl;
 
 import com.jzy.config.FilePathProperties;
+import com.jzy.manager.constant.Constants;
 import com.jzy.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;
@@ -13,6 +14,14 @@ import org.springframework.data.redis.core.*;
  * @date 2019/11/14 23:28
  **/
 public abstract class AbstractServiceImpl {
+    protected static final String SUCCESS = Constants.SUCCESS;
+
+    protected static final String FAILURE = Constants.FAILURE;
+
+    protected static final String UNCHANGED = Constants.UNCHANGED;
+
+    protected static final String UNKNOWN_ERROR = Constants.UNKNOWN_ERROR;
+
     @Autowired
     protected UserService userService;
 

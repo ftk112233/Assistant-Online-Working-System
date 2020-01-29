@@ -2,7 +2,6 @@ package com.jzy.web.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
-import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.FileUtils;
@@ -250,7 +249,7 @@ public class UsefulInformationAdminController extends AbstractController {
         Map<String, Object> map = new HashMap(1);
 
         usefulInformationService.deleteOneUsefulInformationById(id);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -272,7 +271,7 @@ public class UsefulInformationAdminController extends AbstractController {
             ids.add(information.getId());
         }
         usefulInformationService.deleteManyUsefulInformationByIds(ids);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 }

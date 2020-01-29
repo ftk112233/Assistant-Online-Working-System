@@ -3,7 +3,6 @@ package com.jzy.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.MissLessonStudentMapper;
-import com.jzy.manager.constant.Constants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.model.dto.MissLessonStudentDetailedDto;
 import com.jzy.model.dto.MissLessonStudentSearchCondition;
@@ -69,7 +68,7 @@ public class MissLessonStudentServiceImpl extends AbstractServiceImpl implements
     @Override
     public String updateMissLessonStudentInfo(MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
         if (missLessonStudentDetailedDto == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
 
         if (!existOriginalClass(missLessonStudentDetailedDto)) {
@@ -83,13 +82,13 @@ public class MissLessonStudentServiceImpl extends AbstractServiceImpl implements
         }
 
         missLessonStudentMapper.updateMissLessonStudentInfo(missLessonStudentDetailedDto);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     @Override
     public String insertOneMissLessonStudent(MissLessonStudentDetailedDto missLessonStudentDetailedDto) {
         if (missLessonStudentDetailedDto == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
 
         if (!existOriginalClass(missLessonStudentDetailedDto)) {
@@ -103,7 +102,7 @@ public class MissLessonStudentServiceImpl extends AbstractServiceImpl implements
         }
 
         missLessonStudentMapper.insertOneMissLessonStudent(missLessonStudentDetailedDto);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     @Override

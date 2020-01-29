@@ -162,7 +162,7 @@ public class StudentAndClassAdminController extends AbstractController {
         Map<String, Object> map = new HashMap(1);
 
         studentAndClassService.deleteOneStudentAndClassById(id);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -183,7 +183,7 @@ public class StudentAndClassAdminController extends AbstractController {
             ids.add(studentAndClassDetailedDto.getId());
         }
         studentAndClassService.deleteManyStudentAndClassesByIds(ids);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 

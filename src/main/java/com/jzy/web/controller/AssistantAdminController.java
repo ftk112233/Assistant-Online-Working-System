@@ -2,7 +2,6 @@ package com.jzy.web.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
-import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.AssistantUtils;
@@ -132,7 +131,7 @@ public class AssistantAdminController extends AbstractController {
         Map<String, Object> map = new HashMap(1);
 
         assistantService.deleteOneAssistantById(id);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -153,7 +152,7 @@ public class AssistantAdminController extends AbstractController {
             ids.add(assistant.getId());
         }
         assistantService.deleteManyAssistantsByIds(ids);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -168,7 +167,7 @@ public class AssistantAdminController extends AbstractController {
     public Map<String, Object> deleteByCondition(AssistantSearchCondition condition) {
         Map<String, Object> map = new HashMap(1);
         assistantService.deleteAssistantsByCondition(condition);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 }

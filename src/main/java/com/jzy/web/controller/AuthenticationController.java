@@ -214,7 +214,7 @@ public class AuthenticationController extends AbstractController {
         }
 
 
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -343,10 +343,10 @@ public class AuthenticationController extends AbstractController {
         ShiroUtils.setSessionAttribute(SessionConstants.USER_EMAIL_SESSION_KEY, new EmailVerifyCodeSession(userEmail, false));
         try {
             userService.sendVerifyCodeToEmail(userEmail);
-            map.put("msg", Constants.SUCCESS);
+            map.put("msg", SUCCESS);
         } catch (Exception e) {
             logger.error("邮箱验证码发送失败!");
-            map.put("msg", Constants.FAILURE);
+            map.put("msg", FAILURE);
             e.printStackTrace();
         }
         return map;
@@ -399,7 +399,7 @@ public class AuthenticationController extends AbstractController {
             throw new InvalidParameterException(msg);
         }
         userService.updatePasswordByEmail(emailVerifyCodeSession.getUserEmail(), user.getUserPassword());
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -429,7 +429,7 @@ public class AuthenticationController extends AbstractController {
             //通过验证，用固定的明文密文组实现免密登录
             Subject subject = SecurityUtils.getSubject();
             Session session = subject.getSession();
-            session.setAttribute(SessionConstants.LOGIN_WITHOUT_PASSWORD_SESSION_KEY, Constants.SUCCESS);
+            session.setAttribute(SessionConstants.LOGIN_WITHOUT_PASSWORD_SESSION_KEY, SUCCESS);
             UsernamePasswordToken token = new UsernamePasswordToken(null, ShiroUtils.FINAL_PASSWORD_PLAINTEXT);
             try {
                 subject.login(token);
@@ -495,13 +495,13 @@ public class AuthenticationController extends AbstractController {
         try {
             if (!questionService.isCorrectAnswer(questionContent, answer)) {
                 //问题回答错误
-                map.put("data", Constants.FAILURE);
+                map.put("data", FAILURE);
                 return map;
             } else {
                 //通过验证，用固定的明文密文组实现免密登录
                 Subject subject = SecurityUtils.getSubject();
                 Session session = subject.getSession();
-                session.setAttribute(SessionConstants.LOGIN_WITHOUT_PASSWORD_SESSION_KEY, Constants.SUCCESS);
+                session.setAttribute(SessionConstants.LOGIN_WITHOUT_PASSWORD_SESSION_KEY, SUCCESS);
                 UsernamePasswordToken token = new UsernamePasswordToken(null, ShiroUtils.FINAL_PASSWORD_PLAINTEXT);
                 try {
                     subject.login(token);
@@ -509,10 +509,10 @@ public class AuthenticationController extends AbstractController {
                     User guest = new User();
                     setGuestSessionInfo(guest);
                     session.setAttribute(SessionConstants.USER_INFO_SESSION_KEY, guest);
-                    map.put("data", Constants.SUCCESS);
+                    map.put("data", SUCCESS);
                 } catch (AuthenticationException e) {
                     //其他异常
-                    map.put("data", Constants.UNKNOWN_ERROR);
+                    map.put("data", UNKNOWN_ERROR);
                 }
                 //移除免密登录成功标志
                 session.removeAttribute(SessionConstants.LOGIN_WITHOUT_PASSWORD_SESSION_KEY);
@@ -523,7 +523,7 @@ public class AuthenticationController extends AbstractController {
             e.printStackTrace();
             String msg = "isCorrectAnswer方法输入问题内容不存在!";
             logger.error(msg);
-            map.put("data", Constants.UNKNOWN_ERROR);
+            map.put("data", UNKNOWN_ERROR);
         }
         return map;
     }

@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jzy.dao.RoleAndPermissionMapper;
-import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.model.dto.MyPage;
@@ -83,11 +82,11 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
     @Override
     public String updateRoleAndPermissionInfo(RoleAndPermission roleAndPermission) {
         if (roleAndPermission == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         RoleAndPermission originalRoleAndPermission = getRoleAndPermById(roleAndPermission.getId());
         if (originalRoleAndPermission == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
 
         if (isModifiedAndRepeatedRoleAndPermission(originalRoleAndPermission, roleAndPermission)) {
@@ -97,12 +96,12 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
 
         if (roleAndPermission.equalsExceptBaseParams(originalRoleAndPermission)) {
             //未修改
-            return Constants.UNCHANGED;
+            return UNCHANGED;
         }
 
         //执行更新
         roleAndPermissionMapper.updateRoleAndPermissionInfo(roleAndPermission);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     /**
@@ -133,7 +132,7 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
     @Override
     public String insertOneRoleAndPermission(RoleAndPermission roleAndPermission) {
         if (roleAndPermission == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         if (isRepeatedRoleAndPermission(roleAndPermission)) {
             //角色和权限已存在
@@ -141,7 +140,7 @@ public class RoleAndPermissionServiceImpl extends AbstractServiceImpl implements
         }
 
         roleAndPermissionMapper.insertOneRoleAndPermission(roleAndPermission);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     @Override

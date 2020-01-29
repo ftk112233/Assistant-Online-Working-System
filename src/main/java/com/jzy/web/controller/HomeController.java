@@ -85,11 +85,11 @@ public class HomeController extends AbstractController {
         } else {
             String msg = "sendProblem方法错误入参";
             logger.error(msg);
-            map.put("data", Constants.FAILURE);
+            map.put("data", FAILURE);
             return map;
         }
 
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 }

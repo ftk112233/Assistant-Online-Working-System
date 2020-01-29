@@ -89,7 +89,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
     @Override
     public UpdateResult insertOneStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto) {
         if (studentAndClassDetailedDto == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         if (isRepeatedStudentAndClass(studentAndClassDetailedDto)) {
             //重复报班
@@ -110,7 +110,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
      */
     private UpdateResult insertUnrepeatedStudentAndClass(StudentAndClassDetailedDto studentAndClassDetailedDto) {
         if (studentAndClassDetailedDto == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         if (!existStudentId(studentAndClassDetailedDto)) {
             //学员号不存在
@@ -122,7 +122,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
             return new UpdateResult(CLASS_NOT_EXIST);
         }
 
-        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(SUCCESS);
         long count = studentAndClassMapper.insertOneStudentAndClass(studentAndClassDetailedDto);
         result.setInsertCount(count);
         return result;
@@ -131,9 +131,9 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
     @Override
     public UpdateResult updateStudentAndClassByStudentIdAndClassId(StudentAndClassDetailedDto studentAndClassDetailedDto) {
         if (studentAndClassDetailedDto == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
-        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(SUCCESS);
         long count = studentAndClassMapper.updateStudentAndClassByStudentIdAndClassId(studentAndClassDetailedDto);
         result.setUpdateCount(count);
         return result;
@@ -147,7 +147,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
             throw new InvalidParameterException(msg);
         }
 
-        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(Constants.SUCCESS);
+        DefaultFromExcelUpdateResult result = new DefaultFromExcelUpdateResult(SUCCESS);
         String studentIdKeyword = ExcelConstants.STUDENT_ID_COLUMN;
         String classIdKeyword = ExcelConstants.CLASS_ID_COLUMN_2;
         InvalidData invalidData = new InvalidData(studentIdKeyword, classIdKeyword);
@@ -196,7 +196,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
      */
     private UpdateResult insertManyUnrepeatedStudentAndClasses(List<StudentAndClassDetailedDto> studentAndClassDetailedDtos) {
         if (studentAndClassDetailedDtos == null || studentAndClassDetailedDtos.size() == 0) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
 
         /*
@@ -206,7 +206,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
         List<StudentAndClassDetailedDto> dtosToInsert = new ArrayList<>();
         for (StudentAndClassDetailedDto dto : studentAndClassDetailedDtos) {
             if (dto == null) {
-                return new UpdateResult(Constants.FAILURE);
+                return new UpdateResult(FAILURE);
             }
 
             if (!existStudentId(dto)) {
@@ -222,7 +222,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
             dtosToInsert.add(dto);
         }
 
-        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(SUCCESS);
         long count = studentAndClassMapper.insertManyStudentAndClasses(dtosToInsert);
         result.setInsertCount(count);
         return result;
@@ -262,7 +262,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
             //插入
             result.add(insertUnrepeatedStudentAndClass(studentAndClassDetailedDto));
         }
-        result.setResult(Constants.SUCCESS);
+        result.setResult(SUCCESS);
         return result;
     }
 
@@ -283,7 +283,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
     @Override
     public String updateStudentAndClassInfo(StudentAndClassDetailedDto studentAndClassDetailedDto) {
         if (studentAndClassDetailedDto == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         StudentAndClass originalDto = getStudentAndClassById(studentAndClassDetailedDto.getId());
 
@@ -317,7 +317,7 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
         }
 
         studentAndClassMapper.updateStudentAndClassInfo(studentAndClassDetailedDto);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 
     @Override
@@ -388,10 +388,10 @@ public class StudentAndClassServiceImpl extends AbstractServiceImpl implements S
     @Override
     public UpdateResult deleteStudentAndClassesByCondition(StudentAndClassSearchCondition condition) {
         if (condition == null) {
-            return new UpdateResult(Constants.FAILURE);
+            return new UpdateResult(FAILURE);
         }
         long count = studentAndClassMapper.deleteStudentAndClassesByCondition(condition);
-        UpdateResult result = new UpdateResult(Constants.SUCCESS);
+        UpdateResult result = new UpdateResult(SUCCESS);
         result.setDeleteCount(count);
         return result;
     }

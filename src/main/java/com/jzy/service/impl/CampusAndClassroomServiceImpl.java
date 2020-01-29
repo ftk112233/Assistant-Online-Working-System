@@ -3,7 +3,6 @@ package com.jzy.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.jzy.dao.CampusAndClassroomMapper;
-import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.model.entity.CampusAndClassroom;
@@ -85,7 +84,7 @@ public class CampusAndClassroomServiceImpl extends AbstractServiceImpl implement
     @Override
     public String insertOneCampusAndClassroom(CampusAndClassroom campusAndClassroom) {
         if (campusAndClassroom == null) {
-            return Constants.FAILURE;
+            return FAILURE;
         }
         if (isRepeatedCampusAndClassroom(campusAndClassroom)) {
             //已存在
@@ -93,6 +92,6 @@ public class CampusAndClassroomServiceImpl extends AbstractServiceImpl implement
         }
 
         campusAndClassroomMapper.insertOneCampusAndClassroom(campusAndClassroom);
-        return Constants.SUCCESS;
+        return SUCCESS;
     }
 }

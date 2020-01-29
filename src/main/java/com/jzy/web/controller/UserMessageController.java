@@ -167,7 +167,7 @@ public class UserMessageController extends AbstractController {
             }
         }
         userMessageService.updateManyUserMessagesReadByIds(ids);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -182,7 +182,7 @@ public class UserMessageController extends AbstractController {
         Map<String, Object> map = new HashMap(1);
         Long userId = userService.getSessionUserInfo().getId();
         userMessageService.updateManyUserMessagesReadByUserId(userId);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -205,7 +205,7 @@ public class UserMessageController extends AbstractController {
         }
 
         userMessageService.deleteManyUserMessagesByIds(ids);
-        map.put("data", Constants.SUCCESS);
+        map.put("data", SUCCESS);
         return map;
     }
 
@@ -423,7 +423,7 @@ public class UserMessageController extends AbstractController {
             map.put("data", userMessageService.insertManyUserMessages(userMessages));
         } catch (Exception e) {
             e.printStackTrace();
-            map.put("data", Constants.FAILURE);
+            map.put("data", FAILURE);
         }
 
         return map;
@@ -483,7 +483,7 @@ public class UserMessageController extends AbstractController {
             map.put("data", userMessageService.insertManyUserMessages(userMessages));
         } catch (Exception e) {
             e.printStackTrace();
-            map.put("data", Constants.FAILURE);
+            map.put("data", FAILURE);
         }
 
         return map;
