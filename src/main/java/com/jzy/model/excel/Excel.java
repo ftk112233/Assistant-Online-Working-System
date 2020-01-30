@@ -56,9 +56,6 @@ public abstract class Excel implements Serializable, Resettable, ExcelValidity {
     @Setter
     private String pattern;
 
-    public Excel() {
-    }
-
     /**
      * 由输入文件路径构造excel对象
      *
@@ -100,10 +97,10 @@ public abstract class Excel implements Serializable, Resettable, ExcelValidity {
      * @throws InvalidFileTypeException
      */
     public Excel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
-        if (version.equals(ExcelVersionEnum.VERSION_2003)) {
+        if (ExcelVersionEnum.VERSION_2003.equals(version)) {
             this.version = version;
             workbook = new HSSFWorkbook(inputStream);
-        } else if (version.equals(ExcelVersionEnum.VERSION_2007)) {
+        } else if (ExcelVersionEnum.VERSION_2007.equals(version)) {
             this.version = version;
             workbook = new XSSFWorkbook(inputStream);
         } else {
@@ -118,6 +115,24 @@ public abstract class Excel implements Serializable, Resettable, ExcelValidity {
      */
     public Excel(Workbook workbook) {
         this.workbook = workbook;
+    }
+
+    /**
+     * 构建指定excel版本的新表格
+     *
+     * @param version excel版本的枚举对象
+     * @throws InvalidFileTypeException 不合法的入参excel版本枚举异常
+     */
+    public Excel(ExcelVersionEnum version) throws InvalidFileTypeException {
+        if (ExcelVersionEnum.VERSION_2003.equals(version)) {
+            this.version = version;
+            workbook = new HSSFWorkbook();
+        } else if (ExcelVersionEnum.VERSION_2007.equals(version)) {
+            this.version = version;
+            workbook = new XSSFWorkbook();
+        } else {
+            throw new InvalidFileTypeException("不合法的入参excel版本枚举");
+        }
     }
 
     @Override
@@ -529,6 +544,10 @@ public abstract class Excel implements Serializable, Resettable, ExcelValidity {
      */
     public boolean setValueAt(int sheetIx, int rowIndex, int colIndex, String value) throws IOException {
         Sheet sheet = workbook.getSheetAt(sheetIx);
+        Row row = sheet.getRow(rowIndex);
+        if (row == null) {
+            createRow(sheetIx, rowIndex);
+        }
         Cell cell = sheet.getRow(rowIndex).getCell(colIndex);
         if (cell == null) {
             this.createCell(sheetIx, rowIndex, colIndex);
@@ -764,6 +783,8 @@ public abstract class Excel implements Serializable, Resettable, ExcelValidity {
         if (!StringUtils.isEmpty(inputFilePath)) {
             os = new FileOutputStream(new File(inputFilePath));
             submitWrite(os);
+        } else {
+            throw new IOException("文件的默认路径（源文件路径）不存在");
         }
     }
 

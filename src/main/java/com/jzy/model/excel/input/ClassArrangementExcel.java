@@ -11,9 +11,7 @@ import com.jzy.model.excel.ExcelVersionEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -40,23 +38,13 @@ public class ClassArrangementExcel extends AbstractInputExcel {
     private static final String CLASS_TIME_COLUMN = ExcelConstants.CLASS_TIME_COLUMN;
     private static final String CLASSROOM_COLUMN = ExcelConstants.CLASSROOM_COLUMN;
 
-    public ClassArrangementExcel() {
-    }
-
     public ClassArrangementExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public ClassArrangementExcel(File file) throws IOException, InvalidFileTypeException {
-        super(file);
-    }
 
     public ClassArrangementExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
-    }
-
-    public ClassArrangementExcel(Workbook workbook) {
-        super(workbook);
     }
 
     /**
@@ -104,22 +92,22 @@ public class ClassArrangementExcel extends AbstractInputExcel {
 
         int effectiveDataRowCount=0;
 
-        int rowCount = this.getRowCount(sheetIx); // 表的总行数
+        int rowCount = getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
-            if (StringUtils.isEmpty(this.getValueAt(sheetIx, i, columnIndexOfClassId))) {
+            if (StringUtils.isEmpty(getValueAt(sheetIx, i, columnIndexOfClassId))) {
                 //当前行班级编码为空，跳过
                 continue;
             } else {
                 effectiveDataRowCount++;
             }
 
-            String teacherName = this.getValueAt(sheetIx, i, columnIndexOfTeacherName);
-            String assistantName = this.getValueAt(sheetIx, i, columnIndexOfAssistantName);
-            String classId = this.getValueAt(sheetIx, i, columnIndexOfClassId);
+            String teacherName = getValueAt(sheetIx, i, columnIndexOfTeacherName);
+            String assistantName = getValueAt(sheetIx, i, columnIndexOfAssistantName);
+            String classId = getValueAt(sheetIx, i, columnIndexOfClassId);
             classId = StringUtils.upperCase(classId);
-            String className = this.getValueAt(sheetIx, i, columnIndexOfClassName);
-            String classTime = this.getValueAt(sheetIx, i, columnIndexOfClassTime);
-            String classroom = this.getValueAt(sheetIx, i, columnIndexOfClassroom);
+            String className = getValueAt(sheetIx, i, columnIndexOfClassName);
+            String classTime = getValueAt(sheetIx, i, columnIndexOfClassTime);
+            String classroom = getValueAt(sheetIx, i, columnIndexOfClassroom);
 
 
             //先封装teacher
@@ -161,9 +149,9 @@ public class ClassArrangementExcel extends AbstractInputExcel {
     protected void findColumnIndexOfSpecifiedName(int sheetIx) throws ExcelColumnNotFoundException {
         resetColumnIndex();
 
-        int row0ColumnCount = this.getColumnCount(sheetIx, startRow); // 第startRow行的列数
+        int row0ColumnCount = getColumnCount(sheetIx, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
-            String value = this.getValueAt(sheetIx, startRow, i);
+            String value = getValueAt(sheetIx, startRow, i);
             if (value!=null) {
                 switch (value) {
                     case TEACHER_NAME_COLUMN:

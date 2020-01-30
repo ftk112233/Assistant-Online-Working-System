@@ -27,9 +27,6 @@ public class DefaultExcel extends Excel {
      */
     protected static final int DEFAULT_MAX_ROW_COUNT = 30000;
 
-    public DefaultExcel() {
-    }
-
     public DefaultExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
@@ -44,6 +41,10 @@ public class DefaultExcel extends Excel {
 
     public DefaultExcel(Workbook workbook) {
         super(workbook);
+    }
+
+    public DefaultExcel(ExcelVersionEnum version) throws InvalidFileTypeException {
+        super(version);
     }
 
     @Override

@@ -10,9 +10,7 @@ import com.jzy.model.excel.ExcelVersionEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -57,24 +55,12 @@ public class StudentListUploadByUserExcel extends AbstractInputExcel {
     private int columnIndexOfClassId = -1;
     private int columnIndexOfClassName = -1;
 
-
-    public StudentListUploadByUserExcel() {
-    }
-
     public StudentListUploadByUserExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public StudentListUploadByUserExcel(File file) throws IOException, InvalidFileTypeException {
-        super(file);
-    }
-
     public StudentListUploadByUserExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
-    }
-
-    public StudentListUploadByUserExcel(Workbook workbook) {
-        super(workbook);
     }
 
     /**
@@ -98,15 +84,15 @@ public class StudentListUploadByUserExcel extends AbstractInputExcel {
         // 先扫描第startRow行找到"学员号"、"姓名"、"手机"等信息所在列的位置
         findColumnIndexOfSpecifiedName(sheetIx);
 
-        int rowCount = this.getRowCount(sheetIx); // 表的总行数
+        int rowCount = getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
-            if (classId.equals(this.getValueAt(sheetIx, i, columnIndexOfClassId))) { // 找到班级编码匹配的行
+            if (classId.equals(getValueAt(sheetIx, i, columnIndexOfClassId))) { // 找到班级编码匹配的行
                 StudentAndClassDetailedWithSubjectsDto tmp = new StudentAndClassDetailedWithSubjectsDto();
                 tmp.setClassId(classId);
-                tmp.setClassName(this.getValueAt(sheetIx, i, columnIndexOfClassName));
-                tmp.setStudentId(this.getValueAt(sheetIx, i, columnIndexOfStudentId));
-                tmp.setStudentName(this.getValueAt(sheetIx, i, columnIndexOfStudentName));
-                tmp.setStudentPhone(this.getValueAt(sheetIx, i, columnIndexOfStudentPhone));
+                tmp.setClassName(getValueAt(sheetIx, i, columnIndexOfClassName));
+                tmp.setStudentId(getValueAt(sheetIx, i, columnIndexOfStudentId));
+                tmp.setStudentName(getValueAt(sheetIx, i, columnIndexOfStudentName));
+                tmp.setStudentPhone(getValueAt(sheetIx, i, columnIndexOfStudentPhone));
                 output.add(tmp);
             }
         }
@@ -132,9 +118,9 @@ public class StudentListUploadByUserExcel extends AbstractInputExcel {
     protected void findColumnIndexOfSpecifiedName(int sheetIx) throws ExcelColumnNotFoundException {
         resetColumnIndex();
 
-        int row0ColumnCount = this.getColumnCount(sheetIx, startRow); // 第startRow行的列数
+        int row0ColumnCount = getColumnCount(sheetIx, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
-            String value = this.getValueAt(sheetIx, startRow, i);
+            String value = getValueAt(sheetIx, startRow, i);
             if (value != null) {
                 switch (value) {
                     case STUDENT_ID_COLUMN:

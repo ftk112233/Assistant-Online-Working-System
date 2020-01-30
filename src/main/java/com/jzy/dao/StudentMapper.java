@@ -1,5 +1,6 @@
 package com.jzy.dao;
 
+import com.jzy.model.dto.StudentAndClassSearchCondition;
 import com.jzy.model.dto.StudentSearchCondition;
 import com.jzy.model.entity.Student;
 import org.apache.ibatis.annotations.Param;
@@ -69,6 +70,14 @@ public interface StudentMapper {
      * @return 结果集合
      */
     List<Student> listStudents(StudentSearchCondition condition);
+
+    /**
+     * 查询学员个人信息，以上课记录中的信息为查询条件，返回唯一的学生个人信息对象集合
+     *
+     * @param condition 上课记录的查询条件入参
+     * @return 结果集合
+     */
+    List<Student> listStudentsByStudentAndClassSearchCondition(StudentAndClassSearchCondition condition);
 
     /**
      * 修改学生信息由id修改

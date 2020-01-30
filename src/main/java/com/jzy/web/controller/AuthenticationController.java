@@ -439,7 +439,7 @@ public class AuthenticationController extends AbstractController {
                 map.put("data", "verifyCodeCorrect");
             } catch (AuthenticationException e) {
                 //其他异常
-                map.put("data", Constants.UNKNOWN_ERROR);
+                map.put("data", UNKNOWN_ERROR);
             }
             //移除免密登录成功标志
             session.removeAttribute(SessionConstants.LOGIN_WITHOUT_PASSWORD_SESSION_KEY);

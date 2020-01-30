@@ -29,7 +29,7 @@ public class ExcelUtils {
     public static void main(String[] args) throws Exception {
         // 给定两个初始值，标志出导出区域，两个行列组合的单元格
         int[] fromIndex = {0, 0};
-        int[] toIndex = {9,9 };
+        int[] toIndex = {9, 9};
 
         int imageWidth = 0;
         int imageHeight = 0;
@@ -100,8 +100,7 @@ public class ExcelUtils {
         List<Grid> grids = new ArrayList<Grid>();
         for (int i = 0; i < rowSize; i++) {
             for (int j = 0; j < colSize; j++) {
-                System.out.println(i+","+j);
-
+                System.out.println(i + "," + j);
 
 
                 Grid grid = new Grid();

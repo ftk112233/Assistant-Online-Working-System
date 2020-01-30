@@ -40,6 +40,21 @@ public class ToolboxLogger {
     public void exportAssistantTutorialAndSeatTablePoint() {
     }
 
+    /**
+     * 导出学生联系方式到表单的切面
+     */
+    @Pointcut("execution(* com.jzy.web.controller.ToolboxController.exportStudentPhoneToForm(..)) ")
+    public void exportStudentPhoneToFormPoint() {
+    }
+
+    /**
+     * 导出学生联系方式到表格的切面
+     */
+    @Pointcut("execution(* com.jzy.web.controller.ToolboxController.exportStudentPhoneToExcel(..)) ")
+    public void exportStudentPhoneToExcelPoint() {
+    }
+
+
     @AfterReturning("exportAssistantTutorialWithoutSeatTablePoint()")
     public void exportAssistantTutorialWithoutSeatTableLog(JoinPoint jp) {
         User user = userService.getSessionUserInfo();
@@ -53,6 +68,22 @@ public class ToolboxLogger {
         User user = userService.getSessionUserInfo();
         if (user != null) {
             logger.info("用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")导出座位表!");
+        }
+    }
+
+    @AfterReturning("exportStudentPhoneToFormPoint()")
+    public void exportStudentPhoneToFormLog(JoinPoint jp) {
+        User user = userService.getSessionUserInfo();
+        if (user != null) {
+            logger.info("用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")导出学生联系方式到表单!");
+        }
+    }
+
+    @AfterReturning("exportStudentPhoneToExcelPoint()")
+    public void exportStudentPhoneToExcelLog(JoinPoint jp) {
+        User user = userService.getSessionUserInfo();
+        if (user != null) {
+            logger.info("用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")导出学生联系方式到表格!");
         }
     }
 }

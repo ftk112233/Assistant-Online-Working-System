@@ -403,6 +403,14 @@ public class StudentServiceImpl extends AbstractServiceImpl implements StudentSe
     }
 
     @Override
+    public List<Student> listStudents(StudentAndClassSearchCondition condition) {
+        if (condition == null) {
+            return new ArrayList<>();
+        }
+        return studentMapper.listStudentsByStudentAndClassSearchCondition(condition);
+    }
+
+    @Override
     public String updateStudentInfo(Student student) {
         if (student == null) {
             return FAILURE;

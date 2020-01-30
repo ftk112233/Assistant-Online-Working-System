@@ -10,12 +10,9 @@ import com.jzy.model.excel.ExcelVersionEnum;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -25,7 +22,7 @@ import java.util.*;
  * @description 学生花名册用来导入数据库的。同时用户要扫描并填充的空学校统计表也用该对象封装
  * @date 2019/11/1 11:07
  **/
-public class StudentSchoolExcel extends AbstractInputExcel implements Serializable {
+public class StudentSchoolExcel extends AbstractInputExcel {
     private static final long serialVersionUID = 3823535210593191680L;
 
     private static final String STUDENT_ID_COLUMN = ExcelConstants.STUDENT_ID_COLUMN_3;
@@ -61,23 +58,12 @@ public class StudentSchoolExcel extends AbstractInputExcel implements Serializab
     @Setter
     private Map<String, Student> studentCache;
 
-    public StudentSchoolExcel() {
-    }
-
     public StudentSchoolExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public StudentSchoolExcel(File file) throws IOException, InvalidFileTypeException {
-        super(file);
-    }
-
     public StudentSchoolExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
-    }
-
-    public StudentSchoolExcel(Workbook workbook) {
-        super(workbook);
     }
 
     @Override
@@ -110,10 +96,10 @@ public class StudentSchoolExcel extends AbstractInputExcel implements Serializab
 
         int effectiveDataRowCount = 0;
         Map<String, Student> studentMap = new HashMap<>();
-        int rowCount = this.getRowCount(sheetIx); // 表的总行数
+        int rowCount = getRowCount(sheetIx); // 表的总行数
 
         for (int i = startRow + 1; i < rowCount; i++) {
-            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId);
+            String studentId = getValueAt(sheetIx, i, columnIndexOfStudentId);
             System.out.println(i);
             if (StringUtils.isEmpty(studentId)) {
                 //当前行学员号为空，跳过
@@ -122,7 +108,7 @@ public class StudentSchoolExcel extends AbstractInputExcel implements Serializab
                 effectiveDataRowCount++;
             }
             studentId = studentId.toUpperCase();
-            String studentSchool = this.getValueAt(sheetIx, i, columnIndexOfStudentSchool);
+            String studentSchool = getValueAt(sheetIx, i, columnIndexOfStudentSchool);
 
             if (!StringUtils.isEmpty(studentSchool)) {
                 //封装student
@@ -156,9 +142,9 @@ public class StudentSchoolExcel extends AbstractInputExcel implements Serializab
         findColumnIndexOfSpecifiedName(sheetIx);
 
         int effectiveDataRowCount = 0;
-        int rowCount = this.getRowCount(sheetIx); // 表的总行数
+        int rowCount = getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
-            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId);
+            String studentId = getValueAt(sheetIx, i, columnIndexOfStudentId);
             if (StringUtils.isEmpty(studentId)) {
                 //当前行学员号为空，跳过
                 continue;
@@ -190,9 +176,9 @@ public class StudentSchoolExcel extends AbstractInputExcel implements Serializab
             return true;
         }
 
-        int rowCount = this.getRowCount(sheetIx); // 表的总行数
+        int rowCount = getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
-            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId);
+            String studentId = getValueAt(sheetIx, i, columnIndexOfStudentId);
             if (StringUtils.isEmpty(studentId)) {
                 //当前行学员号为空，跳过
                 continue;
@@ -205,7 +191,7 @@ public class StudentSchoolExcel extends AbstractInputExcel implements Serializab
                 school = student.getStudentSchool();
             }
 
-            this.setValueAt(sheetIx, i, columnIndexOfStudentSchool, school);
+            setValueAt(sheetIx, i, columnIndexOfStudentSchool, school);
         }
 
 
@@ -242,9 +228,9 @@ public class StudentSchoolExcel extends AbstractInputExcel implements Serializab
         resetColumnIndex();
 
         // 先扫描第startRow行找到"学员号"、"学校"等信息所在列的位置
-        int row0ColumnCount = this.getColumnCount(sheetIx, startRow); // 第startRow行的列数
+        int row0ColumnCount = getColumnCount(sheetIx, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
-            String value = this.getValueAt(sheetIx, startRow, i);
+            String value = getValueAt(sheetIx, startRow, i);
             if (value!=null) {
                 switch (value) {
                     case STUDENT_ID_COLUMN:

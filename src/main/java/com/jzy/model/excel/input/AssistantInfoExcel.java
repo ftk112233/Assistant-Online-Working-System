@@ -13,9 +13,7 @@ import com.jzy.model.excel.ExcelVersionEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -69,23 +67,12 @@ public class AssistantInfoExcel extends AbstractInputExcel {
     private int columnIndexOfRemark = -1;
 
 
-    public AssistantInfoExcel() {
-    }
-
     public AssistantInfoExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public AssistantInfoExcel(File file) throws IOException, InvalidFileTypeException {
-        super(file);
-    }
-
     public AssistantInfoExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
-    }
-
-    public AssistantInfoExcel(Workbook workbook) {
-        super(workbook);
     }
 
     /**
@@ -107,29 +94,29 @@ public class AssistantInfoExcel extends AbstractInputExcel {
 
         int effectiveDataRowCount = 0;
 
-        int rowCount = this.getRowCount(sheetIx); // 表的总行数
+        int rowCount = getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
             User user = new User();
             Assistant assistant = new Assistant();
 
-            if (StringUtils.isEmpty(this.getValueAt(sheetIx, i, columnIndexOfRealName))) {
+            if (StringUtils.isEmpty(getValueAt(sheetIx, i, columnIndexOfRealName))) {
                 //当前行姓名为空，跳过
                 continue;
             } else {
                 effectiveDataRowCount++;
             }
 
-            String depart = this.getValueAt(sheetIx, i, columnIndexOfDepart);
+            String depart = getValueAt(sheetIx, i, columnIndexOfDepart);
             assistant.setAssistantDepart(depart);
 
-            String campusName = this.getValueAt(sheetIx, i, columnIndexOfCampusName);
+            String campusName = getValueAt(sheetIx, i, columnIndexOfCampusName);
             assistant.setAssistantCampus(campusName);
 
-            String realName = this.getValueAt(sheetIx, i, columnIndexOfRealName);
+            String realName = getValueAt(sheetIx, i, columnIndexOfRealName);
             user.setUserRealName(realName);
             assistant.setAssistantName(realName);
 
-            String workId = this.getValueAt(sheetIx, i, columnIndexOfWorkId);
+            String workId = getValueAt(sheetIx, i, columnIndexOfWorkId);
             if (StringUtils.isEmpty(workId)) {
                 //某些情况下，学管未能知晓助教的工号，因此助教和用户工号先给一个uuid
                 workId = UUID.randomUUID().toString().replace("-", "");
@@ -137,15 +124,15 @@ public class AssistantInfoExcel extends AbstractInputExcel {
             user.setUserWorkId(workId);
             assistant.setAssistantWorkId(workId);
 
-            String idCard = this.getValueAt(sheetIx, i, columnIndexOfIdCard);
+            String idCard = getValueAt(sheetIx, i, columnIndexOfIdCard);
             idCard = StringUtils.upperCase(idCard);
             user.setUserIdCard(idCard);
 
-            String phone = this.getValueAt(sheetIx, i, columnIndexOfPhone);
+            String phone = getValueAt(sheetIx, i, columnIndexOfPhone);
             user.setUserPhone(phone);
             assistant.setAssistantPhone(phone);
 
-            String remark = this.getValueAt(sheetIx, i, columnIndexOfRemark);
+            String remark = getValueAt(sheetIx, i, columnIndexOfRemark);
             user.setUserRemark(remark);
             assistant.setAssistantRemark(remark);
 
@@ -206,9 +193,9 @@ public class AssistantInfoExcel extends AbstractInputExcel {
     protected void findColumnIndexOfSpecifiedName(int sheetIx) throws ExcelColumnNotFoundException {
         resetColumnIndex();
 
-        int row0ColumnCount = this.getColumnCount(sheetIx, startRow); // 第startRow行的列数
+        int row0ColumnCount = getColumnCount(sheetIx, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
-            String value = this.getValueAt(sheetIx, startRow, i);
+            String value = getValueAt(sheetIx, startRow, i);
             if (value != null) {
                 switch (value) {
                     case DEPART_COLUMN:

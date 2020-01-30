@@ -9,12 +9,9 @@ import com.jzy.model.excel.ExcelVersionEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +24,7 @@ import java.util.List;
  **/
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class StudentListForSeatTableUploadByUserExcel extends AbstractInputExcel implements Serializable {
+public class StudentListForSeatTableUploadByUserExcel extends AbstractInputExcel {
     private static final long serialVersionUID = 7525649970044104312L;
 
     private static final String STUDENT_NAME_COLUMN = ExcelConstants.STUDENT_NAME_COLUMN_3;
@@ -48,23 +45,12 @@ public class StudentListForSeatTableUploadByUserExcel extends AbstractInputExcel
      */
     private int columnIndexOfStudentName = -1;
 
-    public StudentListForSeatTableUploadByUserExcel() {
-    }
-
     public StudentListForSeatTableUploadByUserExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public StudentListForSeatTableUploadByUserExcel(File file) throws IOException, InvalidFileTypeException {
-        super(file);
-    }
-
     public StudentListForSeatTableUploadByUserExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
-    }
-
-    public StudentListForSeatTableUploadByUserExcel(Workbook workbook) {
-        super(workbook);
     }
 
     /**
@@ -89,7 +75,7 @@ public class StudentListForSeatTableUploadByUserExcel extends AbstractInputExcel
 
         for (int i = startRow + 1; i < getRowCount(sheetIndex); i++) {
             // 遍历表格所有行
-            String value = this.getValueAt(sheetIndex, i, columnIndexOfStudentName);
+            String value = getValueAt(sheetIndex, i, columnIndexOfStudentName);
             if (!StringUtils.isEmpty(value)) {
                 // “学员姓名”列对应行元素非空
                 studentNames.add(value);
@@ -116,9 +102,9 @@ public class StudentListForSeatTableUploadByUserExcel extends AbstractInputExcel
     protected void findColumnIndexOfSpecifiedName(int sheetIx) throws ExcelColumnNotFoundException {
         resetColumnIndex();
 
-        int targetRowColumnCount = this.getColumnCount(sheetIx, startRow);
+        int targetRowColumnCount = getColumnCount(sheetIx, startRow);
         for (int i = 0; i < targetRowColumnCount; i++) {
-            if (STUDENT_NAME_COLUMN.equals(this.getValueAt(sheetIx, startRow, i))) {
+            if (STUDENT_NAME_COLUMN.equals(getValueAt(sheetIx, startRow, i))) {
                 columnIndexOfStudentName = i;
                 break;
             }

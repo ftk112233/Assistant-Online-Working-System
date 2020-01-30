@@ -46,8 +46,4 @@ public enum ExcelVersionEnum {
         }
         return null;
     }
-
-    public static void main(String[] args) {
-        System.out.println(getVersion("1.xlsx"));
-    }
 }

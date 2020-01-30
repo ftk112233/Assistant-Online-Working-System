@@ -193,4 +193,9 @@ public final class ModelConstants {
      * 跳转做表班号入参不存在提示页面时，错误班号的model键
      */
     public static final String WRONG_CLASS_ID = "wrongClassId";
+
+    /**
+     * 跳转导出学生联系方式页面时，助教姓名的model键
+     */
+    public static final String ASSISTANT_NAME = "assistantName";
 }

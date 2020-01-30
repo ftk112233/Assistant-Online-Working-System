@@ -217,7 +217,26 @@
             </if>
         </if>
     </select>
-
-
-
+    <select id="listStudentsByStudentAndClassSearchCondition" resultMap="BaseResultMap"
+            parameterType="com.jzy.model.dto.StudentAndClassSearchCondition">
+       select s0.* from student s0 where s0.id in
+        (select distinct s.id from (select c.id, a.assistant_name
+        from class c left join assistant a on c.class_assistant_id = a.id
+        <where>
+            <if test="classYear != null and classYear!=''">
+                and c.class_year=#{classYear}
+            </if>
+            <if test="classSeason != null and classSeason!=''">
+                and c.class_season=#{classSeason}
+            </if>
+            <if test="classSubSeason != null and classSubSeason!=''">
+                and c.class_sub_season=#{classSubSeason}
+            </if>
+            <if test="assistantName != null and assistantName!=''">
+                and a.assistant_name=#{assistantName}
+            </if>
+        </where>
+        ) as class_tmp, student_class sc, student s
+        where sc.class_id=class_tmp.id and sc.student_id=s.id)
+    </select>
 </mapper>

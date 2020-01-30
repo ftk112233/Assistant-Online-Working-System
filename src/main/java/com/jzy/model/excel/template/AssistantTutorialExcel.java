@@ -6,14 +6,9 @@ import com.jzy.manager.exception.ExcelColumnNotFoundException;
 import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
 import com.jzy.model.excel.AbstractTemplateExcel;
-import com.jzy.model.excel.ExcelVersionEnum;
 import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -23,7 +18,7 @@ import java.util.List;
  * @description 助教工作手册模板的模型类
  * @date 2019/11/1 15:28
  **/
-public class AssistantTutorialExcel extends AbstractTemplateExcel implements Serializable {
+public class AssistantTutorialExcel extends AbstractTemplateExcel {
     private static final long serialVersionUID = 2416400649170324596L;
 
     private static final String CAMPUS_COLUMN = ExcelConstants.CAMPUS_COLUMN_2;
@@ -63,23 +58,8 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
      */
     private static final int SEAT_SHEET_INDEX = 6;
 
-    public AssistantTutorialExcel() {
-    }
-
     public AssistantTutorialExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
-    }
-
-    public AssistantTutorialExcel(File file) throws IOException, InvalidFileTypeException {
-        super(file);
-    }
-
-    public AssistantTutorialExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
-        super(inputStream, version);
-    }
-
-    public AssistantTutorialExcel(Workbook workbook) {
-        super(workbook);
     }
 
     /**
@@ -129,9 +109,9 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
         int startRow = 0;
         // 先扫描第startRow行找到"校区"、"班号"、"教师姓名"等信息所在列的位置
         int columnIndexOfCampus = -1, columnIndexOfClassId = -2, columnIndexOfTeacherName = -3, columnIndexOfAssistantName = -4, columnIndexOfStudentId = -7, columnIndexOfStudentName = -9, columnIndexOfStudentPhone = -10, columnIndexOfIsOldStudent = -10, columnIndexOfTeacherRequirement = -11, columnIndexOfStudentSchool = -11, columnIndexOfSubjects = -12;
-        int row0ColumnCount = this.getColumnCount(CLASS_START_SHEET_INDEX, startRow); // 第startRow行的列数
+        int row0ColumnCount = getColumnCount(CLASS_START_SHEET_INDEX, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
-            String value = this.getValueAt(CLASS_START_SHEET_INDEX, startRow, i);
+            String value = getValueAt(CLASS_START_SHEET_INDEX, startRow, i);
             if (value != null) {
                 switch (value) {
                     case CAMPUS_COLUMN:
@@ -185,39 +165,39 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
             StudentAndClassDetailedWithSubjectsDto object = data.get(i - startRow);
             //遍历每行要填的学生上课信息对象
             // 填校区
-            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfCampus, object.getClassCampus());
+            setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfCampus, object.getClassCampus());
             // 填班号
-            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfClassId, object.getClassId());
+            setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfClassId, object.getClassId());
             // 填教师姓名
-            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfTeacherName, object.getTeacherName());
+            setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfTeacherName, object.getTeacherName());
             // 填助教
-            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfAssistantName, object.getAssistantName());
+            setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfAssistantName, object.getAssistantName());
             // 填学员编号
-            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentId, object.getStudentId());
+            setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentId, object.getStudentId());
             // 填学员姓名
-            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentName, object.getStudentName());
+            setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentName, object.getStudentName());
             // 姓名背景色
             int count=object.getCountOfSpecifiedAssistant();
             if (count > 1) {
                 //如果同一助教半夏出现次数大于1才改填充色
-                this.updateCellBackgroundColor(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentName, getBackGroundColorIndexByStudentOccurCount(object.getCountOfSpecifiedAssistant()));
+                updateCellBackgroundColor(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentName, getBackGroundColorIndexByStudentOccurCount(object.getCountOfSpecifiedAssistant()));
             }
             // 填学员联系方式
-            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentPhone, object.getStudentPhone());
+            setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentPhone, object.getStudentPhone());
             // 填类别，是否老生
             String isOld = object.isOldStudent() ? "老生" : "新生";
-            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfIsOldStudent, isOld);
+            setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfIsOldStudent, isOld);
             // 填任课教师要求
-            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfTeacherRequirement, object.getClassTeacherRequirement());
+            setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfTeacherRequirement, object.getClassTeacherRequirement());
             // 填学校
-            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentSchool, object.getStudentSchool());
+            setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfStudentSchool, object.getStudentSchool());
             // 填所有在读学科
 //            String subjectsToString = object.getSubjects() == null ? "" : object.getSubjects().toString();
-//            this.setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfSubjects, subjectsToString);
+//            setValueAt(CLASS_START_SHEET_INDEX, i + 1, columnIndexOfSubjects, subjectsToString);
         }
 
         // 删除多余行
-        this.removeRows(CLASS_START_SHEET_INDEX, rowCountToSave + 4, MAX_CLASS_STUDENTS_COUNT);
+        removeRows(CLASS_START_SHEET_INDEX, rowCountToSave + 4, MAX_CLASS_STUDENTS_COUNT);
 
         return true;
     }
@@ -246,18 +226,18 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
         }
         // 填表格第一行
         String str1 = "班号：" + dto.getClassId() + "                  班级名称：" + dto.getClassName();
-        this.setValueAt(SIGN_SHEET_INDEX, 0, 0, str1);
+        setValueAt(SIGN_SHEET_INDEX, 0, 0, str1);
         // 填表格第二行
         String str2 = "上课时间：" + dto.getClassSimplifiedTime() + "         上课教室：" + dto.getClassroom() +
                 "          教师：" + dto.getTeacherName() + "             助教：" + dto.getAssistantName();
-        this.setValueAt(SIGN_SHEET_INDEX, 1, 0, str2);
+        setValueAt(SIGN_SHEET_INDEX, 1, 0, str2);
 
         int startRow = 2;
         // 先扫描第startRow行找到"学员编号"、"学员姓名"、"家长联系方式"等信息所在列的位置
         int columnIndexOfStudentId = -7, columnIndexOfStudentName = -9, columnIndexOfStudentPhone = -10;
-        int row0ColumnCount = this.getColumnCount(SIGN_SHEET_INDEX, startRow); // 第startRow行的列数
+        int row0ColumnCount = getColumnCount(SIGN_SHEET_INDEX, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
-            String value = this.getValueAt(SIGN_SHEET_INDEX, startRow, i);
+            String value = getValueAt(SIGN_SHEET_INDEX, startRow, i);
             if (value != null) {
                 switch (value) {
                     case STUDENT_ID_COLUMN:
@@ -284,16 +264,16 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
             StudentAndClassDetailedWithSubjectsDto object = data.get(i - startRow);
             //遍历每行要填的学生上课信息对象
             // 填学员编号
-            this.setValueAt(SIGN_SHEET_INDEX, i + 1, columnIndexOfStudentId, object.getStudentId());
+            setValueAt(SIGN_SHEET_INDEX, i + 1, columnIndexOfStudentId, object.getStudentId());
             // 填学员姓名
-            this.setValueAt(SIGN_SHEET_INDEX, i + 1, columnIndexOfStudentName, object.getStudentName());
+            setValueAt(SIGN_SHEET_INDEX, i + 1, columnIndexOfStudentName, object.getStudentName());
             // 填学员联系方式
-            this.setValueAt(SIGN_SHEET_INDEX, i + 1, columnIndexOfStudentPhone, object.getStudentPhone());
+            setValueAt(SIGN_SHEET_INDEX, i + 1, columnIndexOfStudentPhone, object.getStudentPhone());
             // 填任课教师要求
         }
 
         // 删除多余行
-        this.removeRows(SIGN_SHEET_INDEX, rowCountToSave + 4 + startRow + 1,
+        removeRows(SIGN_SHEET_INDEX, rowCountToSave + 4 + startRow + 1,
                 MAX_CLASS_STUDENTS_COUNT + startRow + 1);
 
         //根据上课次数删除多余列
@@ -322,9 +302,9 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
         int startRow = 0;
         // 先扫描第startRow行找到"校区"、"班号"、"教师姓名"等信息所在列的位置
         int columnIndexOfCampus = -1, columnIndexOfClassId = -2, columnIndexOfTeacherName = -3, columnIndexOfAssistantName = -4, columnIndexOfStudentId = -7, columnIndexOfStudentName = -9, columnIndexOfIsOldStudent = -10;
-        int row0ColumnCount = this.getColumnCount(CALLBACK_SHEET_INDEX, startRow); // 第startRow行的列数
+        int row0ColumnCount = getColumnCount(CALLBACK_SHEET_INDEX, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
-            String value = this.getValueAt(CALLBACK_SHEET_INDEX, startRow, i);
+            String value = getValueAt(CALLBACK_SHEET_INDEX, startRow, i);
             if (value != null) {
                 switch (value) {
                     case CAMPUS_COLUMN:
@@ -364,24 +344,24 @@ public class AssistantTutorialExcel extends AbstractTemplateExcel implements Ser
             StudentAndClassDetailedWithSubjectsDto object = data.get(i - startRow);
             //遍历每行要填的学生上课信息对象
             // 填校区
-            this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfCampus, object.getClassCampus());
+            setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfCampus, object.getClassCampus());
             // 填班号
-            this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfClassId, object.getClassId());
+            setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfClassId, object.getClassId());
             // 填教师姓名
-            this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfTeacherName, object.getTeacherName());
+            setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfTeacherName, object.getTeacherName());
             // 填助教
-            this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfAssistantName, object.getAssistantName());
+            setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfAssistantName, object.getAssistantName());
             // 填学员编号
-            this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfStudentId, object.getStudentId());
+            setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfStudentId, object.getStudentId());
             // 填学员姓名
-            this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfStudentName, object.getStudentName());
+            setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfStudentName, object.getStudentName());
             // 填类别，是否老生
             String isOld = object.isOldStudent() ? "老生" : "新生";
-            this.setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfIsOldStudent, isOld);
+            setValueAt(CALLBACK_SHEET_INDEX, i + 1, columnIndexOfIsOldStudent, isOld);
         }
 
         // 删除多余行
-        this.removeRows(CALLBACK_SHEET_INDEX, rowCountToSave + 4, MAX_CLASS_STUDENTS_COUNT);
+        removeRows(CALLBACK_SHEET_INDEX, rowCountToSave + 4, MAX_CLASS_STUDENTS_COUNT);
 
         return true;
     }

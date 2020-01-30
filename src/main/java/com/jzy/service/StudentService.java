@@ -125,6 +125,14 @@ public interface StudentService {
     PageInfo<Student> listStudents(MyPage myPage, StudentSearchCondition condition);
 
     /**
+     * 查询学员个人信息，以上课记录中的信息为查询条件，返回唯一的学生个人信息对象集合
+     *
+     * @param condition 上课记录的查询条件入参
+     * @return 结果集合
+     */
+    List<Student> listStudents(StudentAndClassSearchCondition condition);
+
+    /**
      * 修改学生信息由id修改
      *
      * @param student 修改后的学生信息

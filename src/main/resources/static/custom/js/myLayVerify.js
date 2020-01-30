@@ -123,7 +123,7 @@ layui.define(['table', 'form'], function (exports) {
                 return '问题答案1不能为空，且不能超过100个字符';
             }
         }
-        ,answer2: function (value) {
+        , answer2: function (value) {
             if (value.length > 100) {
                 return '问题答案2不能超过100个字符';
             }
@@ -138,12 +138,12 @@ layui.define(['table', 'form'], function (exports) {
                 return '内容不能为空，且不能超过200个字符';
             }
         }
-        ,sequence: function (value) {
+        , sequence: function (value) {
             if (!(value !== '' && isDigit(value) && value.length <= 10)) {
                 return '序号值不能为空，且必须是数字';
             }
         }
-        ,contentOfMessage: function (value) {
+        , contentOfMessage: function (value) {
             if (!(value !== '' && value.length <= 1000)) {
                 return '内容不能为空，且不能超过1000个字符';
             }

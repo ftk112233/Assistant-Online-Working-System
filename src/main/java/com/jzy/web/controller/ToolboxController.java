@@ -6,10 +6,7 @@ import com.jzy.manager.constant.ModelConstants;
 import com.jzy.manager.exception.*;
 import com.jzy.manager.util.*;
 import com.jzy.model.CampusEnum;
-import com.jzy.model.dto.ClassDetailedDto;
-import com.jzy.model.dto.MissManyDaysLessonStudentDetailedDto;
-import com.jzy.model.dto.StudentAndClassDetailedDto;
-import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
+import com.jzy.model.dto.*;
 import com.jzy.model.entity.*;
 import com.jzy.model.entity.Class;
 import com.jzy.model.excel.Excel;
@@ -21,6 +18,7 @@ import com.jzy.model.excel.input.StudentSchoolExcel;
 import com.jzy.model.excel.template.AssistantTutorialExcel;
 import com.jzy.model.excel.template.MissedLessonExcel;
 import com.jzy.model.excel.template.SeatTableTemplateExcel;
+import com.jzy.model.excel.template.StudentPhoneOutputExcel;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -906,6 +904,84 @@ public class ToolboxController extends AbstractController {
             return FAILURE;
         }
 
+
+        return SUCCESS;
+    }
+
+    /**
+     * 跳转导出学生联系方式页面
+     *
+     * @return
+     */
+    @RequestMapping("/assistant/exportStudentPhonePage")
+    public String exportStudentPhonePage(Model model) {
+        model.addAttribute(ModelConstants.CURRENT_ClASS_SEASON_MODEL_KEY, classService.getCurrentClassSeason());
+
+        model.addAttribute(ModelConstants.SEASONS_MODEL_KEY, JSON.toJSONString(Class.SEASONS));
+        model.addAttribute(ModelConstants.SUB_SEASONS_MODEL_KEY, JSON.toJSONString(Class.SUB_SEASONS));
+
+        model.addAttribute(ModelConstants.ASSISTANT_NAME, userService.getSessionUserInfo().getUserRealName());
+        return "toolbox/assistant/studentPhone";
+
+    }
+
+    /**
+     * 导出学生联系方式到表单
+     *
+     * @param condition  年份季度分期和助教姓名得我封装
+     * @param namePrefix 导出姓名前缀
+     * @param nameSuffix 导出姓名后缀
+     * @return
+     */
+    @RequestMapping("/assistant/exportStudentPhoneToForm")
+    @ResponseBody
+    public Map<String, Object> exportStudentPhoneToForm(StudentAndClassSearchCondition condition, @RequestParam("namePrefix") String namePrefix, @RequestParam("nameSuffix") String nameSuffix) {
+        Map<String, Object> map = new HashMap<>(2);
+        StringBuilder names = new StringBuilder();
+        StringBuilder phones = new StringBuilder();
+
+        List<Student> students = studentService.listStudents(condition);
+        for (Student student : students) {
+            names.append(namePrefix).append(student.getStudentName()).append(nameSuffix).append("\n");
+            phones.append(student.getStudentPhone() == null ? "" : student.getStudentPhone()).append("\n");
+        }
+        map.put("names", names.toString());
+        map.put("phones", phones.toString());
+        return map;
+    }
+
+    /**
+     * 导出学生联系方式到表格
+     *
+     * @param condition  年份季度分期和助教姓名得我封装
+     * @param namePrefix 导出姓名前缀
+     * @param nameSuffix 导出姓名后缀
+     * @return
+     */
+    @RequestMapping("/assistant/exportStudentPhoneToExcel")
+    @ResponseBody
+    public String exportStudentPhoneToExcel(HttpServletRequest request, HttpServletResponse response,
+                                            StudentAndClassSearchCondition condition, @RequestParam("namePrefix") String namePrefix, @RequestParam("nameSuffix") String nameSuffix) {
+        StudentPhoneOutputExcel excel = null;
+        try {
+            List<Student> students = studentService.listStudents(condition);
+
+            String fileName = "导出学生联系方式" + UUID.randomUUID().toString().replace("-", "");
+            ExcelVersionEnum version = ExcelVersionEnum.VERSION_2007;
+            excel = new StudentPhoneOutputExcel(version);
+
+            //将读到的数据，填写到表格中
+            excel.writeStudentPhone(students, namePrefix, nameSuffix);
+
+            //下载处理好的文件
+            FileUtils.downloadFile(request, response, excel, fileName + version.getSuffix());
+        } catch (InvalidFileTypeException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+            String msg = "exportStudentPhoneToExcel下载文件失败";
+            logger.error(msg);
+        }
 
         return SUCCESS;
     }

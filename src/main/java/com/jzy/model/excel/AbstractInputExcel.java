@@ -22,9 +22,6 @@ import java.io.InputStream;
 public abstract class AbstractInputExcel extends DefaultExcel {
     private static final long serialVersionUID = 7458303551368759495L;
 
-    public AbstractInputExcel() {
-    }
-
     public AbstractInputExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
@@ -39,6 +36,10 @@ public abstract class AbstractInputExcel extends DefaultExcel {
 
     public AbstractInputExcel(Workbook workbook) {
         super(workbook);
+    }
+
+    public AbstractInputExcel(ExcelVersionEnum version) throws InvalidFileTypeException {
+        super(version);
     }
 
     /**

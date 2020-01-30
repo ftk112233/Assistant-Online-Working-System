@@ -167,6 +167,9 @@
                                     <dd data-name="demo2">
                                         <a lay-href="${ctx}/toolbox/assistant/missLessonStudentExcel" lay-text="开补课单魔法">开补课单魔法</a>
                                     </dd>
+                                    <dd>
+                                        <a lay-href="${ctx}/toolbox/assistant/exportStudentPhonePage" lay-text="导出学生联系方式">导出学生联系方式</a>
+                                    </dd>
                                 </dl>
                             </dd>
                             <dd data-name="grid">

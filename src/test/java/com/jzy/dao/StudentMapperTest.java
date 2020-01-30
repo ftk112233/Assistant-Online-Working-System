@@ -1,6 +1,7 @@
 package com.jzy.dao;
 
 import com.jzy.BaseTest;
+import com.jzy.model.dto.StudentAndClassSearchCondition;
 import com.jzy.model.entity.Student;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,5 +24,18 @@ public class StudentMapperTest extends BaseTest {
         student.setStudentSex(null);
         students.add(student);
         studentMapper.insertManyStudents(students);
+    }
+
+    @Test
+    public void listStudentsByStudentAndClassSearchCondition() {
+        StudentAndClassSearchCondition condition=new StudentAndClassSearchCondition();
+        condition.setClassYear("2020");
+        condition.setClassSeason("秋下");
+        condition.setAssistantName("金之贇");
+        List<Student> students=studentMapper.listStudentsByStudentAndClassSearchCondition(condition);
+        for (Student student:students){
+            System.out.println(student);
+        }
+        System.out.println(students.size());
     }
 }

@@ -3,14 +3,9 @@ package com.jzy.model.excel.template;
 import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
 import com.jzy.model.excel.AbstractTemplateExcel;
-import com.jzy.model.excel.ExcelVersionEnum;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -20,27 +15,11 @@ import java.util.List;
  * @description 座位表模板的模型类
  * @date 2019/10/30 14:21
  **/
-public class SeatTableTemplateExcel extends AbstractTemplateExcel implements Serializable {
+public class SeatTableTemplateExcel extends AbstractTemplateExcel{
     private static final long serialVersionUID = -3764653590834120925L;
-
-
-    public SeatTableTemplateExcel() {
-    }
 
     public SeatTableTemplateExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
-    }
-
-    public SeatTableTemplateExcel(File file) throws IOException, InvalidFileTypeException {
-        super(file);
-    }
-
-    public SeatTableTemplateExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
-        super(inputStream, version);
-    }
-
-    public SeatTableTemplateExcel(Workbook workbook) {
-        super(workbook);
     }
 
     /**
@@ -55,12 +34,12 @@ public class SeatTableTemplateExcel extends AbstractTemplateExcel implements Ser
             return false;
         }
         int start = 0;
-        int totalSheetCount = this.getSheetCount();
+        int totalSheetCount = getSheetCount();
         for (int i = 0; i < totalSheetCount; i++) {
-            if (this.getSheetName(start).equals(classroom)) {
+            if (getSheetName(start).equals(classroom)) {
                 start++;
             } else {
-                this.removeSheetAt(start);
+                removeSheetAt(start);
             }
         }
         return true;
@@ -86,17 +65,17 @@ public class SeatTableTemplateExcel extends AbstractTemplateExcel implements Ser
 
         //开始依序填座位表
         int targetSheetIndex = 0; //在第0张sheet找
-        int rowCount = this.getRowCount(targetSheetIndex);
+        int rowCount = getRowCount(targetSheetIndex);
         for (int i = 0; i < rowCount; i++) {
-            for (int j = 0; j < this.getColumnCount(targetSheetIndex, i); j++) {
+            for (int j = 0; j < getColumnCount(targetSheetIndex, i); j++) {
                 //遍历表格所有行
-                String value = this.getValueAt(targetSheetIndex, i, j);
+                String value = getValueAt(targetSheetIndex, i, j);
                 if (StringUtils.isNumeric(value)) {
                     //对所有为数字的单元格（即座位号）填充姓名
                     int index = Integer.parseInt(value) - 1;
                     if (index < data.size()) {
                         //座位号值大于学生数量的座位不填
-                        this.setValueAt(targetSheetIndex, i, j, value+" "+data.get(Integer.parseInt(value) - 1).getStudentName());
+                        setValueAt(targetSheetIndex, i, j, value+" "+data.get(Integer.parseInt(value) - 1).getStudentName());
                     }
                 }
             }

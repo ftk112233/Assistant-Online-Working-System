@@ -4,13 +4,8 @@ package com.jzy.model.excel.template;
 import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.model.dto.MissManyDaysLessonStudentDetailedDto;
 import com.jzy.model.excel.AbstractTemplateExcel;
-import com.jzy.model.excel.ExcelVersionEnum;
-import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
 
 /**
  * @author JinZhiyun
@@ -19,26 +14,11 @@ import java.io.Serializable;
  * @description 补课单模板的模型类
  * @date 2019/11/3 20:26
  **/
-public class MissedLessonExcel extends AbstractTemplateExcel implements Serializable {
+public class MissedLessonExcel extends AbstractTemplateExcel {
     private static final long serialVersionUID = -4232682893945575846L;
-
-    public MissedLessonExcel() {
-    }
 
     public MissedLessonExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
-    }
-
-    public MissedLessonExcel(File file) throws IOException, InvalidFileTypeException {
-        super(file);
-    }
-
-    public MissedLessonExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
-        super(inputStream, version);
-    }
-
-    public MissedLessonExcel(Workbook workbook) {
-        super(workbook);
     }
 
     /**
@@ -66,21 +46,21 @@ public class MissedLessonExcel extends AbstractTemplateExcel implements Serializ
     public boolean writeMissLesson(MissManyDaysLessonStudentDetailedDto input, String currentCampus, int missedLessonCount) throws IOException {
         int sheetIx = 0;
         String title = "由于学员___" + input.getStudentName() + "___个人原因在上海新东方上课期间缺课___" + missedLessonCount + "___节，经证实情况属实，允许该生于规定时间内在上海新东方相同类型班级里补上所缺课时。";
-        this.setValueAt(sheetIx, 3, 1, title);
+        setValueAt(sheetIx, 3, 1, title);
 
         int targetRow = 14;//目标行
         //填所缺课程
-        this.setValueAt(sheetIx, targetRow, 3, input.getCurrentClassGrade() + input.getCurrentClassSubject());
+        setValueAt(sheetIx, targetRow, 3, input.getCurrentClassGrade() + input.getCurrentClassSubject());
         //填补课班号
-        this.setValueAt(sheetIx, targetRow, 4, input.getCurrentClassId());
+        setValueAt(sheetIx, targetRow, 4, input.getCurrentClassId());
         //填上课时间
-        this.setValueAt(sheetIx, targetRow, 5, input.getDaysBetweenToString() + ", " + input.getCurrentClassSimplifiedTime());
+        setValueAt(sheetIx, targetRow, 5, input.getDaysBetweenToString() + ", " + input.getCurrentClassSimplifiedTime());
         //填上课教室
-        this.setValueAt(sheetIx, targetRow, 6, currentCampus + "/" + input.getCurrentClassroom());
+        setValueAt(sheetIx, targetRow, 6, currentCampus + "/" + input.getCurrentClassroom());
         //填原班助教
-        this.setValueAt(sheetIx, targetRow, 7, input.getOriginalAssistantName());
+        setValueAt(sheetIx, targetRow, 7, input.getOriginalAssistantName());
         //填补课班助教
-        this.setValueAt(sheetIx, targetRow, 8, input.getCurrentAssistantName());
+        setValueAt(sheetIx, targetRow, 8, input.getCurrentAssistantName());
 
         return true;
     }

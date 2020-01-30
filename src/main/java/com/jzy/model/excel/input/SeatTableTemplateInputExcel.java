@@ -11,12 +11,9 @@ import com.jzy.model.excel.ExcelVersionEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,26 +26,15 @@ import java.util.List;
  **/
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SeatTableTemplateInputExcel extends AbstractInputExcel implements Serializable {
+public class SeatTableTemplateInputExcel extends AbstractInputExcel {
     private static final long serialVersionUID = -4498593702973804852L;
-
-    public SeatTableTemplateInputExcel() {
-    }
 
     public SeatTableTemplateInputExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public SeatTableTemplateInputExcel(File file) throws IOException, InvalidFileTypeException {
-        super(file);
-    }
-
     public SeatTableTemplateInputExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
-    }
-
-    public SeatTableTemplateInputExcel(Workbook workbook) {
-        super(workbook);
     }
 
     /**
@@ -70,9 +56,9 @@ public class SeatTableTemplateInputExcel extends AbstractInputExcel implements S
 
         testRowCountValidity();
 
-        int sheetCount = this.getSheetCount();
+        int sheetCount = getSheetCount();
         for (int i = 0; i < sheetCount; i++) {
-            String classroom = this.getSheetName(i);
+            String classroom = getSheetName(i);
             if (!CampusAndClassroomUtils.isValidClassroom(classroom)) {
                 //如果sheet名（教室门牌号）不符合规范
                 throw new ExcelSheetNameInvalidException("教室门牌号不符合规范!");
@@ -80,12 +66,12 @@ public class SeatTableTemplateInputExcel extends AbstractInputExcel implements S
             CampusAndClassroom campusAndClassroom = new CampusAndClassroom();
             campusAndClassroom.setClassroom(classroom);
 
-            int rowCount = this.getRowCount(i);
+            int rowCount = getRowCount(i);
             Integer maxCapacity = null;
             for (int j = 0; j < rowCount; j++) {
-                for (int k = 0; k < this.getColumnCount(i, j); k++) {
+                for (int k = 0; k < getColumnCount(i, j); k++) {
                     //遍历表格所有行
-                    String value = this.getValueAt(i, j, k);
+                    String value = getValueAt(i, j, k);
                     if (StringUtils.isNumeric(value)) {
                         //对所有为数字的单元格找到最大的作为当前教室容量
                         Integer cap = Integer.parseInt(value);

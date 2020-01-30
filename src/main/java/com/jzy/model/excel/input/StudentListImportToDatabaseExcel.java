@@ -12,12 +12,9 @@ import com.jzy.model.excel.ExcelVersionEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.*;
 
@@ -30,7 +27,7 @@ import java.util.*;
  **/
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class StudentListImportToDatabaseExcel extends AbstractInputExcel implements Serializable {
+public class StudentListImportToDatabaseExcel extends AbstractInputExcel {
     private static final long serialVersionUID = 3823535210593191680L;
 
     private static final String STUDENT_ID_COLUMN = ExcelConstants.STUDENT_ID_COLUMN;
@@ -74,23 +71,12 @@ public class StudentListImportToDatabaseExcel extends AbstractInputExcel impleme
      */
     private List<StudentAndClassDetailedDto> studentAndClassDetailedDtos;
 
-    public StudentListImportToDatabaseExcel() {
-    }
-
     public StudentListImportToDatabaseExcel(String inputFile) throws IOException, InvalidFileTypeException {
         super(inputFile);
     }
 
-    public StudentListImportToDatabaseExcel(File file) throws IOException, InvalidFileTypeException {
-        super(file);
-    }
-
     public StudentListImportToDatabaseExcel(InputStream inputStream, ExcelVersionEnum version) throws IOException, InvalidFileTypeException {
         super(inputStream, version);
-    }
-
-    public StudentListImportToDatabaseExcel(Workbook workbook) {
-        super(workbook);
     }
 
     /**
@@ -113,9 +99,9 @@ public class StudentListImportToDatabaseExcel extends AbstractInputExcel impleme
 
         int effectiveDataRowCount = 0;
 
-        int rowCount = this.getRowCount(sheetIx); // 表的总行数
+        int rowCount = getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
-            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId);
+            String studentId = getValueAt(sheetIx, i, columnIndexOfStudentId);
             if (StringUtils.isEmpty(studentId)) {
                 //当前行学员号为空，跳过
                 continue;
@@ -123,13 +109,13 @@ public class StudentListImportToDatabaseExcel extends AbstractInputExcel impleme
                 effectiveDataRowCount++;
             }
             studentId = studentId.toUpperCase();
-            String studentName = this.getValueAt(sheetIx, i, columnIndexOfStudentName);
-            String studentPhone = this.getValueAt(sheetIx, i, columnIndexOfStudentPhone);
-            String studentPhoneBackup = this.getValueAt(sheetIx, i, columnIndexOfStudentPhoneBackup);
-            String classId = this.getValueAt(sheetIx, i, columnIndexOfClassId);
+            String studentName = getValueAt(sheetIx, i, columnIndexOfStudentName);
+            String studentPhone = getValueAt(sheetIx, i, columnIndexOfStudentPhone);
+            String studentPhoneBackup = getValueAt(sheetIx, i, columnIndexOfStudentPhoneBackup);
+            String classId = getValueAt(sheetIx, i, columnIndexOfClassId);
             classId = StringUtils.upperCase(classId);
-            String registerTime = this.getValueAt(sheetIx, i, columnIndexOfRegisterTime);
-            String remark = this.getValueAt(sheetIx, i, columnIndexOfRemark);
+            String registerTime = getValueAt(sheetIx, i, columnIndexOfRegisterTime);
+            String remark = getValueAt(sheetIx, i, columnIndexOfRemark);
 
             //先封装student
             Student student = new Student();
@@ -172,9 +158,9 @@ public class StudentListImportToDatabaseExcel extends AbstractInputExcel impleme
     private void findColumnIndexOfSpecifiedNameForReadingStudentAndClassInfo(int sheetIx) throws ExcelColumnNotFoundException {
         resetColumnIndex();
 
-        int row0ColumnCount = this.getColumnCount(sheetIx, startRow); // 第startRow行的列数
+        int row0ColumnCount = getColumnCount(sheetIx, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
-            String value = this.getValueAt(sheetIx, startRow, i);
+            String value = getValueAt(sheetIx, startRow, i);
             if (value != null) {
                 switch (value) {
                     case STUDENT_ID_COLUMN:
@@ -234,9 +220,9 @@ public class StudentListImportToDatabaseExcel extends AbstractInputExcel impleme
 
         int effectiveDataRowCount = 0;
 
-        int rowCount = this.getRowCount(sheetIx); // 表的总行数
+        int rowCount = getRowCount(sheetIx); // 表的总行数
         for (int i = startRow + 1; i < rowCount; i++) {
-            String studentId = this.getValueAt(sheetIx, i, columnIndexOfStudentId);
+            String studentId = getValueAt(sheetIx, i, columnIndexOfStudentId);
             if (StringUtils.isEmpty(studentId)) {
                 //当前行学员号为空，跳过
                 continue;
@@ -244,9 +230,9 @@ public class StudentListImportToDatabaseExcel extends AbstractInputExcel impleme
                 effectiveDataRowCount++;
             }
             studentId = studentId.toUpperCase();
-            String studentName = this.getValueAt(sheetIx, i, columnIndexOfStudentName);
-            String studentPhone = this.getValueAt(sheetIx, i, columnIndexOfStudentPhone);
-            String studentPhoneBackup = this.getValueAt(sheetIx, i, columnIndexOfStudentPhoneBackup);
+            String studentName = getValueAt(sheetIx, i, columnIndexOfStudentName);
+            String studentPhone = getValueAt(sheetIx, i, columnIndexOfStudentPhone);
+            String studentPhoneBackup = getValueAt(sheetIx, i, columnIndexOfStudentPhoneBackup);
 
             //封装student
             Student student = new Student();
@@ -267,9 +253,9 @@ public class StudentListImportToDatabaseExcel extends AbstractInputExcel impleme
      * @throws ExcelColumnNotFoundException 列属性中有未匹配的属性名，将具体的哪一列未匹配传入异常对象
      */
     private void findColumnIndexOfSpecifiedNameForReadingStudentDetail(int sheetIx) throws ExcelColumnNotFoundException {
-        int row0ColumnCount = this.getColumnCount(sheetIx, startRow); // 第startRow行的列数
+        int row0ColumnCount = getColumnCount(sheetIx, startRow); // 第startRow行的列数
         for (int i = 0; i < row0ColumnCount; i++) {
-            String value = this.getValueAt(sheetIx, startRow, i);
+            String value = getValueAt(sheetIx, startRow, i);
             switch (value) {
                 case STUDENT_ID_COLUMN:
                     columnIndexOfStudentId = i;
