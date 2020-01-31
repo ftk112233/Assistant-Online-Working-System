@@ -3,9 +3,12 @@ package com.jzy.web.controller;
 import com.alibaba.fastjson.JSON;
 import com.jzy.manager.constant.Constants;
 import com.jzy.manager.constant.ModelConstants;
+import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.util.MyStringUtils;
+import com.jzy.manager.util.MyTimeUtils;
 import com.jzy.manager.util.SendEmailUtils;
 import com.jzy.model.vo.ProblemCollection;
+import com.jzy.model.vo.echarts.EchartsFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,9 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author JinZhiyun
@@ -90,6 +91,82 @@ public class HomeController extends AbstractController {
         }
 
         map.put("data", SUCCESS);
+        return map;
+    }
+
+    /**
+     * 跳转访客量统计页面
+     *
+     * @return
+     */
+    @RequestMapping("/visitorStatistics")
+    public String visitorStatistics() {
+        return "home/visitorStatistics";
+    }
+
+    /**
+     * 近三十天的访客量统计，返回echarts图标所需json
+     *
+     * @return
+     */
+    @RequestMapping("/getRecentVisitorStatistics")
+    @ResponseBody
+    public Map<String, Object> getRecentVisitorStatistics() {
+        Map<String, Object> map = new HashMap<>();
+        List<String> xAxisData2 = new ArrayList<>(24);
+        for (int hour = 0; hour <= 23; hour++) {
+            xAxisData2.add(hour + "点");
+        }
+        long[] seriesData2 = new long[24];
+
+        List<String> legendData = Arrays.asList("主页访客", "信息管理区访客", "百宝箱区访客");
+        int daysSize = 30;
+        List<String> xAxisData = new ArrayList<>(daysSize);
+        List<Date> days = MyTimeUtils.getPastDays(new Date(), daysSize - 1);
+        for (Date day : days) {
+            xAxisData.add(MyTimeUtils.dateToStringYMD(day));
+        }
+
+        List<Object> series = new ArrayList<>(legendData.size());
+        for (String name : legendData) {
+            //各类别访客数列表
+            List<Long> seriesData = new ArrayList<>(daysSize);
+            for (Date day : days) {
+                Long visitTimesOfDay = Constants.ZERO;
+                if ("主页访客".equals(name)) {
+                    String key = RedisConstants.getIndexVisitorStatisticsKey(day);
+                    for (int hour = 0; hour <= 23; hour++) {
+                        Long visitTimesOfHour = Constants.ZERO;
+                        String hourKey = hour + "";
+                        if (hashOps.hasKey(key, hourKey)) {
+                            visitTimesOfHour = ((Integer) hashOps.get(key, hourKey)).longValue();
+                        }
+                        visitTimesOfDay += visitTimesOfHour;
+
+                        seriesData2[hour] += visitTimesOfHour;
+                    }
+                } else {
+                    String key;
+                    if ("信息管理区访客".equals(name)) {
+                        key = RedisConstants.getInfoManagementVisitorStatisticsKey(day);
+                    } else {
+                        //百宝箱区访客
+                        key = RedisConstants.getToolboxVisitorStatisticsKey(day);
+                    }
+                    if (redisTemplate.hasKey(key)) {
+                        visitTimesOfDay = ((Integer) valueOps.get(key)).longValue();
+                    }
+                }
+                seriesData.add(visitTimesOfDay);
+            }
+            series.add(EchartsFactory.getLineStackSeries(name, true, seriesData));
+        }
+
+        map.put("legendData", legendData);
+        map.put("xAxisData2", xAxisData2);
+        map.put("xAxisData", xAxisData);
+        map.put("series", series);
+        map.put("seriesData2", seriesData2);
         return map;
     }
 }

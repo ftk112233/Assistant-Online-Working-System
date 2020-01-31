@@ -90,7 +90,7 @@
         select * from question
     </select>
     <select id="listQuestions" resultMap="QuestionWithCreatorResultMap"
-            parameterType="com.jzy.model.dto.QuestionSearchCondition">
+            parameterType="com.jzy.model.dto.search.QuestionSearchCondition">
         select q.*, u.user_real_name as creator_name from question q left join user u on q.creator_id=u.id
         <where>
             <if test="content != null and content!=''">

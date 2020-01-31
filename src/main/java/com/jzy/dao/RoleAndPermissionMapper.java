@@ -1,6 +1,6 @@
 package com.jzy.dao;
 
-import com.jzy.model.dto.RoleAndPermissionSearchCondition;
+import com.jzy.model.dto.search.RoleAndPermissionSearchCondition;
 import com.jzy.model.entity.RoleAndPermission;
 import org.apache.ibatis.annotations.Param;
 

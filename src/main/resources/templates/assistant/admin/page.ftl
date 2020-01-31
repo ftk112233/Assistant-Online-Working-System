@@ -221,7 +221,6 @@
         //监听搜索
         form.on('submit(deleteByCondition)', function (data) {
             var field = data.field;
-            console.log(field)
             layer.confirm('确定要根据上述条件删除数据吗？', function (index) {
                 //执行 Ajax 后重载
                 $.ajax({

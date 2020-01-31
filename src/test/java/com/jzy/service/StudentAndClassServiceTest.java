@@ -4,7 +4,7 @@ import com.jzy.BaseTest;
 import com.jzy.config.FilePathProperties;
 import com.jzy.manager.exception.InvalidFileTypeException;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
-import com.jzy.model.dto.StudentAndClassSearchCondition;
+import com.jzy.model.dto.search.StudentAndClassSearchCondition;
 import com.jzy.model.excel.input.StudentListImportToDatabaseExcel;
 import com.jzy.model.excel.template.SeatTableTemplateExcel;
 import org.junit.Test;

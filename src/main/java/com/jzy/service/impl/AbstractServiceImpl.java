@@ -62,6 +62,9 @@ public abstract class AbstractServiceImpl {
     protected RedisOperation redisOperation;
 
     @Autowired
+    protected ImportantLogService importantLogService;
+
+    @Autowired
     protected RedisTemplate<String, Object> redisTemplate;
 
     @Autowired

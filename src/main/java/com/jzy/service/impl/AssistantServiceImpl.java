@@ -8,6 +8,7 @@ import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.AssistantUtils;
 import com.jzy.model.dto.*;
+import com.jzy.model.dto.search.AssistantSearchCondition;
 import com.jzy.model.entity.Assistant;
 import com.jzy.service.AssistantService;
 import org.apache.commons.lang3.StringUtils;

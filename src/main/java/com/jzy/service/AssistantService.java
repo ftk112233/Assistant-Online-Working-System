@@ -2,6 +2,7 @@ package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
 import com.jzy.model.dto.*;
+import com.jzy.model.dto.search.AssistantSearchCondition;
 import com.jzy.model.entity.Assistant;
 
 import java.util.List;

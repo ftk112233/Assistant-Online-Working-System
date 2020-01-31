@@ -1,7 +1,7 @@
 package com.jzy.dao;
 
 import com.jzy.model.dto.UserMessageDto;
-import com.jzy.model.dto.UserMessageSearchCondition;
+import com.jzy.model.dto.search.UserMessageSearchCondition;
 import com.jzy.model.entity.UserMessage;
 import org.apache.ibatis.annotations.Param;
 

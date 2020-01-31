@@ -12,7 +12,7 @@ import com.jzy.manager.exception.QuestionNotExistException;
 import com.jzy.manager.util.CodeUtils;
 import com.jzy.manager.util.QuestionUtils;
 import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.QuestionSearchCondition;
+import com.jzy.model.dto.search.QuestionSearchCondition;
 import com.jzy.model.dto.QuestionWithCreatorDto;
 import com.jzy.model.dto.UpdateResult;
 import com.jzy.model.entity.Question;

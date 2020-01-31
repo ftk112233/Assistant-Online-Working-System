@@ -20,6 +20,17 @@ public class MyStringUtils {
     private MyStringUtils() {
     }
 
+    private static Pattern ipv6Pattern;
+    private static Pattern ipv4Pattern;
+
+    static {
+        // ipv6
+        ipv6Pattern = Pattern.compile("^((([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){1,7}:)|(([0-9A-Fa-f]{1,4}:){6}:[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){5}(:[0-9A-Fa-f]{1,4}){1,2})|(([0-9A-Fa-f]{1,4}:){4}(:[0-9A-Fa-f]{1,4}){1,3})|(([0-9A-Fa-f]{1,4}:){3}(:[0-9A-Fa-f]{1,4}){1,4})|(([0-9A-Fa-f]{1,4}:){2}(:[0-9A-Fa-f]{1,4}){1,5})|([0-9A-Fa-f]{1,4}:(:[0-9A-Fa-f]{1,4}){1,6})|(:(:[0-9A-Fa-f]{1,4}){1,7})|(([0-9A-Fa-f]{1,4}:){6}(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|(([0-9A-Fa-f]{1,4}:){5}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|(([0-9A-Fa-f]{1,4}:){4}(:[0-9A-Fa-f]{1,4}){0,1}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|(([0-9A-Fa-f]{1,4}:){3}(:[0-9A-Fa-f]{1,4}){0,2}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|(([0-9A-Fa-f]{1,4}:){2}(:[0-9A-Fa-f]{1,4}){0,3}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|([0-9A-Fa-f]{1,4}:(:[0-9A-Fa-f]{1,4}){0,4}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3})|(:(:[0-9A-Fa-f]{1,4}){0,5}:(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}))$");
+        // ipv4
+        ipv4Pattern = Pattern.compile("^(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}$");
+    }
+
+
     /**
      * 判断输入字串是否符合用户名格式，6~20位(数字、字母、下划线)以字母开头
      *
@@ -643,7 +654,44 @@ public class MyStringUtils {
         return true;
     }
 
+    /**
+     * 是否是合法的ip地址，ipv4或ipv6
+     *
+     * @param ip 输入地址
+     * @return 是否合法
+     */
+    public static boolean isIpAddress(String ip){
+        return isIpv4Address(ip) || isIpv6Address(ip);
+    }
+
+    /**
+     * 是否是合法的ipv4地址
+     *
+     * @param ip 输入地址
+     * @return 是否合法
+     */
+    public static boolean isIpv4Address(String ip){
+        if (ip == null) {
+            return false;
+        }
+        return ipv4Pattern.matcher(ip).matches();
+    }
+
+    /**
+     * 是否是合法的ipv6地址
+     *
+     * @param ip 输入地址
+     * @return 是否合法
+     */
+    public static boolean isIpv6Address(String ip){
+        if (ip == null) {
+            return false;
+        }
+        return ipv6Pattern.matcher(ip).matches();
+
+    }
+
     public static void main(String[] args) {
-        System.out.println(MyStringUtils.isPassword("______"));
+        System.out.println(MyStringUtils.isIpv6Address("2001:0db8:85a3:000:0:8A2E:0370:7334"));
     }
 }

@@ -91,12 +91,13 @@ public class UserController extends AbstractController {
     /**
      * 上传头像
      *
+     * @param request
      * @param file
      * @return
      */
     @RequestMapping("/uploadUserIcon")
     @ResponseBody
-    public Map<String, Object> uploadUserIcon(@RequestParam(value = "file", required = false) MultipartFile file) {
+    public Map<String, Object> uploadUserIcon(HttpServletRequest request, @RequestParam(value = "file", required = false) MultipartFile file) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>(3);
 

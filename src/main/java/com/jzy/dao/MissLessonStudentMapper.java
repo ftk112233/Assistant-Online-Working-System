@@ -1,7 +1,7 @@
 package com.jzy.dao;
 
 import com.jzy.model.dto.MissLessonStudentDetailedDto;
-import com.jzy.model.dto.MissLessonStudentSearchCondition;
+import com.jzy.model.dto.search.MissLessonStudentSearchCondition;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

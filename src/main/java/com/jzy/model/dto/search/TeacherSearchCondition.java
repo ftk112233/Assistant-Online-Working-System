@@ -1,4 +1,4 @@
-package com.jzy.model.dto;
+package com.jzy.model.dto.search;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +14,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Data
-public class TeacherSearchCondition extends SearchCondition{
+public class TeacherSearchCondition extends SearchCondition {
     private static final long serialVersionUID = -2964583001985609828L;
 
     /**

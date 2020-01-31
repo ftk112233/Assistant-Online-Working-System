@@ -9,6 +9,8 @@ import com.jzy.manager.util.FileUtils;
 import com.jzy.manager.util.UserMessageUtils;
 import com.jzy.model.CampusEnum;
 import com.jzy.model.dto.*;
+import com.jzy.model.dto.search.UserMessageSearchCondition;
+import com.jzy.model.dto.search.UserSendToSearchCondition;
 import com.jzy.model.entity.User;
 import com.jzy.model.entity.UserMessage;
 import com.jzy.model.vo.ResultMap;

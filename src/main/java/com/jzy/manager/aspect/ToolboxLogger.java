@@ -1,14 +1,12 @@
 package com.jzy.manager.aspect;
 
 import com.jzy.model.entity.User;
-import com.jzy.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,11 +18,8 @@ import org.springframework.stereotype.Component;
  **/
 @Aspect
 @Component
-public class ToolboxLogger {
+public class ToolboxLogger extends AbstractLogger {
     private final static Logger logger = LogManager.getLogger(ToolboxLogger.class);
-
-    @Autowired
-    private UserService userService;
 
     /**
      * 导出助教工作手册的切面
@@ -59,7 +54,9 @@ public class ToolboxLogger {
     public void exportAssistantTutorialWithoutSeatTableLog(JoinPoint jp) {
         User user = userService.getSessionUserInfo();
         if (user != null) {
-            logger.info("用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")导出助教工作手册!");
+            String msg = "用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")导出助教工作手册!";
+            logger.info(msg);
+            saveLogToDatebase(msg, user, getIpAddress(jp));
         }
     }
 
@@ -67,7 +64,9 @@ public class ToolboxLogger {
     public void exportAssistantTutorialAndSeatTableLog(JoinPoint jp) {
         User user = userService.getSessionUserInfo();
         if (user != null) {
-            logger.info("用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")导出座位表!");
+            String msg = "用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")导出座位表!";
+            logger.info(msg);
+            saveLogToDatebase(msg, user, getIpAddress(jp));
         }
     }
 
@@ -75,7 +74,9 @@ public class ToolboxLogger {
     public void exportStudentPhoneToFormLog(JoinPoint jp) {
         User user = userService.getSessionUserInfo();
         if (user != null) {
-            logger.info("用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")导出学生联系方式到表单!");
+            String msg = "用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")导出学生联系方式到表单!";
+            logger.info(msg);
+            saveLogToDatebase(msg, user, getIpAddress(jp));
         }
     }
 
@@ -83,7 +84,9 @@ public class ToolboxLogger {
     public void exportStudentPhoneToExcelLog(JoinPoint jp) {
         User user = userService.getSessionUserInfo();
         if (user != null) {
-            logger.info("用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")导出学生联系方式到表格!");
+            String msg = "用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")导出学生联系方式到表格!";
+            logger.info(msg);
+            saveLogToDatebase(msg, user, getIpAddress(jp));
         }
     }
 }

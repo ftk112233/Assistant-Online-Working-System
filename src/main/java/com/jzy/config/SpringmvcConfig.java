@@ -19,11 +19,6 @@ public class SpringmvcConfig extends WebMvcConfigurerAdapter {
     public UpdateSessionUserInfoInterceptor updateSessionUserInfoInterceptor(){ return new UpdateSessionUserInfoInterceptor(); }
 
     @Bean
-    public ToolboxUploadCacheInterceptor toolboxUploadCacheInterceptor(){
-        return new ToolboxUploadCacheInterceptor();
-    }
-
-    @Bean
     public CsrfInterceptor csrfInterceptor(){
         return new CsrfInterceptor();
     }

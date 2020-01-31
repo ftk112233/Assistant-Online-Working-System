@@ -129,6 +129,37 @@ INSERT INTO `class` VALUES (353,'2020-01-11 14:35:37','2020-01-11 14:35:37','U6M
 UNLOCK TABLES;
 
 --
+-- Table structure for table `important_log`
+--
+
+DROP TABLE IF EXISTS `important_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `important_log` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `message` varchar(1000) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `level` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `operator_id` bigint(20) DEFAULT NULL,
+  `operator_ip` varchar(200) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `remark` varchar(500) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `log_user` (`operator_id`),
+  CONSTRAINT `log_user` FOREIGN KEY (`operator_id`) REFERENCES `user` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `important_log`
+--
+
+LOCK TABLES `important_log` WRITE;
+/*!40000 ALTER TABLE `important_log` DISABLE KEYS */;
+/*!40000 ALTER TABLE `important_log` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `miss_lesson_student`
 --
 
@@ -452,4 +483,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-01-29 17:07:08
+-- Dump completed on 2020-01-31 16:29:17

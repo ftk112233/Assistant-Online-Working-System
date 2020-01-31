@@ -6,7 +6,7 @@ import com.jzy.manager.constant.ModelConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.RoleAndPermissionUtils;
 import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.RoleAndPermissionSearchCondition;
+import com.jzy.model.dto.search.RoleAndPermissionSearchCondition;
 import com.jzy.model.entity.RoleAndPermission;
 import com.jzy.model.entity.User;
 import com.jzy.model.vo.ResultMap;

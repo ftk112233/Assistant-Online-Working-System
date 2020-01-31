@@ -3,7 +3,7 @@ package com.jzy.service;
 import com.github.pagehelper.PageInfo;
 import com.jzy.model.dto.DefaultFromExcelUpdateResult;
 import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.TeacherSearchCondition;
+import com.jzy.model.dto.search.TeacherSearchCondition;
 import com.jzy.model.dto.UpdateResult;
 import com.jzy.model.entity.Teacher;
 

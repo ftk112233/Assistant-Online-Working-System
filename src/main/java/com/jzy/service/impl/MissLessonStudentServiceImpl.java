@@ -5,7 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.jzy.dao.MissLessonStudentMapper;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.model.dto.MissLessonStudentDetailedDto;
-import com.jzy.model.dto.MissLessonStudentSearchCondition;
+import com.jzy.model.dto.search.MissLessonStudentSearchCondition;
 import com.jzy.model.dto.MyPage;
 import com.jzy.service.MissLessonStudentService;
 import org.apache.logging.log4j.LogManager;

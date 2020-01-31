@@ -1,8 +1,10 @@
 package com.jzy.config;
 
+import com.jzy.service.RedisOperation;
 import com.jzy.web.controller.ToolboxController;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,6 +20,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 @EnableScheduling
 public class ScheduleTask {
     private final static Logger logger = LogManager.getLogger(ScheduleTask.class);
+
+    @Autowired
+    private RedisOperation redisOperation;
 
     /**
      * 每天早上2点执行ToolboxController的cache自动清理

@@ -13,6 +13,8 @@ import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.*;
 import com.jzy.model.RoleEnum;
 import com.jzy.model.dto.*;
+import com.jzy.model.dto.search.UserSearchCondition;
+import com.jzy.model.dto.search.UserSendToSearchCondition;
 import com.jzy.model.entity.User;
 import com.jzy.model.entity.UserMessage;
 import com.jzy.service.UserService;

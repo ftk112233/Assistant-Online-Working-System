@@ -61,6 +61,11 @@ public final class ModelConstants {
     public static final String TYPES_MODEL_KEY = "types";
 
     /**
+     * 值为所有日志级别所对应的model键
+     */
+    public static final String LEVELS_MODEL_KEY = "levels";
+
+    /**
      * 值为当前年份所对应的model键
      *      改用对象{@link ClassSeasonDto}包装
      */

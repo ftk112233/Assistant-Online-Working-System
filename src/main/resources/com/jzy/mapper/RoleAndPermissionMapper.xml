@@ -63,7 +63,7 @@
         select perm from role_permisson where role=#{role}
     </select>
     <select id="listRoleAndPerms" resultMap="BaseResultMap"
-            parameterType="com.jzy.model.dto.RoleAndPermissionSearchCondition">
+            parameterType="com.jzy.model.dto.search.RoleAndPermissionSearchCondition">
         select * from role_permisson rp
         <where>
             <if test="role != null and role!=''">

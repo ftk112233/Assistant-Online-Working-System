@@ -103,6 +103,9 @@
                                 <a lay-href="${ctx}/console">控制台</a>
                             </dd>
                             <dd data-name="console">
+                                <a lay-href="${ctx}/visitorStatistics">访客量统计</a>
+                            </dd>
+                            <dd data-name="console">
                                 <a lay-href="${ctx}/problemCollection">问题收集</a>
                             </dd>
                         </dl>
@@ -248,6 +251,9 @@
                                 <dl class="layui-nav-child">
                                     <dd><a lay-href="${ctx}/system/announcement">公告推送</a></dd>
                                 </dl>
+                            </dd>
+                            <dd class="layui-nav-itemed">
+                                <a lay-href="${ctx}/importantLog/admin/page">日志管理</a>
                             </dd>
                         </dl>
                     </li>

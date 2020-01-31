@@ -198,7 +198,7 @@
             #{id}
         </foreach>
     </delete>
-    <delete id="deleteClassesByCondition" parameterType="com.jzy.model.dto.ClassSearchCondition">
+    <delete id="deleteClassesByCondition" parameterType="com.jzy.model.dto.search.ClassSearchCondition">
         delete c.* from class c left join assistant a on c.class_assistant_id = a.id left join teacher t on c.class_teacher_id = t.id
         <where>
             <if test="classYear != null and classYear!=''">
@@ -263,7 +263,7 @@
         select * from class where class_id=#{classId};
     </select>
     <select id="listClasses" resultMap="ClassDetailedResultMap"
-            parameterType="com.jzy.model.dto.ClassSearchCondition">
+            parameterType="com.jzy.model.dto.search.ClassSearchCondition">
       select class_tmp.*, count(sc.id) as class_student_count, cc.classroom_capacity as classroom_capacity
         from (select c.*, a.assistant_name as assistant_name, t.teacher_name as teacher_name
         from class c left join assistant a on c.class_assistant_id = a.id left join teacher t on c.class_teacher_id = t.id

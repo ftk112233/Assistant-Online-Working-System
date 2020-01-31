@@ -134,7 +134,7 @@
         select * from user where id=#{id};
     </select>
     <select id="listUsers" resultMap="BaseResultMap"
-            parameterType="com.jzy.model.dto.UserSearchCondition">
+            parameterType="com.jzy.model.dto.search.UserSearchCondition">
         select * from user u
         <where>
             <if test="userWorkId != null and userWorkId!=''">
@@ -206,7 +206,7 @@
         select * from user;
     </select>
     <select id="listUsersSendTo" resultMap="UserSendToResultMap"
-            parameterType="com.jzy.model.dto.UserSendToSearchCondition">
+            parameterType="com.jzy.model.dto.search.UserSendToSearchCondition">
         select u.*, a.assistant_campus as campus from user u left join assistant a on u.user_work_id=a.assistant_work_id
         <where>
             <if test="userRole != null and userRole!=''">

@@ -135,7 +135,7 @@
             #{id}
         </foreach>
     </delete>
-    <delete id="deleteStudentsByCondition" parameterType="com.jzy.model.dto.StudentSearchCondition">
+    <delete id="deleteStudentsByCondition" parameterType="com.jzy.model.dto.search.StudentSearchCondition">
         delete s.* from student s
         <where>
             <if test="studentId != null and studentId!=''">
@@ -166,7 +166,7 @@
         select * from student where student_id=#{studentId}
     </select>
     <select id="listStudents" resultMap="BaseResultMap"
-            parameterType="com.jzy.model.dto.StudentSearchCondition">
+            parameterType="com.jzy.model.dto.search.StudentSearchCondition">
         select * from student s
         <where>
             <if test="studentId != null and studentId!=''">
@@ -218,7 +218,7 @@
         </if>
     </select>
     <select id="listStudentsByStudentAndClassSearchCondition" resultMap="BaseResultMap"
-            parameterType="com.jzy.model.dto.StudentAndClassSearchCondition">
+            parameterType="com.jzy.model.dto.search.StudentAndClassSearchCondition">
        select s0.* from student s0 where s0.id in
         (select distinct s.id from (select c.id, a.assistant_name
         from class c left join assistant a on c.class_assistant_id = a.id

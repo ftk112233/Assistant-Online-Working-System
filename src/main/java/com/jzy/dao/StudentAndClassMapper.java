@@ -2,7 +2,7 @@ package com.jzy.dao;
 
 import com.jzy.model.dto.StudentAndClassDetailedDto;
 import com.jzy.model.dto.StudentAndClassDetailedWithSubjectsDto;
-import com.jzy.model.dto.StudentAndClassSearchCondition;
+import com.jzy.model.dto.search.StudentAndClassSearchCondition;
 import com.jzy.model.dto.echarts.GroupedByGradeObjectTotal;
 import com.jzy.model.dto.echarts.GroupedBySubjectObjectTotal;
 import com.jzy.model.dto.echarts.GroupedByTypeObjectTotal;

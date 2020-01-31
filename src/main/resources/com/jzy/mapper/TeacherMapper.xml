@@ -85,7 +85,7 @@
             #{id}
         </foreach>
     </delete>
-    <delete id="deleteTeachersByCondition" parameterType="com.jzy.model.dto.TeacherSearchCondition">
+    <delete id="deleteTeachersByCondition" parameterType="com.jzy.model.dto.search.TeacherSearchCondition">
         delete t.* from teacher t
         <where>
             <if test="teacherWorkId != null and teacherWorkId!=''">
@@ -115,7 +115,7 @@
         select * from teacher where id=#{id}
   </select>
     <select id="listTeachers" resultMap="BaseResultMap"
-            parameterType="com.jzy.model.dto.TeacherSearchCondition">
+            parameterType="com.jzy.model.dto.search.TeacherSearchCondition">
         select * from teacher t
         <where>
             <if test="teacherWorkId != null and teacherWorkId!=''">

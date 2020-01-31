@@ -415,7 +415,7 @@ public class AuthenticationController extends AbstractController {
      */
     @RequestMapping("/loginTestByEmailCode")
     @ResponseBody
-    public Map<String, Object> loginTestByEmailCode(@RequestParam(value = "emailVerifyCode", required = false) String emailVerifyCode, User user) {
+    public Map<String, Object> loginTestByEmailCode(@RequestParam(value = "emailVerifyCode", required = false) String emailVerifyCode, User user, HttpServletRequest request) {
         Map<String, Object> map = new HashMap(1);
         User userGetByEmail = userService.getUserByEmail(user.getUserEmail());
         if (userGetByEmail == null) {
@@ -487,7 +487,7 @@ public class AuthenticationController extends AbstractController {
      */
     @RequestMapping("/loginTestByQuestion")
     @ResponseBody
-    public Map<String, Object> loginTestByQuestion(@RequestParam("answer") String answer) {
+    public Map<String, Object> loginTestByQuestion(@RequestParam("answer") String answer, HttpServletRequest request) {
         Map<String, Object> map = new HashMap(1);
 
         String questionContent = (String) ShiroUtils.getSessionAttribute(SessionConstants.LOGIN_QUESTION_SESSION_KEY);

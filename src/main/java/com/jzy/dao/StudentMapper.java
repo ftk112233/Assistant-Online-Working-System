@@ -1,7 +1,7 @@
 package com.jzy.dao;
 
-import com.jzy.model.dto.StudentAndClassSearchCondition;
-import com.jzy.model.dto.StudentSearchCondition;
+import com.jzy.model.dto.search.StudentAndClassSearchCondition;
+import com.jzy.model.dto.search.StudentSearchCondition;
 import com.jzy.model.entity.Student;
 import org.apache.ibatis.annotations.Param;
 

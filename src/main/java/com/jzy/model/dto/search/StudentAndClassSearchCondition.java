@@ -1,21 +1,31 @@
-package com.jzy.model.dto;
+package com.jzy.model.dto.search;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * @ClassName ClassSearchCondition
+ * @ClassName StudentAndClassSearchCondition
  * @Author JinZhiyun
- * @Description 班级查询条件的封装
- * @Date 2019/11/25 11:10
+ * @Description 学生上课信息查询条件的封装
+ * @Date 2019/11/25 18:02
  * @Version 1.0
  **/
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Data
-public class ClassSearchCondition extends SearchCondition {
-    private static final long serialVersionUID = -5466160059919746687L;
+public class StudentAndClassSearchCondition extends SearchCondition {
+    private static final long serialVersionUID = 3988969329024041901L;
+
+    /**
+     * 学员号
+     */
+    private String studentId;
+
+    /**
+     * 学生姓名
+     */
+    private String studentName;
 
     /**
      * 班级编码，唯一，非空，长度小于32，2019年新东方优能中学部的班级编码为12位，U6MCFB020001，
@@ -70,9 +80,10 @@ public class ClassSearchCondition extends SearchCondition {
     private String classTime;
 
     /**
-     * 班级上课教室
+     * 班级上课上课教室
      */
     private String classroom;
+
 
     /**
      * 任课教师的工号
@@ -98,10 +109,5 @@ public class ClassSearchCondition extends SearchCondition {
      * 助教的姓名
      */
     private String assistantName;
-
-    /**
-     * 是否满班
-     */
-    private String isFull;
 
 }

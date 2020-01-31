@@ -1,5 +1,9 @@
 package com.jzy.manager.constant;
 
+import com.jzy.manager.util.MyTimeUtils;
+
+import java.util.Date;
+
 /**
  * @author JinZhiyun
  * @version 1.0
@@ -90,7 +94,89 @@ public final class RedisConstants {
     public static final long CURRENT_SEASON_EXPIRE = 180;
 
     /**
-     * 当前季度的缓存的键
+     * 小问题的缓存的键
      */
     public static final String QUESTION_KEY = ROOT_KEY + ":question";
+
+    /**
+     * 访客量统计的缓存的基键
+     */
+    private static final String VISITOR_STATISTICS_KEY = ROOT_KEY + ":visitorStatistic";
+
+    /**
+     * 访客量统计的缓存的过期时间，31天
+     */
+    public static final long VISITOR_STATISTICS_EXPIRE = 31;
+
+    /**
+     * 主页访客量统计的缓存的键
+     */
+    public static final String INDEX_VISITOR_STATISTICS_KEY = VISITOR_STATISTICS_KEY + ":index";
+
+    /**
+     * 获得今天的主页访客量统计的缓存的键
+     *
+     * @return 缓存的键
+     */
+    public static String getTodayIndexVisitorStatisticsKey() {
+        return getIndexVisitorStatisticsKey(new Date());
+    }
+
+    /**
+     * 获得指定date的主页访客量统计的缓存的键
+     *
+     * @param date date
+     * @return 缓存的键
+     */
+    public static String getIndexVisitorStatisticsKey(Date date) {
+        return INDEX_VISITOR_STATISTICS_KEY + ":" + MyTimeUtils.dateToStringYMD(date);
+    }
+
+    /**
+     * 信息管理区访客量统计的缓存的键
+     */
+    public static final String INFO_MANAGEMENT_VISITOR_STATISTICS_KEY = VISITOR_STATISTICS_KEY + ":infoManagement";
+
+    /**
+     * 获得今天的信息管理区访客量统计的缓存的键
+     *
+     * @return 缓存的键
+     */
+    public static String getTodayInfoManagementVisitorStatisticsKey() {
+        return getInfoManagementVisitorStatisticsKey(new Date());
+    }
+
+    /**
+     * 获得指定date的信息管理区访客量统计的缓存的键
+     *
+     * @param date date
+     * @return 缓存的键
+     */
+    public static String getInfoManagementVisitorStatisticsKey(Date date) {
+        return INFO_MANAGEMENT_VISITOR_STATISTICS_KEY + ":" + MyTimeUtils.dateToStringYMD(date);
+    }
+
+    /**
+     * 百宝箱区访客量统计的缓存的键
+     */
+    public static final String TOOLBOX_VISITOR_STATISTICS_KEY = VISITOR_STATISTICS_KEY + ":toolbox";
+
+    /**
+     * 获得今天的百宝箱区访客量统计的缓存的键
+     *
+     * @return 缓存的键
+     */
+    public static String getTodayToolboxVisitorStatisticsKey() {
+        return getToolboxVisitorStatisticsKey(new Date());
+    }
+
+    /**
+     * 获得指定date的百宝箱区访客量统计的缓存的键
+     *
+     * @param date date
+     * @return 缓存的键
+     */
+    public static String getToolboxVisitorStatisticsKey(Date date) {
+        return TOOLBOX_VISITOR_STATISTICS_KEY + ":" + MyTimeUtils.dateToStringYMD(date);
+    }
 }

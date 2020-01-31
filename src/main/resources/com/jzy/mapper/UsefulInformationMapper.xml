@@ -94,7 +94,7 @@
         select * from useful_information where belong_to=#{belongTo} order by sequence
     </select>
     <select id="listUsefulInformation" resultMap="BaseResultMap"
-            parameterType="com.jzy.model.dto.UsefulInformationSearchCondition">
+            parameterType="com.jzy.model.dto.search.UsefulInformationSearchCondition">
         select * from useful_information u
         <where>
             <if test="title != null and title!=''">

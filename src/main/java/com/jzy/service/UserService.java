@@ -4,6 +4,8 @@ import com.github.pagehelper.PageInfo;
 import com.jzy.manager.exception.InvalidEmailException;
 import com.jzy.manager.exception.InvalidFileInputException;
 import com.jzy.model.dto.*;
+import com.jzy.model.dto.search.UserSearchCondition;
+import com.jzy.model.dto.search.UserSendToSearchCondition;
 import com.jzy.model.entity.User;
 import org.springframework.web.multipart.MultipartFile;
 

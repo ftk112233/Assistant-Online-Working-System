@@ -1,6 +1,6 @@
 package com.jzy.dao;
 
-import com.jzy.model.dto.UsefulInformationSearchCondition;
+import com.jzy.model.dto.search.UsefulInformationSearchCondition;
 import com.jzy.model.entity.UsefulInformation;
 import org.apache.ibatis.annotations.Param;
 

@@ -7,6 +7,7 @@ import com.jzy.manager.exception.*;
 import com.jzy.manager.util.*;
 import com.jzy.model.CampusEnum;
 import com.jzy.model.dto.*;
+import com.jzy.model.dto.search.StudentAndClassSearchCondition;
 import com.jzy.model.entity.*;
 import com.jzy.model.entity.Class;
 import com.jzy.model.excel.Excel;
@@ -708,12 +709,14 @@ public class ToolboxController extends AbstractController {
     /**
      * 导入座位表模板。如果捕获异常，马上返回前端。
      *
-     * @param file 上传的表格
+     * @param file        上传的表格
+     * @param classCampus 选择导入的校区
+     * @param request
      * @return
      */
     @RequestMapping("/assistantAdministrator/seatTableTemplateImport")
     @ResponseBody
-    public Map<String, Object> seatTableTemplateImport(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "classCampus", required = false) String classCampus) {
+    public Map<String, Object> seatTableTemplateImport(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "classCampus", required = false) String classCampus, HttpServletRequest request) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>(3);
         //返回layui规定的文件上传模块JSON格式
@@ -928,6 +931,7 @@ public class ToolboxController extends AbstractController {
     /**
      * 导出学生联系方式到表单
      *
+     * @param request
      * @param condition  年份季度分期和助教姓名得我封装
      * @param namePrefix 导出姓名前缀
      * @param nameSuffix 导出姓名后缀
@@ -935,7 +939,7 @@ public class ToolboxController extends AbstractController {
      */
     @RequestMapping("/assistant/exportStudentPhoneToForm")
     @ResponseBody
-    public Map<String, Object> exportStudentPhoneToForm(StudentAndClassSearchCondition condition, @RequestParam("namePrefix") String namePrefix, @RequestParam("nameSuffix") String nameSuffix) {
+    public Map<String, Object> exportStudentPhoneToForm(HttpServletRequest request, StudentAndClassSearchCondition condition, @RequestParam("namePrefix") String namePrefix, @RequestParam("nameSuffix") String nameSuffix) {
         Map<String, Object> map = new HashMap<>(2);
         StringBuilder names = new StringBuilder();
         StringBuilder phones = new StringBuilder();

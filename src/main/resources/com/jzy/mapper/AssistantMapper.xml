@@ -103,7 +103,7 @@
             #{id}
         </foreach>
     </delete>
-    <delete id="deleteAssistantsByCondition" parameterType="com.jzy.model.dto.AssistantSearchCondition">
+    <delete id="deleteAssistantsByCondition" parameterType="com.jzy.model.dto.search.AssistantSearchCondition">
         delete a.* from assistant a
         <where>
             <if test="assistantWorkId != null and assistantWorkId!=''">
@@ -137,7 +137,7 @@
         select * from assistant where id=#{id}
     </select>
     <select id="listAssistants" resultMap="BaseResultMap"
-            parameterType="com.jzy.model.dto.AssistantSearchCondition">
+            parameterType="com.jzy.model.dto.search.AssistantSearchCondition">
         select * from assistant a
         <where>
             <if test="assistantWorkId != null and assistantWorkId!=''">

@@ -3,7 +3,6 @@ package com.jzy.manager.aspect;
 import com.jzy.manager.constant.RedisConstants;
 import com.jzy.model.entity.User;
 import com.jzy.service.RedisOperation;
-import com.jzy.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
@@ -22,14 +21,11 @@ import org.springframework.stereotype.Component;
  **/
 @Aspect
 @Component
-public class QuestionAspect {
+public class QuestionAspect extends AbstractLogger {
     private final static Logger logger = LogManager.getLogger(QuestionAspect.class);
 
     @Autowired
     private RedisOperation redisOperation;
-
-    @Autowired
-    private UserService userService;
 
     @Pointcut("execution(* com.jzy.service.QuestionService.insert*(..)) " +
             "|| execution(* com.jzy.service.QuestionService.update*(..))" +
@@ -52,7 +48,9 @@ public class QuestionAspect {
         redisOperation.expireKey(key);
         User user = userService.getSessionUserInfo();
         if (user != null) {
-            logger.info("用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")更新了懒癌登陆问题信息!");
+            String msg="用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")更新了懒癌登陆问题信息!";
+            logger.info(msg);
+            saveLogToDatebase(msg, user, getIpAddress(jp));
         }
     }
 

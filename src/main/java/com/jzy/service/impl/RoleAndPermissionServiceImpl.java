@@ -8,7 +8,7 @@ import com.jzy.dao.RoleAndPermissionMapper;
 import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.RoleAndPermissionSearchCondition;
+import com.jzy.model.dto.search.RoleAndPermissionSearchCondition;
 import com.jzy.model.entity.RoleAndPermission;
 import com.jzy.service.RoleAndPermissionService;
 import org.apache.commons.lang3.StringUtils;

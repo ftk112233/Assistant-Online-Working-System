@@ -8,6 +8,8 @@ import com.jzy.manager.util.ClassUtils;
 import com.jzy.manager.util.StudentUtils;
 import com.jzy.manager.util.UserMessageUtils;
 import com.jzy.model.dto.*;
+import com.jzy.model.dto.search.StudentAndClassSearchCondition;
+import com.jzy.model.dto.search.StudentSearchCondition;
 import com.jzy.model.entity.*;
 import com.jzy.model.entity.Class;
 import com.jzy.model.excel.Excel;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
 
@@ -43,18 +46,20 @@ public class StudentAdminController extends AbstractController {
     private final static Logger logger = LogManager.getLogger(StudentAdminController.class);
 
     /**
-     * 导入排班表
+     * 导入学生花名册
      *
-     * @param file 上传的文件
-     * @param type 选项：
-     *             1: 导入学生和上课信息
-     *             2: 导入学生详细信息带手机号
+     * @param file                              学生花名册excel
+     * @param deleteFirstChecked                是否打开先删后导
+     * @param manualDeleteFirstConditionChecked 是否打开手动选择删除条件
+     * @param type                              执行操作类型
+     * @param deleteCondition                   删除的条件
+     * @param request
      * @return
      */
     @RequestMapping("/import")
     @ResponseBody
     public Map<String, Object> importExcel(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "deleteFirst", required = false) boolean deleteFirstChecked, @RequestParam(value = "manualDeleteFirstCondition", required = false) boolean manualDeleteFirstConditionChecked
-            , @RequestParam(value = "type") Integer type, Class deleteCondition) {
+            , @RequestParam(value = "type") Integer type, Class deleteCondition, HttpServletRequest request) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>();
         //返回layui规定的文件上传模块JSON格式
@@ -242,7 +247,7 @@ public class StudentAdminController extends AbstractController {
     }
 
     /**
-     *  向指定开课年份季度分期和校区的用户（助教）发送学生花名册更新的通知
+     * 向指定开课年份季度分期和校区的用户（助教）发送学生花名册更新的通知
      *
      * @param clazz 从更新的记录中选取一个班级为例，取其开课年份季度分期和校区作为要通知的校区，clazz的其他信息也用于消息正文
      */
@@ -255,7 +260,7 @@ public class StudentAdminController extends AbstractController {
                 List<Assistant> assistants = assistantService.listAssistantsByClassSeasonAndCampus(classSeasonDto, campus);
                 List<Long> userIds = new ArrayList<>();
                 for (Assistant assistant : assistants) {
-                    User user=userService.getUserByWorkId(assistant.getAssistantWorkId());
+                    User user = userService.getUserByWorkId(assistant.getAssistantWorkId());
                     if (user != null) {
                         userIds.add(user.getId());
                     }
@@ -282,14 +287,15 @@ public class StudentAdminController extends AbstractController {
     }
 
     /**
-     * 导入学校统计
+     *  导入学校统计
      *
      * @param file
+     * @param request
      * @return
      */
     @RequestMapping("/importSchool")
     @ResponseBody
-    public Map<String, Object> importSchool(@RequestParam(value = "file", required = false) MultipartFile file) {
+    public Map<String, Object> importSchool(@RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>();
         //返回layui规定的文件上传模块JSON格式
@@ -364,7 +370,7 @@ public class StudentAdminController extends AbstractController {
             map.put("databaseSpeed", speedOfDatabaseImport);
 
             map.put("msg", msg);
-        }  catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             map.put("msg", FAILURE);
             return map;

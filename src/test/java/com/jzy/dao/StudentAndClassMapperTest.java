@@ -2,7 +2,7 @@ package com.jzy.dao;
 
 import com.jzy.BaseTest;
 import com.jzy.model.dto.StudentAndClassDetailedDto;
-import com.jzy.model.dto.StudentAndClassSearchCondition;
+import com.jzy.model.dto.search.StudentAndClassSearchCondition;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -1,6 +1,6 @@
 package com.jzy.dao;
 
-import com.jzy.model.dto.TeacherSearchCondition;
+import com.jzy.model.dto.search.TeacherSearchCondition;
 import com.jzy.model.entity.Teacher;
 import org.apache.ibatis.annotations.Param;
 

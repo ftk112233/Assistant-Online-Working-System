@@ -5,7 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.MissLessonStudentUtils;
 import com.jzy.model.dto.MissLessonStudentDetailedDto;
-import com.jzy.model.dto.MissLessonStudentSearchCondition;
+import com.jzy.model.dto.search.MissLessonStudentSearchCondition;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.entity.User;
 import com.jzy.model.vo.ResultMap;

@@ -9,6 +9,7 @@ import com.jzy.manager.constant.RedisConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.ClassUtils;
 import com.jzy.model.dto.*;
+import com.jzy.model.dto.search.ClassSearchCondition;
 import com.jzy.model.entity.Class;
 import com.jzy.service.ClassService;
 import org.apache.commons.lang3.StringUtils;

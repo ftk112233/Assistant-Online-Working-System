@@ -7,7 +7,7 @@ import com.jzy.manager.exception.InvalidFileInputException;
 import com.jzy.manager.util.FileUtils;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.UserMessageDto;
-import com.jzy.model.dto.UserMessageSearchCondition;
+import com.jzy.model.dto.search.UserMessageSearchCondition;
 import com.jzy.model.entity.UserMessage;
 import com.jzy.service.UserMessageService;
 import org.apache.commons.lang3.StringUtils;

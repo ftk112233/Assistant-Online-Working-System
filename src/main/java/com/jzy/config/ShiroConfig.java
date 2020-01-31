@@ -113,6 +113,7 @@ public class ShiroConfig {
         permissions.put("/user/message/all/**", "perms[user:message:all]"); //发全体消息，管理员和学管有
         permissions.put("/user/**", "perms[user:basic]"); //基本用户信息的操作，除游客外都有权限
         permissions.put("/permission/admin/**", "perms[permission:admin]"); //角色权限的权限，管理员才有
+        permissions.put("/importantLog/admin/**", "perms[importantLog:admin]"); //重要日志记录的权限，管理员才有
         permissions.put("/assistant/admin/**", "perms[assistant:admin]"); //管理助教的权限，助教长以上级别才有
         permissions.put("/teacher/admin/**", "perms[teacher:admin]"); //管理教师的权限，助教长以上级别才有
         permissions.put("/class/admin/update*", "perms[class:admin:update]"); //编辑班级的权限，助教长以上级别才有

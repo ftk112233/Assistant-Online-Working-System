@@ -4,7 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.jzy.manager.exception.InvalidFileInputException;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.UserMessageDto;
-import com.jzy.model.dto.UserMessageSearchCondition;
+import com.jzy.model.dto.search.UserMessageSearchCondition;
 import com.jzy.model.entity.UserMessage;
 import org.springframework.web.multipart.MultipartFile;
 

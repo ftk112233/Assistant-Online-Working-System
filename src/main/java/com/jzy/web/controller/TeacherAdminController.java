@@ -5,7 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.TeacherUtils;
 import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.TeacherSearchCondition;
+import com.jzy.model.dto.search.TeacherSearchCondition;
 import com.jzy.model.entity.Teacher;
 import com.jzy.model.vo.ResultMap;
 import org.apache.logging.log4j.LogManager;

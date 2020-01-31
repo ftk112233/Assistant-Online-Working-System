@@ -1,4 +1,4 @@
-package com.jzy.model.dto;
+package com.jzy.model.dto.search;
 
 import lombok.Data;
 

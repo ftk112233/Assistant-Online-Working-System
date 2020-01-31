@@ -1,7 +1,7 @@
 package com.jzy.dao;
 
-import com.jzy.model.dto.UserSearchCondition;
-import com.jzy.model.dto.UserSendToSearchCondition;
+import com.jzy.model.dto.search.UserSearchCondition;
+import com.jzy.model.dto.search.UserSendToSearchCondition;
 import com.jzy.model.entity.User;
 import com.jzy.model.dto.UserSendTo;
 import org.apache.ibatis.annotations.Param;

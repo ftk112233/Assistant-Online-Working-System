@@ -38,15 +38,15 @@ public class EchartsFactory implements Serializable {
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
     @Data
-    private static class SeriesWithAxis extends Series {
+    public static class MixLineBarSeries extends Series {
         private int yAxisIndex;
 
-        public SeriesWithAxis(String type, String name) {
+        public MixLineBarSeries(String type, String name) {
             this.type = type;
             this.name = name;
         }
 
-        public SeriesWithAxis(String type, String name, int yAxisIndex, List<Long> data) {
+        public MixLineBarSeries(String type, String name, int yAxisIndex, List<Long> data) {
             this.type = type;
             this.name = name;
             this.yAxisIndex = yAxisIndex;
@@ -54,9 +54,32 @@ public class EchartsFactory implements Serializable {
         }
     }
 
+    @EqualsAndHashCode(callSuper = true)
+    @ToString(callSuper = true)
+    @Data
+    public static class LineStackSeries extends Series {
+        private boolean smooth;
 
-    public static SeriesWithAxis getSeriesWithAxis(String name, List<Long> data) {
-        return new SeriesWithAxis("line", name, 1, data);
+        public LineStackSeries(String type, String name) {
+            this.type = type;
+            this.name = name;
+        }
+
+        public LineStackSeries(String type, String name, boolean smooth, List<Long> data) {
+            this.type = type;
+            this.name = name;
+            this.smooth = smooth;
+            this.data = data;
+        }
+
+    }
+
+    public static LineStackSeries getLineStackSeries(String name, boolean smooth, List<Long> data) {
+        return new LineStackSeries("line", name, smooth, data);
+    }
+
+    public static MixLineBarSeries getMixLineBarSeries(String name, List<Long> data) {
+        return new MixLineBarSeries("line", name, 1, data);
     }
 
     public static Series getSeries(String name, List<Long> data) {

@@ -6,7 +6,7 @@ import com.jzy.manager.constant.Constants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.QuestionUtils;
 import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.QuestionSearchCondition;
+import com.jzy.model.dto.search.QuestionSearchCondition;
 import com.jzy.model.dto.QuestionWithCreatorDto;
 import com.jzy.model.entity.Question;
 import com.jzy.model.vo.ResultMap;

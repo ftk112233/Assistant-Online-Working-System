@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.jzy.manager.constant.ModelConstants;
 import com.jzy.model.CampusEnum;
 import com.jzy.model.TypeEnum;
-import com.jzy.model.dto.StudentAndClassSearchCondition;
+import com.jzy.model.dto.search.StudentAndClassSearchCondition;
 import com.jzy.model.dto.echarts.GroupedByGradeAndTypeObjectTotal;
 import com.jzy.model.dto.echarts.GroupedBySubjectAndTypeObjectTotal;
 import com.jzy.model.dto.echarts.GroupedByTypeObjectTotal;
@@ -191,7 +191,7 @@ public class SeniorController extends AbstractController {
         map.put("legendData", legendData);
         map.put("xAxisData", xAxisData);
 
-        series.add(EchartsFactory.getSeriesWithAxis("总学生数", seriesLastData));
+        series.add(EchartsFactory.getMixLineBarSeries("总学生数", seriesLastData));
         map.put("series", series);
         return map;
     }
@@ -269,7 +269,7 @@ public class SeniorController extends AbstractController {
         map.put("legendData", legendData);
         map.put("xAxisData", xAxisData);
 
-        series.add(EchartsFactory.getSeriesWithAxis("总学生数", seriesLastData));
+        series.add(EchartsFactory.getMixLineBarSeries("总学生数", seriesLastData));
         map.put("series", series);
         return map;
     }

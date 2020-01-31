@@ -10,7 +10,7 @@ import com.jzy.model.CampusEnum;
 import com.jzy.model.dto.ClassSeasonDto;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.dto.StudentAndClassDetailedDto;
-import com.jzy.model.dto.StudentAndClassSearchCondition;
+import com.jzy.model.dto.search.StudentAndClassSearchCondition;
 import com.jzy.model.entity.Class;
 import com.jzy.model.vo.ResultMap;
 import org.apache.commons.lang3.StringUtils;

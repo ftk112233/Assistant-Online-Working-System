@@ -6,7 +6,7 @@ import com.jzy.manager.constant.ModelConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.AssistantUtils;
 import com.jzy.model.CampusEnum;
-import com.jzy.model.dto.AssistantSearchCondition;
+import com.jzy.model.dto.search.AssistantSearchCondition;
 import com.jzy.model.dto.MyPage;
 import com.jzy.model.entity.Assistant;
 import com.jzy.model.vo.ResultMap;

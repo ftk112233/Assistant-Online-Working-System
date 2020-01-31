@@ -2,7 +2,6 @@ package com.jzy.manager.aspect;
 
 import com.jzy.manager.constant.Constants;
 import com.jzy.model.entity.User;
-import com.jzy.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,7 +10,6 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -25,11 +23,8 @@ import java.util.Map;
  **/
 @Aspect
 @Component
-public class UserAspect {
+public class UserAspect extends AbstractLogger {
     private final static Logger logger = LogManager.getLogger(UserAspect.class);
-
-    @Autowired
-    private UserService userService;
 
     @Pointcut("execution(* com.jzy.web.controller.UserController.update*(..)) " +
             "|| execution(* com.jzy.web.controller.UserController.add*(..))" +
@@ -58,7 +53,9 @@ public class UserAspect {
         String methodName = signature.getDeclaringTypeName() + "." + signature.getName();
         User user = userService.getSessionUserInfo();
         if (user != null) {
-            logger.info("用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")更新了用户的资料。请求方法：" + methodName);
+            String msg = "用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")更新了用户的资料。请求方法：" + methodName;
+            logger.info(msg);
+            saveLogToDatebase(msg, user, getIpAddress(jp));
         }
     }
 
@@ -75,7 +72,9 @@ public class UserAspect {
         if (!StringUtils.isEmpty(fileName)) {
             User user = userService.getSessionUserInfo();
             if (user != null) {
-                logger.info("用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")上传了头像。头像文件名：" + fileName);
+                String msg = "用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")上传了头像。头像文件名：" + fileName;
+                logger.info(msg);
+                saveLogToDatebase(msg, user, getIpAddress(jp));
             }
         }
     }

@@ -11,7 +11,7 @@ import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.FileUtils;
 import com.jzy.model.CampusEnum;
 import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.UsefulInformationSearchCondition;
+import com.jzy.model.dto.search.UsefulInformationSearchCondition;
 import com.jzy.model.entity.UsefulInformation;
 import com.jzy.model.entity.User;
 import com.jzy.service.UsefulInformationService;

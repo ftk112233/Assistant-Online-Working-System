@@ -1,6 +1,6 @@
 package com.jzy.dao;
 
-import com.jzy.model.dto.QuestionSearchCondition;
+import com.jzy.model.dto.search.QuestionSearchCondition;
 import com.jzy.model.dto.QuestionWithCreatorDto;
 import com.jzy.model.entity.Question;
 import org.apache.ibatis.annotations.Param;

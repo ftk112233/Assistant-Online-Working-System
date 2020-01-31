@@ -2,7 +2,7 @@ package com.jzy.service;
 
 import com.github.pagehelper.PageInfo;
 import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.RoleAndPermissionSearchCondition;
+import com.jzy.model.dto.search.RoleAndPermissionSearchCondition;
 import com.jzy.model.entity.RoleAndPermission;
 
 import java.util.List;

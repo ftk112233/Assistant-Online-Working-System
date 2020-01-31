@@ -4,14 +4,12 @@ import com.jzy.manager.constant.Constants;
 import com.jzy.model.entity.User;
 import com.jzy.model.vo.Speed;
 import com.jzy.model.vo.SqlProceedSpeed;
-import com.jzy.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -25,7 +23,7 @@ import java.util.Map;
  **/
 @Aspect
 @Component
-public class DataImportLogger {
+public class DataImportLogger extends AbstractLogger {
     private final static Logger logger = LogManager.getLogger(DataImportLogger.class);
 
     private static final String EXCEL_SPEED = "excelSpeed";
@@ -35,9 +33,6 @@ public class DataImportLogger {
     private static final String INVALID_COUNT = "invalidCount";
 
     private static final String WHAT_INVALID = "whatInvalid";
-
-    @Autowired
-    private UserService userService;
 
     /**
      * 导入助教信息的切面
@@ -77,56 +72,64 @@ public class DataImportLogger {
     /**
      * 助教和用户导入日志记录，仅输出"成功"和"需要引起注意的"
      *
-     * @param jp 连接点
+     * @param jp  连接点
      * @param map 原方法的返回值，json
      */
     @AfterReturning(returning = "map", pointcut = "importAssistantExcelPoint()")
     public void importAssistantExcelLog(JoinPoint jp, Map<String, Object> map) {
         User user = userService.getSessionUserInfo();
         if (user != null) {
-            logger.info("用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")助教信息导入" + calculableImportSuccessMsg(map));
+            String msg = "用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")助教信息导入" + calculableImportSuccessMsg(map);
+            logger.info(msg);
+            saveLogToDatebase(msg, user, getIpAddress(jp));
         }
     }
 
     /**
      * 排班导入日志记录，仅输出"成功"和"需要引起注意的"
      *
-     * @param jp 连接点
+     * @param jp  连接点
      * @param map 原方法的返回值，json
      */
     @AfterReturning(returning = "map", pointcut = "importClassExcelPoint()")
     public void importClassExcelLog(JoinPoint jp, Map<String, Object> map) {
         User user = userService.getSessionUserInfo();
         if (user != null) {
-            logger.info("用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")排班信息导入" + calculableImportSuccessMsg(map));
+            String msg = "用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")排班信息导入" + calculableImportSuccessMsg(map);
+            logger.info(msg);
+            saveLogToDatebase(msg, user, getIpAddress(jp));
         }
     }
 
     /**
      * 花名册导入日志记录，仅输出"成功"和"需要引起注意的"
      *
-     * @param jp 连接点
+     * @param jp  连接点
      * @param map 原方法的返回值，json
      */
     @AfterReturning(returning = "map", pointcut = "importStudentExcelPoint()")
     public void importStudentExcelLog(JoinPoint jp, Map<String, Object> map) {
         User user = userService.getSessionUserInfo();
         if (user != null) {
-            logger.info("用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")花名册学生信息导入" + calculableImportSuccessMsg(map));
+            String msg = "用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")花名册学生信息导入" + calculableImportSuccessMsg(map);
+            logger.info(msg);
+            saveLogToDatebase(msg, user, getIpAddress(jp));
         }
     }
 
     /**
      * 学校统计导入日志记录，仅输出"成功"和"需要引起注意的"
      *
-     * @param jp 连接点
+     * @param jp  连接点
      * @param map 原方法的返回值，json
      */
     @AfterReturning(returning = "map", pointcut = "importStudentSchoolExcelPoint()")
     public void importStudentSchoolExcelLog(JoinPoint jp, Map<String, Object> map) {
         User user = userService.getSessionUserInfo();
         if (user != null) {
-            logger.info("用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")学生学校统计信息导入" + calculableImportSuccessMsg(map));
+            String msg = "用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")学生学校统计信息导入" + calculableImportSuccessMsg(map);
+            logger.info(msg);
+            saveLogToDatebase(msg, user, getIpAddress(jp));
         }
     }
 
@@ -172,14 +175,16 @@ public class DataImportLogger {
     /**
      * 座位表导入日志记录
      *
-     * @param jp 连接点
+     * @param jp  连接点
      * @param map 原方法的返回值，json
      */
     @AfterReturning(returning = "map", pointcut = "importSeatTableTemplatePoint()")
     public void importSeatTableTemplateLog(JoinPoint jp, Map<String, Object> map) {
         User user = userService.getSessionUserInfo();
         if (user != null) {
-            logger.info("用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")座位表模板导入" + generalImportSuccessMsg(map));
+            String msg = "用户(姓名=" + user.getUserRealName() + ", id=" + user.getId() + ")座位表模板导入" + generalImportSuccessMsg(map);
+            logger.info(msg);
+            saveLogToDatebase(msg, user, getIpAddress(jp));
         }
     }
 

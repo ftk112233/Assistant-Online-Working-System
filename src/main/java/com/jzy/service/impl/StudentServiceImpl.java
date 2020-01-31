@@ -8,6 +8,8 @@ import com.jzy.manager.constant.ExcelConstants;
 import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.StudentUtils;
 import com.jzy.model.dto.*;
+import com.jzy.model.dto.search.StudentAndClassSearchCondition;
+import com.jzy.model.dto.search.StudentSearchCondition;
 import com.jzy.model.entity.Student;
 import com.jzy.service.StudentService;
 import org.apache.commons.lang3.StringUtils;

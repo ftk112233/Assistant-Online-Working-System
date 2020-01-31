@@ -9,6 +9,7 @@ import com.jzy.manager.exception.InvalidParameterException;
 import com.jzy.manager.util.StudentAndClassUtils;
 import com.jzy.model.dto.*;
 import com.jzy.model.dto.echarts.*;
+import com.jzy.model.dto.search.StudentAndClassSearchCondition;
 import com.jzy.model.entity.Class;
 import com.jzy.model.entity.StudentAndClass;
 import com.jzy.model.vo.echarts.NamesAndValues;

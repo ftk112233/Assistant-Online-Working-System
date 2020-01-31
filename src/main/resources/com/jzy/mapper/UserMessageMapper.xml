@@ -127,7 +127,7 @@
         select count(*) from user_message um  where um.user_id=#{userId} and um.read=#{read}
     </select>
     <select id="listUserMessages" resultMap="UserMessageDtoResultMap"
-            parameterType="com.jzy.model.dto.UserMessageSearchCondition">
+            parameterType="com.jzy.model.dto.search.UserMessageSearchCondition">
         select um.*, u_from.user_role as user_from_role, u_from.user_real_name as user_from_real_name, u_from.user_icon as user_from_icon,
         CONCAT_WS('-', u_from.user_role,u_from.user_real_name) as user_from
         from user_message um left join user u_from on um.user_from_id=u_from.id

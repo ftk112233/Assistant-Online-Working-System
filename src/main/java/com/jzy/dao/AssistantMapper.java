@@ -1,6 +1,6 @@
 package com.jzy.dao;
 
-import com.jzy.model.dto.AssistantSearchCondition;
+import com.jzy.model.dto.search.AssistantSearchCondition;
 import com.jzy.model.dto.ClassSeasonDto;
 import com.jzy.model.entity.Assistant;
 import org.apache.ibatis.annotations.Param;

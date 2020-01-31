@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jzy.dao.ImportantLogMapper">
+    <resultMap id="BaseColumnResultMap" type="com.jzy.model.entity.BaseEntity">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap" type="com.jzy.model.entity.ImportantLog" extends="BaseColumnResultMap">
+        <result column="message" property="message" jdbcType="VARCHAR"/>
+        <result column="level" property="level" jdbcType="VARCHAR"/>
+        <result column="operator_id" property="operatorId" jdbcType="BIGINT"/>
+        <result column="operator_ip" property="operatorIp" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="LogDetailedResultMap" type="com.jzy.model.dto.ImportantLogDetailedDto" extends="BaseResultMap">
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="user_real_name" property="userRealName" jdbcType="VARCHAR"/>
+        <result column="user_role" property="userRole" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <insert id="insertOneImportantLog" parameterType="com.jzy.model.entity.ImportantLog">
+        insert into important_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="message != null and message!=''">
+                message,
+            </if>
+            <if test="level != null and level!=''">
+                level,
+            </if>
+            <if test="operatorId != null">
+                operator_id,
+            </if>
+            <if test="operatorIp != null and operatorIp!=''">
+                operator_ip,
+            </if>
+            <if test="remark != null and remark!=''">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="message != null and message!=''">
+                #{message},
+            </if>
+            <if test="level != null and level!=''">
+                #{level},
+            </if>
+            <if test="operatorId != null">
+                #{operatorId},
+            </if>
+            <if test="operatorIp != null and operatorIp!=''">
+                #{operatorIp},
+            </if>
+            <if test="remark != null and remark!=''">
+                #{remark},
+            </if>
+        </trim>
+    </insert>
+    <delete id="deleteManyImportantLogByIds">
+        delete from important_log where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteImportantLogByCondition"
+            parameterType="com.jzy.model.dto.search.ImportantLogSearchCondition">
+        delete l.* from important_log l left join user u on l.operator_id=u.id
+        <where>
+            <if test="userRole != null and userRole!=''">
+                and u.user_role=#{userRole}
+            </if>
+            <if test="commonSearchUser != null and commonSearchUser!=''">
+                <bind name="commonSearchUserLike" value=" '%' + commonSearchUser + '%' "/>
+                and (u.user_work_id COLLATE utf8_general_ci like #{commonSearchUserLike}
+                or u.user_id_card COLLATE utf8_general_ci like #{commonSearchUserLike}
+                or u.user_name COLLATE utf8_general_ci like #{commonSearchUserLike}
+                or u.user_real_name COLLATE utf8_general_ci like #{commonSearchUserLike}
+                or u.user_email COLLATE utf8_general_ci like #{commonSearchUserLike}
+                or u.user_phone COLLATE utf8_general_ci like #{commonSearchUserLike})
+            </if>
+            <if test="message != null and message!=''">
+                <bind name="messageLike" value=" '%' + message + '%' "/>
+                and l.message like #{messageLike}
+            </if>
+            <if test="level != null and level!=''">
+                and l.level=#{level}
+            </if>
+            <if test="operatorIp != null and operatorIp!=''">
+                <bind name="operatorIpLike" value=" '%' + operatorIp + '%' "/>
+                and l.operator_ip like #{operatorIpLike}
+            </if>
+        </where>
+    </delete>
+    <select id="listImportantLog" resultMap="LogDetailedResultMap"
+            parameterType="com.jzy.model.dto.search.ImportantLogSearchCondition">
+        select l.*, u.user_name, u.user_real_name, u.user_role from important_log l left join user u on l.operator_id=u.id
+        <where>
+            <if test="userRole != null and userRole!=''">
+                and u.user_role=#{userRole}
+            </if>
+            <if test="commonSearchUser != null and commonSearchUser!=''">
+                <bind name="commonSearchUserLike" value=" '%' + commonSearchUser + '%' "/>
+                and (u.user_work_id COLLATE utf8_general_ci like #{commonSearchUserLike}
+                or u.user_id_card COLLATE utf8_general_ci like #{commonSearchUserLike}
+                or u.user_name COLLATE utf8_general_ci like #{commonSearchUserLike}
+                or u.user_real_name COLLATE utf8_general_ci like #{commonSearchUserLike}
+                or u.user_email COLLATE utf8_general_ci like #{commonSearchUserLike}
+                or u.user_phone COLLATE utf8_general_ci like #{commonSearchUserLike})
+            </if>
+            <if test="message != null and message!=''">
+                <bind name="messageLike" value=" '%' + message + '%' "/>
+                and l.message like #{messageLike}
+            </if>
+            <if test="level != null and level!=''">
+                and l.level=#{level}
+            </if>
+            <if test="operatorIp != null and operatorIp!=''">
+                <bind name="operatorIpLike" value=" '%' + operatorIp + '%' "/>
+                and l.operator_ip like #{operatorIpLike}
+            </if>
+        </where>
+        <if test="condition1 == 'level'">
+            order by l.level
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'operatorId'">
+            order by l.operator_id
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+        <if test="condition1 == 'operatorIp'">
+            order by l.operator_ip
+            <if test="condition2 == 'asc'">
+                asc
+            </if>
+            <if test="condition2 == 'desc'">
+                desc
+            </if>
+        </if>
+    </select>
+
+</mapper>

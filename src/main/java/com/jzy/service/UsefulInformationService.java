@@ -3,7 +3,7 @@ package com.jzy.service;
 import com.github.pagehelper.PageInfo;
 import com.jzy.manager.exception.InvalidFileInputException;
 import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.UsefulInformationSearchCondition;
+import com.jzy.model.dto.search.UsefulInformationSearchCondition;
 import com.jzy.model.entity.UsefulInformation;
 import org.springframework.web.multipart.MultipartFile;
 

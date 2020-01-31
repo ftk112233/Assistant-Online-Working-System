@@ -9,7 +9,7 @@ import com.jzy.manager.util.UserUtils;
 import com.jzy.model.RoleEnum;
 import com.jzy.model.dto.DefaultFromExcelUpdateResult;
 import com.jzy.model.dto.MyPage;
-import com.jzy.model.dto.UserSearchCondition;
+import com.jzy.model.dto.search.UserSearchCondition;
 import com.jzy.model.entity.User;
 import com.jzy.model.excel.Excel;
 import com.jzy.model.excel.ExcelVersionEnum;
@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -327,11 +328,12 @@ public class UserAdminController extends AbstractController {
      * @param file 上传的表格
      * @param type 1表示仅导入用户
      *             2表示导入用户和助教
+     * @param request
      * @return
      */
     @RequestMapping("/import")
     @ResponseBody
-    public Map<String, Object> importExcel(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "type") Integer type) {
+    public Map<String, Object> importExcel(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "type") Integer type, HttpServletRequest request) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>();
         //返回layui规定的文件上传模块JSON格式

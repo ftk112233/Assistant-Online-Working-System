@@ -120,7 +120,7 @@
         </foreach>
     </delete>
     <delete id="deleteStudentAndClassesByCondition"
-            parameterType="com.jzy.model.dto.StudentAndClassSearchCondition">
+            parameterType="com.jzy.model.dto.search.StudentAndClassSearchCondition">
         delete sc.* from (select c.*, a.assistant_name as assistant_name, t.teacher_name as teacher_name
         from class c left join assistant a on c.class_assistant_id = a.id left join teacher t on c.class_teacher_id = t.id
         <where>
@@ -197,7 +197,7 @@
           inner join class c on s_c.class_id = c.id and c.class_id=#{classId}
     </select>
     <select id="listStudentAndClasses" resultMap="StudentAndClassDetailedResultMap"
-            parameterType="com.jzy.model.dto.StudentAndClassSearchCondition">
+            parameterType="com.jzy.model.dto.search.StudentAndClassSearchCondition">
         select sc.id, sc.create_time, sc.update_time,sc.register_time,sc.remark,
           s.student_id,s.student_name,s.student_sex,s.student_phone,s.student_phone_backup,s.student_school,
           class_tmp.class_id,class_tmp.class_name,class_tmp.class_campus,class_tmp.class_grade,class_tmp.class_subject,
@@ -351,7 +351,7 @@
         order by sc.register_time asc
     </select>
     <select id="listStudentAndClassesWithSubjectsByStudentId"
-            resultMap="StudentAndClassDetailedResultMap" parameterType="com.jzy.model.dto.StudentAndClassSearchCondition">
+            resultMap="StudentAndClassDetailedResultMap" parameterType="com.jzy.model.dto.search.StudentAndClassSearchCondition">
         select sc.id, sc.create_time, sc.update_time,sc.register_time,sc.remark,
         s.student_id,s.student_name,s.student_sex,s.student_phone,s.student_phone_backup,s.student_school,
         c.class_id,c.class_name,c.class_campus,c.class_grade,c.class_subject,
@@ -373,7 +373,7 @@
         </where>
     </select>
     <select id="countStudentsGroupByClassGrade" resultType="com.jzy.model.dto.echarts.GroupedByGradeObjectTotal"
-            parameterType="com.jzy.model.dto.StudentAndClassSearchCondition">
+            parameterType="com.jzy.model.dto.search.StudentAndClassSearchCondition">
         select c.class_grade as name, count(distinct sc.student_id) as value from class c inner join student_class sc on c.id = sc.class_id
         <where>
             <if test="classYear != null and classYear!=''">
@@ -392,7 +392,7 @@
          group by c.class_grade
     </select>
     <select id="countStudentsGroupByClassSubject" resultType="com.jzy.model.dto.echarts.GroupedBySubjectObjectTotal"
-            parameterType="com.jzy.model.dto.StudentAndClassSearchCondition">
+            parameterType="com.jzy.model.dto.search.StudentAndClassSearchCondition">
         select c.class_subject as name, count(sc.student_id) as value from class c inner join student_class sc on c.id = sc.class_id
         <where>
             <if test="classYear != null and classYear!=''">
@@ -411,7 +411,7 @@
         group by c.class_subject
     </select>
     <select id="countStudentsGroupByClassType" resultType="com.jzy.model.dto.echarts.GroupedByTypeObjectTotal"
-            parameterType="com.jzy.model.dto.StudentAndClassSearchCondition">
+            parameterType="com.jzy.model.dto.search.StudentAndClassSearchCondition">
         select c.class_type as name, count(sc.student_id) as value from class c inner join student_class sc on c.id = sc.class_id
         <where>
             <if test="classYear != null and classYear!=''">
@@ -436,7 +436,7 @@
         group by c.class_type
     </select>
     <select id="countStudentAndClassBySeasonAndAssistant" resultType="long"
-            parameterType="com.jzy.model.dto.StudentAndClassSearchCondition">
+            parameterType="com.jzy.model.dto.search.StudentAndClassSearchCondition">
         select count(*)
         from (select c.id, a.assistant_name
         from class c left join assistant a on c.class_assistant_id = a.id

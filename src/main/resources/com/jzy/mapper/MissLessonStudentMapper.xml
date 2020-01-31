@@ -119,7 +119,7 @@
         </foreach>
     </delete>
     <select id="listMissLessonStudents" resultMap="MissLessonStudentDetailedResultMap"
-            parameterType="com.jzy.model.dto.MissLessonStudentSearchCondition">
+            parameterType="com.jzy.model.dto.search.MissLessonStudentSearchCondition">
         select tmp.*, a1.assistant_name as original_assistant_name, t1.teacher_name as original_teacher_name,
         a2.assistant_name as current_assistant_name, t2.teacher_name as current_teacher_name
         from (select m_l_s.id, m_l_s.create_time,

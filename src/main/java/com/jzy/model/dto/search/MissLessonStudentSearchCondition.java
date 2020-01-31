@@ -1,4 +1,4 @@
-package com.jzy.model.dto;
+package com.jzy.model.dto.search;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -18,7 +18,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Data
-public class MissLessonStudentSearchCondition extends SearchCondition{
+public class MissLessonStudentSearchCondition extends SearchCondition {
     private static final long serialVersionUID = -1052808763185112629L;
 
     /**

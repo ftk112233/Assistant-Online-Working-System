@@ -9,6 +9,7 @@ import com.jzy.manager.util.ClassUtils;
 import com.jzy.manager.util.UserMessageUtils;
 import com.jzy.model.CampusEnum;
 import com.jzy.model.dto.*;
+import com.jzy.model.dto.search.ClassSearchCondition;
 import com.jzy.model.entity.Assistant;
 import com.jzy.model.entity.Class;
 import com.jzy.model.entity.User;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
 
@@ -59,12 +61,13 @@ public class ClassAdminController extends AbstractController {
      * @param deleteFirstChecked  是否开启先删后导
      * @param chooseSeason        是否开启智能校历
      * @param clazz               开班年份、季度、分期、校区信息的封装
+     * @param request
      * @return [更新结果, [更新条数，速度]]
      */
     @RequestMapping("/import")
     @ResponseBody
     public Map<String, Object> importExcel(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam("parseClassId") boolean parseClassIdChecked,
-                                           @RequestParam("deleteFirst") boolean deleteFirstChecked, @RequestParam("chooseSeason") boolean chooseSeason, Class clazz) {
+                                           @RequestParam("deleteFirst") boolean deleteFirstChecked, @RequestParam("chooseSeason") boolean chooseSeason, Class clazz, HttpServletRequest request) {
         Map<String, Object> map2 = new HashMap<>(1);
         Map<String, Object> map = new HashMap<>();
         //返回layui规定的文件上传模块JSON格式
